@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: status of the online search section: offer, loading, nothing found, error. -->
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:orientation="vertical"
+  android:paddingStart="@dimen/margin_half_double_plus"
+  android:paddingEnd="@dimen/margin_half_double_plus"
+  android:paddingTop="@dimen/margin_half"
+  android:paddingBottom="@dimen/margin_half">
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+      android:id="@+id/online_search_progress"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="@dimen/margin_half"
+      android:indeterminate="true"
+      android:visibility="gone"
+      tools:visibility="visible"
+      android:importantForAccessibility="no"
+      app:indicatorSize="18dp" />
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/online_search_message"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:textAlignment="viewStart"
+      android:textAppearance="@style/MwmTextAppearance.Body3"
+      tools:text="@string/online_search_offer" />
+  </LinearLayout>
+
+  <com.google.android.material.button.MaterialButton
+    android:id="@+id/online_search_action"
+    style="@style/Widget.Material3.Button.TonalButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/margin_quarter"
+    android:textAllCaps="false"
+    android:visibility="gone"
+    tools:visibility="visible"
+    tools:text="@string/online_search_offer_button" />
+</LinearLayout>

@@ -25,6 +25,13 @@
     android:summary="@string/transit_settings_summary" />
 
   <PreferenceScreen
+    android:key="pref_screen_online_search"
+    android:title="@string/online_search_settings_title"
+    app:fragment="app.organicmaps.settings.OnlineSearchSettingsFragment"
+    app:icon="@drawable/ic_search"
+    android:summary="@string/online_search_settings_summary" />
+
+  <PreferenceScreen
     android:key="pref_screen_map_appearance"
     android:title="@string/prefs_group_map_appearance"
     app:fragment="app.organicmaps.settings.MapAppearanceSettingsFragment"

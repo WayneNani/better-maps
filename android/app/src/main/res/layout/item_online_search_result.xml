@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: an online search result (Photon), styled like item_search_result. -->
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:orientation="vertical"
+  android:background="?selectableItemBackground"
+  android:minHeight="@dimen/search_item_height"
+  android:paddingStart="@dimen/margin_half_double_plus"
+  android:paddingEnd="@dimen/margin_half_double_plus"
+  android:paddingTop="@dimen/margin_half_double_plus"
+  android:paddingBottom="@dimen/margin_half">
+
+  <com.google.android.material.textview.MaterialTextView
+    android:id="@+id/title"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textAlignment="viewStart"
+    android:textAppearance="@style/MwmTextAppearance.Body1"
+    android:ellipsize="end"
+    android:maxLines="2"
+    tools:text="Marienplatz" />
+
+  <com.google.android.material.textview.MaterialTextView
+    android:id="@+id/description"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/margin_quarter"
+    android:textAlignment="viewStart"
+    android:textAppearance="@style/MwmTextAppearance.Body3"
+    android:maxLines="1"
+    android:ellipsize="end"
+    tools:text="Square" />
+
+  <com.google.android.material.textview.MaterialTextView
+    android:id="@+id/region"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/margin_quarter"
+    android:textAlignment="viewStart"
+    android:textAppearance="@style/MwmTextAppearance.Body3"
+    android:textStyle="italic"
+    android:maxLines="2"
+    android:ellipsize="end"
+    tools:text="Altstadt, 80331 München, Deutschland" />
+
+  <com.google.android.material.button.MaterialButton
+    android:id="@+id/online_search_download"
+    style="@style/Widget.Material3.Button.TextButton.Icon"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="-12dp"
+    android:minHeight="0dp"
+    android:gravity="start|center_vertical"
+    android:textAlignment="viewStart"
+    android:textAllCaps="false"
+    android:visibility="gone"
+    app:icon="@drawable/ic_cloud_download"
+    tools:visibility="visible"
+    tools:text="Download map: Upper Bavaria (190 MB)" />
+</LinearLayout>

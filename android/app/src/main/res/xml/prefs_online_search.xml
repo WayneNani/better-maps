@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: online search settings. Keys: app.organicmaps.search.online.OnlineSearchSettings. -->
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <SwitchPreferenceCompat
+    android:key="online_search_enabled"
+    android:defaultValue="false"
+    android:persistent="false"
+    android:title="@string/online_search_pref_online"
+    android:summary="@string/online_search_pref_online_summary"
+    android:widgetLayout="@layout/preference_switch"
+    app:iconSpaceReserved="false"
+    app:singleLineTitle="false" />
+
+  <Preference
+    android:key="online_search_attribution"
+    android:title="@string/online_search_pref_attribution"
+    android:summary="openstreetmap.org/copyright"
+    app:iconSpaceReserved="false"
+    app:singleLineTitle="false" />
+
+  <PreferenceCategory
+    android:key="online_search_category_expert"
+    android:title="@string/online_search_pref_category_expert"
+    app:iconSpaceReserved="false">
+
+    <EditTextPreference
+      android:key="online_search_server_url"
+      android:title="@string/online_search_pref_server"
+      android:dialogMessage="@string/online_search_pref_server_dialog"
+      android:inputType="textUri"
+      app:iconSpaceReserved="false" />
+  </PreferenceCategory>
+</androidx.preference.PreferenceScreen>
