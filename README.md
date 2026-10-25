@@ -170,3 +170,23 @@ See [LICENSE](LICENSE), [NOTICE](NOTICE), and [data/copyright.html](data/copyrig
 
 Our project is completely free and open source software. It had been reviewed by "[is it really FOSS?](https://isitreallyfoss.com/projects/comaps/)" and is listed as 100% FOSS, [see what that means](https://isitreallyfoss.com/about/categorisation/)
 
+
+## better-maps: own Photon server for the online search
+
+The optional online search (Settings → Online search, off by default) uses the public Photon instance
+`photon.komoot.io`, which may only be used in reasonable amounts. For regular use, run an own server with Podman and
+enter its address under Settings → Online search → Server (e.g. `http://192.168.1.10:2322`). Germany needs about
+7.5 GB download, 20 GB disk and 4–8 GB RAM; the database dump must match the Photon version (here 1.0).
+
+```sh
+mkdir -p ~/photon && cd ~/photon
+# Download the Photon jar (1.0.x) from https://github.com/komoot/photon/releases and save it as photon.jar
+# Weekly dump of GraphHopper; other regions: https://download1.graphhopper.com/public/
+curl -L https://download1.graphhopper.com/public/europe/germany/photon-db-germany-1.0-latest.tar.bz2 \
+  | bzip2 -cd | tar x          # creates ./photon_data
+podman run -d --name photon -p 2322:2322 -v ~/photon:/photon:Z -w /photon \
+  docker.io/library/eclipse-temurin:21-jre java -Xmx6g -jar photon.jar serve -listen-ip 0.0.0.0
+curl 'http://localhost:2322/api?q=Marienplatz&limit=1'
+```
+
+To update, unpack a new dump into another directory, swap it with `photon_data` and restart the container.
