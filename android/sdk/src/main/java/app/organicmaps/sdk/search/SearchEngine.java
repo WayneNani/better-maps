@@ -113,30 +113,68 @@ public enum SearchEngine implements SearchListener, MapSearchListener,
   public boolean search(@NonNull Context context, @NonNull String query, boolean isCategory, long timestamp,
                         boolean hasLocation, double lat, double lon)
   {
+    return search(context, query, isCategory, timestamp, hasLocation, lat, lon, OpeningHoursFilter.OFF);
+  }
+
+  /**
+   * @param openingHoursFilter filters POI results by their opening hours.
+   */
+  @MainThread
+  public boolean search(@NonNull Context context, @NonNull String query, boolean isCategory, long timestamp,
+                        boolean hasLocation, double lat, double lon, @NonNull OpeningHoursFilter openingHoursFilter)
+  {
     return nativeRunSearch(query.getBytes(StandardCharsets.UTF_8), isCategory, Language.getKeyboardLocale(context),
-                           timestamp, hasLocation, lat, lon);
+                           timestamp, hasLocation, lat, lon, openingHoursFilter.toNative());
+  }
+
+  /**
+   * @param openingHoursFilter filters POI results by their opening hours, also for the following
+   *                           viewport searches on map moves.
+   */
+  @MainThread
+  public void searchInteractive(@NonNull String query, boolean isCategory, @NonNull String locale, long timestamp,
+                                boolean isMapAndTable, boolean hasLocation, double lat, double lon,
+                                @NonNull OpeningHoursFilter openingHoursFilter)
+  {
+    nativeRunInteractiveSearch(query.getBytes(StandardCharsets.UTF_8), isCategory, locale, timestamp, isMapAndTable,
+                               hasLocation, lat, lon, openingHoursFilter.toNative());
   }
 
   @MainThread
   public void searchInteractive(@NonNull String query, boolean isCategory, @NonNull String locale, long timestamp,
                                 boolean isMapAndTable, boolean hasLocation, double lat, double lon)
   {
-    nativeRunInteractiveSearch(query.getBytes(StandardCharsets.UTF_8), isCategory, locale, timestamp, isMapAndTable,
-                               hasLocation, lat, lon);
+    searchInteractive(query, isCategory, locale, timestamp, isMapAndTable, hasLocation, lat, lon,
+                      OpeningHoursFilter.OFF);
+  }
+
+  @MainThread
+  public void searchInteractive(@NonNull String query, boolean isCategory, @NonNull String locale, long timestamp,
+                                boolean isMapAndTable, @NonNull OpeningHoursFilter openingHoursFilter)
+  {
+    searchInteractive(query, isCategory, locale, timestamp, isMapAndTable, false, 0, 0, openingHoursFilter);
   }
 
   @MainThread
   public void searchInteractive(@NonNull String query, boolean isCategory, @NonNull String locale, long timestamp,
                                 boolean isMapAndTable)
   {
-    searchInteractive(query, isCategory, locale, timestamp, isMapAndTable, false, 0, 0);
+    searchInteractive(query, isCategory, locale, timestamp, isMapAndTable, OpeningHoursFilter.OFF);
+  }
+
+  @MainThread
+  public void searchInteractive(@NonNull Context context, @NonNull String query, boolean isCategory, long timestamp,
+                                boolean isMapAndTable, @NonNull OpeningHoursFilter openingHoursFilter)
+  {
+    searchInteractive(query, isCategory, Language.getKeyboardLocale(context), timestamp, isMapAndTable,
+                      openingHoursFilter);
   }
 
   @MainThread
   public void searchInteractive(@NonNull Context context, @NonNull String query, boolean isCategory, long timestamp,
                                 boolean isMapAndTable)
   {
-    searchInteractive(query, isCategory, Language.getKeyboardLocale(context), timestamp, isMapAndTable, false, 0, 0);
+    searchInteractive(context, query, isCategory, timestamp, isMapAndTable, OpeningHoursFilter.OFF);
   }
 
   @MainThread
@@ -217,16 +255,18 @@ public enum SearchEngine implements SearchListener, MapSearchListener,
 
   /**
    * @param bytes utf-8 formatted bytes of query.
+   * @param openingHoursFilter native value of {@link OpeningHoursFilter}.
    */
   private static native boolean nativeRunSearch(byte[] bytes, boolean isCategory, String language, long timestamp,
-                                                boolean hasLocation, double lat, double lon);
+                                                boolean hasLocation, double lat, double lon, int openingHoursFilter);
 
   /**
    * @param bytes utf-8 formatted query bytes
+   * @param openingHoursFilter native value of {@link OpeningHoursFilter}.
    */
   private static native void nativeRunInteractiveSearch(byte[] bytes, boolean isCategory, String language,
                                                         long timestamp, boolean isMapAndTable, boolean hasLocation,
-                                                        double lat, double lon);
+                                                        double lat, double lon, int openingHoursFilter);
 
   /**
    * @param bytes utf-8 formatted query bytes
