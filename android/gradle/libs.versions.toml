@@ -16,6 +16,8 @@ robo = "4.16.1"
 jUnit = "4.13.2"
 mockitoCore = "5.23.0"
 androidxTestJUnit = "1.3.0"
+androidxTestRunner = "1.7.0"
+androidxTestEspresso = "3.7.0"
 
 # AndroidX
 coreKtx = "1.16.0"
@@ -56,6 +58,10 @@ junit = { module = "junit:junit", version.ref = "jUnit" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robo" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestJUnit" }
+androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRunner" }
+androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidxTestEspresso" }
+androidx-fragment-testing = { module = "androidx.fragment:fragment-testing", version.ref = "androidxFragment" }
+androidx-fragment-testing-manifest = { module = "androidx.fragment:fragment-testing-manifest", version.ref = "androidxFragment" }
 
 # AndroidX
 androidx-core = { module = "androidx.core:core", version.ref = "androidxCore" }
