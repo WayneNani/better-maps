@@ -398,7 +398,26 @@ public class MapObject implements PlacePageData
 
   public boolean hasAtm()
   {
-    return mRawTypes.contains("amenity-atm");
+    return mRawTypes != null && mRawTypes.contains("amenity-atm");
+  }
+
+  public boolean hasPublicTransport()
+  {
+    if (mRawTypes == null)
+    {
+      return false;
+    }
+    return mRawTypes.stream().anyMatch(type ->
+        type.contains("public_transport") ||
+            type.contains("bus_stop") ||
+            type.contains("bus_station") ||
+            type.contains("tram_stop") ||
+            type.contains("tram_station") ||
+            type.contains("railway-station") ||
+            type.contains("railway-platform") ||
+            type.contains("railway-halt") ||
+            type.contains("ferry_terminal")
+    );
   }
 
   public String getOrganic()

@@ -38,6 +38,8 @@ import app.organicmaps.sdk.bookmarks.data.Track;
 import app.organicmaps.sdk.routing.RoutingController;
 import app.organicmaps.sdk.settings.RoadType;
 import app.organicmaps.sdk.util.log.Logger;
+import app.organicmaps.transit.TransitDebug;
+import app.organicmaps.transit.TransitServices;
 import app.organicmaps.util.ThemeUtils;
 import app.organicmaps.util.UiUtils;
 import app.organicmaps.util.bottomsheet.MenuBottomSheetFragment;
@@ -728,6 +730,33 @@ public class PlacePageController
     mViewModel.setCurrentButtons(buttons);
   }
 
+  // MVP of online departures (Transitous) until the real place page UI exists (AP3b).
+  private void displayStopTimes(@NonNull MapObject mapObject)
+  {
+    TransitServices.get(requireContext())
+        .closestStopWithTimes(mapObject.getLat(), mapObject.getLon(), 5)
+        .onSuccess(departures -> {
+          Logger.i(TAG, "Departures at " + departures.getStop() + ": " + departures.getDepartures().size());
+          // Ignore late results for another object or a closed place page.
+          if (isAdded() && MapObject.same(mMapObject, mapObject))
+            showTransitAlert("Departures", TransitDebug.formatDepartures(departures));
+        })
+        .onFailure(error -> {
+          Logger.w(TAG, "Departures failed: " + error.getMessage());
+          if (isAdded() && MapObject.same(mMapObject, mapObject))
+            showTransitAlert("Departures failed", String.valueOf(error.getMessage()));
+        });
+  }
+
+  private void showTransitAlert(@NonNull String title, @NonNull String message)
+  {
+    new MaterialAlertDialogBuilder(requireContext())
+        .setTitle(title)
+        .setMessage(message)
+        .setPositiveButton(android.R.string.ok, null)
+        .show();
+  }
+
   @Override
   public void onChanged(@Nullable MapObject mapObject)
   {
@@ -743,6 +772,9 @@ public class PlacePageController
       // Only collapse the place page if the data is different from the one already available
       mShouldCollapse = PlacePageUtils.isHiddenState(mPlacePageBehavior.getState())
                      || !MapObject.same(mPreviousMapObject, mMapObject);
+      // Request departures only once per opened object, not on every update of it.
+      if (mShouldCollapse && mapObject.hasPublicTransport())
+        displayStopTimes(mapObject);
       mPreviousMapObject = mMapObject;
       // Place page will automatically open when the bottom sheet content is loaded so we can compute the peek height
       createPlacePageFragments();

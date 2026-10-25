@@ -1,10 +1,16 @@
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 import java.util.Locale
 
 plugins {
     id("com.android.library")
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.openapi.generator)
 }
+
+// Client code for the MOTIS API (online public transport, e.g. Transitous), generated from the OpenAPI spec.
+val motisOpenApiSpec = layout.projectDirectory.file("motis_openapi.yaml")
+val motisOpenApiOutput = layout.buildDirectory.dir("generated/openapi")
 
 /** Sanitizes property values to either "ON" or "OFF". Nonsensical values default to "OFF". */
 private fun Project.getPropertyValueForCMake(propertyName: String): String {
@@ -111,6 +117,12 @@ android {
         // TODO: Remove after upgrading to Gradle 9.0 or higher.
         jvmTarget = "17"
     }
+
+    sourceSets {
+        getByName("main") {
+            java.srcDir(motisOpenApiOutput.map { it.dir("src/main/java") })
+        }
+    }
 }
 
 dependencies {
@@ -125,8 +137,15 @@ dependencies {
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.documentfile)
     implementation(libs.androidx.lifecycle.process)
+    implementation(libs.gson)
+    implementation(libs.gson.fire)
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
+    implementation(libs.jakarta.annotation.api)
+    implementation(libs.google.guava)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
+    testImplementation(libs.okhttp.mockwebserver)
     coreLibraryDesugaring(libs.android.tools.desugar)
 }
 
@@ -170,6 +189,45 @@ project.afterEvaluate {
     }
 }
 
+tasks.named<GenerateTask>("openApiGenerate") {
+    generatorName.set("java")
+    library.set("okhttp-gson")
+    inputSpec.set(motisOpenApiSpec.asFile.path)
+    outputDir.set(motisOpenApiOutput)
+    apiPackage.set("app.organicmaps.sdk.motis.api")
+    modelPackage.set("app.organicmaps.sdk.motis.model")
+    invokerPackage.set("app.organicmaps.sdk.motis.invoker")
+    generateApiTests.set(false)
+    generateModelTests.set(false)
+    generateApiDocumentation.set(false)
+    generateModelDocumentation.set(false)
+    configOptions.set(
+        mapOf(
+            "dateLibrary" to "java8",
+            "useBeanValidation" to "false",
+            "hideGenerationTimestamp" to "true",
+            "useJakartaEe" to "true",
+            "disallowAdditionalPropertiesIfNotPresent" to "false",
+            "generateBuilders" to "true",
+            "sortParamsByRequiredFlag" to "true",
+            // Fluent request builders: api.plan(from, to).arriveBy(true).executeAsync(...)
+            "useSingleRequestParameter" to "true",
+            // Newer MOTIS servers may add enum values (e.g. transport modes); map them to
+            // UNKNOWN_DEFAULT_OPEN_API instead of failing the whole response.
+            "enumUnknownDefaultCase" to "true",
+        )
+    )
+    // Declare inputs and outputs for incremental builds.
+    inputs.file(motisOpenApiSpec)
+    outputs.dir(motisOpenApiOutput)
+}
+
 tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.addAll(listOf("-Xlint:unchecked", "-Xlint:deprecation"))
+    dependsOn("openApiGenerate")
+}
+
+tasks.configureEach {
+    if (name == "extractDebugAnnotations" || (name.startsWith("compile") && name.endsWith("Kotlin")))
+        dependsOn("openApiGenerate")
 }

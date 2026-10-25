@@ -33,6 +33,13 @@ androidxRecyclerView = "1.4.0"
 androidxConstraintLayout = "2.2.1"
 androidxLifecycleProcess = "2.9.4"
 
+# Online public transport (MOTIS client generated from OpenAPI)
+gson = "2.13.2"
+gsonFire = "1.9.0"
+okhttp = "4.12.0"
+openapiGenerator = "7.26.0"
+jakartaAnnotationApi = "3.0.0"
+
 [libraries]
 google-guava = { module = "com.google.guava:guava", version.ref = "googleGuava" }
 android-tools = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
@@ -67,7 +74,16 @@ androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayo
 androidx-car-app-projected = { module = "androidx.car.app:app-projected", version.ref = "androidxCarApp" }
 androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "androidxLifecycleProcess" }
 
+# Online public transport
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+gson-fire = { module = "io.gsonfire:gson-fire", version.ref = "gsonFire" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
+okhttp-mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
+jakarta-annotation-api = { module = "jakarta.annotation:jakarta.annotation-api", version.ref = "jakartaAnnotationApi" }
+
 [plugins]
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 android-library= { id = "com.android.library", version.ref = "androidGradlePlugin" }
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+openapi-generator = { id = "org.openapi.generator", version.ref = "openapiGenerator" }
