@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response status="OK" subscription_id="SUB0001" timeout="3600">
+  <feed>
+    <message id="de.autobahn.closure:2025-047692--vi-fbm.2026-07-17_22-00-00-000.devi-zus.2026-03-01_00-00-00-000_006.de21" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-11-09T21:00:00Z" end_time="2026-11-09T23:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" directionality="ONE_DIRECTION" ramps="ALL_RAMPS" road_class="MOTORWAY" road_ref="A 7">
+        <from>+47.994545 +10.151049</from>
+        <via>+47.997454 +10.151932</via>
+        <to>+47.996385 +10.151706</to>
+      </location>
+      <events>
+        <event class="RESTRICTION" type="RESTRICTION_RAMP_CLOSED"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.closure:2025-047692--vi-fbm.2026-07-17_22-00-00-000.devi-zus.2026-03-01_00-00-00-000_006.de22" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-11-09T21:00:00Z" end_time="2026-11-09T23:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Lindau" directionality="ONE_DIRECTION" origin="München" road_class="MOTORWAY" road_ref="A 7">
+        <from>+47.995924 +10.149996</from>
+        <via>+47.995230 +10.146619</via>
+        <to>+47.993174 +10.142833</to>
+      </location>
+      <events>
+        <event class="RESTRICTION" type="RESTRICTION_CLOSED"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.closure:2025-050233--vi-fbm.2026-09-14_00-00-00-000.devi-zus.2026-07-13_00-00-00-000.de5" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-09-13T22:00:00Z" end_time="2026-12-11T23:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" directionality="ONE_DIRECTION" ramps="EXIT_RAMP" road_class="MOTORWAY" road_ref="A 7">
+        <from>+50.197642 +9.939222</from>
+        <via>+50.196732 +9.939221</via>
+        <to>+50.196393 +9.938660</to>
+      </location>
+      <events>
+        <event class="RESTRICTION" type="RESTRICTION_RAMP_CLOSED"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.closure:2026-005141--vi-fbm.2026-10-26_20-00-00-000.devi-zus.2026-05-04_07-00-00-000_018.de35" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-26T21:00:00Z" end_time="2026-10-27T04:30:00Z" cancellation="false" forecast="false">
+      <location country="DE" directionality="ONE_DIRECTION" ramps="ENTRY_RAMP" road_class="MOTORWAY" road_ref="A 7">
+        <from>+47.652562 +10.464064</from>
+        <via>+47.653491 +10.462630</via>
+        <to>+47.653323 +10.466065</to>
+      </location>
+      <events>
+        <event class="RESTRICTION" type="RESTRICTION_RAMP_CLOSED"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.closure:2026-005141--vi-fbm.2026-10-26_20-00-00-000.devi-zus.2026-05-04_07-00-00-000_018.de36" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-29T21:00:00Z" end_time="2026-10-30T04:30:00Z" cancellation="false" forecast="false">
+      <location country="DE" directionality="ONE_DIRECTION" ramps="ENTRY_RAMP" road_class="MOTORWAY" road_ref="A 7">
+        <from>+47.654612 +10.466509</from>
+        <via>+47.653587 +10.467337</via>
+        <to>+47.653747 +10.463768</to>
+      </location>
+      <events>
+        <event class="RESTRICTION" type="RESTRICTION_RAMP_CLOSED"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.closure:2026-024658--vi-fbm.2026-09-13_00-00-00-000.devi-bs.2026-09-12_00-00-00-000.de0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-09-12T22:00:00Z" end_time="2026-11-08T23:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Nürnberg" directionality="ONE_DIRECTION" origin="Halle/Leipzig" ramps="EXIT_RAMP" road_class="MOTORWAY" road_ref="A 9">
+        <from>+50.028521 +11.605965</from>
+        <via>+50.025245 +11.603230</via>
+        <to>+50.025744 +11.598500</to>
+      </location>
+      <events>
+        <event class="RESTRICTION" type="RESTRICTION_RAMP_CLOSED"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.closure:2026-052191--vi-fbm.2026-10-26_20-00-00-000.devi-bs.2026-10-19_19-00-00-000_009.de15" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-26T19:00:00Z" end_time="2026-10-27T04:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" directionality="ONE_DIRECTION" ramps="ENTRY_RAMP" road_class="MOTORWAY" road_ref="A 9">
+        <from>+48.316483 +11.621635</from>
+        <via>+48.316234 +11.623162</via>
+        <to>+48.315705 +11.621691</to>
+      </location>
+      <events>
+        <event class="RESTRICTION" type="RESTRICTION_RAMP_CLOSED"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.closure:2026-052191--vi-fbm.2026-10-26_20-00-00-000.devi-bs.2026-10-19_19-00-00-000_009.de16" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-26T19:00:00Z" end_time="2026-10-27T04:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" directionality="ONE_DIRECTION" ramps="EXIT_RAMP" road_class="MOTORWAY" road_ref="A 9">
+        <from>+48.312406 +11.623613</from>
+        <via>+48.314826 +11.622844</via>
+        <to>+48.315695 +11.621703</to>
+      </location>
+      <events>
+        <event class="RESTRICTION" type="RESTRICTION_RAMP_CLOSED"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.closure:2026-052191--vi-fbm.2026-10-26_20-00-00-000.devi-bs.2026-10-19_19-00-00-000_009.de17" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-26T19:00:00Z" end_time="2026-10-27T04:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" directionality="ONE_DIRECTION" ramps="ENTRY_RAMP" road_class="MOTORWAY" road_ref="A 9">
+        <from>+48.320188 +11.628374</from>
+        <via>+48.318601 +11.622214</via>
+        <to>+48.321266 +11.618391</to>
+      </location>
+      <events>
+        <event class="RESTRICTION" type="RESTRICTION_RAMP_CLOSED"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.closure:2026-052191--vi-fbm.2026-10-26_20-00-00-000.devi-bs.2026-10-19_19-00-00-000_009.de18" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-26T19:00:00Z" end_time="2026-10-27T04:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" directionality="ONE_DIRECTION" ramps="ENTRY_RAMP" road_class="MOTORWAY" road_ref="A 9">
+        <from>+48.317538 +11.620585</from>
+        <via>+48.318435 +11.621776</via>
+        <to>+48.316753 +11.621271</to>
+      </location>
+      <events>
+        <event class="RESTRICTION" type="RESTRICTION_RAMP_CLOSED"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.closure:2026-052191--vi-fbm.2026-10-26_20-00-00-000.devi-bs.2026-10-19_19-00-00-000_009.de19" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-26T19:00:00Z" end_time="2026-10-27T04:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" directionality="ONE_DIRECTION" ramps="ENTRY_RAMP" road_class="MOTORWAY" road_ref="A 9">
+        <from>+48.315820 +11.621579</from>
+        <via>+48.316106 +11.621372</via>
+        <to>+48.317345 +11.620654</to>
+      </location>
+      <events>
+        <event class="RESTRICTION" type="RESTRICTION_RAMP_CLOSED"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.closure:2026-053039--vi-fbm.2026-10-29_19-00-00-000.devi-zus.2027-10-29_19-00-00-000.de1" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-29T19:00:00Z" end_time="2026-10-30T04:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Füssen/Reutte" directionality="ONE_DIRECTION" origin="Ulm" road_class="MOTORWAY" road_ref="A 7">
+        <from>+47.576461 +10.661894</from>
+        <via>+47.568957 +10.659382</via>
+        <to>+47.559297 +10.656680</to>
+      </location>
+      <events>
+        <event class="RESTRICTION" type="RESTRICTION_CLOSED"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.closure:2026-053039--vi-fbm.2026-10-29_19-00-00-000.devi-zus.2027-10-29_19-00-00-000.de2" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-29T19:00:00Z" end_time="2026-10-30T04:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Ulm" directionality="ONE_DIRECTION" origin="Füssen/Reutte" road_class="MOTORWAY" road_ref="A 7">
+        <from>+47.559297 +10.656680</from>
+        <via>+47.568943 +10.659520</via>
+        <to>+47.576447 +10.662038</to>
+      </location>
+      <events>
+        <event class="RESTRICTION" type="RESTRICTION_CLOSED"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.closure:2026-053039--vi-fbm.2026-10-29_19-00-00-000.devi-zus.2027-10-29_19-00-00-000.de7" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-29T19:00:00Z" end_time="2026-10-30T04:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" directionality="ONE_DIRECTION" ramps="ENTRY_RAMP" road_class="MOTORWAY" road_ref="A 7">
+        <from>+47.574002 +10.659548</from>
+        <via>+47.575937 +10.660839</via>
+        <to>+47.573939 +10.661127</to>
+      </location>
+      <events>
+        <event class="RESTRICTION" type="RESTRICTION_RAMP_CLOSED"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.closure:2026-053687--vi-fbm.2026-10-19_09-00-00-000.devi-zus.2026-10-19_09-00-00-000_016.de2" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-26T08:15:00Z" end_time="2026-10-27T23:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" directionality="ONE_DIRECTION" ramps="EXIT_RAMP" road_class="MOTORWAY" road_ref="A 9">
+        <from>+48.999827 +11.365835</from>
+        <via>+49.000087 +11.365686</via>
+        <to>+49.000202 +11.365731</to>
+      </location>
+      <events>
+        <event class="RESTRICTION" type="RESTRICTION_RAMP_CLOSED"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.closure:2026-053713--vi-fbm.2026-10-27_22-00-00-000.devi-zus.2026-10-27_17-00-00-000.de1" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-27T21:00:00Z" end_time="2026-10-28T04:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Ulm" directionality="ONE_DIRECTION" origin="Füssen/Reutte" road_class="MOTORWAY" road_ref="A 7">
+        <from>+47.574905 +10.661608</from>
+        <via>+47.627190 +10.647242</via>
+        <to>+47.641049 +10.525643</to>
+      </location>
+      <events>
+        <event class="RESTRICTION" type="RESTRICTION_CLOSED"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.closure:2026-053713--vi-fbm.2026-10-27_22-00-00-000.devi-zus.2026-10-27_17-00-00-000.de2" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-27T21:00:00Z" end_time="2026-10-28T04:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Füssen/Reutte" directionality="ONE_DIRECTION" origin="Ulm" road_class="MOTORWAY" road_ref="A 7">
+        <from>+47.640948 +10.525654</from>
+        <via>+47.627084 +10.649328</via>
+        <to>+47.574926 +10.661470</to>
+      </location>
+      <events>
+        <event class="RESTRICTION" type="RESTRICTION_CLOSED"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2023-000423--vi-bs.2026-07-04_00-00-00-000.devi-zus.2023-09-04_00-00-00-000.f_001.de19" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-07-03T22:00:00Z" end_time="2026-11-18T23:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Nürnberg" directionality="ONE_DIRECTION" origin="Halle/Leipzig" road_class="MOTORWAY" road_ref="A 9">
+        <from>+49.991435 +11.607252</from>
+        <via>+49.963607 +11.605213</via>
+        <to>+49.945950 +11.606513</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_SPEED_LIMIT" speed="80"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="6.25"></event>
+        <event class="RESTRICTION" type="RESTRICTION_LANE_CLOSED" q_int="2"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2023-000423--vi-bs.2026-07-04_00-00-00-000.devi-zus.2023-09-04_00-00-00-000.f_001.de21" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-07-03T22:00:00Z" end_time="2026-11-18T23:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Halle/Leipzig" directionality="ONE_DIRECTION" origin="Nürnberg" road_class="MOTORWAY" road_ref="A 9">
+        <from>+49.945926 +11.606730</from>
+        <via>+49.964485 +11.605386</via>
+        <to>+49.991444 +11.607475</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="8"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2023-000427--vi-bs.2025-05-24_00-00-00-000.devi-zus.2023-09-25_00-00-00-000.f_001.de5" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2025-05-23T22:00:00Z" end_time="2027-06-30T22:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Halle/Leipzig" directionality="ONE_DIRECTION" origin="München" road_class="MOTORWAY" road_ref="A 9">
+        <from>+49.351346 +11.203846</from>
+        <via>+49.354080 +11.203501</via>
+        <to>+49.357626 +11.203056</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="5"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2023-000427--vi-bs.2025-05-24_00-00-00-000.devi-zus.2023-09-25_00-00-00-000.f_001.de7" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2025-05-23T22:00:00Z" end_time="2027-06-30T22:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="München" directionality="ONE_DIRECTION" origin="Halle/Leipzig" road_class="MOTORWAY" road_ref="A 9">
+        <from>+49.357614 +11.202827</from>
+        <via>+49.353081 +11.203373</via>
+        <to>+49.351341 +11.203571</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="5.5"></event>
+        <event class="RESTRICTION" type="RESTRICTION_CONTRAFLOW"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2023-001923--vi-bs.2025-11-12_00-00-00-000.devi-zus.2024-04-08_06-00-00-000.f_001.de17" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2025-11-11T23:00:00Z" end_time="2026-11-11T19:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="München" directionality="ONE_DIRECTION" origin="Nürnberg" road_class="MOTORWAY" road_ref="A 9">
+        <from>+48.871818 +11.467730</from>
+        <via>+48.815753 +11.467150</via>
+        <to>+48.766880 +11.459980</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_SPEED_LIMIT" speed="60"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="8.5"></event>
+        <event class="RESTRICTION" type="RESTRICTION_CONTRAFLOW"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2023-001923--vi-bs.2025-11-12_00-00-00-000.devi-zus.2024-04-08_06-00-00-000.f_001.de21" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2025-11-11T23:00:00Z" end_time="2026-11-11T19:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="München" directionality="ONE_DIRECTION" origin="Nürnberg" road_class="MOTORWAY" road_ref="A 9">
+        <from>+48.871818 +11.467730</from>
+        <via>+48.815753 +11.467150</via>
+        <to>+48.766889 +11.459982</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="8.5"></event>
+        <event class="RESTRICTION" type="RESTRICTION_CONTRAFLOW"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2024-018126--vi-bs.2026-09-11_00-00-00-000.devi-zus.2025-08-04_00-00-00-000.f_001.de11" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-09-10T22:00:00Z" end_time="2027-06-02T21:45:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Halle/Leipzig" directionality="ONE_DIRECTION" origin="Nürnberg" road_class="MOTORWAY" road_ref="A 9">
+        <from>+50.381678 +11.784500</from>
+        <via>+50.403447 +11.767187</via>
+        <to>+50.420402 +11.789352</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_SPEED_LIMIT" speed="80"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="5.85"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2024-018126--vi-bs.2026-09-11_00-00-00-000.devi-zus.2025-08-04_00-00-00-000.f_001.de13" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-09-10T22:00:00Z" end_time="2027-06-02T21:45:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Nürnberg" directionality="ONE_DIRECTION" origin="Halle/Leipzig" road_class="MOTORWAY" road_ref="A 9">
+        <from>+50.420492 +11.789135</from>
+        <via>+50.403927 +11.768518</via>
+        <to>+50.381562 +11.784358</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_SPEED_LIMIT" speed="80"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="5.85"></event>
+        <event class="RESTRICTION" type="RESTRICTION_CONTRAFLOW"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2025-048792--vi-bs.2026-09-13_00-00-00-000.devi-zus.2026-04-13_00-00-00-000_005.de11" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-09-12T22:00:00Z" end_time="2026-11-27T23:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Nürnberg" directionality="ONE_DIRECTION" origin="Halle/Leipzig" road_class="MOTORWAY" road_ref="A 9">
+        <from>+50.062446 +11.618481</from>
+        <via>+50.043568 +11.614560</via>
+        <to>+50.025322 +11.605127</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="5"></event>
+        <event class="RESTRICTION" type="RESTRICTION_LANE_CLOSED" q_int="2"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2025-048792--vi-bs.2026-09-13_00-00-00-000.devi-zus.2026-04-13_00-00-00-000_005.de13" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-09-12T22:00:00Z" end_time="2026-11-27T23:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Halle/Leipzig" directionality="ONE_DIRECTION" origin="Nürnberg" road_class="MOTORWAY" road_ref="A 9">
+        <from>+50.025298 +11.605338</from>
+        <via>+50.043556 +11.614779</via>
+        <to>+50.062407 +11.618690</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="8"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2026-029505--vi-bs.2026-08-02_05-00-00-000.devi-fbm.2026-06-22_21-00-00-000.de2" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-08-02T03:00:00Z" end_time="2027-08-02T03:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" directionality="ONE_DIRECTION" road_class="MOTORWAY" road_ref="A 9">
+        <from>+48.186643 +11.616710</from>
+        <via>+48.186546 +11.614616</via>
+        <to>+48.186610 +11.614191</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="3.25"></event>
+        <event class="RESTRICTION" type="RESTRICTION_LANE_CLOSED" q_int="1"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2026-029505--vi-bs.2026-08-02_05-00-00-000.devi-fbm.2026-06-22_21-00-00-000.de4" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-08-02T03:00:00Z" end_time="2027-08-02T03:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" directionality="ONE_DIRECTION" road_class="MOTORWAY" road_ref="A 9">
+        <from>+48.186493 +11.614168</from>
+        <via>+48.186439 +11.615136</via>
+        <to>+48.186557 +11.616700</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="3.25"></event>
+        <event class="RESTRICTION" type="RESTRICTION_LANE_CLOSED" q_int="1"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2026-047030--vi-bs.2026-09-21_00-00-00-000.de0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-09-20T22:00:00Z" end_time="2026-11-13T23:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Halle/Leipzig" directionality="ONE_DIRECTION" origin="Nürnberg" road_class="MOTORWAY" road_ref="A 9">
+        <from>+49.813044 +11.499203</from>
+        <via>+49.819747 +11.497213</via>
+        <to>+49.826068 +11.499592</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="7.5"></event>
+        <event class="RESTRICTION" type="RESTRICTION_LANE_CLOSED" q_int="1"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2026-047954--vi-fbm.2026-09-23_00-00-00-000.de0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-24T22:00:00Z" end_time="2026-10-25T23:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Halle/Leipzig" directionality="ONE_DIRECTION" origin="Nürnberg" road_class="MOTORWAY" road_ref="A 9">
+        <from>+49.813044 +11.499203</from>
+        <via>+49.819747 +11.497213</via>
+        <to>+49.826068 +11.499592</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="7"></event>
+        <event class="RESTRICTION" type="RESTRICTION_LANE_CLOSED" q_int="1"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2026-052191--vi-bs.2026-10-19_19-00-00-000.devi-bs.2026-10-19_19-00-00-000_009.de3" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-28T18:00:00Z" end_time="2026-10-29T04:15:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Nürnberg" directionality="ONE_DIRECTION" origin="München" road_class="MOTORWAY" road_ref="A 9">
+        <from>+48.321521 +11.618056</from>
+        <via>+48.327757 +11.614687</via>
+        <to>+48.332502 +11.612055</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="7"></event>
+        <event class="RESTRICTION" type="RESTRICTION_LANE_CLOSED" q_int="1"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2026-052966--vi-bs.2026-10-26_20-30-00-000.devi-zus.2026-10-20_19-15-00-000_001.de11" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-27T02:30:00Z" end_time="2026-10-27T04:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="München" directionality="ONE_DIRECTION" origin="Nürnberg" road_class="MOTORWAY" road_ref="A 9">
+        <from>+48.572740 +11.592477</from>
+        <via>+48.559995 +11.588612</via>
+        <to>+48.555131 +11.588888</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="5"></event>
+        <event class="RESTRICTION" type="RESTRICTION_LANE_CLOSED" q_int="1"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2026-052966--vi-bs.2026-10-26_20-30-00-000.devi-zus.2026-10-20_19-15-00-000_001.de9" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-26T19:30:00Z" end_time="2026-10-27T02:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="München" directionality="ONE_DIRECTION" origin="Nürnberg" road_class="MOTORWAY" road_ref="A 9">
+        <from>+48.572740 +11.592477</from>
+        <via>+48.494373 +11.594705</via>
+        <to>+48.348388 +11.602582</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="5"></event>
+        <event class="RESTRICTION" type="RESTRICTION_LANE_CLOSED" q_int="2"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2026-054209--vi-bs.2026-10-27_08-30-00-000.de0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-27T07:30:00Z" end_time="2026-10-27T15:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Nürnberg" directionality="ONE_DIRECTION" origin="München" road_class="MOTORWAY" road_ref="A 9">
+        <from>+48.671432 +11.507290</from>
+        <via>+48.672695 +11.506523</via>
+        <to>+48.674759 +11.505218</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="12"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2026-054426--vi-bs.2026-10-26_08-00-00-000.devi-zus.2026-10-26_08-00-00-000_006.de1" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-26T07:00:00Z" end_time="2026-10-26T16:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" directionality="ONE_DIRECTION" road_class="MOTORWAY" road_ref="A 9">
+        <from>+48.218045 +11.629551</from>
+        <via>+48.218713 +11.631814</via>
+        <to>+48.218448 +11.633779</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_SPEED_LIMIT" speed="80"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="3.5"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.roadworks:2026-054478--vi-bs.2026-10-26_07-00-00-000_006.de0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-26T06:00:00Z" end_time="2026-10-26T14:00:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Nürnberg" directionality="ONE_DIRECTION" origin="Halle/Leipzig" road_class="MOTORWAY" road_ref="A 9">
+        <from>+50.800925 +11.895291</from>
+        <via>+50.575601 +11.774377</via>
+        <to>+50.418724 +11.786868</to>
+      </location>
+      <events>
+        <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+        <event class="RESTRICTION" type="RESTRICTION_SPEED_LIMIT" speed="80"></event>
+        <event class="RESTRICTION" type="RESTRICTION_TEMP_MAX_WIDTH" q_dimension="10.25"></event>
+        <event class="RESTRICTION" type="RESTRICTION_LANE_CLOSED" q_int="1"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.warning:INRIX--vi-avl.2026-10-25_08-31-00-000_003.de0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-25T08:31:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="München" directionality="ONE_DIRECTION" origin="Salzburg" road_class="MOTORWAY" road_ref="A 8">
+        <from>+47.796139 +12.205644</from>
+        <via>+47.802357 +12.184816</via>
+        <to>+47.805133 +12.150462</to>
+      </location>
+      <events>
+        <event class="CONGESTION" type="CONGESTION_STATIONARY_TRAFFIC"></event>
+        <event class="DELAY" type="DELAY_DELAY" q_duration="00:19"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.warning:INRIX--vi-avl.2026-10-25_09-13-00-000_011.de0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-25T09:13:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="München" directionality="ONE_DIRECTION" origin="Salzburg" road_class="MOTORWAY" road_ref="A 8">
+        <from>+47.768447 +12.943230</from>
+        <via>+47.768301 +12.936037</via>
+        <to>+47.767465 +12.925401</to>
+      </location>
+      <events>
+        <event class="CONGESTION" type="CONGESTION_STATIONARY_TRAFFIC" speed="15"></event>
+        <event class="DELAY" type="DELAY_DELAY" q_duration="00:04"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.warning:INRIX--vi-avl.2026-10-25_15-08-00-000_009.de0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-25T15:08:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Fulda" directionality="ONE_DIRECTION" origin="Würzburg" road_class="MOTORWAY" road_ref="A 7">
+        <from>+50.302025 +9.848275</from>
+        <via>+50.315713 +9.845064</via>
+        <to>+50.319385 +9.838167</to>
+      </location>
+      <events>
+        <event class="CONGESTION" type="CONGESTION_STATIONARY_TRAFFIC"></event>
+        <event class="DELAY" type="DELAY_DELAY" q_duration="00:12"></event>
+      </events>
+    </message>
+    <message id="de.autobahn.warning:INRIX--vi-zus.2026-10-25_14-29-29-000.de0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-25T14:29:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Stuttgart" directionality="ONE_DIRECTION" origin="München" road_class="MOTORWAY" road_ref="A 8">
+        <from>+48.412774 +10.433410</from>
+        <via>+48.430666 +10.371743</via>
+        <to>+48.432547 +10.295021</to>
+      </location>
+      <events>
+        <event class="INCIDENT" type="INCIDENT_ACCIDENT"></event>
+        <event class="HAZARD" type="HAZARD_PEOPLE_ON_ROAD"></event>
+        <event class="RESTRICTION" type="RESTRICTION_LANE_CLOSED"></event>
+        <event class="DELAY" type="DELAY_DELAY" q_duration="00:05"></event>
+      </events>
+    </message>
+  </feed>
+</response>
