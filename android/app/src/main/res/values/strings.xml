@@ -860,6 +860,22 @@
     <string name="traffic_legacy_enabled">Use data from legacy TraFF applications</string>
     <!-- Enable traffic data from TraFF 0.7 apps (description) -->
     <string name="traffic_legacy_enabled_description">When enabled, the app will receive and process traffic data from legacy TraFF applications.</string>
+    <!-- Anonymous congestion reports (better-maps): settings category -->
+    <string name="crowd_traffic_category">Congestion detection</string>
+    <!-- Anonymous congestion reports: opt-in switch (title) -->
+    <string name="crowd_traffic_enabled">Contribute anonymously to congestion detection</string>
+    <!-- Anonymous congestion reports: opt-in switch (description) -->
+    <string name="crowd_traffic_enabled_description">During car navigation, the app reports how fast you passed road sections, without start and destination, with added noise, bundled and through an anonymizing relay. Off by default.</string>
+    <!-- Anonymous congestion reports: link to the privacy documentation (title) -->
+    <string name="crowd_traffic_privacy">How the reports are anonymized</string>
+    <!-- Anonymous congestion reports: link to the privacy documentation (summary) -->
+    <string name="crowd_traffic_privacy_summary">Privacy documentation (opens in the browser)</string>
+    <!-- Anonymous congestion reports: relay URL, an expert setting (title) -->
+    <string name="crowd_traffic_relay_url">Relay URL (experts)</string>
+    <!-- Anonymous congestion reports: no relay configured -->
+    <string name="crowd_traffic_relay_url_not_set">Not set – no reports are sent</string>
+    <!-- Anonymous congestion reports: invalid relay URL entered -->
+    <string name="crowd_traffic_relay_url_invalid">Please enter an http or https URL, or leave the field empty.</string>
     <!-- Local language -->
     <string name="pref_maplanguage_local">Local Language</string>
     <!-- OpenStreetMap text on splash screen -->

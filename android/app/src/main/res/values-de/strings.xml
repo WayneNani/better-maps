@@ -999,4 +999,13 @@
     <string name="stars_3">3-Sterne</string>
     <string name="stars_4">4-Sterne</string>
     <string name="stars_5">5-Sterne</string>
+    <!-- Anonymous congestion reports (better-maps) -->
+    <string name="crowd_traffic_category">Stauerkennung</string>
+    <string name="crowd_traffic_enabled">Anonym zur Stauerkennung beitragen</string>
+    <string name="crowd_traffic_enabled_description">Während der Auto-Navigation meldet die App, wie schnell du Straßenabschnitte durchfahren hast – ohne Start und Ziel, verrauscht, gebündelt und über ein anonymisierendes Relay. Standardmäßig aus.</string>
+    <string name="crowd_traffic_privacy">So werden die Meldungen anonymisiert</string>
+    <string name="crowd_traffic_privacy_summary">Datenschutz-Dokumentation (öffnet im Browser)</string>
+    <string name="crowd_traffic_relay_url">Relay-URL (Experten)</string>
+    <string name="crowd_traffic_relay_url_not_set">Nicht gesetzt – es werden keine Meldungen gesendet</string>
+    <string name="crowd_traffic_relay_url_invalid">Bitte eine http- oder https-URL eingeben oder das Feld leer lassen.</string>
 </resources>
