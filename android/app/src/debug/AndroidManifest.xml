@@ -4,5 +4,11 @@
   <application
     android:gwpAsanMode="always"
     android:memtagMode="sync"
-    tools:replace="android:memtagMode" />
+    tools:replace="android:memtagMode">
+    <!-- Emulator tests: drive the current route with simulated locations. -->
+    <receiver
+      android:name="app.organicmaps.debug.NavigationSimulationReceiver"
+      android:exported="true"
+      tools:ignore="ExportedReceiver" />
+  </application>
 </manifest>
