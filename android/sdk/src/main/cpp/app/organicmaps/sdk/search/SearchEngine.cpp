@@ -9,6 +9,7 @@
 #include "map/viewport_search_params.hpp"
 
 #include "search/mode.hpp"
+#include "search/opening_hours_filter.hpp"
 #include "search/result.hpp"
 
 #include "platform/network_policy.hpp"
@@ -59,6 +60,20 @@ jmethodID g_mapResultCtor;
 
 jmethodID g_updateBookmarksResultsId;
 jmethodID g_endBookmarksResultsId;
+
+// Values are defined in SearchEngine.OpeningHoursFilter java enum.
+search::OpeningHoursFilter ToOpeningHoursFilter(jint filter)
+{
+  switch (filter)
+  {
+  case static_cast<jint>(search::OpeningHoursFilter::Off): return search::OpeningHoursFilter::Off;
+  case static_cast<jint>(search::OpeningHoursFilter::OpenNow): return search::OpeningHoursFilter::OpenNow;
+  case static_cast<jint>(search::OpeningHoursFilter::OpenNowOrUnknown):
+    return search::OpeningHoursFilter::OpenNowOrUnknown;
+  }
+  LOG(LERROR, ("Unknown opening hours filter", filter));
+  return search::OpeningHoursFilter::Off;
+}
 
 bool PopularityHasHigherPriority(bool hasPosition, double distanceInMeters)
 {
@@ -268,13 +283,14 @@ JNIEXPORT void JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeInit(J
 
 JNIEXPORT jboolean JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeRunSearch(
     JNIEnv * env, jclass clazz, jbyteArray bytes, jboolean isCategory, jstring lang, jlong timestamp,
-    jboolean hasPosition, jdouble lat, jdouble lon)
+    jboolean hasPosition, jdouble lat, jdouble lon, jint openingHoursFilter)
 {
   search::EverywhereSearchParams params{jni::ToNativeString(env, bytes),
                                         jni::ToNativeString(env, lang),
                                         {},  // default timeout
                                         static_cast<bool>(isCategory),
-                                        bind(&OnResults, _1, _2, timestamp, false, hasPosition, lat, lon)};
+                                        bind(&OnResults, _1, _2, timestamp, false, hasPosition, lat, lon),
+                                        ToOpeningHoursFilter(openingHoursFilter)};
   bool const searchStarted = g_framework->NativeFramework()->GetSearchAPI().SearchEverywhere(std::move(params));
   if (searchStarted)
     g_queryTimestamp = timestamp;
@@ -283,7 +299,7 @@ JNIEXPORT jboolean JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeRu
 
 JNIEXPORT void JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeRunInteractiveSearch(
     JNIEnv * env, jclass clazz, jbyteArray bytes, jboolean isCategory, jstring lang, jlong timestamp,
-    jboolean isMapAndTable, jboolean hasPosition, jdouble lat, jdouble lon)
+    jboolean isMapAndTable, jboolean hasPosition, jdouble lat, jdouble lon, jint openingHoursFilter)
 {
   search::ViewportSearchParams vparams{
       jni::ToNativeString(env, bytes),
@@ -292,6 +308,7 @@ JNIEXPORT void JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeRunInt
       static_cast<bool>(isCategory),
       {},  // Empty m_onStarted callback
       {},  // Empty m_onCompleted callback
+      ToOpeningHoursFilter(openingHoursFilter),
   };
 
   // TODO (@alexzatsepin): set up vparams.m_onCompleted here and use
@@ -305,7 +322,8 @@ JNIEXPORT void JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeRunInt
                                            std::move(vparams.m_inputLocale),
                                            {},  // default timeout
                                            static_cast<bool>(isCategory),
-                                           bind(&OnResults, _1, _2, timestamp, isMapAndTable, hasPosition, lat, lon)};
+                                           bind(&OnResults, _1, _2, timestamp, isMapAndTable, hasPosition, lat, lon),
+                                           vparams.m_openingHoursFilter};
 
     if (g_framework->NativeFramework()->GetSearchAPI().SearchEverywhere(std::move(eparams)))
       g_queryTimestamp = timestamp;

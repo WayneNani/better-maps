@@ -1,5 +1,6 @@
 #pragma once
 
+#include "search/opening_hours_filter.hpp"
 #include "search/result.hpp"
 
 #include <chrono>
@@ -21,5 +22,9 @@ struct ViewportSearchParams
 
   OnStarted m_onStarted;
   OnCompleted m_onCompleted;
+
+  // Filters POI results by their opening hours.
+  // Placed after callbacks to keep aggregate initialization of existing fields valid.
+  OpeningHoursFilter m_openingHoursFilter = OpeningHoursFilter::Off;
 };
 }  // namespace search

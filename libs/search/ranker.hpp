@@ -13,6 +13,7 @@
 #include "geometry/rect2d.hpp"
 
 #include <algorithm>
+#include <ctime>
 #include <string>
 #include <vector>
 
@@ -46,6 +47,9 @@ public:
     bool m_needHighlighting = false;
     bool m_viewportSearch = false;
     bool m_categorialRequest = false;
+
+    // Moment to evaluate opening hours at, see Result::IsOpenNow().
+    time_t m_openingHoursTime = 0;
 
     QueryString m_query;
 

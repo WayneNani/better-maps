@@ -31,6 +31,7 @@ import app.organicmaps.sdk.bookmarks.data.MapObject;
 import app.organicmaps.sdk.downloader.MapManager;
 import app.organicmaps.sdk.location.LocationListener;
 import app.organicmaps.sdk.routing.RoutingController;
+import app.organicmaps.sdk.search.OpeningHoursFilter;
 import app.organicmaps.sdk.search.SearchEngine;
 import app.organicmaps.sdk.search.SearchListener;
 import app.organicmaps.sdk.search.SearchRecents;
@@ -46,6 +47,7 @@ import app.organicmaps.widget.PlaceholderView;
 import app.organicmaps.widget.SearchToolbarController;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
@@ -146,6 +148,8 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
 
   private View mResultsFrame;
   private View mTabFrame;
+  private Chip mOpenNowChip;
+  private Chip mIncludeUnknownOpeningHoursChip;
   private PlaceholderView mResultsPlaceholder;
   private ExtendedFloatingActionButton mShowOnMapFab;
   private FloatingActionButton mOpenContactPicker;
@@ -301,6 +305,7 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
                                                    updateResultsPlaceholder();
                                                  }
                                                });
+    initOpeningHoursFilter(mResultsFrame);
     mShowOnMapFab = root.findViewById(R.id.show_on_map_fab);
     mShowOnMapFab.setOnClickListener(v -> showAllResultsOnMap());
     mOpenContactPicker = root.findViewById(R.id.open_contact_picker);
@@ -337,6 +342,43 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
 
     if (mInitialSearchOnMap)
       showAllResultsOnMap();
+  }
+
+  private void initOpeningHoursFilter(@NonNull View root)
+  {
+    final OpeningHoursFilterState state = OpeningHoursFilterState.SESSION;
+    mOpenNowChip = root.findViewById(R.id.filter_open_now);
+    mIncludeUnknownOpeningHoursChip = root.findViewById(R.id.filter_include_unknown_opening_hours);
+    mOpenNowChip.setChecked(state.isOpenNow());
+    mIncludeUnknownOpeningHoursChip.setChecked(state.isIncludeUnknown());
+    UiUtils.showIf(state.isOpenNow(), mIncludeUnknownOpeningHoursChip);
+
+    mOpenNowChip.setOnCheckedChangeListener((chip, isChecked) -> {
+      state.setOpenNow(isChecked);
+      UiUtils.showIf(isChecked, mIncludeUnknownOpeningHoursChip);
+      onOpeningHoursFilterChanged();
+    });
+    mIncludeUnknownOpeningHoursChip.setOnCheckedChangeListener((chip, isChecked) -> {
+      state.setIncludeUnknown(isChecked);
+      onOpeningHoursFilterChanged();
+    });
+  }
+
+  private void onOpeningHoursFilterChanged()
+  {
+    if (!isAdded() || !mToolbarController.hasQuery())
+      return;
+
+    mSearchAdapter.clear();
+    runSearch();
+    // Hide "not found" placeholder, shown by clear(), while the new search is running.
+    updateResultsPlaceholder();
+  }
+
+  @NonNull
+  private static OpeningHoursFilter getOpeningHoursFilter()
+  {
+    return OpeningHoursFilterState.SESSION.getFilter();
   }
 
   @Override
@@ -474,7 +516,7 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
     SearchEngine.INSTANCE.searchInteractive(
         query, isCategory(),
         !TextUtils.isEmpty(mInitialLocale) ? mInitialLocale : Language.getKeyboardLocale(requireContext()),
-        mLastQueryTimestamp, false /* isMapAndTable */);
+        mLastQueryTimestamp, false /* isMapAndTable */, getOpeningHoursFilter());
 
     SearchEngine.INSTANCE.setQuery(query);
     Utils.navigateToParent(requireActivity());
@@ -516,12 +558,13 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
     if (isTabletSearch())
     {
       SearchEngine.INSTANCE.searchInteractive(requireContext(), getQuery(), isCategory(), mLastQueryTimestamp,
-                                              true /* isMapAndTable */);
+                                              true /* isMapAndTable */, getOpeningHoursFilter());
     }
     else
     {
       if (!SearchEngine.INSTANCE.search(requireContext(), getQuery(), isCategory(), mLastQueryTimestamp,
-                                        mLastPosition.valid, mLastPosition.lat, mLastPosition.lon))
+                                        mLastPosition.valid, mLastPosition.lat, mLastPosition.lon,
+                                        getOpeningHoursFilter()))
       {
         return;
       }

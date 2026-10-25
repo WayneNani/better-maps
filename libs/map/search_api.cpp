@@ -190,6 +190,7 @@ bool SearchAPI::SearchEverywhere(EverywhereSearchParams params)
   p.m_needAddress = true;
   p.m_needHighlighting = true;
   p.m_categorialRequest = params.m_isCategory;
+  p.m_openingHoursFilter = params.m_openingHoursFilter;
   if (params.m_timeout)
     p.m_timeout = *params.m_timeout;
 
@@ -214,6 +215,7 @@ bool SearchAPI::SearchInViewport(ViewportSearchParams params)
   p.m_needAddress = false;
   p.m_needHighlighting = false;
   p.m_categorialRequest = params.m_isCategory;
+  p.m_openingHoursFilter = params.m_openingHoursFilter;
 
   if (params.m_timeout)
     p.m_timeout = *params.m_timeout;

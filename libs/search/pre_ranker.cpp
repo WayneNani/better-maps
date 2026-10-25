@@ -1,6 +1,7 @@
 #include "search/pre_ranker.hpp"
 
 #include "search/lazy_centers_table.hpp"
+#include "search/model.hpp"
 #include "search/pre_ranking_info.hpp"
 
 #include "editor/osm_editor.hpp"
@@ -8,6 +9,8 @@
 #include "indexer/data_source.hpp"
 #include "indexer/dummy_rank_table.hpp"
 #include "indexer/editable_map_object.hpp"
+#include "indexer/feature.hpp"
+#include "indexer/feature_meta.hpp"
 #include "indexer/feature_source.hpp"
 #include "indexer/mwm_set.hpp"
 #include "indexer/rank_table.hpp"
@@ -23,7 +26,9 @@
 
 #include <algorithm>
 #include <iterator>
+#include <memory>
 #include <random>
+#include <string>
 
 #include "3party/ankerl/unordered_dense.h"
 
@@ -207,7 +212,11 @@ void PreRanker::Filter()
 
   // Viewport search ends here.
   if (m_results.size() <= BatchSize())
+  {
+    if (!m_params.m_viewportSearch)
+      FilterByOpeningHours();
     return;
+  }
 
   std::vector<size_t> indices(m_results.size());
   std::generate(indices.begin(), indices.end(), [n = 0]() mutable { return n++; });
@@ -253,6 +262,10 @@ void PreRanker::Filter()
   for (size_t idx : filtered)
     newResults.push_back(m_results[idx]);
   m_results.swap(newResults);
+
+  // Filter by opening hours after the batch is selected, as it needs to read features.
+  ASSERT(!m_params.m_viewportSearch, ());
+  FilterByOpeningHours();
 }
 
 void PreRanker::UpdateResults(bool lastUpdate)
@@ -276,6 +289,46 @@ void PreRanker::ClearCaches()
   m_currEmit.clear();
 }
 
+void PreRanker::FilterByOpeningHours()
+{
+  if (m_params.m_openingHoursFilter == OpeningHoursFilter::Off)
+    return;
+
+  // Read features of one mwm in a row.
+  sort(m_results.begin(), m_results.end(), base::LessBy(&PreRankerResult::GetId));
+
+  unique_ptr<FeaturesLoaderGuard> loader;
+  // Many POIs share the same opening hours, parse each value only once.
+  ankerl::unordered_dense::map<string, bool> passedByOpeningHours;
+  size_t const sizeBefore = m_results.size();
+  base::EraseIf(m_results, [&](PreRankerResult const & result)
+  {
+    // Opening hours make sense for POIs only. Streets, buildings (addresses), localities, etc. are kept.
+    if (!Model::IsPoi(result.GetInfo().m_type))
+      return false;
+
+    FeatureID const & id = result.GetId();
+    if (!loader || loader->GetId() != id.m_mwmId)
+      loader = make_unique<FeaturesLoaderGuard>(m_dataSource, id.m_mwmId);
+
+    auto const ft = loader->GetFeatureByIndex(id.m_index);
+    if (!ft)
+      return false;
+
+    string openingHours(ft->GetMetadata(feature::Metadata::FMD_OPEN_HOURS));
+    auto const it = passedByOpeningHours.find(openingHours);
+    if (it != passedByOpeningHours.end())
+      return !it->second;
+
+    auto const status = GetOpeningHoursStatus(openingHours, m_params.m_openingHoursTime);
+    bool const passed = PassesOpeningHoursFilter(m_params.m_openingHoursFilter, status.m_isOpen);
+    passedByOpeningHours.emplace(std::move(openingHours), passed);
+    return !passed;
+  });
+
+  LOG(LDEBUG, ("Removed", sizeBefore - m_results.size(), "results by", m_params.m_openingHoursFilter, "filter."));
+}
+
 void PreRanker::FilterForViewportSearch()
 {
   base::EraseIf(m_results, [this](PreRankerResult const & result)
@@ -290,6 +343,9 @@ void PreRanker::FilterForViewportSearch()
     /// @todo Probably, should show say 20-30 first results with honest ranking, but need to refactor a lot ..
     return result.SkipForViewportSearch(m_params.m_numQueryTokens);
   });
+
+  // Should be done before sweeping, otherwise filtered out POIs can displace the suitable ones.
+  FilterByOpeningHours();
 
   /// @DebugNote
   // Comment this line to discard viewport filtering (displacement).

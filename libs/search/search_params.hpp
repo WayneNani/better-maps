@@ -3,6 +3,7 @@
 #include "search/bookmarks/types.hpp"
 #include "search/filtering_params.hpp"
 #include "search/mode.hpp"
+#include "search/opening_hours_filter.hpp"
 
 #include "geometry/point2d.hpp"
 #include "geometry/rect2d.hpp"
@@ -11,6 +12,7 @@
 
 #include <chrono>
 #include <cstddef>
+#include <ctime>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -95,6 +97,14 @@ struct SearchParams
 
   // True if you need *pure* category results only, without names/addresses/etc matching.
   bool m_categorialRequest = false;
+
+  // Filters POI results by their opening hours. Other results (streets, addresses, localities, ...) are kept.
+  // Works for Everywhere and Viewport modes.
+  OpeningHoursFilter m_openingHoursFilter = OpeningHoursFilter::Off;
+
+  // Moment to evaluate opening hours at, both for |m_openingHoursFilter| and Result::IsOpenNow().
+  // The current time is used if not set.
+  std::optional<time_t> m_openingHoursTime;
 
   // Set to true for debug logs and tests.
 #ifdef DEBUG

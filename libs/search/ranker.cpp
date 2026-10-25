@@ -349,7 +349,7 @@ public:
     if (!ft)
       return {};
 
-    RankerResult res(*ft, center, std::move(name), country);
+    RankerResult res(*ft, center, std::move(name), country, m_ranker.m_params.m_openingHoursTime);
 
     RankingInfo info;
     InitRankingInfo(*ft, center, preResult, info);

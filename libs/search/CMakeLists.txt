@@ -107,6 +107,8 @@ set(SRC
   mwm_context.hpp
   nested_rects_cache.cpp
   nested_rects_cache.hpp
+  opening_hours_filter.cpp
+  opening_hours_filter.hpp
   point_rect_matcher.hpp
   postcode_points.cpp
   postcode_points.hpp

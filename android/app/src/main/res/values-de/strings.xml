@@ -856,6 +856,8 @@
     <string name="open_now">Jetzt geöffnet</string>
     <string name="at">um %s</string>
     <string name="closed_now">Jetzt geschlossen</string>
+    <!-- Search results filter chip, shown when the "Open now" filter is enabled: also show places without known opening hours. -->
+    <string name="search_filter_include_unknown_opening_hours">Auch ohne Öffnungszeiten</string>
     <string name="osm_note_hint">Oder hinterlasse alternativ einen Hinweis für die OpenStreetMap-Community, sodass jemand anderes einen Ort hinzufügen oder korrigieren kann.</string>
     <string name="osm_note_toast">Ein Hinweis wird an OpenStreetMap gesendet</string>
     <string name="share_track">Strecke teilen</string>
