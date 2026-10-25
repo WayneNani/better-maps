@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,8 +14,11 @@ import androidx.preference.MultiSelectListPreference;
 import androidx.preference.Preference;
 import androidx.preference.TwoStatePreference;
 import app.organicmaps.R;
+import app.organicmaps.sdk.crowdtraffic.CrowdTraffic;
+import app.organicmaps.sdk.crowdtraffic.CrowdTrafficSettings;
 import app.organicmaps.sdk.traffxml.AndroidTransport;
 import app.organicmaps.sdk.util.Config;
+import app.organicmaps.util.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +38,7 @@ public class TrafficSettingsFragment extends BaseXmlSettingsFragment
     super.onResume();
     updateTrafficHttpUrlSummary();
     updateTrafficAppsSummary();
+    updateCrowdTrafficRelayUrlSummary();
   }
 
   @Override
@@ -44,6 +49,7 @@ public class TrafficSettingsFragment extends BaseXmlSettingsFragment
     initTrafficHttpUrlPrefsCallbacks();
     initTrafficAppsPrefs();
     initTrafficLegacyEnabledPrefsCallbacks();
+    initCrowdTrafficPrefs();
   }
 
   private void initTrafficHttpEnabledPrefsCallbacks()
@@ -171,4 +177,48 @@ public class TrafficSettingsFragment extends BaseXmlSettingsFragment
     }
   }
 
+  /**
+   * Anonymous congestion reports (opt-in, off by default) and the relay URL (expert setting, empty by
+   * default). Both are stored in the native settings via CrowdTrafficSettings.
+   */
+  private void initCrowdTrafficPrefs()
+  {
+    final CrowdTrafficSettings settings = CrowdTraffic.getSettings();
+
+    final TwoStatePreference enabled = getPreference(getString(R.string.pref_crowd_traffic_enabled));
+    enabled.setChecked(settings.isEnabled());
+    enabled.setOnPreferenceChangeListener((preference, newValue) -> {
+      settings.setEnabled((Boolean) newValue);
+      return true;
+    });
+
+    final Preference privacy = getPreference(getString(R.string.pref_crowd_traffic_privacy));
+    privacy.setOnPreferenceClickListener(preference -> {
+      Utils.openUrl(requireContext(), CrowdTraffic.PRIVACY_URL);
+      return true;
+    });
+
+    final EditTextPreference relay = getPreference(getString(R.string.pref_crowd_traffic_relay_url));
+    relay.setText(settings.getRelayUrl());
+    relay.setOnPreferenceChangeListener((preference, newValue) -> {
+      if (!settings.setRelayUrl((String) newValue))
+      {
+        Toast.makeText(requireContext(), R.string.crowd_traffic_relay_url_invalid, Toast.LENGTH_LONG).show();
+        return false;
+      }
+      relay.setText(settings.getRelayUrl());
+      updateCrowdTrafficRelayUrlSummary();
+      return false; // The value is stored by CrowdTrafficSettings, not by the preference.
+    });
+  }
+
+  private void updateCrowdTrafficRelayUrlSummary()
+  {
+    final Preference pref = getPreference(getString(R.string.pref_crowd_traffic_relay_url));
+    final String url = CrowdTraffic.getSettings().getRelayUrl();
+    if (url.isEmpty())
+      pref.setSummary(R.string.crowd_traffic_relay_url_not_set);
+    else
+      pref.setSummary(url);
+  }
 }

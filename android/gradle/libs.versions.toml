@@ -11,6 +11,9 @@ tripletPlayPublisher = "3.13.0"
 microgServicesLocation = "0.3.14.250932"
 appDevNextAndroidChart = "3.1.0.31"
 
+# Anonymous congestion reports: HPKE for Oblivious HTTP
+bouncycastle = "1.81"
+
 # Testing
 robo = "4.16.1"
 jUnit = "4.13.2"
@@ -52,6 +55,8 @@ android-tools-desugar = { module = "com.android.tools:desugar_jdk_libs", version
 triplet-play-publisher = { module = "com.github.triplet.gradle:play-publisher", version.ref = "tripletPlayPublisher" }
 appdevnext-androidchart = { module = "com.github.AppDevNext:AndroidChart", version.ref = "appDevNextAndroidChart" }
 microg-services-location = { module = "org.microg.gms:play-services-location", version.ref = "microgServicesLocation" }
+
+bouncycastle-bcprov = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
 
 # Testing
 junit = { module = "junit:junit", version.ref = "jUnit" }

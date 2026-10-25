@@ -29,4 +29,30 @@
     android:widgetLayout="@layout/preference_switch"
     android:order="4"/>
 
+  <PreferenceCategory
+    android:key="@string/pref_crowd_traffic_category"
+    android:title="@string/crowd_traffic_category"
+    android:order="5">
+    <SwitchPreferenceCompat
+      android:key="@string/pref_crowd_traffic_enabled"
+      android:title="@string/crowd_traffic_enabled"
+      app:singleLineTitle="false"
+      android:summary="@string/crowd_traffic_enabled_description"
+      android:defaultValue="false"
+      android:persistent="false"
+      android:widgetLayout="@layout/preference_switch"
+      android:order="1"/>
+    <Preference
+      android:key="@string/pref_crowd_traffic_privacy"
+      android:title="@string/crowd_traffic_privacy"
+      android:summary="@string/crowd_traffic_privacy_summary"
+      app:singleLineTitle="false"
+      android:order="2"/>
+    <EditTextPreference
+      android:key="@string/pref_crowd_traffic_relay_url"
+      android:title="@string/crowd_traffic_relay_url"
+      app:singleLineTitle="false"
+      android:persistent="false"
+      android:order="3"/>
+  </PreferenceCategory>
 </androidx.preference.PreferenceScreen>

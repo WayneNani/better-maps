@@ -1,5 +1,6 @@
 #pragma once
 
+#include "map/crowd_traffic_recorder.hpp"
 #include "map/extrapolation/extrapolator.hpp"
 #include "map/routing_mark.hpp"
 #include "map/transit/transit_display.hpp"
@@ -239,6 +240,8 @@ public:
 
   void AddRoutePoint(RouteMarkData && markData, bool reorderIntermediatePoints = true);
   void ContinueRouteToPoint(RouteMarkData && markData);
+  CrowdTrafficRecorder & GetCrowdTrafficRecorder() { return *m_crowdTraffic; }
+
   std::vector<RouteMarkData> GetRoutePoints() const;
   size_t GetRoutePointsCount() const;
   void RemoveRoutePoint(RouteMarkType type, size_t intermediateIndex = 0);
@@ -406,6 +409,8 @@ private:
 
   BookmarkManager * m_bmManager = nullptr;
   extrapolation::Extrapolator m_extrapolator;
+  // Anonymous congestion reports (opt-in, car navigation only).
+  std::unique_ptr<CrowdTrafficRecorder> m_crowdTraffic;
 
   std::vector<dp::DrapeID> m_drapeSubroutes;
   mutable std::mutex m_drapeSubroutesMutex;
