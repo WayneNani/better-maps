@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: optional online search (Photon). Kept apart from the generated strings.xml. -->
+<resources>
+  <string name="online_search_settings_title">Online search</string>
+  <string name="online_search_settings_summary">Find places in regions without downloaded maps</string>
+
+  <string name="online_search_section_title">Online results (%1$s)</string>
+  <string name="online_search_attribution">Data © OpenStreetMap contributors</string>
+  <string name="online_search_offer">No downloaded map here or few offline results. Search online with Photon?</string>
+  <string name="online_search_offer_button">Search online</string>
+  <string name="online_search_loading">Searching online…</string>
+  <string name="online_search_empty">No further results online.</string>
+  <string name="online_search_retry">Try again</string>
+  <string name="online_search_error_network">No connection to the server.</string>
+  <string name="online_search_error_server">The server is not available right now. Please try again later.</string>
+  <string name="online_search_error_request">The server cannot answer this search.</string>
+  <string name="online_search_error_disabled">Online search is switched off.</string>
+  <string name="online_search_error_unknown">Something went wrong.</string>
+  <string name="online_search_download">Download map: %1$s (%2$s)</string>
+  <string name="online_search_download_no_size">Download map: %1$s</string>
+  <string name="online_search_download_started">Downloading map: %1$s</string>
+
+  <string name="online_search_consent_title">Use online search?</string>
+  <string name="online_search_consent_message">Places in regions without a downloaded map can be found online with Photon, a search service for OpenStreetMap data. For this, your search text and the approximate map position (rounded to about 1 km) are sent to the server, by default photon.komoot.io, operated by komoot. Nothing else is sent. Online results are only added when the offline search finds little or the map of the region is missing. You can switch this off at any time in Settings → Online search.</string>
+  <string name="online_search_consent_learn_more">About Photon</string>
+  <string name="online_search_consent_accept">Allow</string>
+  <string name="online_search_consent_decline">Not now</string>
+
+  <string name="online_search_pref_online">Online search with Photon</string>
+  <string name="online_search_pref_online_summary">Supplements the offline search when it finds little. Search text and approximate map position are sent to the server.</string>
+  <string name="online_search_pref_attribution">Data: © OpenStreetMap contributors (ODbL)</string>
+  <string name="online_search_pref_category_expert">Expert</string>
+  <string name="online_search_pref_server">Server</string>
+  <string name="online_search_pref_server_dialog">Address of a Photon server, e.g. an own server. Leave empty for photon.komoot.io.</string>
+  <string name="online_search_pref_server_invalid">Invalid address. It must start with https:// or http://.</string>
+</resources>

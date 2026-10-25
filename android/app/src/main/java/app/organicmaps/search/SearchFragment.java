@@ -10,6 +10,7 @@ import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.CallSuper;
@@ -18,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
@@ -27,7 +29,10 @@ import app.organicmaps.MwmApplication;
 import app.organicmaps.R;
 import app.organicmaps.base.BaseMwmFragment;
 import app.organicmaps.downloader.CountrySuggestFragment;
+import app.organicmaps.downloader.MapManagerHelper;
 import app.organicmaps.sdk.Framework;
+import app.organicmaps.sdk.Map;
+import app.organicmaps.sdk.api.RequestType;
 import app.organicmaps.sdk.bookmarks.data.FeatureId;
 import app.organicmaps.sdk.bookmarks.data.MapObject;
 import app.organicmaps.sdk.downloader.MapManager;
@@ -39,10 +44,19 @@ import app.organicmaps.sdk.search.SearchEngine;
 import app.organicmaps.sdk.search.SearchListener;
 import app.organicmaps.sdk.search.SearchRecents;
 import app.organicmaps.sdk.search.SearchResult;
+import app.organicmaps.sdk.search.online.OnlineSearchResult;
 import app.organicmaps.sdk.util.Config;
 import app.organicmaps.sdk.util.Language;
 import app.organicmaps.sdk.util.SharedPropertiesUtils;
 import app.organicmaps.sdk.util.log.Logger;
+import app.organicmaps.search.online.OfflinePlace;
+import app.organicmaps.search.online.OnlineSearchItem;
+import app.organicmaps.search.online.OnlineSearchMapLink;
+import app.organicmaps.search.online.OnlineSearchPresenter;
+import app.organicmaps.search.online.OnlineSearchServices;
+import app.organicmaps.search.online.RegionInfo;
+import app.organicmaps.search.online.ui.OnlineSearchAdapter;
+import app.organicmaps.search.online.ui.OnlineSearchConsentDialog;
 import app.organicmaps.transit.TransitDebug;
 import app.organicmaps.util.UiUtils;
 import app.organicmaps.util.Utils;
@@ -98,6 +112,7 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
       if (TextUtils.isEmpty(query))
       {
         mSearchAdapter.clear();
+        mOnlinePresenter.clear();
         stopSearch();
         return;
       }
@@ -105,6 +120,7 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
       if (tryRecognizeHiddenCommand(query))
       {
         mSearchAdapter.clear();
+        mOnlinePresenter.clear();
         stopSearch();
         closeSearch();
         return;
@@ -171,6 +187,13 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
   @SuppressWarnings("NullableProblems")
   @NonNull
   private SearchAdapter mSearchAdapter;
+  // better-maps: online results (Photon) below the offline results, see OnlineSearchPolicy.
+  @SuppressWarnings("NullableProblems")
+  @NonNull
+  private OnlineSearchAdapter mOnlineAdapter;
+  @SuppressWarnings("NullableProblems")
+  @NonNull
+  private OnlineSearchPresenter mOnlinePresenter;
 
   private final List<RecyclerView> mAttachedRecyclers = new ArrayList<>();
   private final RecyclerView.OnScrollListener mRecyclerListener = new RecyclerView.OnScrollListener() {
@@ -268,7 +291,8 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
 
   private void updateResultsPlaceholder()
   {
-    final boolean show = !mSearchRunning && mSearchAdapter.getItemCount() == 0 && mToolbarController.hasQuery();
+    final boolean show = !mSearchRunning && mSearchAdapter.getItemCount() == 0 && mToolbarController.hasQuery()
+                      && !mOnlineAdapter.getState().isVisible();
 
     UiUtils.showIf(show, mResultsPlaceholder);
   }
@@ -285,6 +309,7 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
   {
     super.onViewCreated(view, savedInstanceState);
     mSearchAdapter = new SearchAdapter(this);
+    initOnlineSearch();
     readArguments();
 
     ViewGroup root = (ViewGroup) view;
@@ -338,7 +363,7 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
     ViewCompat.setOnApplyWindowInsetsListener(mResultsPlaceholder, new WindowInsetUtils.ScrollableContentInsetsListener(mResultsPlaceholder, mOpenContactPicker));
 
     mResults.setLayoutManager(new LinearLayoutManager(view.getContext()));
-    mResults.setAdapter(mSearchAdapter);
+    mResults.setAdapter(new ConcatAdapter(mSearchAdapter, mOnlineAdapter));
 
     updateFrames();
     updateResultsPlaceholder();
@@ -466,6 +491,14 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
   {
     super.onStop();
     mToolbarController.detach();
+  }
+
+  @Override
+  public void onDestroyView()
+  {
+    mOnlinePresenter.setListener(null);
+    mOnlinePresenter.clear();
+    super.onDestroyView();
   }
 
   @Override
@@ -612,6 +645,9 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
     SearchEngine.INSTANCE.cancel();
 
     mLastQueryTimestamp = System.nanoTime();
+    mOnlinePresenter.onQueryChanged(getQuery(), isCategory(), Language.getKeyboardLocale(requireContext()),
+                                    getMapCenter(),
+                                    mLastPosition.valid ? new double[] {mLastPosition.lat, mLastPosition.lon} : null);
     if (isTabletSearch())
     {
       SearchEngine.INSTANCE.searchInteractive(requireContext(), getQuery(), isCategory(), mLastQueryTimestamp,
@@ -623,6 +659,9 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
                                         mLastPosition.valid, mLastPosition.lat, mLastPosition.lon,
                                         getOpeningHoursFilter()))
       {
+        // No new offline search (e.g. the same query again): decide with the results already shown.
+        mOnlinePresenter.onOfflineResults(toOfflinePlaces(mSearchAdapter.getResults()));
+        mOnlinePresenter.onOfflineSearchFinished();
         return;
       }
     }
@@ -640,12 +679,16 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
       return;
 
     refreshSearchResults(results);
+    if (timestamp == mLastQueryTimestamp)
+      mOnlinePresenter.onOfflineResults(toOfflinePlaces(results));
   }
 
   @Override
   public void onResultsEnd(long timestamp)
   {
     onSearchEnd();
+    if (isAdded() && timestamp == mLastQueryTimestamp && mToolbarController.hasQuery())
+      mOnlinePresenter.onOfflineSearchFinished();
   }
 
   @Override
@@ -684,6 +727,119 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
     if (isSearchActivity)
       closeSearch();
     return isSearchActivity;
+  }
+
+  private void initOnlineSearch()
+  {
+    mOnlinePresenter = OnlineSearchServices.get(requireContext()).createPresenter();
+    mOnlineAdapter = new OnlineSearchAdapter(new OnlineSearchAdapter.Listener() {
+      @Override
+      public void onEnableOnlineSearch()
+      {
+        OnlineSearchConsentDialog.show(requireContext(), granted -> {
+          if (isAdded())
+            mOnlinePresenter.onConsentChanged();
+        });
+      }
+
+      @Override
+      public void onRetry()
+      {
+        mOnlinePresenter.retry();
+      }
+
+      @Override
+      public void onShowResult(@NonNull OnlineSearchItem item)
+      {
+        showOnlineResultOnMap(item.getResult());
+      }
+
+      @Override
+      public void onDownloadRegion(@NonNull OnlineSearchItem item)
+      {
+        downloadRegion(item);
+      }
+    });
+    mOnlinePresenter.setListener(state -> {
+      if (!isAdded())
+        return;
+      mOnlineAdapter.setState(state);
+      updateResultsPlaceholder();
+    });
+  }
+
+  /** Map center {lat, lon} for the online search, null if the map is not ready. */
+  @Nullable
+  private static double[] getMapCenter()
+  {
+    try
+    {
+      final double[] center = Framework.nativeGetScreenRectCenter();
+      return center != null && center.length >= 2 ? center : null;
+    }
+    catch (RuntimeException | UnsatisfiedLinkError e)
+    {
+      return null;
+    }
+  }
+
+  @NonNull
+  private static List<OfflinePlace> toOfflinePlaces(@Nullable SearchResult[] results)
+  {
+    final List<OfflinePlace> places = new ArrayList<>();
+    if (results == null)
+      return places;
+    for (SearchResult result : results)
+    {
+      if (result.type != SearchResult.TYPE_RESULT)
+        continue;
+      final String name = !TextUtils.isEmpty(result.name)
+                            ? result.name
+                            : (result.description != null ? result.description.localizedFeatureType : "");
+      places.add(new OfflinePlace(name != null ? name : "", result.lat, result.lon));
+    }
+    return places;
+  }
+
+  /** Shows an online result as a marked point with a place page (like a map link), or picks it as a route point. */
+  void showOnlineResultOnMap(@NonNull OnlineSearchResult result)
+  {
+    final String query = getQuery();
+    if (Config.isSearchHistoryEnabled())
+      SearchRecents.add(query, requireContext());
+    // Also removes earlier marked points.
+    SearchEngine.INSTANCE.cancel();
+
+    if (RoutingController.get().isWaitingPoiPick())
+    {
+      final MapObject point = MapObject.createMapObject(FeatureId.EMPTY, MapObject.API_POINT, result.getTitle(),
+                                                        result.getAddress(), result.getLat(), result.getLon());
+      RoutingController.get().onPoiSelected(point);
+    }
+    else if (Framework.nativeParseAndSetApiUrl(OnlineSearchMapLink.toApiUrl(result)) == RequestType.MAP)
+    {
+      // Without a downloaded map at this place the map shows its download button.
+      Map.executeMapApiRequest();
+    }
+
+    mToolbarController.deactivate();
+
+    if (requireActivity() instanceof SearchActivity)
+      Utils.navigateToParent(requireActivity());
+  }
+
+  private void downloadRegion(@NonNull OnlineSearchItem item)
+  {
+    final RegionInfo region = item.getRegion();
+    if (region == null || region.isDownloaded())
+      return;
+    MapManagerHelper.warn3gAndDownload(requireActivity(), region.getId(), () -> {
+      if (isAdded())
+        Toast
+            .makeText(requireContext(), getString(R.string.online_search_download_started, region.getName()),
+                      Toast.LENGTH_SHORT)
+            .show();
+    });
   }
 
   private void closeSearch()

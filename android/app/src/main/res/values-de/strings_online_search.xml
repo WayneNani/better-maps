@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="online_search_settings_title">Online-Suche</string>
+  <string name="online_search_settings_summary">Orte in Regionen ohne heruntergeladene Karte finden</string>
+
+  <string name="online_search_section_title">Online-Ergebnisse (%1$s)</string>
+  <string name="online_search_attribution">Daten © OpenStreetMap-Mitwirkende</string>
+  <string name="online_search_offer">Hier ist keine Karte heruntergeladen oder offline gibt es wenige Treffer. Online mit Photon suchen?</string>
+  <string name="online_search_offer_button">Online suchen</string>
+  <string name="online_search_loading">Suche online …</string>
+  <string name="online_search_empty">Online keine weiteren Ergebnisse.</string>
+  <string name="online_search_retry">Erneut versuchen</string>
+  <string name="online_search_error_network">Keine Verbindung zum Server.</string>
+  <string name="online_search_error_server">Der Server ist gerade nicht erreichbar. Bitte später erneut versuchen.</string>
+  <string name="online_search_error_request">Der Server kann diese Suche nicht beantworten.</string>
+  <string name="online_search_error_disabled">Die Online-Suche ist ausgeschaltet.</string>
+  <string name="online_search_error_unknown">Etwas ist schiefgelaufen.</string>
+  <string name="online_search_download">Karte laden: %1$s (%2$s)</string>
+  <string name="online_search_download_no_size">Karte laden: %1$s</string>
+  <string name="online_search_download_started">Karte wird geladen: %1$s</string>
+
+  <string name="online_search_consent_title">Online-Suche nutzen?</string>
+  <string name="online_search_consent_message">Orte in Regionen ohne heruntergeladene Karte lassen sich online mit Photon finden, einem Suchdienst für OpenStreetMap-Daten. Dafür werden dein Suchbegriff und die ungefähre Kartenposition (auf etwa 1 km gerundet) an den Server gesendet, standardmäßig photon.komoot.io, betrieben von komoot. Sonst wird nichts übertragen. Online-Ergebnisse werden nur ergänzt, wenn die Offline-Suche wenig findet oder die Karte der Region fehlt. Du kannst das jederzeit unter Einstellungen → Online-Suche abschalten.</string>
+  <string name="online_search_consent_learn_more">Über Photon</string>
+  <string name="online_search_consent_accept">Erlauben</string>
+  <string name="online_search_consent_decline">Nicht jetzt</string>
+
+  <string name="online_search_pref_online">Online-Suche mit Photon</string>
+  <string name="online_search_pref_online_summary">Ergänzt die Offline-Suche, wenn sie wenig findet. Suchbegriff und ungefähre Kartenposition werden an den Server gesendet.</string>
+  <string name="online_search_pref_attribution">Daten: © OpenStreetMap-Mitwirkende (ODbL)</string>
+  <string name="online_search_pref_category_expert">Experten</string>
+  <string name="online_search_pref_server">Server</string>
+  <string name="online_search_pref_server_dialog">Adresse eines Photon-Servers, z. B. eines eigenen. Leer lassen für photon.komoot.io.</string>
+  <string name="online_search_pref_server_invalid">Ungültige Adresse. Sie muss mit https:// oder http:// beginnen.</string>
+</resources>

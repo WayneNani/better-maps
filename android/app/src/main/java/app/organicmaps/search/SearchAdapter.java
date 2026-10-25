@@ -252,6 +252,12 @@ class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchDataViewHol
     refreshData(null);
   }
 
+  @Nullable
+  SearchResult[] getResults()
+  {
+    return mResults;
+  }
+
   void refreshData(@Nullable SearchResult[] results)
   {
     mResults = results;
