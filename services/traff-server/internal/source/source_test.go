@@ -183,3 +183,48 @@ func TestRunOnceDeduplicates(t *testing.T) {
 		t.Errorf("without dedup: %d active", act)
 	}
 }
+
+// intervalSource is a fake source with its own fetch interval.
+type intervalSource struct {
+	fakeSource
+	interval time.Duration
+}
+
+func (s *intervalSource) Interval() time.Duration { return s.interval }
+
+func TestRunPerSourceInterval(t *testing.T) {
+	st := store.New(30*time.Minute, time.Hour)
+	slow := &fakeSource{name: "slow", results: []result{{msgs: []traff.Message{msg("slow:1")}}}}
+	fast := &intervalSource{fakeSource{name: "fast", results: []result{{msgs: []traff.Message{msg("fast:2")}}}}, 10 * time.Millisecond}
+	same := &intervalSource{fakeSource{name: "same", results: []result{{msgs: []traff.Message{}}}}, 0} // runner interval
+	r := NewRunner(st, time.Hour, slog.New(slog.NewTextHandler(&bytes.Buffer{}, nil)), slow, fast, same)
+	r.SetDeduplicator(prefixDedup{})
+	ctx, cancel := context.WithCancel(context.Background())
+	done := make(chan struct{})
+	go func() { r.Run(ctx); close(done) }()
+	deadline := time.Now().Add(5 * time.Second)
+	for {
+		fast.mu.Lock()
+		calls := fast.calls
+		fast.mu.Unlock()
+		if calls >= 4 {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("fast source fetched only %d times", calls)
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+	cancel()
+	<-done
+	slow.mu.Lock()
+	same.mu.Lock()
+	defer slow.mu.Unlock()
+	defer same.mu.Unlock()
+	if slow.calls != 1 || same.calls != 1 {
+		t.Errorf("sources with the runner interval fetched %d and %d times, want 1", slow.calls, same.calls)
+	}
+	if e := st.Get("fast:2"); e == nil || e.Cancelled() {
+		t.Error("fast source not stored")
+	}
+}
