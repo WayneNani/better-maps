@@ -1,0 +1,3591 @@
+{
+  "version": 1,
+  "generated": "2026-10-25T17:17:07Z",
+  "window_seconds": 60,
+  "k": 10,
+  "epsilon": 3,
+  "segments": [
+    {
+      "id": "org.bettermaps.crowd:17/70394/43010/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70394,
+        43010
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.477889,
+        "lon": 13.345642
+      },
+      "to": {
+        "lat": 52.478098,
+        "lon": 13.342896
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 46,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.063,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70394/43010/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70394,
+        43010
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.478098,
+        "lon": 13.342896
+      },
+      "to": {
+        "lat": 52.477889,
+        "lon": 13.345642
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 77,
+      "speed_kmh": 95.9,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.959,
+      "slow_share": 0.021,
+      "slow_share_se": 0.06,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70395/43010/S-W/MOTORWAY",
+      "tile": [
+        17,
+        70395,
+        43010
+      ],
+      "entry": "S",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.477762,
+        "lon": 13.346806
+      },
+      "to": {
+        "lat": 52.477889,
+        "lon": 13.345642
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 47,
+      "speed_kmh": 93.6,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.936,
+      "slow_share": 0.115,
+      "slow_share_se": 0.089,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70395/43010/W-S/MOTORWAY",
+      "tile": [
+        17,
+        70395,
+        43010
+      ],
+      "entry": "W",
+      "exit": "S",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.477889,
+        "lon": 13.345642
+      },
+      "to": {
+        "lat": 52.477762,
+        "lon": 13.346806
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 73,
+      "speed_kmh": 93.4,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.934,
+      "slow_share": 0.095,
+      "slow_share_se": 0.07,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70395/43011/E-N/MOTORWAY",
+      "tile": [
+        17,
+        70395,
+        43011
+      ],
+      "entry": "E",
+      "exit": "N",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.477628,
+        "lon": 13.348389
+      },
+      "to": {
+        "lat": 52.477762,
+        "lon": 13.346806
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 54,
+      "speed_kmh": 94.3,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.943,
+      "slow_share": 0.038,
+      "slow_share_se": 0.077,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70395/43011/N-E/MOTORWAY",
+      "tile": [
+        17,
+        70395,
+        43011
+      ],
+      "entry": "N",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.477762,
+        "lon": 13.346806
+      },
+      "to": {
+        "lat": 52.477628,
+        "lon": 13.348389
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 85,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.058,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70396/43011/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70396,
+        43011
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.477367,
+        "lon": 13.351135
+      },
+      "to": {
+        "lat": 52.477628,
+        "lon": 13.348389
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 45,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.078,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70396/43011/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70396,
+        43011
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.477628,
+        "lon": 13.348389
+      },
+      "to": {
+        "lat": 52.477367,
+        "lon": 13.351135
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 79,
+      "speed_kmh": 91.4,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.914,
+      "slow_share": 0.208,
+      "slow_share_se": 0.073,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70397/43011/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70397,
+        43011
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.477053,
+        "lon": 13.353882
+      },
+      "to": {
+        "lat": 52.477367,
+        "lon": 13.351135
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 48,
+      "speed_kmh": 94.5,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.945,
+      "slow_share": 0.031,
+      "slow_share_se": 0.08,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70397/43011/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70397,
+        43011
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.477367,
+        "lon": 13.351135
+      },
+      "to": {
+        "lat": 52.477053,
+        "lon": 13.353882
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 73,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.053,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70398/43011/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70398,
+        43011
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.476635,
+        "lon": 13.356628
+      },
+      "to": {
+        "lat": 52.477053,
+        "lon": 13.353882
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 38,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.081,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70398/43011/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70398,
+        43011
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.477053,
+        "lon": 13.353882
+      },
+      "to": {
+        "lat": 52.476635,
+        "lon": 13.356628
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 72,
+      "speed_kmh": 93.5,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.935,
+      "slow_share": 0.09,
+      "slow_share_se": 0.07,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70399/43011/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70399,
+        43011
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.476216,
+        "lon": 13.359375
+      },
+      "to": {
+        "lat": 52.476635,
+        "lon": 13.356628
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 46,
+      "speed_kmh": 93.5,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.935,
+      "slow_share": 0.085,
+      "slow_share_se": 0.086,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70399/43011/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70399,
+        43011
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.476635,
+        "lon": 13.356628
+      },
+      "to": {
+        "lat": 52.476216,
+        "lon": 13.359375
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 78,
+      "speed_kmh": 94.1,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.941,
+      "slow_share": 0.055,
+      "slow_share_se": 0.065,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70400/43011/S-W/MOTORWAY",
+      "tile": [
+        17,
+        70400,
+        43011
+      ],
+      "entry": "S",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.476089,
+        "lon": 13.360196
+      },
+      "to": {
+        "lat": 52.476216,
+        "lon": 13.359375
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 39,
+      "speed_kmh": 94.3,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.943,
+      "slow_share": 0.046,
+      "slow_share_se": 0.088,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70400/43011/W-S/MOTORWAY",
+      "tile": [
+        17,
+        70400,
+        43011
+      ],
+      "entry": "W",
+      "exit": "S",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.476216,
+        "lon": 13.359375
+      },
+      "to": {
+        "lat": 52.476089,
+        "lon": 13.360196
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 80,
+      "speed_kmh": 94.3,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.943,
+      "slow_share": 0.047,
+      "slow_share_se": 0.061,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70400/43012/E-N/MOTORWAY",
+      "tile": [
+        17,
+        70400,
+        43012
+      ],
+      "entry": "E",
+      "exit": "N",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.475798,
+        "lon": 13.362122
+      },
+      "to": {
+        "lat": 52.476089,
+        "lon": 13.360196
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 46,
+      "speed_kmh": 94.3,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.943,
+      "slow_share": 0.065,
+      "slow_share_se": 0.083,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70400/43012/N-E/MOTORWAY",
+      "tile": [
+        17,
+        70400,
+        43012
+      ],
+      "entry": "N",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.476089,
+        "lon": 13.360196
+      },
+      "to": {
+        "lat": 52.475798,
+        "lon": 13.362122
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 68,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.061,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70401/43012/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70401,
+        43012
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.475171,
+        "lon": 13.364868
+      },
+      "to": {
+        "lat": 52.475798,
+        "lon": 13.362122
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 34,
+      "speed_kmh": 93.3,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.933,
+      "slow_share": 0.105,
+      "slow_share_se": 0.103,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70401/43012/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70401,
+        43012
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.475798,
+        "lon": 13.362122
+      },
+      "to": {
+        "lat": 52.475171,
+        "lon": 13.364868
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 71,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.059,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70402/43012/S-W/MOTORWAY",
+      "tile": [
+        17,
+        70402,
+        43012
+      ],
+      "entry": "S",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.474416,
+        "lon": 13.367062
+      },
+      "to": {
+        "lat": 52.475171,
+        "lon": 13.364868
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 52,
+      "speed_kmh": 94.9,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.949,
+      "slow_share": 0.048,
+      "slow_share_se": 0.077,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70402/43012/W-S/MOTORWAY",
+      "tile": [
+        17,
+        70402,
+        43012
+      ],
+      "entry": "W",
+      "exit": "S",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.475171,
+        "lon": 13.364868
+      },
+      "to": {
+        "lat": 52.474416,
+        "lon": 13.367062
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 78,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.059,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70403/43013/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70403,
+        43013
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.473236,
+        "lon": 13.370361
+      },
+      "to": {
+        "lat": 52.474178,
+        "lon": 13.367615
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 50,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.067,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70403/43013/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70403,
+        43013
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.474178,
+        "lon": 13.367615
+      },
+      "to": {
+        "lat": 52.473236,
+        "lon": 13.370361
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 74,
+      "speed_kmh": 94.4,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.944,
+      "slow_share": 0.038,
+      "slow_share_se": 0.062,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70404/43013/S-W/MOTORWAY",
+      "tile": [
+        17,
+        70404,
+        43013
+      ],
+      "entry": "S",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.472743,
+        "lon": 13.371697
+      },
+      "to": {
+        "lat": 52.473236,
+        "lon": 13.370361
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 40,
+      "speed_kmh": 94.4,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.944,
+      "slow_share": 0.041,
+      "slow_share_se": 0.09,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70404/43013/W-S/MOTORWAY",
+      "tile": [
+        17,
+        70404,
+        43013
+      ],
+      "entry": "W",
+      "exit": "S",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.473236,
+        "lon": 13.370361
+      },
+      "to": {
+        "lat": 52.472743,
+        "lon": 13.371697
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 86,
+      "speed_kmh": 94.2,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.942,
+      "slow_share": 0.047,
+      "slow_share_se": 0.06,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70404/43014/E-N/MOTORWAY",
+      "tile": [
+        17,
+        70404,
+        43014
+      ],
+      "entry": "E",
+      "exit": "N",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.472243,
+        "lon": 13.373108
+      },
+      "to": {
+        "lat": 52.472743,
+        "lon": 13.371697
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 44,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.079,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70404/43014/N-E/MOTORWAY",
+      "tile": [
+        17,
+        70404,
+        43014
+      ],
+      "entry": "N",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.472743,
+        "lon": 13.371697
+      },
+      "to": {
+        "lat": 52.472243,
+        "lon": 13.373108
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 84,
+      "speed_kmh": 94.1,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.941,
+      "slow_share": 0.054,
+      "slow_share_se": 0.061,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70405/43014/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70405,
+        43014
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.47125,
+        "lon": 13.375854
+      },
+      "to": {
+        "lat": 52.472243,
+        "lon": 13.373108
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 48,
+      "speed_kmh": 94.4,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.944,
+      "slow_share": 0.036,
+      "slow_share_se": 0.08,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70405/43014/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70405,
+        43014
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.472243,
+        "lon": 13.373108
+      },
+      "to": {
+        "lat": 52.47125,
+        "lon": 13.375854
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 74,
+      "speed_kmh": 94.1,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.941,
+      "slow_share": 0.057,
+      "slow_share_se": 0.065,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70406/43015/E-N/MOTORWAY",
+      "tile": [
+        17,
+        70406,
+        43015
+      ],
+      "entry": "E",
+      "exit": "N",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.469995,
+        "lon": 13.378601
+      },
+      "to": {
+        "lat": 52.47107,
+        "lon": 13.376246
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 48,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.065,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70406/43015/N-E/MOTORWAY",
+      "tile": [
+        17,
+        70406,
+        43015
+      ],
+      "entry": "N",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.47107,
+        "lon": 13.376246
+      },
+      "to": {
+        "lat": 52.469995,
+        "lon": 13.378601
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 74,
+      "speed_kmh": 16.5,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.165,
+      "slow_share": 0.956,
+      "slow_share_se": 0.049,
+      "state": "QUEUE",
+      "confident": true,
+      "congested": true,
+      "traff_event": "CONGESTION_QUEUE",
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70407/43015/S-W/MOTORWAY",
+      "tile": [
+        17,
+        70407,
+        43015
+      ],
+      "entry": "S",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.469397,
+        "lon": 13.379937
+      },
+      "to": {
+        "lat": 52.469995,
+        "lon": 13.378601
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 38,
+      "speed_kmh": 92.6,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.926,
+      "slow_share": 0.132,
+      "slow_share_se": 0.101,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70407/43015/W-S/MOTORWAY",
+      "tile": [
+        17,
+        70407,
+        43015
+      ],
+      "entry": "W",
+      "exit": "S",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.469995,
+        "lon": 13.378601
+      },
+      "to": {
+        "lat": 52.469397,
+        "lon": 13.379937
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 71,
+      "speed_kmh": 5,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.05,
+      "slow_share": 1,
+      "slow_share_se": 0.027,
+      "state": "STATIONARY_TRAFFIC",
+      "confident": true,
+      "congested": true,
+      "traff_event": "CONGESTION_STATIONARY_TRAFFIC",
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70407/43016/E-N/MOTORWAY",
+      "tile": [
+        17,
+        70407,
+        43016
+      ],
+      "entry": "E",
+      "exit": "N",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.46874,
+        "lon": 13.381348
+      },
+      "to": {
+        "lat": 52.469397,
+        "lon": 13.379937
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 46,
+      "speed_kmh": 94.3,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.943,
+      "slow_share": 0.043,
+      "slow_share_se": 0.086,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70407/43016/N-E/MOTORWAY",
+      "tile": [
+        17,
+        70407,
+        43016
+      ],
+      "entry": "N",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.469397,
+        "lon": 13.379937
+      },
+      "to": {
+        "lat": 52.46874,
+        "lon": 13.381348
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 69,
+      "speed_kmh": 6.3,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.063,
+      "slow_share": 1,
+      "slow_share_se": 0.02,
+      "state": "STATIONARY_TRAFFIC",
+      "confident": true,
+      "congested": true,
+      "traff_event": "CONGESTION_STATIONARY_TRAFFIC",
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70408/43016/S-W/MOTORWAY",
+      "tile": [
+        17,
+        70408,
+        43016
+      ],
+      "entry": "S",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.467724,
+        "lon": 13.383542
+      },
+      "to": {
+        "lat": 52.46874,
+        "lon": 13.381348
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 39,
+      "speed_kmh": 94,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.94,
+      "slow_share": 0.05,
+      "slow_share_se": 0.092,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70408/43016/W-S/MOTORWAY",
+      "tile": [
+        17,
+        70408,
+        43016
+      ],
+      "entry": "W",
+      "exit": "S",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.46874,
+        "lon": 13.381348
+      },
+      "to": {
+        "lat": 52.467724,
+        "lon": 13.383542
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 65,
+      "speed_kmh": 5,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.05,
+      "slow_share": 1,
+      "slow_share_se": 0.041,
+      "state": "STATIONARY_TRAFFIC",
+      "confident": true,
+      "congested": true,
+      "traff_event": "CONGESTION_STATIONARY_TRAFFIC",
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70408/43025/E-S/PRIMARY",
+      "tile": [
+        17,
+        70408,
+        43025
+      ],
+      "entry": "E",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.453522,
+        "lon": 13.384094
+      },
+      "to": {
+        "lat": 52.452662,
+        "lon": 13.384057
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 47,
+      "speed_kmh": 45.1,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.902,
+      "slow_share": 0.124,
+      "slow_share_se": 0.071,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43004/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43004
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.48947,
+        "lon": 13.385945
+      },
+      "to": {
+        "lat": 52.487798,
+        "lon": 13.385945
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 54,
+      "speed_kmh": 45,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.9,
+      "slow_share": 0.154,
+      "slow_share_se": 0.062,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43005/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43005
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.487798,
+        "lon": 13.385945
+      },
+      "to": {
+        "lat": 52.486125,
+        "lon": 13.385859
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 62,
+      "speed_kmh": 45,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.9,
+      "slow_share": 0.125,
+      "slow_share_se": 0.055,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43006/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43006
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.486125,
+        "lon": 13.385859
+      },
+      "to": {
+        "lat": 52.484453,
+        "lon": 13.385859
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 47,
+      "speed_kmh": 44.8,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.896,
+      "slow_share": 0.175,
+      "slow_share_se": 0.071,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43007/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43007
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.484453,
+        "lon": 13.385859
+      },
+      "to": {
+        "lat": 52.48278,
+        "lon": 13.385773
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 52,
+      "speed_kmh": 44.7,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.894,
+      "slow_share": 0.149,
+      "slow_share_se": 0.061,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43008/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43008
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.48278,
+        "lon": 13.385773
+      },
+      "to": {
+        "lat": 52.481108,
+        "lon": 13.385687
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 49,
+      "speed_kmh": 45,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.9,
+      "slow_share": 0.125,
+      "slow_share_se": 0.053,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43009/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43009
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.481108,
+        "lon": 13.385687
+      },
+      "to": {
+        "lat": 52.479435,
+        "lon": 13.385687
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 53,
+      "speed_kmh": 45,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.9,
+      "slow_share": 0.13,
+      "slow_share_se": 0.059,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43010/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43010
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.479435,
+        "lon": 13.385687
+      },
+      "to": {
+        "lat": 52.477762,
+        "lon": 13.385602
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 51,
+      "speed_kmh": 45.1,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.901,
+      "slow_share": 0.124,
+      "slow_share_se": 0.066,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43011/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43011
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.477762,
+        "lon": 13.385602
+      },
+      "to": {
+        "lat": 52.476089,
+        "lon": 13.385516
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 49,
+      "speed_kmh": 45,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.9,
+      "slow_share": 0.125,
+      "slow_share_se": 0.053,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43012/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43012
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.476089,
+        "lon": 13.385516
+      },
+      "to": {
+        "lat": 52.474416,
+        "lon": 13.38543
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 42,
+      "speed_kmh": 44.9,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.898,
+      "slow_share": 0.135,
+      "slow_share_se": 0.062,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43013/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43013
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.474416,
+        "lon": 13.38543
+      },
+      "to": {
+        "lat": 52.472743,
+        "lon": 13.385344
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 48,
+      "speed_kmh": 45,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.9,
+      "slow_share": 0.125,
+      "slow_share_se": 0.028,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43014/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43014
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.472743,
+        "lon": 13.385344
+      },
+      "to": {
+        "lat": 52.47107,
+        "lon": 13.385258
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 36,
+      "speed_kmh": 45.4,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.907,
+      "slow_share": 0.125,
+      "slow_share_se": 0.079,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43015/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43015
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.47107,
+        "lon": 13.385258
+      },
+      "to": {
+        "lat": 52.469397,
+        "lon": 13.385172
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 44,
+      "speed_kmh": 45,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.899,
+      "slow_share": 0.128,
+      "slow_share_se": 0.031,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43016/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43016
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.469397,
+        "lon": 13.385172
+      },
+      "to": {
+        "lat": 52.467724,
+        "lon": 13.385001
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 52,
+      "speed_kmh": 45.1,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.901,
+      "slow_share": 0.129,
+      "slow_share_se": 0.068,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43017/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70409,
+        43017
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.466701,
+        "lon": 13.386841
+      },
+      "to": {
+        "lat": 52.467433,
+        "lon": 13.384094
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 50,
+      "speed_kmh": 94.9,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.949,
+      "slow_share": 0.008,
+      "slow_share_se": 0.077,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43017/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43017
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.467724,
+        "lon": 13.385001
+      },
+      "to": {
+        "lat": 52.46605,
+        "lon": 13.384915
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 40,
+      "speed_kmh": 45,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.9,
+      "slow_share": 0.125,
+      "slow_share_se": 0.047,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43017/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70409,
+        43017
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.467433,
+        "lon": 13.384094
+      },
+      "to": {
+        "lat": 52.466701,
+        "lon": 13.386841
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 64,
+      "speed_kmh": 5,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.05,
+      "slow_share": 1,
+      "slow_share_se": 0.03,
+      "state": "STATIONARY_TRAFFIC",
+      "confident": true,
+      "congested": true,
+      "traff_event": "CONGESTION_STATIONARY_TRAFFIC",
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43018/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43018
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.46605,
+        "lon": 13.384915
+      },
+      "to": {
+        "lat": 52.464377,
+        "lon": 13.384829
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 46,
+      "speed_kmh": 45,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.9,
+      "slow_share": 0.125,
+      "slow_share_se": 0.05,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43019/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43019
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.464377,
+        "lon": 13.384829
+      },
+      "to": {
+        "lat": 52.462704,
+        "lon": 13.384658
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 50,
+      "speed_kmh": 45,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.9,
+      "slow_share": 0.125,
+      "slow_share_se": 0.052,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43020/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43020
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.462704,
+        "lon": 13.384658
+      },
+      "to": {
+        "lat": 52.46103,
+        "lon": 13.384572
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 44,
+      "speed_kmh": 44.8,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.896,
+      "slow_share": 0.141,
+      "slow_share_se": 0.059,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43021/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43021
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.46103,
+        "lon": 13.384572
+      },
+      "to": {
+        "lat": 52.459357,
+        "lon": 13.384486
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 50,
+      "speed_kmh": 44.9,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.898,
+      "slow_share": 0.143,
+      "slow_share_se": 0.058,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43022/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43022
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.459357,
+        "lon": 13.384486
+      },
+      "to": {
+        "lat": 52.457683,
+        "lon": 13.3844
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 55,
+      "speed_kmh": 45,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.899,
+      "slow_share": 0.195,
+      "slow_share_se": 0.071,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43023/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43023
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.457683,
+        "lon": 13.3844
+      },
+      "to": {
+        "lat": 52.456009,
+        "lon": 13.384228
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 50,
+      "speed_kmh": 45.2,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.904,
+      "slow_share": 0.122,
+      "slow_share_se": 0.067,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43024/N-S/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43024
+      ],
+      "entry": "N",
+      "exit": "S",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.456009,
+        "lon": 13.384228
+      },
+      "to": {
+        "lat": 52.454336,
+        "lon": 13.384143
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 51,
+      "speed_kmh": 44.1,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.882,
+      "slow_share": 0.204,
+      "slow_share_se": 0.062,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70409/43025/N-W/PRIMARY",
+      "tile": [
+        17,
+        70409,
+        43025
+      ],
+      "entry": "N",
+      "exit": "W",
+      "road_class": "PRIMARY",
+      "from": {
+        "lat": 52.454336,
+        "lon": 13.384143
+      },
+      "to": {
+        "lat": 52.453522,
+        "lon": 13.384094
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 54,
+      "speed_kmh": 45,
+      "ref_speed_kmh": 50,
+      "ref_source": "road_class_default",
+      "ratio": 0.9,
+      "slow_share": 0.125,
+      "slow_share_se": 0.049,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70410/43017/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70410,
+        43017
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.466387,
+        "lon": 13.389587
+      },
+      "to": {
+        "lat": 52.466701,
+        "lon": 13.386841
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 37,
+      "speed_kmh": 94.5,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.945,
+      "slow_share": 0.046,
+      "slow_share_se": 0.092,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70410/43017/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70410,
+        43017
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.466701,
+        "lon": 13.386841
+      },
+      "to": {
+        "lat": 52.466387,
+        "lon": 13.389587
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 63,
+      "speed_kmh": 5.2,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.052,
+      "slow_share": 0.998,
+      "slow_share_se": 0.037,
+      "state": "STATIONARY_TRAFFIC",
+      "confident": true,
+      "congested": true,
+      "traff_event": "CONGESTION_STATIONARY_TRAFFIC",
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70411/43017/S-W/MOTORWAY",
+      "tile": [
+        17,
+        70411,
+        43017
+      ],
+      "entry": "S",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.46605,
+        "lon": 13.392125
+      },
+      "to": {
+        "lat": 52.466387,
+        "lon": 13.389587
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 37,
+      "speed_kmh": 94.5,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.945,
+      "slow_share": 0.03,
+      "slow_share_se": 0.092,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70411/43017/W-S/MOTORWAY",
+      "tile": [
+        17,
+        70411,
+        43017
+      ],
+      "entry": "W",
+      "exit": "S",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.466387,
+        "lon": 13.389587
+      },
+      "to": {
+        "lat": 52.46605,
+        "lon": 13.392125
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 68,
+      "speed_kmh": 5,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.05,
+      "slow_share": 1,
+      "slow_share_se": 0.043,
+      "state": "STATIONARY_TRAFFIC",
+      "confident": true,
+      "congested": true,
+      "traff_event": "CONGESTION_STATIONARY_TRAFFIC",
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70412/43018/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70412,
+        43018
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.465707,
+        "lon": 13.395081
+      },
+      "to": {
+        "lat": 52.466021,
+        "lon": 13.392334
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 35,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.074,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70412/43018/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70412,
+        43018
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.466021,
+        "lon": 13.392334
+      },
+      "to": {
+        "lat": 52.465707,
+        "lon": 13.395081
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 60,
+      "speed_kmh": 5.1,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.051,
+      "slow_share": 0.986,
+      "slow_share_se": 0.053,
+      "state": "STATIONARY_TRAFFIC",
+      "confident": true,
+      "congested": true,
+      "traff_event": "CONGESTION_STATIONARY_TRAFFIC",
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70413/43018/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70413,
+        43018
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.465341,
+        "lon": 13.397827
+      },
+      "to": {
+        "lat": 52.465707,
+        "lon": 13.395081
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 42,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.068,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70413/43018/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70413,
+        43018
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.465707,
+        "lon": 13.395081
+      },
+      "to": {
+        "lat": 52.465341,
+        "lon": 13.397827
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 67,
+      "speed_kmh": 6.2,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.062,
+      "slow_share": 0.94,
+      "slow_share_se": 0.054,
+      "state": "STATIONARY_TRAFFIC",
+      "confident": true,
+      "congested": true,
+      "traff_event": "CONGESTION_STATIONARY_TRAFFIC",
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70414/43018/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70414,
+        43018
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.465132,
+        "lon": 13.400574
+      },
+      "to": {
+        "lat": 52.465341,
+        "lon": 13.397827
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 44,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.052,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70414/43018/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70414,
+        43018
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.465341,
+        "lon": 13.397827
+      },
+      "to": {
+        "lat": 52.465132,
+        "lon": 13.400574
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 74,
+      "speed_kmh": 5,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.05,
+      "slow_share": 1,
+      "slow_share_se": 0.031,
+      "state": "STATIONARY_TRAFFIC",
+      "confident": true,
+      "congested": true,
+      "traff_event": "CONGESTION_STATIONARY_TRAFFIC",
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70415/43018/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70415,
+        43018
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464975,
+        "lon": 13.40332
+      },
+      "to": {
+        "lat": 52.465132,
+        "lon": 13.400574
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 41,
+      "speed_kmh": 94.5,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.945,
+      "slow_share": 0.033,
+      "slow_share_se": 0.085,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70415/43018/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70415,
+        43018
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.465132,
+        "lon": 13.400574
+      },
+      "to": {
+        "lat": 52.464975,
+        "lon": 13.40332
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 83,
+      "speed_kmh": 5.3,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.053,
+      "slow_share": 0.969,
+      "slow_share_se": 0.047,
+      "state": "STATIONARY_TRAFFIC",
+      "confident": true,
+      "congested": true,
+      "traff_event": "CONGESTION_STATIONARY_TRAFFIC",
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70416/43018/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70416,
+        43018
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464818,
+        "lon": 13.406067
+      },
+      "to": {
+        "lat": 52.464975,
+        "lon": 13.40332
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 43,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.081,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70416/43018/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70416,
+        43018
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464975,
+        "lon": 13.40332
+      },
+      "to": {
+        "lat": 52.464818,
+        "lon": 13.406067
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 76,
+      "speed_kmh": 15.3,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.153,
+      "slow_share": 0.987,
+      "slow_share_se": 0.025,
+      "state": "QUEUE",
+      "confident": true,
+      "congested": true,
+      "traff_event": "CONGESTION_QUEUE",
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70417/43018/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70417,
+        43018
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464714,
+        "lon": 13.408813
+      },
+      "to": {
+        "lat": 52.464818,
+        "lon": 13.406067
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 42,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.062,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70417/43018/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70417,
+        43018
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464818,
+        "lon": 13.406067
+      },
+      "to": {
+        "lat": 52.464714,
+        "lon": 13.408813
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 81,
+      "speed_kmh": 94.4,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.944,
+      "slow_share": 0.029,
+      "slow_share_se": 0.059,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70418/43018/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70418,
+        43018
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464557,
+        "lon": 13.41156
+      },
+      "to": {
+        "lat": 52.464714,
+        "lon": 13.408813
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 47,
+      "speed_kmh": 94.7,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.947,
+      "slow_share": 0.02,
+      "slow_share_se": 0.082,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70418/43018/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70418,
+        43018
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464714,
+        "lon": 13.408813
+      },
+      "to": {
+        "lat": 52.464557,
+        "lon": 13.41156
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 75,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.056,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70419/43018/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70419,
+        43018
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464452,
+        "lon": 13.414307
+      },
+      "to": {
+        "lat": 52.464557,
+        "lon": 13.41156
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 43,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.072,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70419/43018/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70419,
+        43018
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464557,
+        "lon": 13.41156
+      },
+      "to": {
+        "lat": 52.464452,
+        "lon": 13.414307
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 86,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.056,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70420/43018/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70420,
+        43018
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.4644,
+        "lon": 13.417053
+      },
+      "to": {
+        "lat": 52.464452,
+        "lon": 13.414307
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 31,
+      "speed_kmh": 94.4,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.944,
+      "slow_share": 0.037,
+      "slow_share_se": 0.09,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70420/43018/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70420,
+        43018
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464452,
+        "lon": 13.414307
+      },
+      "to": {
+        "lat": 52.4644,
+        "lon": 13.417053
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 74,
+      "speed_kmh": 94.2,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.942,
+      "slow_share": 0.053,
+      "slow_share_se": 0.067,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70421/43018/S-W/MOTORWAY",
+      "tile": [
+        17,
+        70421,
+        43018
+      ],
+      "entry": "S",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464377,
+        "lon": 13.418389
+      },
+      "to": {
+        "lat": 52.4644,
+        "lon": 13.417053
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 39,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.079,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70421/43018/W-S/MOTORWAY",
+      "tile": [
+        17,
+        70421,
+        43018
+      ],
+      "entry": "W",
+      "exit": "S",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.4644,
+        "lon": 13.417053
+      },
+      "to": {
+        "lat": 52.464377,
+        "lon": 13.418389
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 70,
+      "speed_kmh": 94.8,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.948,
+      "slow_share": 0.012,
+      "slow_share_se": 0.064,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70421/43019/E-N/MOTORWAY",
+      "tile": [
+        17,
+        70421,
+        43019
+      ],
+      "entry": "E",
+      "exit": "N",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464348,
+        "lon": 13.4198
+      },
+      "to": {
+        "lat": 52.464377,
+        "lon": 13.418389
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 38,
+      "speed_kmh": 94.8,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.948,
+      "slow_share": 0.014,
+      "slow_share_se": 0.086,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70421/43019/N-E/MOTORWAY",
+      "tile": [
+        17,
+        70421,
+        43019
+      ],
+      "entry": "N",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464377,
+        "lon": 13.418389
+      },
+      "to": {
+        "lat": 52.464348,
+        "lon": 13.4198
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 72,
+      "speed_kmh": 94,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.94,
+      "slow_share": 0.066,
+      "slow_share_se": 0.068,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70422/43019/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70422,
+        43019
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464295,
+        "lon": 13.422546
+      },
+      "to": {
+        "lat": 52.464348,
+        "lon": 13.4198
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 41,
+      "speed_kmh": 92.7,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.927,
+      "slow_share": 0.133,
+      "slow_share_se": 0.095,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70422/43019/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70422,
+        43019
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464348,
+        "lon": 13.4198
+      },
+      "to": {
+        "lat": 52.464295,
+        "lon": 13.422546
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 81,
+      "speed_kmh": 94.7,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.947,
+      "slow_share": 0.028,
+      "slow_share_se": 0.06,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70423/43019/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70423,
+        43019
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464191,
+        "lon": 13.425293
+      },
+      "to": {
+        "lat": 52.464295,
+        "lon": 13.422546
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 44,
+      "speed_kmh": 94.5,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.945,
+      "slow_share": 0.034,
+      "slow_share_se": 0.086,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70423/43019/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70423,
+        43019
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464295,
+        "lon": 13.422546
+      },
+      "to": {
+        "lat": 52.464191,
+        "lon": 13.425293
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 73,
+      "speed_kmh": 94.3,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.943,
+      "slow_share": 0.08,
+      "slow_share_se": 0.069,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70424/43019/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70424,
+        43019
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464138,
+        "lon": 13.42804
+      },
+      "to": {
+        "lat": 52.464191,
+        "lon": 13.425293
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 44,
+      "speed_kmh": 94,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.94,
+      "slow_share": 0.068,
+      "slow_share_se": 0.086,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70424/43019/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70424,
+        43019
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464191,
+        "lon": 13.425293
+      },
+      "to": {
+        "lat": 52.464138,
+        "lon": 13.42804
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 80,
+      "speed_kmh": 93.9,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.939,
+      "slow_share": 0.067,
+      "slow_share_se": 0.066,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70425/43019/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70425,
+        43019
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464086,
+        "lon": 13.430786
+      },
+      "to": {
+        "lat": 52.464138,
+        "lon": 13.42804
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 43,
+      "speed_kmh": 93.8,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.938,
+      "slow_share": 0.075,
+      "slow_share_se": 0.091,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70425/43019/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70425,
+        43019
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464138,
+        "lon": 13.42804
+      },
+      "to": {
+        "lat": 52.464086,
+        "lon": 13.430786
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 75,
+      "speed_kmh": 94.1,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.941,
+      "slow_share": 0.059,
+      "slow_share_se": 0.066,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70426/43019/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70426,
+        43019
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464034,
+        "lon": 13.433533
+      },
+      "to": {
+        "lat": 52.464086,
+        "lon": 13.430786
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 43,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0.015,
+      "slow_share_se": 0.077,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70426/43019/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70426,
+        43019
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464086,
+        "lon": 13.430786
+      },
+      "to": {
+        "lat": 52.464034,
+        "lon": 13.433533
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 79,
+      "speed_kmh": 94.6,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.946,
+      "slow_share": 0.019,
+      "slow_share_se": 0.062,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70427/43019/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70427,
+        43019
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.463982,
+        "lon": 13.436279
+      },
+      "to": {
+        "lat": 52.464034,
+        "lon": 13.433533
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 57,
+      "speed_kmh": 94.3,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.943,
+      "slow_share": 0.039,
+      "slow_share_se": 0.076,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70427/43019/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70427,
+        43019
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.464034,
+        "lon": 13.433533
+      },
+      "to": {
+        "lat": 52.463982,
+        "lon": 13.436279
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 83,
+      "speed_kmh": 94.4,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.944,
+      "slow_share": 0.031,
+      "slow_share_se": 0.062,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70428/43019/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70428,
+        43019
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.463877,
+        "lon": 13.439026
+      },
+      "to": {
+        "lat": 52.463982,
+        "lon": 13.436279
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 36,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.079,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70428/43019/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70428,
+        43019
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.463982,
+        "lon": 13.436279
+      },
+      "to": {
+        "lat": 52.463877,
+        "lon": 13.439026
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 80,
+      "speed_kmh": 94.7,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.947,
+      "slow_share": 0.022,
+      "slow_share_se": 0.06,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70429/43019/E-W/MOTORWAY",
+      "tile": [
+        17,
+        70429,
+        43019
+      ],
+      "entry": "E",
+      "exit": "W",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.463825,
+        "lon": 13.441772
+      },
+      "to": {
+        "lat": 52.463877,
+        "lon": 13.439026
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 48,
+      "speed_kmh": 95,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.95,
+      "slow_share": 0,
+      "slow_share_se": 0.06,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    },
+    {
+      "id": "org.bettermaps.crowd:17/70429/43019/W-E/MOTORWAY",
+      "tile": [
+        17,
+        70429,
+        43019
+      ],
+      "entry": "W",
+      "exit": "E",
+      "road_class": "MOTORWAY",
+      "from": {
+        "lat": 52.463877,
+        "lon": 13.439026
+      },
+      "to": {
+        "lat": 52.463825,
+        "lon": 13.441772
+      },
+      "window_start": "2026-10-25T17:16:00Z",
+      "window_end": "2026-10-25T17:17:00Z",
+      "reports": 77,
+      "speed_kmh": 92.9,
+      "ref_speed_kmh": 100,
+      "ref_source": "road_class_default",
+      "ratio": 0.929,
+      "slow_share": 0.131,
+      "slow_share_se": 0.069,
+      "state": "FREE_FLOW",
+      "confident": true,
+      "congested": false,
+      "first_seen": "2026-10-25T17:17:05Z",
+      "updated": "2026-10-25T17:17:05Z",
+      "expires": "2026-10-25T17:18:10Z"
+    }
+  ]
+}
