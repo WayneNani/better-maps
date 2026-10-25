@@ -101,6 +101,8 @@ public final class TransitConnectionsPresenter
   private TransitError mError;
   @Nullable
   private TransitError mPagingError;
+  // Which page failed, for retry().
+  private boolean mFailedPageEarlier;
 
   @NonNull
   private final List<TransitItinerary> mItineraries = new ArrayList<>();
@@ -188,7 +190,7 @@ public final class TransitConnectionsPresenter
       startQuery(true);
   }
 
-  /** Explicit retry after an error. */
+  /** Explicit retry after an error: repeats the failed query or page. */
   public void retry()
   {
     if (!hasQuery())
@@ -201,7 +203,10 @@ public final class TransitConnectionsPresenter
     if (mPagingError != null)
     {
       mPagingError = null;
-      render();
+      if (mFailedPageEarlier)
+        loadEarlier();
+      else
+        loadLater();
     }
   }
 
@@ -232,6 +237,7 @@ public final class TransitConnectionsPresenter
             return;
           mLoadingEarlier = false;
           mPagingError = TransitError.from(error);
+          mFailedPageEarlier = true;
           render();
         });
   }
@@ -259,6 +265,7 @@ public final class TransitConnectionsPresenter
             return;
           mLoadingLater = false;
           mPagingError = TransitError.from(error);
+          mFailedPageEarlier = false;
           render();
         });
   }

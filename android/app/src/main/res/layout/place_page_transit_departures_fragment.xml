@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: next departures of a stop (online, Transitous). -->
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/transit_departures"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:orientation="vertical"
+  android:paddingStart="@dimen/margin_base"
+  android:paddingEnd="@dimen/margin_base"
+  android:paddingTop="@dimen/margin_half"
+  android:paddingBottom="@dimen/margin_half"
+  android:visibility="gone"
+  tools:visibility="visible">
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <com.google.android.material.imageview.ShapeableImageView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="@dimen/margin_base"
+      app:srcCompat="@drawable/ic_transit_bus"
+      app:tint="?iconTint" />
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/departures_title"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:text="@string/transit_departures"
+      android:textAppearance="@style/MwmTextAppearance.PlacePage"
+      tools:text="Departures from S+U Alexanderplatz" />
+
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/departures_refresh"
+      style="@style/Widget.Material3.Button.IconButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:contentDescription="@string/transit_departures_refresh"
+      app:icon="@drawable/ic_transit_refresh"
+      app:iconTint="?iconTint" />
+  </LinearLayout>
+
+  <com.google.android.material.progressindicator.LinearProgressIndicator
+    android:id="@+id/departures_progress"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:indeterminate="true"
+    android:visibility="gone" />
+
+  <com.google.android.material.textview.MaterialTextView
+    android:id="@+id/departures_status"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/margin_quarter"
+    android:textAppearance="@style/MwmTextAppearance.Body3"
+    android:visibility="gone"
+    tools:text="@string/transit_error_network" />
+
+  <com.google.android.material.button.MaterialButton
+    android:id="@+id/departures_enable"
+    style="@style/Widget.Material3.Button.TonalButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/transit_departures_enable"
+    android:visibility="gone" />
+
+  <LinearLayout
+    android:id="@+id/departures_list"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/margin_quarter"
+    android:orientation="vertical" />
+
+  <com.google.android.material.textview.MaterialTextView
+    android:id="@+id/departures_footer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="32dp"
+    android:gravity="center_vertical"
+    android:textAppearance="@style/MwmTextAppearance.Body4"
+    tools:text="As of 17:00 · Data: Transitous and sources" />
+</LinearLayout>

@@ -335,10 +335,24 @@ public class TransitConnectionsPresenterTest
     assertEquals(1, state().getItems().size());
     assertTrue(state().canLoadLater());
 
+    // "Try again" repeats the failed page.
     mPresenter.retry();
     assertNull(state().getPagingError());
-    mPresenter.loadLater();
+    assertTrue(state().isLoadingLater());
     assertEquals(3, mProvider.mPlanRequests.size());
+    assertEquals("n1", mProvider.lastRequest().getPageCursor());
+  }
+
+  @Test
+  public void retryRepeatsFailedEarlierPage()
+  {
+    searchAndWait();
+    mProvider.lastPlan().complete(plan("p1", "n1", Fixtures.s5("b", 10)));
+    mPresenter.loadEarlier();
+    mProvider.lastPlan().fail(new TransitServiceException(TransitServiceException.Kind.NETWORK, 0, null, "x", null));
+    mPresenter.retry();
+    assertTrue(state().isLoadingEarlier());
+    assertEquals("p1", mProvider.lastRequest().getPageCursor());
   }
 
   @Test

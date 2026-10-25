@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:gravity="center_vertical"
+  android:minHeight="32dp"
+  android:orientation="horizontal">
+
+  <com.google.android.material.textview.MaterialTextView
+    android:id="@+id/departure_time"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:minWidth="48dp"
+    android:textAppearance="@style/MwmTextAppearance.Body3"
+    android:textStyle="bold"
+    tools:text="17:03" />
+
+  <com.google.android.material.textview.MaterialTextView
+    android:id="@+id/departure_delay"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:minWidth="28dp"
+    android:textAppearance="@style/MwmTextAppearance.Body4"
+    android:textStyle="bold"
+    tools:text="+1" />
+
+  <include
+    android:id="@+id/departure_badge"
+    layout="@layout/item_transit_badge" />
+
+  <com.google.android.material.textview.MaterialTextView
+    android:id="@+id/departure_direction"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/margin_half"
+    android:layout_weight="1"
+    android:ellipsize="end"
+    android:maxLines="1"
+    android:textAppearance="@style/MwmTextAppearance.Body3"
+    tools:text="S Potsdam Hauptbahnhof" />
+
+  <com.google.android.material.textview.MaterialTextView
+    android:id="@+id/departure_track"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/margin_half"
+    android:textAppearance="@style/MwmTextAppearance.Body4"
+    tools:text="Pl. 2" />
+</LinearLayout>

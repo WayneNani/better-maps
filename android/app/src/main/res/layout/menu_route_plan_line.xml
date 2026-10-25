@@ -9,6 +9,8 @@
 
   <include layout="@layout/routing_bottom_panel_transit"/>
 
+  <include layout="@layout/routing_bottom_panel_online_transit"/>
+
   <com.google.android.material.textview.MaterialTextView
     android:id="@+id/error"
     android:paddingStart="@dimen/margin_base"

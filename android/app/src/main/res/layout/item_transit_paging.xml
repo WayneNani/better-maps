@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content">
+
+  <com.google.android.material.button.MaterialButton
+    android:id="@+id/paging_button"
+    style="@style/Widget.Material3.Button.TextButton"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:text="@string/transit_later" />
+
+  <com.google.android.material.progressindicator.CircularProgressIndicator
+    android:id="@+id/paging_progress"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:indeterminate="true"
+    android:visibility="gone"
+    app:indicatorSize="24dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto" />
+</FrameLayout>

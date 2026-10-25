@@ -193,6 +193,13 @@ public class RoutingPlanController extends ToolbarController
   {
     RoutingController.BuildState buildState = RoutingController.get().getBuildState();
 
+    // The online public transport planner shows its own progress and errors.
+    if (isTransitType() && RoutingController.get().isExternalRoute())
+    {
+      mRoutingBottomMenuController.showOnlineTransit();
+      return;
+    }
+
     final boolean ready = (buildState == RoutingController.BuildState.BUILT);
 
     if (!ready)
@@ -294,6 +301,12 @@ public class RoutingPlanController extends ToolbarController
     boolean hasView = state.getBoolean(BUNDLE_HAS_DRIVING_OPTIONS_VIEW);
     if (hasView)
       showRoutingOptionsView();
+  }
+
+  /** @return true if the back press was consumed by the route plan (e.g. a connection's detail view). */
+  public boolean onBackPressed()
+  {
+    return mRoutingBottomMenuController.onBackPressed();
   }
 
   public void showAddStartFrame()

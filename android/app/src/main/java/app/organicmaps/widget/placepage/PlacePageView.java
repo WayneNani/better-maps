@@ -86,6 +86,7 @@ import app.organicmaps.widget.placepage.sections.PlacePageLinksFragment;
 import app.organicmaps.widget.placepage.sections.PlacePageOpeningHoursFragment;
 import app.organicmaps.widget.placepage.sections.PlacePagePhoneFragment;
 import app.organicmaps.widget.placepage.sections.PlacePageTrackFragment;
+import app.organicmaps.widget.placepage.sections.PlacePageTransitDeparturesFragment;
 import app.organicmaps.widget.placepage.sections.PlacePageWikipediaFragment;
 
 import java.text.NumberFormat;
@@ -110,6 +111,7 @@ public class PlacePageView extends Fragment
   private static final String TRACK_FRAGMENT_TAG = "TRACK_FRAGMENT_TAG";
   private static final String WIKIPEDIA_FRAGMENT_TAG = "WIKIPEDIA_FRAGMENT_TAG";
   private static final String CHARGE_SOCKETS_FRAGMENT_TAG = "CHARGE_SOCKETS_FRAGMENT_TAG";
+  private static final String TRANSIT_DEPARTURES_FRAGMENT_TAG = "TRANSIT_DEPARTURES_FRAGMENT_TAG";
   private static final String PHONE_FRAGMENT_TAG = "PHONE_FRAGMENT_TAG";
   private static final String OPENING_HOURS_FRAGMENT_TAG = "OPENING_HOURS_FRAGMENT_TAG";
   private static final String LINKS_FRAGMENT_TAG = "LINKS_FRAGMENT_TAG";
@@ -480,6 +482,13 @@ public class PlacePageView extends Fragment
     final String ohStr = mMapObject.getMetadata(Metadata.MetadataType.FMD_OPEN_HOURS);
     updateViewFragment(PlacePageOpeningHoursFragment.class, OPENING_HOURS_FRAGMENT_TAG,
                        R.id.place_page_opening_hours_fragment, !TextUtils.isEmpty(ohStr));
+  }
+
+  private void updateTransitDeparturesView()
+  {
+    // The fragment hides itself without consent or departures.
+    updateViewFragment(PlacePageTransitDeparturesFragment.class, TRANSIT_DEPARTURES_FRAGMENT_TAG,
+                       R.id.place_page_transit_departures_fragment, mMapObject.hasPublicTransport());
   }
 
   private void updateChargeSocketsView()
@@ -898,6 +907,7 @@ public class PlacePageView extends Fragment
     updateWikipediaView();
     updateBookmarkView();
     updateChargeSocketsView();
+    updateTransitDeparturesView();
     updatePhoneView();
     updateTrackView();
     updateAddReviewView();

@@ -20,6 +20,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
+import app.organicmaps.BuildConfig;
 import app.organicmaps.MwmActivity;
 import app.organicmaps.MwmApplication;
 import app.organicmaps.R;
@@ -467,8 +468,9 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
     {
       mHiddenCommands.addAll(Arrays.asList(
           new BadStorageCommand("?emulateBadStorage", requireContext()), new JavaCrashCommand("?emulateJavaCrash"),
-          new NativeCrashCommand("?emulateNativeCrash"), new PushTokenCommand("?pushToken"),
-          new TransitPlanCommand("?transit-plan", requireActivity())));
+          new NativeCrashCommand("?emulateNativeCrash"), new PushTokenCommand("?pushToken")));
+      if (BuildConfig.DEBUG)
+        mHiddenCommands.add(new TransitPlanCommand("?transit-plan", requireActivity()));
     }
 
     return mHiddenCommands;

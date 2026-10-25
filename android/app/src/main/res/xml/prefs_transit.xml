@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: public transport settings. Keys and values: app.organicmaps.transit.TransitSettings. -->
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <SwitchPreferenceCompat
+    android:key="transit_online"
+    android:defaultValue="false"
+    android:persistent="false"
+    android:title="@string/transit_pref_online"
+    android:summary="@string/transit_pref_online_summary"
+    android:widgetLayout="@layout/preference_switch"
+    app:singleLineTitle="false" />
+
+  <Preference
+    android:key="transit_attribution"
+    android:title="@string/transit_pref_attribution"
+    android:summary="transitous.org/sources"
+    app:singleLineTitle="false" />
+
+  <PreferenceCategory
+    android:key="transit_category_route"
+    android:title="@string/transit_pref_category_route"
+    app:iconSpaceReserved="false">
+
+    <ListPreference
+      android:key="transit_transfer_time"
+      android:defaultValue="NORMAL"
+      android:title="@string/transit_pref_transfer_time"
+      android:entries="@array/transit_transfer_time_entries"
+      android:entryValues="@array/transit_transfer_time_values"
+      app:useSimpleSummaryProvider="true"
+      app:iconSpaceReserved="false" />
+
+    <ListPreference
+      android:key="transit_walking_speed"
+      android:defaultValue="NORMAL"
+      android:title="@string/transit_pref_walking_speed"
+      android:entries="@array/transit_walking_speed_entries"
+      android:entryValues="@array/transit_walking_speed_values"
+      app:useSimpleSummaryProvider="true"
+      app:iconSpaceReserved="false" />
+
+    <ListPreference
+      android:key="transit_max_walk"
+      android:defaultValue="15"
+      android:title="@string/transit_pref_max_walk"
+      android:entryValues="@array/transit_max_walk_values"
+      android:entries="@array/transit_max_walk_values"
+      app:iconSpaceReserved="false" />
+
+    <SwitchPreferenceCompat
+      android:key="transit_wheelchair"
+      android:defaultValue="false"
+      android:title="@string/transit_pref_wheelchair"
+      android:summary="@string/transit_pref_wheelchair_summary"
+      android:widgetLayout="@layout/preference_switch"
+      app:singleLineTitle="false"
+      app:iconSpaceReserved="false" />
+
+    <SwitchPreferenceCompat
+      android:key="transit_bike"
+      android:defaultValue="false"
+      android:title="@string/transit_pref_bike"
+      android:summary="@string/transit_pref_bike_summary"
+      android:widgetLayout="@layout/preference_switch"
+      app:singleLineTitle="false"
+      app:iconSpaceReserved="false" />
+
+    <MultiSelectListPreference
+      android:key="transit_excluded_modes"
+      android:title="@string/transit_pref_excluded_modes"
+      android:entries="@array/transit_mode_entries"
+      android:entryValues="@array/transit_mode_values"
+      app:iconSpaceReserved="false" />
+  </PreferenceCategory>
+
+  <PreferenceCategory
+    android:key="transit_category_expert"
+    android:title="@string/transit_pref_category_expert"
+    app:iconSpaceReserved="false">
+
+    <EditTextPreference
+      android:key="transit_server_url"
+      android:title="@string/transit_pref_server"
+      android:dialogMessage="@string/transit_pref_server_dialog"
+      android:inputType="textUri"
+      app:iconSpaceReserved="false" />
+  </PreferenceCategory>
+</androidx.preference.PreferenceScreen>

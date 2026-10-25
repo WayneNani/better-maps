@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: connections of the online public transport planner (list and detail view). -->
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/online_transit_panel"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:orientation="vertical"
+  android:paddingTop="@dimen/margin_quarter"
+  android:visibility="gone"
+  tools:visibility="visible">
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/margin_half"
+    android:paddingEnd="@dimen/margin_half">
+
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/transit_back"
+      style="@style/Widget.Material3.Button.IconButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:contentDescription="@string/transit_back"
+      android:visibility="gone"
+      app:icon="@drawable/ic_transit_back"
+      app:iconTint="?iconTint"
+      tools:visibility="visible" />
+
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/transit_time"
+      style="@style/Widget.Material3.Button.TextButton"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:gravity="start|center_vertical"
+      android:textAllCaps="false"
+      app:icon="@drawable/ic_transit_schedule"
+      tools:text="Depart now" />
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/transit_detail_title"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:textAppearance="@style/MwmTextAppearance.Body2"
+      android:textStyle="bold"
+      android:visibility="gone"
+      tools:text="17:29 – 17:46 · 17 min" />
+
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/transit_settings"
+      style="@style/Widget.Material3.Button.IconButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:contentDescription="@string/transit_settings_open"
+      app:icon="@drawable/ic_settings"
+      app:iconTint="?iconTint" />
+  </LinearLayout>
+
+  <com.google.android.material.progressindicator.LinearProgressIndicator
+    android:id="@+id/transit_progress"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:indeterminate="true"
+    android:visibility="gone"
+    tools:visibility="visible" />
+
+  <LinearLayout
+    android:id="@+id/transit_status"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/margin_base"
+    android:paddingEnd="@dimen/margin_base"
+    android:paddingTop="@dimen/margin_half"
+    android:visibility="gone"
+    tools:visibility="visible">
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/transit_status_text"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:textAppearance="@style/MwmTextAppearance.Body3"
+      tools:text="@string/transit_error_network" />
+
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/transit_retry"
+      style="@style/Widget.Material3.Button.TextButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/transit_retry" />
+  </LinearLayout>
+
+  <app.organicmaps.transit.ui.MaxHeightRecyclerView
+    android:id="@+id/transit_list"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:scrollbars="vertical" />
+
+  <com.google.android.material.textview.MaterialTextView
+    android:id="@+id/transit_attribution"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="32dp"
+    android:gravity="center_vertical"
+    android:paddingStart="@dimen/margin_base"
+    android:paddingEnd="@dimen/margin_base"
+    android:paddingBottom="@dimen/margin_quarter"
+    android:textAppearance="@style/MwmTextAppearance.Body4"
+    tools:text="Data: Transitous and sources" />
+</LinearLayout>

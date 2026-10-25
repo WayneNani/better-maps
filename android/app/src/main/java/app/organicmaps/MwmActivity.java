@@ -120,6 +120,9 @@ import app.organicmaps.search.SearchActivity;
 import app.organicmaps.search.SearchFragment;
 import app.organicmaps.settings.RoutingOptionsActivity;
 import app.organicmaps.settings.SettingsActivity;
+import app.organicmaps.transit.OnlineTransitRouter;
+import app.organicmaps.transit.TransitServices;
+import app.organicmaps.transit.ui.TransitConsentDialog;
 import app.organicmaps.util.SharingUtils;
 import app.organicmaps.util.ThemeSwitcher;
 import app.organicmaps.util.ThemeUtils;
@@ -1228,6 +1231,9 @@ public class MwmActivity extends BaseMwmFragmentActivity
     super.onStart();
     Framework.nativePlacePageActivationListener(this);
     BookmarkManager.INSTANCE.addLoadingListener(this);
+    final OnlineTransitRouter transitRouter = TransitServices.get(this).getRouter();
+    transitRouter.setConsentPrompter(this::askForTransitConsent);
+    RoutingController.get().setExternalRouter(transitRouter);
     RoutingController.get().attach(this);
     MwmApplication.from(getApplicationContext()).getIsolinesManager().attach(this::onIsolinesStateChanged);
     LocationState.nativeSetListener(this);
@@ -1242,6 +1248,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
     super.onStop();
     Framework.nativeRemovePlacePageActivationListener(this);
     BookmarkManager.INSTANCE.removeLoadingListener(this);
+    TransitServices.get(this).getRouter().setConsentPrompter(null);
     MwmApplication.from(this).getLocationHelper().removeListener(this);
     if (mDisplayManager.isDeviceDisplayUsed() && !RoutingController.get().isNavigating())
     {
@@ -1279,13 +1286,38 @@ public class MwmActivity extends BaseMwmFragmentActivity
       mDisplayManager.removeListener(DisplayType.Device);
   }
 
+  /** Back from the detail view of an online public transport connection to the list. */
+  private boolean closeTransitConnectionDetails()
+  {
+    final RoutingController controller = RoutingController.get();
+    return controller.isPlanning() && controller.isExternalRoute()
+ && TransitServices.get(this).getConnectionsPresenter().back();
+  }
+
+  /** Opt-in dialog for online public transport, shown by the route planner before the first request. */
+  private void askForTransitConsent(@NonNull Runnable onGranted, @NonNull Runnable onDeclined)
+  {
+    if (isFinishing() || isDestroyed())
+    {
+      onDeclined.run();
+      return;
+    }
+    TransitConsentDialog.show(this, granted -> {
+      if (granted)
+        onGranted.run();
+      else
+        onDeclined.run();
+    });
+  }
+
   @Override
   public void onBackPressed()
   {
     final RoutingController routingController = RoutingController.get();
     if (!closeBottomSheet(MAIN_MENU_ID) && !closeBottomSheet(LAYERS_MENU_ID) && !collapseNavMenu() && !closePlacePage()
         && !closeSearchToolbar(true, true) && !closeSidePanel() && !closePositionChooser()
-        && !routingController.resetToPlanningStateIfNavigating() && !routingController.cancel())
+        && !closeTransitConnectionDetails() && !routingController.resetToPlanningStateIfNavigating()
+        && !routingController.cancel())
     {
       try
       {

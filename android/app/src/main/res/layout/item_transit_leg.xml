@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:orientation="horizontal"
+  android:paddingStart="@dimen/margin_base"
+  android:paddingEnd="@dimen/margin_base"
+  android:paddingTop="@dimen/margin_quarter"
+  android:paddingBottom="@dimen/margin_quarter">
+
+  <LinearLayout
+    android:layout_width="64dp"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/leg_departure"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textAppearance="@style/MwmTextAppearance.Body3"
+      android:textStyle="bold"
+      tools:text="17:33" />
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/leg_departure_delay"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textAppearance="@style/MwmTextAppearance.Body4"
+      android:textStyle="bold"
+      tools:text="+2" />
+
+    <Space
+      android:layout_width="0dp"
+      android:layout_height="0dp"
+      android:layout_weight="1" />
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/leg_arrival"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textAppearance="@style/MwmTextAppearance.Body3"
+      android:textStyle="bold"
+      tools:text="17:43" />
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/leg_arrival_delay"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textAppearance="@style/MwmTextAppearance.Body4"
+      android:textStyle="bold"
+      tools:text="+2" />
+  </LinearLayout>
+
+  <FrameLayout
+    android:layout_width="20dp"
+    android:layout_height="match_parent"
+    android:layout_marginEnd="@dimen/margin_half">
+
+    <View
+      android:id="@+id/leg_line"
+      android:layout_width="4dp"
+      android:layout_height="match_parent"
+      android:layout_gravity="center_horizontal"
+      android:layout_marginTop="6dp"
+      android:layout_marginBottom="6dp"
+      tools:background="#eb7405" />
+
+    <View
+      android:id="@+id/leg_dot_start"
+      android:layout_width="12dp"
+      android:layout_height="12dp"
+      android:layout_gravity="center_horizontal|top"
+      android:layout_marginTop="4dp"
+      android:background="@drawable/bg_transit_leg_dot" />
+
+    <View
+      android:id="@+id/leg_dot_end"
+      android:layout_width="12dp"
+      android:layout_height="12dp"
+      android:layout_gravity="center_horizontal|bottom"
+      android:layout_marginBottom="4dp"
+      android:background="@drawable/bg_transit_leg_dot" />
+  </FrameLayout>
+
+  <LinearLayout
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:orientation="vertical">
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal">
+
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/leg_from"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textAppearance="@style/MwmTextAppearance.Body3"
+        android:textStyle="bold"
+        tools:text="S+U Berlin Hauptbahnhof" />
+
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/leg_from_track"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_half"
+        android:textAppearance="@style/MwmTextAppearance.Body3"
+        tools:text="Pl. 15" />
+    </LinearLayout>
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/margin_quarter"
+      android:gravity="center_vertical"
+      android:orientation="horizontal">
+
+      <include
+        android:id="@+id/leg_badge"
+        layout="@layout/item_transit_badge" />
+
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/leg_direction"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_half"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAppearance="@style/MwmTextAppearance.Body3"
+        tools:text="→ S Mahlsdorf" />
+    </LinearLayout>
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/leg_cancelled"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/transit_cancelled"
+      android:textAppearance="@style/MwmTextAppearance.Body3"
+      android:textColor="@color/base_red"
+      android:textStyle="bold"
+      android:visibility="gone" />
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/leg_alerts"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:textAppearance="@style/MwmTextAppearance.Body4"
+      android:visibility="gone"
+      tools:text="Construction work" />
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/leg_summary"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:minHeight="32dp"
+      android:background="?selectableItemBackground"
+      android:drawablePadding="@dimen/margin_quarter"
+      android:gravity="center_vertical"
+      android:textAppearance="@style/MwmTextAppearance.Body4"
+      tools:text="10 min · 3 stops" />
+
+    <LinearLayout
+      android:id="@+id/leg_stops"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:visibility="gone" />
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal">
+
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/leg_to"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textAppearance="@style/MwmTextAppearance.Body3"
+        android:textStyle="bold"
+        tools:text="S+U Alexanderplatz" />
+
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/leg_to_track"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_half"
+        android:textAppearance="@style/MwmTextAppearance.Body3"
+        tools:text="Pl. 2" />
+    </LinearLayout>
+  </LinearLayout>
+</LinearLayout>

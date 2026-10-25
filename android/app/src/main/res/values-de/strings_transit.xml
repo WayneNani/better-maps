@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="transit_settings_title">Öffentlicher Verkehr</string>
+  <string name="transit_settings_summary">Online-Verbindungen, Umstiege, Fußwege</string>
+
+  <string name="transit_consent_title">Online-Fahrplanauskunft nutzen?</string>
+  <string name="transit_consent_message">Für Verbindungen mit Fahrplan und Echtzeitdaten werden Start, Ziel und Zeit deiner Suche an Transitous gesendet, einen kostenlosen Gemeinschaftsdienst (transitous.org). Für Abfahrten in der Ortsansicht wird die Position der Haltestelle gesendet. Sonst wird nichts übertragen. Du kannst das jederzeit unter Einstellungen → Öffentlicher Verkehr abschalten.</string>
+  <string name="transit_consent_learn_more">Über Transitous</string>
+  <string name="transit_consent_sources">Datenquellen und Lizenzen</string>
+  <string name="transit_consent_accept">Erlauben</string>
+  <string name="transit_consent_decline">Nicht jetzt</string>
+
+  <string name="transit_pref_online">Online-Verbindungen und Abfahrten</string>
+  <string name="transit_pref_online_summary">Fahrplan- und Echtzeitdaten von Transitous. Start, Ziel und Zeit einer Suche werden an den Server gesendet.</string>
+  <string name="transit_pref_category_route">Verbindungen</string>
+  <string name="transit_pref_category_expert">Experten</string>
+  <string name="transit_pref_server">Server</string>
+  <string name="transit_pref_server_dialog">Adresse eines MOTIS-Servers (API v6). Leer lassen für Transitous.</string>
+  <string name="transit_pref_server_invalid">Ungültige Adresse. Sie muss mit https:// oder http:// beginnen.</string>
+  <string name="transit_pref_transfer_time">Umsteigezeit</string>
+  <string name="transit_pref_transfer_normal">Normal</string>
+  <string name="transit_pref_transfer_more">Mehr Puffer (+5 Min.)</string>
+  <string name="transit_pref_transfer_much_more">Viel mehr Puffer (+10 Min.)</string>
+  <string name="transit_pref_walking_speed">Gehgeschwindigkeit</string>
+  <string name="transit_pref_walking_slow">Langsam</string>
+  <string name="transit_pref_walking_normal">Normal</string>
+  <string name="transit_pref_walking_fast">Schnell</string>
+  <string name="transit_pref_wheelchair">Barrierefrei</string>
+  <string name="transit_pref_wheelchair_summary">Nur barrierefreie Haltestellen und Wege, z. B. für Rollstühle</string>
+  <string name="transit_pref_bike">Fahrrad mitnehmen</string>
+  <string name="transit_pref_bike_summary">Nur Fahrzeuge mit Fahrradmitnahme</string>
+  <string name="transit_pref_max_walk">Max. Fußweg zur und von der Haltestelle</string>
+  <string name="transit_pref_excluded_modes">Verkehrsmittel ausschließen</string>
+  <string name="transit_pref_excluded_none">Keine</string>
+  <string name="transit_pref_excluded_all">Mindestens ein Verkehrsmittel muss bleiben.</string>
+  <string name="transit_mode_bus">Bus</string>
+  <string name="transit_mode_tram">Straßenbahn</string>
+  <string name="transit_mode_subway">U-Bahn</string>
+  <string name="transit_mode_suburban">S-Bahn</string>
+  <string name="transit_mode_regional">Regionalzug</string>
+  <string name="transit_mode_long_distance">Fernzug</string>
+  <string name="transit_mode_ferry">Fähre</string>
+  <string name="transit_pref_attribution">Datenquellen und Lizenzen</string>
+
+  <string name="transit_attribution">Daten: %1$s und Quellen</string>
+  <string name="transit_depart_now">Abfahrt jetzt</string>
+  <string name="transit_depart_at">Abfahrt %1$s</string>
+  <string name="transit_arrive_by">Ankunft %1$s</string>
+  <string name="transit_earlier">Früher</string>
+  <string name="transit_later">Später</string>
+  <string name="transit_direct">Direkt</string>
+  <plurals name="transit_transfers">
+    <item quantity="one">%d Umstieg</item>
+    <item quantity="other">%d Umstiege</item>
+  </plurals>
+  <plurals name="transit_stops">
+    <item quantity="one">%d Halt</item>
+    <item quantity="other">%d Halte</item>
+  </plurals>
+  <string name="transit_track">Gl. %1$s</string>
+  <string name="transit_walk">Fußweg %1$s</string>
+  <string name="transit_walk_distance">Fußweg %1$s (%2$s)</string>
+  <string name="transit_start">Start</string>
+  <string name="transit_destination">Ziel</string>
+  <string name="transit_minutes">%d Min.</string>
+  <string name="transit_hours">%d Std.</string>
+  <string name="transit_hours_minutes">%1$d Std. %2$d Min.</string>
+  <string name="transit_meters">%d m</string>
+  <string name="transit_kilometers">%.1f km</string>
+  <string name="transit_direction">→ %1$s</string>
+  <string name="transit_cancelled">Fällt aus</string>
+  <string name="transit_realtime">Echtzeit</string>
+  <string name="transit_back">Zurück zu den Verbindungen</string>
+  <string name="transit_settings_open">Einstellungen öffentlicher Verkehr</string>
+  <string name="transit_no_connections">Keine Verbindungen gefunden.</string>
+  <string name="transit_retry">Erneut versuchen</string>
+  <string name="transit_error_network">Keine Verbindung zum Server.</string>
+  <string name="transit_error_server">Der Server ist gerade nicht erreichbar. Bitte später erneut versuchen.</string>
+  <string name="transit_error_request">Für diese Strecke ist keine Suche möglich (außerhalb des abgedeckten Gebiets?).</string>
+  <string name="transit_error_disabled">Die Online-Fahrplanauskunft ist ausgeschaltet.</string>
+  <string name="transit_error_unknown">Etwas ist schiefgelaufen.</string>
+
+  <string name="transit_time_title">Abfahrt oder Ankunft</string>
+  <string name="transit_departure">Abfahrt</string>
+  <string name="transit_arrival">Ankunft</string>
+  <string name="transit_now">Jetzt</string>
+  <string name="transit_today">Heute</string>
+  <string name="transit_tomorrow">Morgen</string>
+  <string name="transit_day_after_tomorrow">Übermorgen</string>
+
+  <string name="transit_departures">Abfahrten</string>
+  <string name="transit_departures_from">Abfahrten ab %1$s</string>
+  <string name="transit_departures_refresh">Aktualisieren</string>
+  <string name="transit_departures_updated">Stand %1$s</string>
+  <string name="transit_departures_empty">In nächster Zeit keine Abfahrten.</string>
+  <string name="transit_departures_no_stop">Keine Haltestelle mit Abfahrten in der Nähe gefunden.</string>
+  <string name="transit_departures_enable">Abfahrten mit Echtzeit anzeigen</string>
+</resources>
