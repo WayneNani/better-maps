@@ -84,7 +84,10 @@ func NewClient(cfg ClientConfig) (*Client, error) {
 		if err != nil {
 			return nil, fmt.Errorf("datex2 %s: client certificate: %w", cfg.Name, err)
 		}
-		tlsCfg.Certificates = []tls.Certificate{cert}
+		// Always present the certificate when the server asks for one, like curl does. Go's default
+		// selection sends nothing if the server's list of acceptable CAs does not name the
+		// issuer exactly (e.g. when the PEM file lacks intermediate certificates).
+		tlsCfg.GetClientCertificate = func(*tls.CertificateRequestInfo) (*tls.Certificate, error) { return &cert, nil }
 	}
 	if cfg.CAFile != "" {
 		pem, err := os.ReadFile(cfg.CAFile)

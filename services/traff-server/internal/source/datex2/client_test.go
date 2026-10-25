@@ -432,6 +432,25 @@ func TestClientCertificate(t *testing.T) {
 	if len(subjects) != 1 || subjects[0] != "better-maps" {
 		t.Errorf("server saw %v", subjects)
 	}
+	// The certificate is also sent if the server names other acceptable CAs (Go would otherwise
+	// send none); the server decides.
+	otherTmpl := &x509.Certificate{SerialNumber: big.NewInt(4), Subject: pkix.Name{CommonName: "Other CA"}, NotBefore: now.Add(-time.Hour),
+		NotAfter: now.Add(time.Hour), IsCA: true, BasicConstraintsValid: true, KeyUsage: x509.KeyUsageCertSign}
+	_, _, otherCA := newCert(t, otherTmpl, nil, nil)
+	otherPool := x509.NewCertPool()
+	otherPool.AddCert(otherCA)
+	var sent int
+	lax := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sent = len(r.TLS.PeerCertificates)
+		_, _ = w.Write(readFixture(t, "container_v3.xml"))
+	}))
+	lax.TLS = &tls.Config{Certificates: srv.TLS.Certificates, ClientAuth: tls.RequestClientCert, ClientCAs: otherPool}
+	lax.StartTLS()
+	defer lax.Close()
+	c, _ = NewClient(ClientConfig{Name: "lax", URL: lax.URL, ClientCertFile: cliCert, ClientKeyFile: cliKeyFile, CAFile: caFile})
+	if _, _, err := getAll(t, c); err != nil || sent != 1 {
+		t.Errorf("certificate not sent to server with other CA list: %v, %d", err, sent)
+	}
 	// Without client certificate the handshake fails.
 	c, _ = NewClient(ClientConfig{Name: "mobilithek", URL: srv.URL, CAFile: caFile})
 	if _, _, err := getAll(t, c); err == nil {
