@@ -1,6 +1,6 @@
 # Datenschutzfreundliche Stauerkennung (Feature 5) – Design
 
-Status: **Entwurf zur Freigabe** durch den Projektinhaber (AP5a, Stand 2026-10-25).
+Status: **Freigegeben für die Umsetzung (AP5b)** – von der Koordination im Auftrag des Projektinhabers, 2026-10-25. Eine abschließende Durchsicht durch den Projektinhaber (v. a. Abschnitt 11, Restrisiken) steht noch aus.
 Implementierung: `services/crowd-traffic/` (Server, Referenz-Client, Simulator).
 Client in der App: AP5b, siehe Abschnitt [Client-Vertrag](#13-client-vertrag-ap5b).
 
