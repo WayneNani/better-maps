@@ -1,6 +1,8 @@
 package app.organicmaps.transit;
 
+import android.app.Activity;
 import android.content.Context;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import app.organicmaps.sdk.transit.TransitDeparture;
 import app.organicmaps.sdk.transit.TransitDepartures;
@@ -39,11 +41,12 @@ public final class TransitDebug
         .onSuccess(plan -> {
           final String text = formatPlan(plan);
           Logger.i(TAG, "Plan result:\n" + text);
-          showDialog(context, "Berlin Hbf → Alexanderplatz", text);
+          show(context, "Berlin Hbf → Alexanderplatz", text, summarize(plan));
         })
         .onFailure(error -> {
           Logger.e(TAG, "Plan failed", error);
-          showDialog(context, "Transit plan failed", String.valueOf(error.getMessage()));
+          final String message = "Transit plan failed: " + error.getMessage();
+          show(context, "Transit plan failed", message, message);
         });
   }
 
@@ -120,12 +123,33 @@ public final class TransitDebug
     return minutes > 0 ? " +" + minutes : " " + minutes;
   }
 
-  private static void showDialog(@NonNull Context context, @NonNull String title, @NonNull String message)
+  @NonNull
+  private static String summarize(@NonNull TransitPlan plan)
   {
-    new MaterialAlertDialogBuilder(context)
-        .setTitle(title)
-        .setMessage(message)
-        .setPositiveButton(android.R.string.ok, null)
-        .show();
+    if (plan.getItineraries().isEmpty())
+      return "Transit plan: no connections";
+    final TransitItinerary first = plan.getItineraries().get(0);
+    final TransitLeg leg = first.getFirstTransitLeg();
+    return "Transit plan: " + plan.getItineraries().size() + " connections, first " + time(first.getStartTime()) + "–"
+  + time(first.getEndTime()) + (leg != null ? " " + leg.getLineName() : "") + " (details in logcat)";
+  }
+
+  /**
+   * Shows a dialog if the context is a running activity, otherwise a toast (the search screen closes itself
+   * after a hidden command).
+   */
+  private static void show(@NonNull Context context, @NonNull String title, @NonNull String message,
+                           @NonNull String shortMessage)
+  {
+    if (context instanceof Activity && !((Activity) context).isFinishing() && !((Activity) context).isDestroyed())
+    {
+      new MaterialAlertDialogBuilder(context)
+          .setTitle(title)
+          .setMessage(message)
+          .setPositiveButton(android.R.string.ok, null)
+          .show();
+    }
+    else
+      Toast.makeText(context.getApplicationContext(), shortMessage, Toast.LENGTH_LONG).show();
   }
 }

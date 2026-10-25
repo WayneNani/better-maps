@@ -736,13 +736,14 @@ public class PlacePageController
     TransitServices.get(requireContext())
         .closestStopWithTimes(mapObject.getLat(), mapObject.getLon(), 5)
         .onSuccess(departures -> {
+          Logger.i(TAG, "Departures at " + departures.getStop() + ": " + departures.getDepartures().size());
           // Ignore late results for another object or a closed place page.
-          if (isAdded() && mMapObject == mapObject)
+          if (isAdded() && MapObject.same(mMapObject, mapObject))
             showTransitAlert("Departures", TransitDebug.formatDepartures(departures));
         })
         .onFailure(error -> {
           Logger.w(TAG, "Departures failed: " + error.getMessage());
-          if (isAdded() && mMapObject == mapObject)
+          if (isAdded() && MapObject.same(mMapObject, mapObject))
             showTransitAlert("Departures failed", String.valueOf(error.getMessage()));
         });
   }
@@ -767,13 +768,13 @@ public class PlacePageController
     mMapObject = mapObject;
     if (mapObject != null)
     {
-      if (mapObject.hasPublicTransport())
-        displayStopTimes(mapObject);
-
       setPlacePageInteractions(true);
       // Only collapse the place page if the data is different from the one already available
       mShouldCollapse = PlacePageUtils.isHiddenState(mPlacePageBehavior.getState())
                      || !MapObject.same(mPreviousMapObject, mMapObject);
+      // Request departures only once per opened object, not on every update of it.
+      if (mShouldCollapse && mapObject.hasPublicTransport())
+        displayStopTimes(mapObject);
       mPreviousMapObject = mMapObject;
       // Place page will automatically open when the bottom sheet content is loaded so we can compute the peek height
       createPlacePageFragments();
