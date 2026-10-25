@@ -63,24 +63,63 @@
         android:focusable="true"
         android:background="?appBackground">
 
-        <androidx.recyclerview.widget.RecyclerView
-          android:id="@+id/recycler"
-          android:clipToPadding="false"
-          android:background="?appBackground"
+        <LinearLayout
           android:layout_width="match_parent"
           android:layout_height="match_parent"
-          />
+          android:orientation="vertical">
 
-        <app.organicmaps.widget.PlaceholderView
-          android:id="@+id/placeholder"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          android:gravity="center_horizontal"
-          android:paddingStart="@dimen/margin_double_and_half"
-          android:paddingEnd="@dimen/margin_double_and_half"
-          android:paddingTop="@dimen/placeholder_margin_top"
-          android:visibility="gone"
-          tools:visibility="visible"/>
+          <!-- Results filters -->
+          <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+            <com.google.android.material.chip.ChipGroup
+              android:id="@+id/opening_hours_filter"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:paddingStart="@dimen/margin_base"
+              android:paddingEnd="@dimen/margin_base"
+              app:singleLine="true">
+              <com.google.android.material.chip.Chip
+                android:id="@+id/filter_open_now"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/open_now"/>
+              <com.google.android.material.chip.Chip
+                android:id="@+id/filter_include_unknown_opening_hours"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/search_filter_include_unknown_opening_hours"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+            </com.google.android.material.chip.ChipGroup>
+          </HorizontalScrollView>
+
+          <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <androidx.recyclerview.widget.RecyclerView
+              android:id="@+id/recycler"
+              android:clipToPadding="false"
+              android:background="?appBackground"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              />
+
+            <app.organicmaps.widget.PlaceholderView
+              android:id="@+id/placeholder"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center_horizontal"
+              android:paddingStart="@dimen/margin_double_and_half"
+              android:paddingEnd="@dimen/margin_double_and_half"
+              android:paddingTop="@dimen/placeholder_margin_top"
+              android:visibility="gone"
+              tools:visibility="visible"/>
+          </FrameLayout>
+        </LinearLayout>
       </FrameLayout>
 
       <!-- Country download suggest fragment -->
