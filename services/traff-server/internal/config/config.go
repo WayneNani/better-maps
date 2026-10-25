@@ -16,6 +16,8 @@ import (
 	"strings"
 	"time"
 	"unicode"
+
+	"github.com/WayneNani/better-maps/services/traff-server/internal/source/crowd"
 )
 
 // Config holds all settings.
@@ -40,8 +42,16 @@ type Config struct {
 	Datex2Timeout  time.Duration
 
 	// Duplicate suppression across sources.
-	DedupEnabled  bool
-	DedupDistance int // metres
+	DedupEnabled         bool
+	DedupDistance        int // metres
+	DedupSpatialDistance int // metres, 0 = no spatial comparison of messages without road reference
+
+	// Crowd-sourced congestion from services/crowd-traffic (empty URL = disabled).
+	CrowdURL           string
+	CrowdInterval      time.Duration
+	CrowdTimeout       time.Duration
+	CrowdMergeDistance int // metres, 0 = one message per tile
+	CrowdMaxLength     int // metres, 0 = no limit
 }
 
 // Datex2Feed is one configured DATEX II publication. Credentials only come from environment
@@ -69,6 +79,7 @@ const (
 	DefaultDatex2Horizon           = 7 * 24 * time.Hour
 	DefaultDatex2Timeout           = time.Minute
 	DefaultDedupDistance           = 500
+	DefaultDedupSpatialDistance    = 250
 )
 
 type envFunc func(string) string
@@ -141,6 +152,12 @@ func Parse(args []string, env func(string) string, out io.Writer) (Config, error
 	fs.DurationVar(&c.Datex2Timeout, "datex2-timeout", durEnv("TRAFF_DATEX2_TIMEOUT", DefaultDatex2Timeout), "timeout for downloading a DATEX II feed (env TRAFF_DATEX2_TIMEOUT)")
 	fs.BoolVar(&c.DedupEnabled, "dedup", boolEnv("TRAFF_DEDUP_ENABLED", true), "suppress messages that duplicate a message of a source with higher priority (env TRAFF_DEDUP_ENABLED)")
 	fs.IntVar(&c.DedupDistance, "dedup-distance", intEnv("TRAFF_DEDUP_DISTANCE", DefaultDedupDistance), "maximum distance in metres between duplicates (env TRAFF_DEDUP_DISTANCE)")
+	fs.IntVar(&c.DedupSpatialDistance, "dedup-spatial-distance", intEnv("TRAFF_DEDUP_SPATIAL_DISTANCE", DefaultDedupSpatialDistance), "maximum distance in metres for congestion duplicates without road reference, 0 = disabled (env TRAFF_DEDUP_SPATIAL_DISTANCE)")
+	fs.StringVar(&c.CrowdURL, "crowd-url", envString(env, "TRAFF_CROWD_URL", ""), "base URL of the crowd-traffic server, empty = disabled (env TRAFF_CROWD_URL)")
+	fs.DurationVar(&c.CrowdInterval, "crowd-interval", durEnv("TRAFF_CROWD_INTERVAL", crowd.DefaultInterval), "interval for fetching the crowd source (env TRAFF_CROWD_INTERVAL)")
+	fs.DurationVar(&c.CrowdTimeout, "crowd-timeout", durEnv("TRAFF_CROWD_TIMEOUT", crowd.DefaultTimeout), "timeout for downloading the crowd export (env TRAFF_CROWD_TIMEOUT)")
+	fs.IntVar(&c.CrowdMergeDistance, "crowd-merge-distance", intEnv("TRAFF_CROWD_MERGE_DISTANCE", crowd.DefaultMergeDistance), "maximum gap in metres between adjacent congested tiles that are merged, 0 = no merging (env TRAFF_CROWD_MERGE_DISTANCE)")
+	fs.IntVar(&c.CrowdMaxLength, "crowd-max-length", intEnv("TRAFF_CROWD_MAX_LENGTH", crowd.DefaultMaxLength), "maximum length in metres of a merged crowd message, 0 = no limit (env TRAFF_CROWD_MAX_LENGTH)")
 
 	if err := fs.Parse(args); err != nil {
 		return c, err
@@ -166,8 +183,20 @@ func Parse(args []string, env func(string) string, out io.Writer) (Config, error
 		errs = append(errs, errors.New("message lease must be at least twice the poll interval"))
 	}
 	if c.AutobahnRequestInterval < 0 || c.MaxSubscriptions < 0 || c.MaxFilters < 0 || c.Datex2Interval < 0 ||
-		c.Datex2Horizon < 0 || c.Datex2Timeout <= 0 || c.DedupDistance <= 0 {
+		c.Datex2Horizon < 0 || c.Datex2Timeout <= 0 || c.DedupDistance <= 0 || c.DedupSpatialDistance < 0 ||
+		c.CrowdTimeout <= 0 || c.CrowdMergeDistance < 0 || c.CrowdMaxLength < 0 {
 		errs = append(errs, errors.New("negative limits are not allowed"))
+	}
+	if c.CrowdURL != "" {
+		if _, err := crowd.ExportURL(c.CrowdURL); err != nil {
+			errs = append(errs, err)
+		}
+		if c.CrowdInterval < 10*time.Second {
+			errs = append(errs, errors.New("crowd interval must be at least 10s"))
+		}
+		if c.MessageLease < c.CrowdInterval*2 {
+			errs = append(errs, errors.New("message lease must be at least twice the crowd interval"))
+		}
 	}
 	var err error
 	if c.Datex2Feeds, err = parseFeeds(*feeds, env); err != nil {

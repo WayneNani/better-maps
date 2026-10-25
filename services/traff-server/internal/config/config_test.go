@@ -166,3 +166,50 @@ func TestDatex2FeedErrors(t *testing.T) {
 		}
 	}
 }
+
+func TestCrowd(t *testing.T) {
+	c, err := Parse(nil, env(nil), io.Discard)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c.CrowdURL != "" || c.CrowdInterval != 2*time.Minute || c.CrowdTimeout != 20*time.Second || c.CrowdMergeDistance != 25 ||
+		c.CrowdMaxLength != 5000 || c.DedupSpatialDistance != DefaultDedupSpatialDistance {
+		t.Errorf("defaults = %+v", c)
+	}
+	e := env(map[string]string{
+		"TRAFF_CROWD_URL":              "http://crowd-traffic:8080",
+		"TRAFF_CROWD_INTERVAL":         "1m",
+		"TRAFF_CROWD_TIMEOUT":          "5s",
+		"TRAFF_CROWD_MERGE_DISTANCE":   "0",
+		"TRAFF_CROWD_MAX_LENGTH":       "0",
+		"TRAFF_DEDUP_SPATIAL_DISTANCE": "0",
+	})
+	c, err = Parse(nil, e, io.Discard)
+	if err != nil || c.CrowdURL != "http://crowd-traffic:8080" || c.CrowdInterval != time.Minute || c.CrowdTimeout != 5*time.Second ||
+		c.CrowdMergeDistance != 0 || c.CrowdMaxLength != 0 || c.DedupSpatialDistance != 0 {
+		t.Errorf("config = %+v, %v", c, err)
+	}
+	c, err = Parse([]string{"-crowd-url", "https://crowd.example.org/", "-crowd-merge-distance", "40", "-dedup-spatial-distance", "100"}, e, io.Discard)
+	if err != nil || c.CrowdURL != "https://crowd.example.org/" || c.CrowdMergeDistance != 40 || c.DedupSpatialDistance != 100 {
+		t.Errorf("flags: %+v, %v", c, err)
+	}
+
+	for _, bad := range []map[string]string{
+		{"TRAFF_CROWD_URL": "crowd-traffic:8080"},
+		{"TRAFF_CROWD_URL": "file:///tmp/segments.json"},
+		{"TRAFF_CROWD_URL": "http://crowd", "TRAFF_CROWD_INTERVAL": "5s"},
+		{"TRAFF_CROWD_URL": "http://crowd", "TRAFF_CROWD_INTERVAL": "20m"}, // lease 30m < 2 × interval
+		{"TRAFF_CROWD_TIMEOUT": "0s"},
+		{"TRAFF_CROWD_MERGE_DISTANCE": "-1"},
+		{"TRAFF_CROWD_MAX_LENGTH": "-5"},
+		{"TRAFF_DEDUP_SPATIAL_DISTANCE": "-1"},
+	} {
+		if _, err := Parse(nil, env(bad), io.Discard); err == nil {
+			t.Errorf("%v accepted", bad)
+		}
+	}
+	// Without URL the crowd interval is not checked.
+	if _, err := Parse(nil, env(map[string]string{"TRAFF_CROWD_INTERVAL": "5s"}), io.Discard); err != nil {
+		t.Errorf("interval without URL: %v", err)
+	}
+}

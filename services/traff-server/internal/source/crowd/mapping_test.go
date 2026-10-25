@@ -185,8 +185,9 @@ func TestRecordedExport(t *testing.T) {
 	}
 	clientAccepts(t, single)
 
-	// 20 minutes after the evaluation everything has expired.
-	if gone, st := Map(doc, doc.Generated.Add(21*time.Minute), MergeOptions{Tolerance: 25}); len(gone) != 0 || st.Skipped[skipExpired] != 12 {
+	// The recording used a window of 60 s: the segments expire 65 s after the evaluation
+	// (window + grace; 20 min in production).
+	if gone, st := Map(doc, doc.Generated.Add(2*time.Minute), MergeOptions{Tolerance: 25}); len(gone) != 0 || st.Skipped[skipExpired] != 12 {
 		t.Errorf("after expiry: %v, %+v", ids(gone), st)
 	}
 }

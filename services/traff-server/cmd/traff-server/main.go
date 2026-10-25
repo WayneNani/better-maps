@@ -24,6 +24,7 @@ import (
 	"github.com/WayneNani/better-maps/services/traff-server/internal/server"
 	"github.com/WayneNani/better-maps/services/traff-server/internal/source"
 	"github.com/WayneNani/better-maps/services/traff-server/internal/source/autobahn"
+	"github.com/WayneNani/better-maps/services/traff-server/internal/source/crowd"
 	"github.com/WayneNani/better-maps/services/traff-server/internal/source/datex2"
 	"github.com/WayneNani/better-maps/services/traff-server/internal/store"
 	"github.com/WayneNani/better-maps/services/traff-server/internal/subscription"
@@ -93,9 +94,24 @@ func build(cfg config.Config, logger *slog.Logger) (*app, error) {
 		}
 		sources = append(sources, datex2.NewSource(datex2.SourceConfig{Feed: f.Name, MinInterval: cfg.Datex2Interval, Horizon: cfg.Datex2Horizon}, client, logger))
 	}
+	// Crowd-sourced congestion comes last: official messages win over crowd data.
+	if cfg.CrowdURL != "" {
+		cs, err := crowd.NewSource(crowd.Config{
+			URL: cfg.CrowdURL, Interval: cfg.CrowdInterval, Timeout: cfg.CrowdTimeout, UserAgent: cfg.UserAgent,
+			Merge: crowd.MergeOptions{Tolerance: float64(cfg.CrowdMergeDistance), MaxLength: float64(cfg.CrowdMaxLength)},
+		})
+		if err != nil {
+			return nil, err
+		}
+		sources = append(sources, cs)
+	}
 	runner := source.NewRunner(st, cfg.PollInterval, logger, sources...)
 	if cfg.DedupEnabled {
-		runner.SetDeduplicator(dedup.New(dedup.Config{MaxDistance: float64(cfg.DedupDistance)}))
+		spatial := float64(cfg.DedupSpatialDistance)
+		if spatial == 0 {
+			spatial = -1 // disabled
+		}
+		runner.SetDeduplicator(dedup.New(dedup.Config{MaxDistance: float64(cfg.DedupDistance), SpatialDistance: spatial}))
 	}
 	srv := &server.Server{
 		Store: st, Subs: subs, Coverage: runner.Coverage, Status: runner.Status,

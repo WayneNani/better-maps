@@ -99,3 +99,25 @@ func TestBuildWithDatex2(t *testing.T) {
 		t.Errorf("build = %v", err)
 	}
 }
+
+func TestBuildWithCrowd(t *testing.T) {
+	envs := map[string]string{"TRAFF_CROWD_URL": "http://crowd-traffic:8080", "TRAFF_DATEX2_FEEDS": "bw=https://example.org/a.xml"}
+	cfg, err := config.Parse([]string{"-autobahn-roads", "A7", "-dedup-spatial-distance", "0"}, func(k string) string { return envs[k] }, io.Discard)
+	if err != nil {
+		t.Fatal(err)
+	}
+	a, err := build(cfg, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// The crowd source has the lowest priority.
+	st := a.runner.Status()
+	if len(st) != 3 || st[0].Name != "autobahn" || st[1].Name != "datex2-bw" || st[2].Name != "crowd" {
+		t.Errorf("sources = %+v", st)
+	}
+	// An invalid URL that slipped past the configuration is reported by build.
+	cfg.CrowdURL = "ftp://crowd"
+	if _, err := build(cfg, slog.New(slog.NewTextHandler(io.Discard, nil))); err == nil {
+		t.Error("invalid crowd URL accepted")
+	}
+}
