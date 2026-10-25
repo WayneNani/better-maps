@@ -120,6 +120,8 @@ set(SRC
   processor.hpp
   projection_on_street.cpp
   projection_on_street.hpp
+  query_filters.cpp
+  query_filters.hpp
   query_params.cpp
   query_params.hpp
   query_saver.cpp

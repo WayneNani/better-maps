@@ -10,6 +10,7 @@
 #include "search/latlon_match.hpp"
 #include "search/mode.hpp"
 #include "search/postcode_points.hpp"
+#include "search/query_filters.hpp"
 #include "search/query_params.hpp"
 #include "search/result.hpp"
 #include "search/search_params.hpp"
@@ -553,9 +554,14 @@ void Processor::Search(SearchParams params)
 
   m_emitter.Init(std::move(params.m_onResults));
 
+  SetInputLocale(params.m_inputLocale);
+
   // Use the same moment for all opening hours checks during this search.
   if (!params.m_openingHoursTime)
     params.m_openingHoursTime = time(nullptr);
+
+  if (params.m_detectQueryFilters && !params.m_categorialRequest)
+    ApplyQueryFilters(params);
 
   bool const viewportSearch = params.m_mode == Mode::Viewport;
 
@@ -563,8 +569,6 @@ void Processor::Search(SearchParams params)
   ASSERT(viewport.IsValid(), ());
 
   m_position = params.m_position;
-
-  SetInputLocale(params.m_inputLocale);
 
   SetQuery(params.m_query, params.m_categorialRequest);
   SetViewport(viewport);
@@ -628,6 +632,23 @@ void Processor::Search(SearchParams params)
 
   if (!viewportSearch && cancellationStatus == Cancellable::Status::DeadlineExceeded)
     LOG(LWARNING, ("Search stopped by timeout"));
+}
+
+void Processor::ApplyQueryFilters(SearchParams & params) const
+{
+  ASSERT(params.m_openingHoursTime, ());
+  auto filters = DetectQueryFilters(params.m_query, *params.m_openingHoursTime, m_categories, GetCategoryLocales());
+  if (!filters)
+    return;
+
+  LOG(LDEBUG, ("Query filters:", *filters));
+  params.m_query = std::move(filters->m_query);
+  // An explicit filter (e.g. "open now or unknown" chosen in UI) has priority.
+  if (params.m_openingHoursFilter == OpeningHoursFilter::Off)
+    params.m_openingHoursFilter = filters->m_openingHoursFilter;
+  // A day or time from the query ("Sonntag") is relative to the search moment.
+  if (filters->m_openingHoursTime)
+    params.m_openingHoursTime = filters->m_openingHoursTime;
 }
 
 bool Processor::SearchDebug()

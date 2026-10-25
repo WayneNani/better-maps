@@ -62,6 +62,7 @@ DEFINE_string(ranking_csv_file, "", "File ranking info will be exported to");
 DEFINE_string(position, "", "User position as \"lat,lon\" (none by default)");
 DEFINE_int64(opening_hours_time, 0, "Unix time to evaluate opening hours at (current time by default)");
 DEFINE_bool(prefix_free, true, "Append a space to every query, so the last token is not treated as a prefix");
+DEFINE_bool(detect_query_filters, false, "Recognize filter words in queries like the app does (\"Café offen\")");
 DEFINE_string(tsv_out, "", "File the top results are written to as TSV (query, position, name, type, ...)");
 
 string const kDefaultQueriesPathSuffix = "/../search/search_quality/search_quality_tool/queries.txt";
@@ -357,6 +358,7 @@ void RunRequests(TestSearchEngine & engine, m2::RectD const & viewport, string q
     params.m_mode = Mode::Everywhere;
     params.m_position = ParsePosition(FLAGS_position);
     params.m_needAddress = true;
+    params.m_detectQueryFilters = FLAGS_detect_query_filters;
     if (FLAGS_opening_hours_time != 0)
       params.m_openingHoursTime = static_cast<time_t>(FLAGS_opening_hours_time);
     requests.emplace_back(make_unique<TestSearchRequest>(engine, params));

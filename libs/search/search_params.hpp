@@ -106,6 +106,12 @@ struct SearchParams
   // The current time is used if not set.
   std::optional<time_t> m_openingHoursTime;
 
+  // Recognize opening hours filter words in the query, e.g. "Café offen", "Apotheke Sonntag", and use them
+  // as |m_openingHoursFilter| and |m_openingHoursTime| instead of search tokens (see DetectQueryFilters).
+  // An explicitly set filter has priority over the one from the query. A day or time from the query
+  // ("Sonntag", "20 Uhr") is relative to |m_openingHoursTime| and replaces it.
+  bool m_detectQueryFilters = false;
+
   // Set to true for debug logs and tests.
 #ifdef DEBUG
   bool m_useDebugInfo = true;
