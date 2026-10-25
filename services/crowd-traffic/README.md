@@ -36,7 +36,7 @@ go run ./cmd/crowd-sim -relay http://127.0.0.1:8090/relay -server http://127.0.0
 curl -s http://127.0.0.1:8080/v1/traff
 ```
 
-Als Container (Podman); das Image enthält alle drei Programme, läuft als Benutzer 65532 und ist ca. 15 MB groß:
+Als Container (Podman); das Image enthält alle drei Programme, läuft als Benutzer 65532 und ist ca. 23 MB groß:
 
 ```sh
 podman build -t crowd-traffic -f Containerfile .
