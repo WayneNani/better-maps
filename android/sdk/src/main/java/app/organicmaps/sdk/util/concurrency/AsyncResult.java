@@ -1,96 +1,186 @@
 package app.organicmaps.sdk.util.concurrency;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.util.Function;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executor;
 
-public class AsyncResult<T> {
-
-  public interface SuccessHandler<T> {
+/**
+ * Result of an asynchronous operation that completes exactly once, either with a value or with an error.
+ * <p>
+ * Handlers are always invoked on the executor passed to the constructor (e.g. the main thread executor),
+ * regardless of the thread that completes the result. Handlers registered after completion are invoked
+ * as well. Completing a result more than once is ignored. This class is thread-safe.
+ */
+public class AsyncResult<T>
+{
+  public interface SuccessHandler<T>
+  {
     void handle(T value);
   }
 
-  public interface FailureHandler {
-    void handle(Throwable error);
+  public interface FailureHandler
+  {
+    void handle(@NonNull Throwable error);
   }
 
-  private final Executor executor;
+  @NonNull
+  private final Executor mExecutor;
+  private final Object mLock = new Object();
 
-  private SuccessHandler<T> successHandler;
-  private FailureHandler failureHandler;
+  private final List<SuccessHandler<T>> mSuccessHandlers = new ArrayList<>();
+  private final List<FailureHandler> mFailureHandlers = new ArrayList<>();
 
-  private boolean completed = false;
-  private T value;
-  private Throwable error;
+  private boolean mCompleted = false;
+  @Nullable
+  private T mValue;
+  @Nullable
+  private Throwable mError;
 
-  public AsyncResult(Executor executor) {
-    this.executor = executor;
+  public AsyncResult(@NonNull Executor executor)
+  {
+    mExecutor = executor;
   }
 
-  public void complete(T value) {
-    this.completed = true;
-    this.value = value;
-    dispatch();
+  /** Creates an already completed result. */
+  @NonNull
+  public static <T> AsyncResult<T> completed(@NonNull Executor executor, T value)
+  {
+    final AsyncResult<T> result = new AsyncResult<>(executor);
+    result.complete(value);
+    return result;
   }
 
-  public void fail(Throwable error) {
-    this.completed = true;
-    this.error = error;
-    dispatch();
+  /** Creates an already failed result. */
+  @NonNull
+  public static <T> AsyncResult<T> failed(@NonNull Executor executor, @NonNull Throwable error)
+  {
+    final AsyncResult<T> result = new AsyncResult<>(executor);
+    result.fail(error);
+    return result;
   }
 
-  private void dispatch() {
-    executor.execute(() -> {
-      if (error != null && failureHandler != null) {
-        failureHandler.handle(error);
-      } else if (value != null && successHandler != null) {
-        successHandler.handle(value);
+  /** @return false if the result has already been completed or failed before. */
+  public boolean complete(T value)
+  {
+    final List<SuccessHandler<T>> handlers;
+    synchronized (mLock)
+    {
+      if (mCompleted)
+        return false;
+      mCompleted = true;
+      mValue = value;
+      handlers = new ArrayList<>(mSuccessHandlers);
+      mSuccessHandlers.clear();
+      mFailureHandlers.clear();
+    }
+    for (SuccessHandler<T> handler : handlers)
+      mExecutor.execute(() -> handler.handle(value));
+    return true;
+  }
+
+  /** @return false if the result has already been completed or failed before. */
+  public boolean fail(@NonNull Throwable error)
+  {
+    final List<FailureHandler> handlers;
+    synchronized (mLock)
+    {
+      if (mCompleted)
+        return false;
+      mCompleted = true;
+      mError = error;
+      handlers = new ArrayList<>(mFailureHandlers);
+      mSuccessHandlers.clear();
+      mFailureHandlers.clear();
+    }
+    for (FailureHandler handler : handlers)
+      mExecutor.execute(() -> handler.handle(error));
+    return true;
+  }
+
+  public boolean isDone()
+  {
+    synchronized (mLock)
+    {
+      return mCompleted;
+    }
+  }
+
+  @NonNull
+  public AsyncResult<T> onSuccess(@NonNull SuccessHandler<T> handler)
+  {
+    final T value;
+    synchronized (mLock)
+    {
+      if (!mCompleted)
+      {
+        mSuccessHandlers.add(handler);
+        return this;
       }
-    });
-  }
-
-  public AsyncResult<T> onSuccess(SuccessHandler<T> handler) {
-    this.successHandler = handler;
-    if (completed && error == null) dispatch();
+      if (mError != null)
+        return this;
+      value = mValue;
+    }
+    mExecutor.execute(() -> handler.handle(value));
     return this;
   }
 
-  public AsyncResult<T> onFailure(FailureHandler handler) {
-    this.failureHandler = handler;
-    if (completed && error != null) dispatch();
+  @NonNull
+  public AsyncResult<T> onFailure(@NonNull FailureHandler handler)
+  {
+    final Throwable error;
+    synchronized (mLock)
+    {
+      if (!mCompleted)
+      {
+        mFailureHandlers.add(handler);
+        return this;
+      }
+      if (mError == null)
+        return this;
+      error = mError;
+    }
+    mExecutor.execute(() -> handler.handle(error));
     return this;
   }
 
-  public <R> AsyncResult<R> thenApply(Function<T, R> mapper) {
-    AsyncResult<R> next = new AsyncResult<>(executor);
-
+  /** Maps the value. An exception thrown by the mapper fails the returned result. */
+  @NonNull
+  public <R> AsyncResult<R> thenApply(@NonNull Function<T, R> mapper)
+  {
+    final AsyncResult<R> next = new AsyncResult<>(mExecutor);
     onSuccess(value -> {
-      try {
+      try
+      {
         next.complete(mapper.apply(value));
-      } catch (Throwable t) {
+      }
+      catch (Throwable t)
+      {
         next.fail(t);
       }
     });
-
     onFailure(next::fail);
     return next;
   }
 
-  public <R> AsyncResult<R> thenCompose(Function<T, AsyncResult<R>> mapper) {
-    AsyncResult<R> next = new AsyncResult<>(executor);
-
+  /** Chains another asynchronous operation. An exception thrown by the mapper fails the returned result. */
+  @NonNull
+  public <R> AsyncResult<R> thenCompose(@NonNull Function<T, AsyncResult<R>> mapper)
+  {
+    final AsyncResult<R> next = new AsyncResult<>(mExecutor);
     onSuccess(value -> {
-      try {
-        mapper.apply(value)
-            .onSuccess(next::complete)
-            .onFailure(next::fail);
-      } catch (Throwable t) {
+      try
+      {
+        mapper.apply(value).onSuccess(next::complete).onFailure(next::fail);
+      }
+      catch (Throwable t)
+      {
         next.fail(t);
       }
     });
-
     onFailure(next::fail);
     return next;
   }
 }
-
