@@ -127,6 +127,12 @@ public class OnlineTransitService implements TransitService
     return result;
   }
 
+  /**
+   * Stops of the reverse geocoding to try at most. The nearest stop is not always served (e.g. a tram platform
+   * without trips in the feed), so further stops are tried until one has departures.
+   */
+  static final int MAX_STOPS_TO_TRY = 3;
+
   @NonNull
   @Override
   public AsyncResult<TransitDepartures> closestStopWithTimes(double lat, double lon, int limit)
@@ -135,8 +141,30 @@ public class OnlineTransitService implements TransitService
       if (stops.isEmpty())
         return AsyncResult.failed(mExecutor,
                                   TransitServiceException.noResults("No stops found near " + lat + ", " + lon));
-      return stopTimes(stops.get(0).getId(), limit);
+      final AsyncResult<TransitDepartures> result = new AsyncResult<>(mExecutor);
+      tryStops(stops.subList(0, Math.min(MAX_STOPS_TO_TRY, stops.size())), 0, limit, null, result);
+      return result;
     });
+  }
+
+  /**
+   * Requests the departures of stops[index]; on an empty answer the next stop is tried. Errors end the search
+   * (no further requests). If no stop has departures, the empty answer of the nearest stop is returned.
+   */
+  private void tryStops(@NonNull List<TransitStop> stops, int index, int limit, @Nullable TransitDepartures nearest,
+                        @NonNull AsyncResult<TransitDepartures> result)
+  {
+    stopTimes(stops.get(index).getId(), limit)
+        .onSuccess(departures -> {
+          final TransitDepartures first = nearest != null ? nearest : departures;
+          if (!departures.getDepartures().isEmpty())
+            result.complete(departures);
+          else if (index + 1 < stops.size())
+            tryStops(stops, index + 1, limit, first, result);
+          else
+            result.complete(first);
+        })
+        .onFailure(result::fail);
   }
 
   @NonNull
