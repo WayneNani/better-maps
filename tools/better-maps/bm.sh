@@ -108,7 +108,9 @@ android_build() {
 
 android_unit() {
   cd "$REPO_ROOT/android"
-  with_build_slot ./gradlew --no-daemon --max-workers=4 -Px86_64 -Pnjobs="$NJOBS" testFdroidDebugUnitTest "$@"
+  # App- und SDK-Modul; das SDK hat keine Produkt-Flavors.
+  with_build_slot ./gradlew --no-daemon --max-workers=4 -Px86_64 -Pnjobs="$NJOBS" \
+    :app:testFdroidDebugUnitTest :sdk:testDebugUnitTest "$@"
 }
 
 apk_path() { ls -t "$REPO_ROOT"/android/app/build/outputs/apk/fdroid/debug/*.apk | head -1; }
@@ -116,7 +118,8 @@ apk_path() { ls -t "$REPO_ROOT"/android/app/build/outputs/apk/fdroid/debug/*.apk
 android_install_run() {
   local apk; apk="$(apk_path)"
   emulator_start
-  adb install -r -g "$apk"
+  # -d: andere Worktrees installieren evtl. einen höheren Versionscode derselben App-ID.
+  adb install -r -d -g "$apk"
   adb shell am start -n "$APP_ID/app.organicmaps.SplashActivity" || adb shell monkey -p "$APP_ID" 1
 }
 
