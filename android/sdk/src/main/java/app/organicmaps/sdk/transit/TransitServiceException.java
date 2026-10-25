@@ -17,7 +17,9 @@ public class TransitServiceException extends Exception
     /** The response could not be parsed. */
     INVALID_RESPONSE,
     /** The request succeeded, but nothing was found (e.g. no stop near the given point). */
-    NO_RESULTS
+    NO_RESULTS,
+    /** No request was sent: online public transport is switched off or the user has not agreed to it. */
+    DISABLED
   }
 
   @NonNull
@@ -39,6 +41,12 @@ public class TransitServiceException extends Exception
   public static TransitServiceException noResults(@NonNull String message)
   {
     return new TransitServiceException(Kind.NO_RESULTS, 0, null, message, null);
+  }
+
+  @NonNull
+  public static TransitServiceException disabled(@NonNull String message)
+  {
+    return new TransitServiceException(Kind.DISABLED, 0, null, message, null);
   }
 
   @NonNull

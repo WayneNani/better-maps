@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -208,6 +209,48 @@ public final class TransitRoutingOptions
   public RealtimeMode getRealtimeMode()
   {
     return mRealtimeMode;
+  }
+
+  @Override
+  public boolean equals(Object o)
+  {
+    if (this == o)
+      return true;
+    if (!(o instanceof TransitRoutingOptions))
+      return false;
+    final TransitRoutingOptions that = (TransitRoutingOptions) o;
+    return mUseRoutedTransfers == that.mUseRoutedTransfers && mDetailedTransfers == that.mDetailedTransfers
+ && mNumItineraries == that.mNumItineraries && Objects.equals(mMaxTransfers, that.mMaxTransfers)
+ && Objects.equals(mMinTransferTimeMinutes, that.mMinTransferTimeMinutes)
+ && Objects.equals(mAdditionalTransferTimeMinutes, that.mAdditionalTransferTimeMinutes)
+ && Objects.equals(mTransferTimeFactor, that.mTransferTimeFactor) && mPedestrianProfile == that.mPedestrianProfile
+ && Objects.equals(mPedestrianSpeed, that.mPedestrianSpeed)
+ && Objects.equals(mRequireBikeTransport, that.mRequireBikeTransport) && mTransitModes.equals(that.mTransitModes)
+ && mPreTransitModes.equals(that.mPreTransitModes) && mPostTransitModes.equals(that.mPostTransitModes)
+ && Objects.equals(mMaxPreTransitTimeSeconds, that.mMaxPreTransitTimeSeconds)
+ && Objects.equals(mMaxPostTransitTimeSeconds, that.mMaxPostTransitTimeSeconds)
+ && Objects.equals(mSearchWindowSeconds, that.mSearchWindowSeconds) && mRealtimeMode == that.mRealtimeMode;
+  }
+
+  @Override
+  public int hashCode()
+  {
+    return Objects.hash(mMaxTransfers, mMinTransferTimeMinutes, mAdditionalTransferTimeMinutes, mTransferTimeFactor,
+                        mUseRoutedTransfers, mDetailedTransfers, mPedestrianProfile, mPedestrianSpeed,
+                        mRequireBikeTransport, mTransitModes, mPreTransitModes, mPostTransitModes,
+                        mMaxPreTransitTimeSeconds, mMaxPostTransitTimeSeconds, mNumItineraries, mSearchWindowSeconds,
+                        mRealtimeMode);
+  }
+
+  @NonNull
+  @Override
+  public String toString()
+  {
+    return "TransitRoutingOptions{maxTransfers=" + mMaxTransfers
+  + ", additionalTransferTime=" + mAdditionalTransferTimeMinutes + ", pedestrianProfile=" + mPedestrianProfile
+  + ", pedestrianSpeed=" + mPedestrianSpeed + ", requireBikeTransport=" + mRequireBikeTransport
+  + ", transitModes=" + mTransitModes + ", maxPreTransitTime=" + mMaxPreTransitTimeSeconds
+  + ", maxPostTransitTime=" + mMaxPostTransitTimeSeconds + ", numItineraries=" + mNumItineraries + "}";
   }
 
   @NonNull
