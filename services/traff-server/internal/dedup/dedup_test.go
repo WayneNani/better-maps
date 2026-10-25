@@ -41,7 +41,9 @@ func indexAfterClass(typ string) int {
 	return 0
 }
 
+// with returns a modified deep copy of m.
 func with(m traff.Message, opts ...msgOpt) traff.Message {
+	m = m.Clone()
 	for _, o := range opts {
 		o(&m)
 	}
@@ -101,6 +103,7 @@ func TestDuplicateCases(t *testing.T) {
 		{"b starts when a ends", with(a7, times(t0.Add(-h), t0)), with(a7, times(t0, t0.Add(h))), false},
 		{"a starts after b ends", with(a7, times(t0.Add(2*h), time.Time{})), with(a7, times(time.Time{}, t0)), false},
 		{"no location", a7, traff.Message{ID: "b", Events: a7.Events}, false},
+		{"location without points", a7, traff.Message{ID: "b", Location: &traff.Location{RoadRef: "A 7"}, Events: a7.Events}, false},
 	}
 	for _, c := range cases {
 		if got := m.Duplicate(&c.a, &c.b); got != c.want {
@@ -216,5 +219,95 @@ func TestGeometry(t *testing.T) {
 	a, b := project(traff.LatLon{Lat: 51, Lon: 9}), project(traff.LatLon{Lat: 51.01, Lon: 9})
 	if d := math.Hypot(a.x-b.x, a.y-b.y); d < 1100 || d > 1112 {
 		t.Errorf("0.01° = %v m", d)
+	}
+}
+
+func class(rc traff.RoadClass) msgOpt { return func(m *traff.Message) { m.Location.RoadClass = rc } }
+
+// TestSpatialDuplicate covers the comparison of congestion messages without road reference
+// (crowd-sourced data) with official messages.
+func TestSpatialDuplicate(t *testing.T) {
+	m := New(Config{})
+	mw := class(traff.RoadClassMotorway)
+	// Official jam on the A 100 in Berlin, about 2.4 km long, from west to east.
+	official := with(msg("de.autobahn.warning:a100", "A 100", []string{"CONGESTION_STATIONARY_TRAFFIC", "DELAY_DELAY"},
+		[2]float64{52.4710, 13.3762}, [2]float64{52.4674, 13.3841}, [2]float64{52.4648, 13.4061}), mw)
+	// Crowd chain on the same stretch, a little shorter.
+	crowd := with(msg("de.crowd:x", "", []string{"CONGESTION_STATIONARY_TRAFFIC"},
+		[2]float64{52.4700, 13.3786}, [2]float64{52.4664, 13.3868}, [2]float64{52.4650, 13.4033}), mw)
+	h := time.Hour
+	cases := []struct {
+		name string
+		a, b traff.Message
+		want bool
+	}{
+		{"crowd covered by official jam", official, crowd, true},
+		{"message with road reference covered by official jam without", with(official, func(m *traff.Message) { m.Location.RoadRef = "" }),
+			with(crowd, func(m *traff.Message) { m.Location.RoadRef = "A100" }), true},
+		{"official without road reference, both directions", with(official, func(m *traff.Message) { m.Location.RoadRef = "" }, bothDirections),
+			with(msg("c", "", []string{"CONGESTION_QUEUE"}, [2]float64{52.4650, 13.4033}, [2]float64{52.4700, 13.3786}), mw), true},
+		{"official is a pure delay", with(msg("a", "A 100", []string{"DELAY_DELAY"}, [2]float64{52.4710, 13.3762}, [2]float64{52.4674, 13.3841}, [2]float64{52.4648, 13.4061}), mw), crowd, true},
+
+		{"crowd longer than official jam", with(msg("a", "A 100", []string{"CONGESTION_QUEUE"}, [2]float64{52.4674, 13.3841}, [2]float64{52.4664, 13.3868}), mw), crowd, false},
+		{"opposite direction", official,
+			with(msg("c", "", []string{"CONGESTION_QUEUE"}, [2]float64{52.4650, 13.4033}, [2]float64{52.4700, 13.3786}), mw), false},
+		{"different road class", official, with(crowd, class(traff.RoadClassPrimary)), false},
+		{"crowd without road class", official, with(crowd, class("")), false},
+		{"official without road class", with(official, class("")), crowd, false},
+		{"official accident without congestion", with(msg("a", "A 100", []string{"INCIDENT_ACCIDENT"}, [2]float64{52.4710, 13.3762}, [2]float64{52.4648, 13.4061}), mw), crowd, false},
+		{"crowd message with incident", official, with(crowd, func(m *traff.Message) {
+			m.Events = append(m.Events, traff.Event{Class: "INCIDENT", Type: "INCIDENT_ACCIDENT"})
+		}), false},
+		{"official jam ended", with(official, times(t0.Add(-2*h), t0.Add(-h))), with(crowd, times(t0, time.Time{})), false},
+		{"far away", official, with(msg("c", "", []string{"CONGESTION_QUEUE"}, [2]float64{52.50, 13.38}, [2]float64{52.50, 13.40}), mw), false},
+	}
+	for _, c := range cases {
+		if got := m.Duplicate(&c.a, &c.b); got != c.want {
+			t.Errorf("%s: Duplicate = %v", c.name, got)
+		}
+	}
+	// The rule is asymmetric: a short crowd message does not suppress the official one.
+	short := with(msg("c", "", []string{"CONGESTION_QUEUE"}, [2]float64{52.4674, 13.3841}, [2]float64{52.4664, 13.3868}), mw)
+	if !m.Duplicate(&official, &short) || m.Duplicate(&short, &official) {
+		t.Error("official message duplicates the crowd message")
+	}
+	// The distance is configurable; a negative value disables the rule.
+	shifted := with(msg("c", "", []string{"CONGESTION_QUEUE"}, [2]float64{52.4721, 13.3786}, [2]float64{52.4671, 13.4033}), mw) // ~200 m north
+	if !m.Duplicate(&official, &shifted) || New(Config{SpatialDistance: 100}).Duplicate(&official, &shifted) {
+		t.Error("SpatialDistance not applied")
+	}
+	if New(Config{SpatialDistance: -1}).Duplicate(&official, &crowd) {
+		t.Error("negative SpatialDistance does not disable the rule")
+	}
+	if New(Config{}).cfg.SpatialDistance != DefaultSpatialDistance {
+		t.Error("default spatial distance")
+	}
+}
+
+func TestFilterSpatial(t *testing.T) {
+	mw := class(traff.RoadClassMotorway)
+	ref := []traff.Message{
+		with(msg("official", "A 100", []string{"CONGESTION_QUEUE"}, [2]float64{52.4710, 13.3762}, [2]float64{52.4648, 13.4061}), mw),
+		with(msg("official-noref", "", []string{"CONGESTION_QUEUE"}, [2]float64{52.50, 13.30}, [2]float64{52.50, 13.32}), mw),
+		with(msg("roadworks", "", []string{"CONSTRUCTION_ROADWORKS"}, [2]float64{52.52, 13.30}, [2]float64{52.52, 13.32}), mw),
+	}
+	in := []traff.Message{
+		with(msg("crowd-1", "", []string{"CONGESTION_QUEUE"}, [2]float64{52.4700, 13.3786}, [2]float64{52.4650, 13.4033}), mw),
+		with(msg("crowd-2", "", []string{"CONGESTION_QUEUE"}, [2]float64{52.50, 13.302}, [2]float64{52.50, 13.318}), mw),
+		with(msg("crowd-3", "", []string{"CONGESTION_QUEUE"}, [2]float64{52.52, 13.302}, [2]float64{52.52, 13.318}), mw),
+		// With road reference: compared by road with "official", spatially with "official-noref".
+		with(msg("ref-1", "A 100", []string{"CONGESTION_SLOW_TRAFFIC"}, [2]float64{52.4700, 13.3786}, [2]float64{52.4650, 13.4033}), mw),
+		with(msg("ref-2", "B 1", []string{"CONGESTION_SLOW_TRAFFIC"}, [2]float64{52.50, 13.302}, [2]float64{52.50, 13.318}), mw),
+		with(msg("ref-3", "B 1", []string{"CONGESTION_SLOW_TRAFFIC", "INCIDENT_ACCIDENT"}, [2]float64{52.50, 13.302}, [2]float64{52.50, 13.318}), mw),
+	}
+	kept, suppressed := New(Config{}).Filter(in, ref)
+	want := map[string]string{"crowd-1": "official", "crowd-2": "official-noref", "ref-1": "official", "ref-2": "official-noref"}
+	if len(suppressed) != len(want) || len(kept) != 2 || kept[0].ID != "crowd-3" || kept[1].ID != "ref-3" {
+		t.Errorf("kept %v, suppressed %v", kept, suppressed)
+	}
+	for id, of := range want {
+		if suppressed[id] != of {
+			t.Errorf("%s suppressed as duplicate of %q, want %q", id, suppressed[id], of)
+		}
 	}
 }
