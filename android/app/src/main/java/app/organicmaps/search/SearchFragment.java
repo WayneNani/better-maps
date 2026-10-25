@@ -39,6 +39,7 @@ import app.organicmaps.sdk.util.Config;
 import app.organicmaps.sdk.util.Language;
 import app.organicmaps.sdk.util.SharedPropertiesUtils;
 import app.organicmaps.sdk.util.log.Logger;
+import app.organicmaps.transit.TransitDebug;
 import app.organicmaps.util.UiUtils;
 import app.organicmaps.util.Utils;
 import app.organicmaps.util.WindowInsetUtils;
@@ -424,7 +425,8 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
     {
       mHiddenCommands.addAll(Arrays.asList(
           new BadStorageCommand("?emulateBadStorage", requireContext()), new JavaCrashCommand("?emulateJavaCrash"),
-          new NativeCrashCommand("?emulateNativeCrash"), new PushTokenCommand("?pushToken")));
+          new NativeCrashCommand("?emulateNativeCrash"), new PushTokenCommand("?pushToken"),
+          new TransitPlanCommand("?transit-plan", requireActivity())));
     }
 
     return mHiddenCommands;
@@ -619,6 +621,25 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
     void executeInternal()
     {
       SharedPropertiesUtils.setShouldShowEmulateBadStorageSetting(true);
+    }
+  }
+
+  /** Requests public transport connections Berlin Hbf -> Alexanderplatz from Transitous (debug only). */
+  private static class TransitPlanCommand extends HiddenCommand.BaseHiddenCommand
+  {
+    @NonNull
+    private final Context mContext;
+
+    TransitPlanCommand(@NonNull String command, @NonNull Context context)
+    {
+      super(command);
+      mContext = context;
+    }
+
+    @Override
+    void executeInternal()
+    {
+      TransitDebug.planBerlinHbfToAlexanderplatz(mContext);
     }
   }
 

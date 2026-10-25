@@ -10,13 +10,11 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.view.accessibility.AccessibilityEvent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -27,11 +25,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.shape.MaterialShapeDrawable;
-
 import app.organicmaps.MwmActivity;
 import app.organicmaps.R;
 import app.organicmaps.api.Const;
@@ -44,9 +37,9 @@ import app.organicmaps.sdk.bookmarks.data.RoadWarningMarkType;
 import app.organicmaps.sdk.bookmarks.data.Track;
 import app.organicmaps.sdk.routing.RoutingController;
 import app.organicmaps.sdk.settings.RoadType;
-import app.organicmaps.sdk.transit.OnlineTransitService;
-import app.organicmaps.sdk.transit.TransitService;
 import app.organicmaps.sdk.util.log.Logger;
+import app.organicmaps.transit.TransitDebug;
+import app.organicmaps.transit.TransitServices;
 import app.organicmaps.util.ThemeUtils;
 import app.organicmaps.util.UiUtils;
 import app.organicmaps.util.bottomsheet.MenuBottomSheetFragment;
@@ -57,7 +50,6 @@ import com.google.android.material.shape.MaterialShapeDrawable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.Map;
 
 public class PlacePageController
@@ -88,6 +80,8 @@ public class PlacePageController
   private WindowInsetsCompat mCurrentWindowInsets;
   @Nullable
   private Map<View, Integer> mImportantForAccessibilityMap;
+
+
 
   private boolean mShouldCollapse;
   private int mDistanceToTop;
@@ -736,45 +730,30 @@ public class PlacePageController
     mViewModel.setCurrentButtons(buttons);
   }
 
-  private void showAlert(String message)
+  // MVP of online departures (Transitous) until the real place page UI exists (AP3b).
+  private void displayStopTimes(@NonNull MapObject mapObject)
   {
-    if (isAdded() && getContext() != null)
-    {
-      requireActivity().runOnUiThread(() -> {
-        new MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Alert")
-            .setMessage(message)
-            .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
-            .show();
-      });
-    }
+    TransitServices.get(requireContext())
+        .closestStopWithTimes(mapObject.getLat(), mapObject.getLon(), 5)
+        .onSuccess(departures -> {
+          // Ignore late results for another object or a closed place page.
+          if (isAdded() && mMapObject == mapObject)
+            showTransitAlert("Departures", TransitDebug.formatDepartures(departures));
+        })
+        .onFailure(error -> {
+          Logger.w(TAG, "Departures failed: " + error.getMessage());
+          if (isAdded() && mMapObject == mapObject)
+            showTransitAlert("Departures failed", String.valueOf(error.getMessage()));
+        });
   }
 
-  private void displayStoptimes(double lat, double lon)
+  private void showTransitAlert(@NonNull String title, @NonNull String message)
   {
-    TransitService transit =
-        new OnlineTransitService(
-            "https://api.transitous.org/",
-            ContextCompat.getMainExecutor(requireContext())
-        );
-
-    transit.closestStopWithTimes(lat, lon, 3)
-        .onSuccess(response -> {
-          String message =
-              response.getStopTimes().stream()
-                  .map(st ->
-                      st.getRouteShortName() + ": " +
-                          st.getTripTo().getName())
-                  .collect(Collectors.joining("\n\n"));
-
-          showAlert("Stoptimes for "
-              + response.getPlace().getName()
-              + "\n\n" + message);
-        })
-        .onFailure(err ->
-            showAlert("Failed: " + err.getMessage())
-        );
-
+    new MaterialAlertDialogBuilder(requireContext())
+        .setTitle(title)
+        .setMessage(message)
+        .setPositiveButton(android.R.string.ok, null)
+        .show();
   }
 
   @Override
@@ -788,9 +767,8 @@ public class PlacePageController
     mMapObject = mapObject;
     if (mapObject != null)
     {
-
       if (mapObject.hasPublicTransport())
-        displayStoptimes(mapObject.getLat(), mapObject.getLon());
+        displayStopTimes(mapObject);
 
       setPlacePageInteractions(true);
       // Only collapse the place page if the data is different from the one already available
