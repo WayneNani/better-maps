@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response status="OK" subscription_id="SUB0001" timeout="3600">
+  <feed>
+    <message id="de.crowd:17/70416/43018/W-E/MOTORWAY" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" cancellation="false" forecast="false">
+      <location directionality="ONE_DIRECTION" road_class="MOTORWAY">
+        <from>+52.471070 +13.376246</from>
+        <via>+52.466387 +13.389587</via>
+        <to>+52.464818 +13.406067</to>
+      </location>
+      <events>
+        <event class="CONGESTION" type="CONGESTION_STATIONARY_TRAFFIC" speed="6"></event>
+      </events>
+    </message>
+  </feed>
+</response>

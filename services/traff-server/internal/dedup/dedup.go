@@ -2,11 +2,10 @@
 // e.g. a closure reported both by the Autobahn API and by a DATEX II feed of a traffic
 // information centre.
 //
-// The heuristic is deliberately simple and conservative. Two messages are duplicates if all of
-// the following hold:
+// The heuristic is deliberately simple and conservative. If both messages have a road
+// reference, they are duplicates if all of the following hold:
 //
-//  1. Same road: both have a road reference and the references are equal after normalization
-//     ("A 8", "A8" and "a8" are equal). Messages without road reference are never duplicates.
+//  1. Same road: the references are equal after normalization ("A 8", "A8" and "a8" are equal).
 //  2. Same kind of event: the event categories overlap (see Category).
 //  3. Spatial proximity: the shortest distance between the two locations (polylines through
 //     from, via and to, or the point at) is at most MaxDistance.
@@ -14,6 +13,19 @@
 //     extent, their directions differ by at most 90°.
 //  5. Overlapping time: the validity intervals [start_time, end_time] overlap; a missing start
 //     or end is open.
+//
+// Messages without road reference (e.g. crowd-sourced congestion, which only knows the road
+// class) are compared spatially, and only for congestion: a message b without road reference
+// duplicates a message a of a source with higher priority (or vice versa, a without reference
+// and b with one) if
+//
+//  1. b reports congestion only (CONGESTION_*, DELAY_*) and a reports congestion as well,
+//  2. both have the same road class (a missing class never matches),
+//  3. every reference point of b (from, via, to, at) lies within SpatialDistance of the
+//     location of a, i.e. a covers b; a long message b is not suppressed by a short one,
+//  4. directions and times match as above.
+//
+// This rule is asymmetric: b is the message that would be suppressed.
 //
 // The runner applies the heuristic in a merge step before the messages of a source are stored:
 // a message is suppressed if it duplicates an active message of a source with higher priority.
@@ -30,11 +42,18 @@ import (
 // DefaultMaxDistance is the default value of Config.MaxDistance in metres.
 const DefaultMaxDistance = 500
 
+// DefaultSpatialDistance is the default value of Config.SpatialDistance in metres.
+const DefaultSpatialDistance = 250
+
 // Config holds the parameters of the heuristic.
 type Config struct {
 	// MaxDistance is the largest distance in metres between two locations that are considered
 	// the same place.
 	MaxDistance float64
+	// SpatialDistance is the largest distance in metres between a reference point of a
+	// congestion message without road reference and the location of the message it duplicates.
+	// Zero selects DefaultSpatialDistance, a negative value disables the spatial comparison.
+	SpatialDistance float64
 }
 
 // Matcher compares messages.
@@ -42,10 +61,14 @@ type Matcher struct {
 	cfg Config
 }
 
-// New creates a matcher. A non-positive MaxDistance is replaced by DefaultMaxDistance.
+// New creates a matcher. A non-positive MaxDistance is replaced by DefaultMaxDistance, a zero
+// SpatialDistance by DefaultSpatialDistance.
 func New(cfg Config) *Matcher {
 	if cfg.MaxDistance <= 0 {
 		cfg.MaxDistance = DefaultMaxDistance
+	}
+	if cfg.SpatialDistance == 0 {
+		cfg.SpatialDistance = DefaultSpatialDistance
 	}
 	return &Matcher{cfg: cfg}
 }
@@ -100,11 +123,15 @@ func NormalizeRoad(ref string) string {
 // features are the precomputed properties of a message.
 type features struct {
 	road       string
+	class      traff.RoadClass
 	cats       map[string]bool
 	line       []xy // local planar coordinates in metres
 	both       bool
 	start, end time.Time
 }
+
+// congestionOnly reports whether congestion is the only event category.
+func (f *features) congestionOnly() bool { return len(f.cats) == 1 && f.cats[CatCongestion] }
 
 type xy struct{ x, y float64 }
 
@@ -122,7 +149,8 @@ func featuresOf(m *traff.Message) *features {
 	if m.Location == nil {
 		return nil
 	}
-	f := &features{road: NormalizeRoad(m.Location.RoadRef), cats: Categories(m), both: m.Location.Directionality == traff.BothDirections}
+	f := &features{road: NormalizeRoad(m.Location.RoadRef), class: m.Location.RoadClass, cats: Categories(m),
+		both: m.Location.Directionality == traff.BothDirections}
 	for _, p := range []*traff.Point{m.Location.From, m.Location.Via, m.Location.To, m.Location.At} {
 		if p != nil {
 			f.line = append(f.line, project(p.Coord))
@@ -134,24 +162,46 @@ func featuresOf(m *traff.Message) *features {
 	if m.EndTime != nil {
 		f.end = m.EndTime.Time
 	}
-	if f.road == "" || len(f.line) == 0 {
+	if len(f.line) == 0 {
 		return nil
 	}
 	return f
 }
 
-// Duplicate reports whether a and b describe the same event.
+// Duplicate reports whether b duplicates a, where a belongs to the source with higher priority.
+// The comparison is symmetric for messages that both have a road reference.
 func (mt *Matcher) Duplicate(a, b *traff.Message) bool {
 	fa, fb := featuresOf(a), featuresOf(b)
 	return fa != nil && fb != nil && mt.dup(fa, fb)
 }
 
+// dup reports whether b duplicates a.
 func (mt *Matcher) dup(a, b *features) bool {
-	if a.road != b.road || !overlap(a.cats, b.cats) || !timesOverlap(a, b) {
+	if !timesOverlap(a, b) {
+		return false
+	}
+	if a.road == "" || b.road == "" {
+		return mt.spatialDup(a, b)
+	}
+	if a.road != b.road || !overlap(a.cats, b.cats) {
 		return false
 	}
 	if lineDistance(a.line, b.line) > mt.cfg.MaxDistance {
 		return false
+	}
+	return a.both || b.both || sameDirection(a.line, b.line)
+}
+
+// spatialDup reports whether the congestion message b, of which at least one of a and b has no
+// road reference, is covered by a.
+func (mt *Matcher) spatialDup(a, b *features) bool {
+	if mt.cfg.SpatialDistance < 0 || !b.congestionOnly() || !a.cats[CatCongestion] || b.class == "" || a.class != b.class {
+		return false
+	}
+	for _, p := range b.line {
+		if lineDistance([]xy{p}, a.line) > mt.cfg.SpatialDistance {
+			return false
+		}
 	}
 	return a.both || b.both || sameDirection(a.line, b.line)
 }
@@ -233,17 +283,40 @@ func segmentsIntersect(a1, a2, b1, b2 xy) bool {
 // message, the ID of the message it duplicates.
 func (mt *Matcher) Filter(msgs, ref []traff.Message) (kept []traff.Message, suppressed map[string]string) {
 	byRoad := map[string][]refFeature{}
+	// Congestion messages with road class for the spatial comparison: all of them, and those
+	// without road reference.
+	var spatialAll, spatialNoRoad []refFeature
 	for i := range ref {
-		if f := featuresOf(&ref[i]); f != nil {
-			byRoad[f.road] = append(byRoad[f.road], refFeature{id: ref[i].ID, f: f})
+		f := featuresOf(&ref[i])
+		if f == nil {
+			continue
+		}
+		rf := refFeature{id: ref[i].ID, f: f}
+		if f.road != "" {
+			byRoad[f.road] = append(byRoad[f.road], rf)
+		}
+		if f.cats[CatCongestion] && f.class != "" {
+			spatialAll = append(spatialAll, rf)
+			if f.road == "" {
+				spatialNoRoad = append(spatialNoRoad, rf)
+			}
 		}
 	}
 	suppressed = map[string]string{}
 	kept = make([]traff.Message, 0, len(msgs))
 	for i := range msgs {
-		f := featuresOf(&msgs[i])
-		if f != nil {
-			if id, ok := mt.match(f, byRoad[f.road]); ok {
+		if f := featuresOf(&msgs[i]); f != nil {
+			var id string
+			var ok bool
+			if f.road != "" {
+				id, ok = mt.match(f, byRoad[f.road])
+				if !ok && f.congestionOnly() {
+					id, ok = mt.match(f, spatialNoRoad)
+				}
+			} else if f.congestionOnly() {
+				id, ok = mt.match(f, spatialAll)
+			}
+			if ok {
 				suppressed[msgs[i].ID] = id
 				continue
 			}

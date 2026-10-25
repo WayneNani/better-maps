@@ -41,6 +41,13 @@ type DetailsReporter interface {
 	Details() map[string]int
 }
 
+// IntervalSource is implemented by sources that are fetched at their own interval instead of
+// the poll interval of the runner (e.g. the crowd source, whose data changes every few minutes).
+type IntervalSource interface {
+	// Interval returns the fetch interval; a non-positive value selects the runner's interval.
+	Interval() time.Duration
+}
+
 // Deduplicator removes messages that duplicate messages of other sources.
 type Deduplicator interface {
 	// Filter returns the messages of msgs that do not duplicate a message in ref, and for each
@@ -112,56 +119,62 @@ func (r *Runner) Coverage() []traff.BBox {
 // RunOnce fetches every source once and updates the store. Sources are fetched one after the
 // other; an error in one source does not affect the others.
 func (r *Runner) RunOnce(ctx context.Context) {
-	for i, s := range r.sources {
-		start := r.now()
-		msgs, err := s.Fetch(ctx, start)
-		total := len(msgs)
-		dups := 0
-		if msgs != nil && r.dedup != nil && i > 0 {
-			var suppressed map[string]string
-			msgs, suppressed = r.dedup.Filter(msgs, r.activeMessages(r.sources[:i]))
-			dups = len(suppressed)
-			if dups > 0 && r.log.Enabled(ctx, slog.LevelDebug) {
-				ids := slices.Sorted(maps.Keys(suppressed))
-				for _, id := range ids[:min(len(ids), maxLoggedDuplicates)] {
-					r.log.Debug("duplicate suppressed", "source", s.Name(), "id", id, "duplicate_of", suppressed[id])
-				}
-			}
-		}
-		r.mu.Lock()
-		st := r.status[s.Name()]
-		st.LastAttempt = start
-		if err != nil {
-			st.LastError = err.Error()
-		} else {
-			st.LastError = ""
-		}
-		if msgs != nil {
-			st.LastSuccess = start
-			st.Messages = total
-			st.Duplicates = dups
-			st.DuplicatesTotal += dups
-		}
-		if dr, ok := s.(DetailsReporter); ok {
-			st.Details = dr.Details()
-		}
-		r.mu.Unlock()
-		if msgs == nil {
-			if err != nil {
-				r.log.Warn("source fetch failed, keeping previous data", "source", s.Name(), "err", err)
-			}
-			continue
-		}
-		stats := r.store.Replace(s.Name(), msgs, r.now())
-		attrs := []any{"source", s.Name(), "messages", total, "duplicates", dups, "new", stats.New, "changed", stats.Changed,
-			"renewed", stats.Renewed, "cancelled", stats.Cancelled, "skipped", stats.Skipped, "duration", r.now().Sub(start).Round(time.Millisecond)}
-		if err != nil {
-			r.log.Warn("source fetch partially failed", append(attrs, "err", err)...)
-		} else {
-			r.log.Info("source fetched", attrs...)
-		}
+	for i := range r.sources {
+		r.fetch(ctx, i)
 	}
 	r.store.Purge(r.now())
+}
+
+// fetch fetches source i, applies the duplicate suppression and stores the result.
+func (r *Runner) fetch(ctx context.Context, i int) {
+	s := r.sources[i]
+	start := r.now()
+	msgs, err := s.Fetch(ctx, start)
+	total := len(msgs)
+	dups := 0
+	if msgs != nil && r.dedup != nil && i > 0 {
+		var suppressed map[string]string
+		msgs, suppressed = r.dedup.Filter(msgs, r.activeMessages(r.sources[:i]))
+		dups = len(suppressed)
+		if dups > 0 && r.log.Enabled(ctx, slog.LevelDebug) {
+			ids := slices.Sorted(maps.Keys(suppressed))
+			for _, id := range ids[:min(len(ids), maxLoggedDuplicates)] {
+				r.log.Debug("duplicate suppressed", "source", s.Name(), "id", id, "duplicate_of", suppressed[id])
+			}
+		}
+	}
+	r.mu.Lock()
+	st := r.status[s.Name()]
+	st.LastAttempt = start
+	if err != nil {
+		st.LastError = err.Error()
+	} else {
+		st.LastError = ""
+	}
+	if msgs != nil {
+		st.LastSuccess = start
+		st.Messages = total
+		st.Duplicates = dups
+		st.DuplicatesTotal += dups
+	}
+	if dr, ok := s.(DetailsReporter); ok {
+		st.Details = dr.Details()
+	}
+	r.mu.Unlock()
+	if msgs == nil {
+		if err != nil {
+			r.log.Warn("source fetch failed, keeping previous data", "source", s.Name(), "err", err)
+		}
+		return
+	}
+	stats := r.store.Replace(s.Name(), msgs, r.now())
+	attrs := []any{"source", s.Name(), "messages", total, "duplicates", dups, "new", stats.New, "changed", stats.Changed,
+		"renewed", stats.Renewed, "cancelled", stats.Cancelled, "skipped", stats.Skipped, "duration", r.now().Sub(start).Round(time.Millisecond)}
+	if err != nil {
+		r.log.Warn("source fetch partially failed", append(attrs, "err", err)...)
+	} else {
+		r.log.Info("source fetched", attrs...)
+	}
 }
 
 // activeMessages returns the active (not cancelled) messages of the given sources.
@@ -179,17 +192,54 @@ func (r *Runner) activeMessages(sources []Source) []traff.Message {
 	return res
 }
 
-// Run calls RunOnce immediately and then every interval until ctx is cancelled.
+// Run calls RunOnce immediately and then fetches every source periodically until ctx is
+// cancelled: sources implementing IntervalSource at their own interval, all others at the
+// runner's interval. Sources with the same interval are fetched one after the other in priority
+// order; groups with different intervals run concurrently, so that a slow source (the Autobahn
+// API takes about two minutes per round) does not delay a source with a short interval.
 func (r *Runner) Run(ctx context.Context) {
-	t := time.NewTicker(r.interval)
+	r.RunOnce(ctx)
+	var intervals []time.Duration
+	groups := map[time.Duration][]int{}
+	for i := range r.sources {
+		d := r.intervalOf(i)
+		if _, ok := groups[d]; !ok {
+			intervals = append(intervals, d)
+		}
+		groups[d] = append(groups[d], i)
+	}
+	var wg sync.WaitGroup
+	for _, d := range intervals {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			r.loop(ctx, d, groups[d])
+		}()
+	}
+	wg.Wait()
+}
+
+// intervalOf returns the fetch interval of source i.
+func (r *Runner) intervalOf(i int) time.Duration {
+	if is, ok := r.sources[i].(IntervalSource); ok && is.Interval() > 0 {
+		return is.Interval()
+	}
+	return r.interval
+}
+
+func (r *Runner) loop(ctx context.Context, interval time.Duration, idx []int) {
+	t := time.NewTicker(interval)
 	defer t.Stop()
 	for {
-		r.RunOnce(ctx)
 		select {
 		case <-ctx.Done():
 			return
 		case <-t.C:
 		}
+		for _, i := range idx {
+			r.fetch(ctx, i)
+		}
+		r.store.Purge(r.now())
 	}
 }
 

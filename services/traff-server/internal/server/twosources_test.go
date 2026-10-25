@@ -250,7 +250,8 @@ func checkNoDuplicates(t *testing.T, st *store.Store) {
 	m := dedup.New(dedup.Config{})
 	for i, a := range entries {
 		for _, b := range entries[i+1:] {
-			if a.Source != b.Source && m.Duplicate(&a.Msg, &b.Msg) {
+			// Duplicate is asymmetric for messages without road reference: check both ways.
+			if a.Source != b.Source && (m.Duplicate(&a.Msg, &b.Msg) || m.Duplicate(&b.Msg, &a.Msg)) {
 				t.Errorf("duplicates in feed: %s and %s", a.Msg.ID, b.Msg.ID)
 			}
 		}

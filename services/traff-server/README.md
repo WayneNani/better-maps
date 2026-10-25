@@ -1,16 +1,18 @@
-# TraFF-Server (better-maps, AP4b/AP4c)
+# TraFF-Server (better-maps, AP4b/AP4c/AP5c)
 
 Kleiner Verkehrsdatenserver in Go. Er liest Baustellen, Warnungen (Staus, Unfälle) und Sperrungen aus der
 [Autobahn-API des Bundes](https://autobahn.api.bund.dev) und Verkehrsmeldungen im Format
 [DATEX II](https://docs.datex2.eu) (v2 und v3) von Landesmeldestellen, Straßenbauverwaltungen und der
-[Mobilithek](https://mobilithek.info). Er liefert sie ohne Dubletten im Format
+[Mobilithek](https://mobilithek.info) sowie anonym gemeldete Staus des eigenen Crowd-Servers
+(`services/crowd-traffic`). Er liefert sie ohne Dubletten im Format
 [TraFF](https://gitlab.com/traffxml/traff) (Traffic Feed Format, Version 0.8) über die HTTP-Abo-Schnittstelle aus.
 Gegenstelle ist die HTTP-TraFF-Quelle der App (`libs/traffxml/traff_source.cpp`, Branch `traffic`).
 
 - Nur Standardbibliothek, keine externen Abhängigkeiten.
 - Alles im Arbeitsspeicher: keine Datenbank, keine Dateien, Abos verschwinden beim Neustart.
 - Quellen docken über das `Source`-Interface an (`internal/source`): Autobahn-API (`internal/source/autobahn`),
-  DATEX II (`internal/source/datex2`); Crowd-Daten folgen.
+  DATEX II (`internal/source/datex2`), Crowd-Staus (`internal/source/crowd`). Jede Quelle kann ein eigenes
+  Abrufintervall haben (`IntervalSource`); Quellen mit verschiedenen Intervallen laufen nebenläufig.
 
 ## Starten
 
@@ -23,6 +25,9 @@ go run ./cmd/traff-server -autobahn-roads A7,A9 -log-level debug
 # Zusätzlich die frei zugänglichen DATEX-II-Feeds aus Baden-Württemberg
 TRAFF_DATEX2_FEEDS="bw-incidents=https://api.mobidata-bw.de/datasets/traffic/incidents/incidents_lmsbw.datex2.xml,bw-roadworks=https://api.mobidata-bw.de/datasets/traffic/roadworks/roadworks_svzbw.datex2.xml" \
   go run ./cmd/traff-server
+
+# Zusätzlich die Staus des Crowd-Servers (services/crowd-traffic, dort mit -listen :8081 gestartet)
+TRAFF_CROWD_URL=http://127.0.0.1:8081 go run ./cmd/traff-server
 ```
 
 Als Container (Podman):
@@ -62,6 +67,12 @@ Jede Option gibt es als Flag und als Umgebungsvariable; das Flag hat Vorrang.
 | `-datex2-timeout` | `TRAFF_DATEX2_TIMEOUT` | `1m` | Zeitlimit für einen Download |
 | `-dedup` | `TRAFF_DEDUP_ENABLED` | `true` | Dubletten zwischen Quellen unterdrücken |
 | `-dedup-distance` | `TRAFF_DEDUP_DISTANCE` | `500` | Höchstabstand in Metern, bis zu dem zwei Meldungen als derselbe Ort gelten |
+| `-dedup-spatial-distance` | `TRAFF_DEDUP_SPATIAL_DISTANCE` | `250` | Höchstabstand in Metern für Stau-Dubletten ohne Straßennummer (Crowd-Daten), `0` = aus |
+| `-crowd-url` | `TRAFF_CROWD_URL` | leer = aus | Basis-URL des Crowd-Servers, z. B. `http://crowd-traffic:8080`; abgerufen wird `/v1/segments` (eine Query wie `?bbox=…` bleibt erhalten) |
+| `-crowd-interval` | `TRAFF_CROWD_INTERVAL` | `2m` | eigenes Abrufintervall der Crowd-Quelle (mind. 10 s), unabhängig von `poll-interval` |
+| `-crowd-timeout` | `TRAFF_CROWD_TIMEOUT` | `20s` | Zeitlimit für einen Abruf |
+| `-crowd-merge-distance` | `TRAFF_CROWD_MERGE_DISTANCE` | `25` | Toleranz in Metern zwischen Ausfahrts- und Einfahrtspunkt benachbarter Stau-Kacheln; `0` = nicht zusammenfassen (eine Meldung pro Kachel) |
+| `-crowd-max-length` | `TRAFF_CROWD_MAX_LENGTH` | `5000` | Höchstlänge einer zusammengefassten Meldung in Metern, `0` = unbegrenzt |
 
 Zugangsdaten für DATEX-II-Feeds gibt es **nur** als Umgebungsvariablen (Flags wären in der Prozessliste sichtbar).
 `<NAME>` ist der Feed-Name in Großbuchstaben, `-` wird zu `_` (Feed `bw-incidents` → `TRAFF_DATEX2_BW_INCIDENTS_…`):
@@ -81,7 +92,10 @@ HTTP 200 und einem TraFF-Status gemeldet, wie es die Spezifikation (Abschnitt 6.
 `GET /healthz` liefert den Zustand als JSON: Anzahl Meldungen, Aufhebungen, Abos, `duplicates_suppressed` (im letzten
 Abruf unterdrückte Dubletten) und je Quelle letzter Abruf, Fehler, `messages`, `duplicates`, `duplicates_total`
 sowie bei DATEX-II-Feeds `details` (Downloads, `not_modified`, `fetch_errors`, Situationen, Records, Meldungen und
-übersprungene Records nach Grund, z. B. `skipped_alertc_only`).
+übersprungene Records nach Grund, z. B. `skipped_alertc_only`). Die Crowd-Quelle (`crowd`) meldet in `details`
+`downloads`, `fetch_errors`, `segments` (Abschnitte im Export), `congested_segments`, `skipped_free_flow`,
+`skipped_invalid`, `skipped_expired`, `messages` (nach dem Zusammenfassen), `joins`, `corner_joins`, `forks`,
+`merges`, `splits`, `longest_chain` (Kacheln) und `export_age_seconds` (Alter des verwendeten Exports).
 
 Unterstützte Operationen: `SUBSCRIBE`, `SUBSCRIPTION_CHANGE`, `POLL` (mit Abo, oder ohne Abo als
 „One-Shot“-Abfrage mit `filter_list`), `HEARTBEAT`, `UNSUBSCRIBE`, `GET_CAPABILITIES`.
@@ -165,7 +179,8 @@ nur ein Teil darin, `PARTIALLY_COVERED` (der Client behandelt das wie `OK`).
 **Gültigkeit.** `receive_time` ist der Zeitpunkt, an dem der Server die Meldung zuerst gesehen hat,
 `update_time` die letzte Änderung. `expiration_time` ist eine Frist (Standard 30 min), die verlängert wird,
 solange die Quelle die Meldung weiter meldet. Verschwindet eine Meldung aus der Quelle, verschickt der Server
-eine Aufhebung. Fällt die Quelle aus, bleiben die letzten Daten bis zum Ablauf der Frist erhalten.
+eine Aufhebung. Fällt die Quelle aus, bleiben die letzten Daten bis zum Ablauf der Frist erhalten (Crowd-Quelle:
+nur bis zum Ablauf der Crowd-Daten, siehe unten).
 
 ### Abbildung der Autobahn-Daten
 
@@ -249,16 +264,71 @@ Ereignisse verwirft er (siehe unten).
 **Versionen und Aufhebungen.** DATEX-Versionsnummern werden nicht gebraucht: Der Store vergleicht den Inhalt jeder
 Meldung und vergibt bei Änderungen eine neue Version; verschwundene Records werden aufgehoben.
 
+### Crowd-Daten (`services/crowd-traffic`)
+
+Der Crowd-Server veröffentlicht Staus aus anonymen Meldungen der App, erst ab k = 10 Meldungen pro Abschnitt und
+15-Minuten-Fenster (Datenschutzkonzept: [docs/CROWD_TRAFFIC_PRIVACY.md](../../docs/CROWD_TRAFFIC_PRIVACY.md)). Ein
+Abschnitt ist die Durchfahrt einer Web-Mercator-Kachel der Zoomstufe 17 (in Deutschland ≈ 180–210 m) von einer
+Kante zur anderen, getrennt nach Straßenklasse; der Export enthält **eine Meldung pro Kachel**. Die Quelle
+(`internal/source/crowd`) fasst sie zusammen, damit die App statt hunderter Kleinstmeldungen wenige Staumeldungen
+bekommt.
+
+**Abruf.** `GET <TRAFF_CROWD_URL>/v1/segments` (JSON, Version 1) alle 2 Minuten, als **vollständiger
+Schnappschuss**: Was fehlt, hebt der Store auf. Der JSON-Export wird dem TraFF-Feed `/v1/traff` vorgezogen, weil er
+Kachel, Ein- und Ausfahrtskante und Straßenklasse als eigene Felder enthält (im TraFF-Feed stecken sie nur in der
+Meldungs-ID), dazu die ungerundete Geschwindigkeit, das Ablaufdatum jedes Abschnitts und eine Formatversion.
+Verwendet werden Abschnitte mit `congested` und `confident`; ungültige (Zoomstufe, Kanten, Klasse, Koordinaten,
+Zustand) und abgelaufene werden gezählt und übersprungen. Eine andere Formatversion gilt als Fehler.
+
+**Zusammenfassen.** Abschnitt A wird mit Abschnitt B verkettet, wenn
+
+1. beide dieselbe Straßenklasse haben,
+2. B in der Nachbarkachel jenseits der Ausfahrtskante von A beginnt, und zwar an der gegenüberliegenden Kante
+   (damit gleiche Fahrtrichtung; die Gegenrichtung beginnt an der anderen Kante und wird nie angehängt),
+3. Ausfahrtspunkt von A und Einfahrtspunkt von B höchstens `TRAFF_CROWD_MERGE_DISTANCE` (25 m) auseinanderliegen
+   (die Punkte sind die häufigsten gemeldeten Kantenpositionen, Raster ≈ 6 m).
+
+Hat A keinen solchen Nachfolger, darf B auch in der **diagonal** angrenzenden Kachel liegen, wenn die Punkte
+höchstens 50 m + Toleranz auseinanderliegen: Die App meldet Eck-Durchfahrten unter 50 m nicht, die Straße läuft dann
+scheinbar „über Eck“ weiter (im aufgezeichneten A100-Stau 2 von 11 Verbindungen). Eine Verbindung wird nur
+übernommen, wenn sie eindeutig ist: Bei **Verzweigungen** (mehrere Nachfolger) und **Zusammenführungen** (mehrere
+Vorgänger) endet die Kette, jeder Ast wird eine eigene Meldung. **Lücken** (Kachel ohne Stau, frei oder unter k)
+trennen ebenfalls. Geschlossene Ringe werden vor dem Abschnitt mit dem kleinsten Schlüssel aufgeschnitten. Ketten
+über `TRAFF_CROWD_MAX_LENGTH` (5 km) werden vom Stauende (stromabwärts) her in Stücke geteilt, damit der Decoder der
+App zwischen `from`, `via` und `to` sicher der Straße folgt.
+
+**Abbildung einer Kette.**
+
+| Feld | Wert |
+|---|---|
+| `id` | `de.crowd:17/<x>/<y>/<Einfahrt>-<Ausfahrt>/<Klasse>` des **stromabwärts letzten** Abschnitts. Der Stauanfang (Engstelle) bleibt meist stehen, während das Stauende wächst und schrumpft – die ID bleibt dann gleich, die Meldung wird nur aktualisiert. Verschwindet der vorderste Abschnitt, wird die Meldung aufgehoben und der Rest bekommt eine neue ID. |
+| `from`, `to` | Einfahrtspunkt des ersten, Ausfahrtspunkt des letzten Abschnitts (auf der Straße) |
+| `via` | Übergang zwischen zwei Abschnitten, der der halben Kettenlänge am nächsten liegt (ab zwei Abschnitten) |
+| `road_class`, `directionality` | Straßenklasse der Abschnitte, `ONE_DIRECTION`; keine Straßennummer (kennt der Crowd-Server nicht) |
+| Ereignis | ein `CONGESTION_*` mit dem **längengewichteten** Zustand (dichter Verkehr 1, zähfließend 2, Stau 3, stehender Verkehr 4; Mittel kaufmännisch gerundet) |
+| `speed` | **längengewichtetes harmonisches Mittel** der Abschnittsgeschwindigkeiten (km/h, mind. 1) = die Geschwindigkeit, die dieselbe Fahrzeit über die Kette ergibt. Die App wendet `speed` als Höchstgeschwindigkeit auf den ganzen Ort an; das Minimum würde die Verzögerung eines langen Staus mit kurzem Stillstandskern stark überschätzen. |
+| Zeiten | wie bei allen Quellen vom Store (`receive_time` = erstes Auftreten, Frist `message-lease`) |
+
+**Ausfall.** Scheitert ein Abruf (Netz, HTTP-Fehler, Zeitlimit, kaputtes JSON), verwendet die Quelle den letzten
+Export weiter, aber ohne die inzwischen abgelaufenen Abschnitte (`expires`, 20 min nach der Auswertung): Ein
+ausgefallener Crowd-Server hält keine alten Staus am Leben, sie werden spätestens 20 Minuten nach der letzten
+Auswertung aufgehoben. `/healthz` zeigt dann `last_error` und `export_age_seconds`. Vor dem ersten erfolgreichen
+Abruf liefert die Quelle nichts.
+
+**Datenschutz.** Der Export enthält nur Aggregate (Zustand, Median, Zahl der Meldungen ≥ k) ohne Bezug zu
+einzelnen Fahrten; der traff-server übernimmt davon nur Ort, Klasse, Zustand und Geschwindigkeit, nicht die Zahl
+der Meldungen. Er protokolliert keine Abschnitte.
+
 ### Dubletten
 
 Mehrere Quellen melden oft dasselbe Ereignis (die Autobahn-API und die Polizei-Landesmeldestelle denselben Stau,
 Baustellen-Feeds und Polizeimeldungen dieselbe Sperrung). Der Runner führt vor dem Speichern einen
 Zusammenführungsschritt aus (`internal/dedup`): Eine Meldung wird **unterdrückt**, wenn sie eine aktive Meldung einer
 Quelle mit höherer Priorität dupliziert. Priorität = Reihenfolge der Quellen: Autobahn-API vor allen DATEX-II-Feeds,
-DATEX-II-Feeds in der Reihenfolge von `TRAFF_DATEX2_FEEDS`. Zwei Meldungen sind Dubletten, wenn **alle** Bedingungen
-gelten:
+DATEX-II-Feeds in der Reihenfolge von `TRAFF_DATEX2_FEEDS`, die Crowd-Quelle **zuletzt** (amtliche Meldungen gewinnen).
+Zwei Meldungen **mit Straßennummer** sind Dubletten, wenn **alle** Bedingungen gelten:
 
-1. **Gleiche Straße:** beide haben `road_ref`, gleich nach Normalisierung (`A 8` = `A8`). Ohne Straßennummer nie.
+1. **Gleiche Straße:** beide `road_ref` sind gleich nach Normalisierung (`A 8` = `A8`).
 2. **Gleiche Ereignisklasse:** die Kategorien überschneiden sich – Unfall/Gefahr (`INCIDENT`, `HAZARD`), Stau
    (`CONGESTION`, `DELAY`), Baustelle (`CONSTRUCTION`), Wetter. `RESTRICTION_*` zählt nur, wenn sonst nichts gemeldet
    ist (dann als Baustelle/Sperrung), damit eine unfallbedingte Fahrstreifensperrung nicht eine Baustelle verdeckt.
@@ -268,7 +338,19 @@ gelten:
    höchstens 90° ab; `BOTH_DIRECTIONS` passt immer.
 5. **Überlappende Zeit:** `[start_time, end_time)` überschneiden sich (fehlende Grenzen sind offen).
 
-Verschwindet die Meldung der höheren Quelle, erscheint die bisher unterdrückte beim nächsten Abruf. Unterdrückte
+Fehlt einer der beiden Meldungen die Straßennummer (Crowd-Staus haben nur die Straßenklasse), wird **nur für Staus**
+räumlich verglichen. Meldung B wird als Dublette der höher priorisierten Meldung A unterdrückt, wenn
+
+1. B nur Stau-Ereignisse enthält (`CONGESTION_*`, `DELAY_*`) und A ebenfalls einen Stau meldet,
+2. beide dieselbe Straßenklasse haben (fehlt sie, nie),
+3. **alle** Bezugspunkte von B (`from`, `via`, `to`) höchstens `TRAFF_DEDUP_SPATIAL_DISTANCE` (250 m) von A entfernt
+   liegen – A deckt B ab; eine lange Crowd-Kette wird von einer kurzen amtlichen Meldung nicht verdeckt (beide bleiben),
+4. Richtung und Zeit wie oben passen.
+
+Die 250 m decken ab, dass die Autobahn-API nur `from`/`via`/`to` liefert und die Linie dazwischen in Kurven von der
+Straße abweicht; Gleichheit der Straßenklasse und Richtung verhindert, dass ein Stau auf einer parallelen
+Bundesstraße verschluckt wird. Verschwindet die Meldung der höheren Quelle, erscheint die bisher unterdrückte beim
+nächsten Abruf. Unterdrückte
 Meldungen zählt `/healthz` (`duplicates_suppressed`, je Quelle `duplicates`/`duplicates_total`); mit
 `-log-level debug` stehen die Paare im Log (`duplicate suppressed id=… duplicate_of=…`). Live am 25.10.2026 mit
 A5/A6/A7/A8/A81 und den beiden BW-Feeds: 1 von 54 Polizeimeldungen als Dublette der Autobahn-API erkannt (Unfall mit
@@ -336,6 +418,8 @@ scripts/smoke.sh                                  # Container bauen, starten, Ab
                                                   # mit lokaler DATEX-II-Fixture als zweiter Quelle
 SMOKE_OFFLINE=1 scripts/smoke.sh                  # dito ohne Netzzugriff auf die Autobahn-API
 SMOKE_DATEX2= scripts/smoke.sh                    # ohne DATEX-II-Quelle
+scripts/smoke-crowd.sh                            # Container: crowd-traffic + Relay + traff-server im Pod, crowd-sim
+                                                  # (A100-Stau), prüft zusammengefasste Meldungen und Aufhebung (~3 min)
 ```
 
 - `internal/source/autobahn/testdata/*.json` sind echte, am 25.10.2026 aufgezeichnete API-Antworten. Die Tests
@@ -346,6 +430,14 @@ SMOKE_DATEX2= scripts/smoke.sh                    # ohne DATEX-II-Quelle
 - `internal/dedup` testet positive und negative Fälle sowie eine echte Polizeimeldung gegen die zugehörige
   Autobahn-Warnung. `internal/server/twosources_test.go` lässt beide Quellen gegen lokale Fake-Server laufen und prüft
   den Feed auf Dubletten, Aktualisierungen, Aufhebungen und Ausfälle.
+- `internal/source/crowd/testdata/a100_segments.json` ist ein echter Export von `crowd-traffic` nach einem Lauf von
+  `crowd-sim` (A100-Stau, Fenster 60 s, Seed 7): 105 Abschnitte, davon 12 Stau-Kacheln, die zu einer Meldung werden.
+  Die Unit-Tests prüfen Ketten, Lücken, Gegenrichtung, Klassenwechsel, Toleranz, Eck-Verbindungen, Verzweigungen,
+  Zusammenführungen, Ringe, Längenbegrenzung, stabile IDs, gewichteten Zustand und Geschwindigkeit sowie Abruffehler
+  (HTTP, JSON, Version, Größe, Zeitlimit, Rückfall auf den letzten Export bis zum Ablauf).
+  `internal/server/crowd_test.go` lässt Autobahn- und Crowd-Quelle gegen lokale Fake-Server laufen (synthetische
+  A100-Warnung `testdata/A100_warning.json`): Zusammenfassen, Unterdrückung durch die amtliche Meldung und
+  Wiederkehr, schrumpfendes Stauende (gleiche ID), aufgelöster Stauanfang (Aufhebung, neue ID), Ausfall und Ablauf.
 - `internal/clientcheck` bildet die Annahmeregeln des App-Parsers (`libs/traffxml/traff_model_xml.cpp`) in Go nach;
   die HTTP-Ende-zu-Ende-Tests prüfen damit jede Antwort und vergleichen sie mit Golden-Files
   (`internal/server/testdata`).

@@ -1,0 +1,109 @@
+{
+ "warning": [
+  {
+   "identifier": "E2E--a100-jam",
+   "icon": "101",
+   "isBlocked": "false",
+   "future": false,
+   "extent": "52.471250,13.375854,52.464714,13.408813",
+   "point": "52.471250,13.375854",
+   "display_type": "WARNING",
+   "subtitle": " Charlottenburg -> Neukölln",
+   "title": "A100 | AS Tempelhofer Damm - AS Grenzallee",
+   "startTimestamp": "2026-10-25T15:50:00Z",
+   "delayTimeValue": "9",
+   "abnormalTrafficType": "STATIONARY_TRAFFIC",
+   "coordinate": {
+    "lat": 52.47125,
+    "long": 13.375854
+   },
+   "description": [
+    "Beginn: 25.10.26 um 16:50 Uhr",
+    "",
+    "Stau, seit 25.10.2026, 16:50",
+    "A100: Charlottenburg -> Neukölln, zwischen AS Tempelhofer Damm und AS Grenzallee",
+    "",
+    "Ereignismeldung:",
+    "- Im Stillstand",
+    "- Reisezeitverlust: 9 Minuten"
+   ],
+   "routeRecommendation": [],
+   "footer": [],
+   "lorryParkingFeatureIcons": [],
+   "source": "inrix",
+   "geometry": {
+    "type": "LineString",
+    "coordinates": [
+     [
+      13.375854,
+      52.47125
+     ],
+     [
+      13.376246,
+      52.47107
+     ],
+     [
+      13.378601,
+      52.469995
+     ],
+     [
+      13.379937,
+      52.469397
+     ],
+     [
+      13.381348,
+      52.46874
+     ],
+     [
+      13.383542,
+      52.467724
+     ],
+     [
+      13.384094,
+      52.467433
+     ],
+     [
+      13.386841,
+      52.466701
+     ],
+     [
+      13.389587,
+      52.466387
+     ],
+     [
+      13.392125,
+      52.46605
+     ],
+     [
+      13.392334,
+      52.466021
+     ],
+     [
+      13.395081,
+      52.465707
+     ],
+     [
+      13.397827,
+      52.465341
+     ],
+     [
+      13.400574,
+      52.465132
+     ],
+     [
+      13.40332,
+      52.464975
+     ],
+     [
+      13.406067,
+      52.464818
+     ],
+     [
+      13.408813,
+      52.464714
+     ]
+    ]
+   }
+  }
+ ]
+}
