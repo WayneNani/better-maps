@@ -78,7 +78,8 @@ func ParseRequest(r io.Reader, maxFilters int) (*Request, error) {
 		return nil, fmt.Errorf("unsupported charset %q", charset)
 	}
 	if err := dec.Decode(&x); err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrInvalidRequest, err)
+		// Keep the cause in the chain, e.g. *http.MaxBytesError for oversized requests.
+		return nil, fmt.Errorf("%w: %w", ErrInvalidRequest, err)
 	}
 	req := &Request{
 		Operation:      strings.ToUpper(strings.TrimSpace(x.Operation)),

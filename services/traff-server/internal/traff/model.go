@@ -239,7 +239,43 @@ type Message struct {
 	Urgency        string    `xml:"urgency,attr,omitempty"`
 	Merge          *Merge    `xml:"merge,omitempty"`
 	Location       *Location `xml:"location,omitempty"`
-	Events         []Event   `xml:"events>event"`
+	Events         []Event   `xml:"-"`
+}
+
+type eventList struct {
+	Events []Event `xml:"event"`
+}
+
+// MarshalXML implements xml.Marshaler. It omits the events element for messages without
+// events (cancellations).
+func (m Message) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	type Plain Message // exported name: encoding/xml cannot set fields of unexported embedded types
+	x := struct {
+		Plain
+		EventList *eventList `xml:"events,omitempty"`
+	}{Plain: Plain(m)}
+	if len(m.Events) > 0 {
+		x.EventList = &eventList{m.Events}
+	}
+	start.Name = xml.Name{Local: "message"}
+	return e.EncodeElement(x, start)
+}
+
+// UnmarshalXML implements xml.Unmarshaler.
+func (m *Message) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	type Plain Message // exported name: encoding/xml cannot set fields of unexported embedded types
+	var x struct {
+		Plain
+		EventList *eventList `xml:"events"`
+	}
+	if err := d.DecodeElement(&x, &start); err != nil {
+		return err
+	}
+	*m = Message(x.Plain)
+	if x.EventList != nil {
+		m.Events = x.EventList.Events
+	}
+	return nil
 }
 
 // EffectiveExpiration returns the latest of expiration, start and end time. This mirrors
