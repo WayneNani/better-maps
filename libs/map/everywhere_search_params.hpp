@@ -2,6 +2,7 @@
 
 #include "map/search_product_info.hpp"
 
+#include "search/opening_hours_filter.hpp"
 #include "search/result.hpp"
 
 #include <chrono>
@@ -22,5 +23,9 @@ struct EverywhereSearchParams
   bool m_isCategory = false;
 
   OnResults m_onResults;
+
+  // Filters POI results by their opening hours.
+  // Placed after callbacks to keep aggregate initialization of existing fields valid.
+  OpeningHoursFilter m_openingHoursFilter = OpeningHoursFilter::Off;
 };
 }  // namespace search
