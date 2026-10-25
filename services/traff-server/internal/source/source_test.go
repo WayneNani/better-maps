@@ -108,3 +108,78 @@ func TestRunStopsOnCancel(t *testing.T) {
 		t.Errorf("source fetched %d times, expected periodic fetching", calls)
 	}
 }
+
+// detailSource is a fake source that reports details.
+type detailSource struct{ fakeSource }
+
+func (d *detailSource) Details() map[string]int { return map[string]int{"records": 3} }
+
+// prefixDedup treats messages as duplicates if their ID suffix after ":" is equal.
+type prefixDedup struct{}
+
+func (prefixDedup) Filter(msgs, ref []traff.Message) ([]traff.Message, map[string]string) {
+	have := map[string]string{}
+	for _, m := range ref {
+		have[strings.SplitN(m.ID, ":", 2)[1]] = m.ID
+	}
+	var kept []traff.Message
+	sup := map[string]string{}
+	for _, m := range msgs {
+		if id, ok := have[strings.SplitN(m.ID, ":", 2)[1]]; ok {
+			sup[m.ID] = id
+			continue
+		}
+		kept = append(kept, m)
+	}
+	return kept, sup
+}
+
+func TestRunOnceDeduplicates(t *testing.T) {
+	st := store.New(30*time.Minute, time.Hour)
+	var logBuf bytes.Buffer
+	log := slog.New(slog.NewTextHandler(&logBuf, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	a := &fakeSource{name: "a", results: []result{
+		{msgs: []traff.Message{msg("a:1"), msg("a:2")}},
+		{msgs: []traff.Message{msg("a:2")}}, // a:1 disappears
+	}}
+	b := &detailSource{fakeSource{name: "b", results: []result{{msgs: []traff.Message{msg("b:1"), msg("b:3")}}}}}
+	r := NewRunner(st, time.Minute, log, a, b)
+	r.SetDeduplicator(prefixDedup{})
+	now := time.Date(2026, 10, 25, 16, 0, 0, 0, time.UTC)
+	r.now = func() time.Time { return now }
+
+	r.RunOnce(context.Background())
+	if st.Get("b:1") != nil || st.Get("b:3") == nil {
+		t.Errorf("b:1 not suppressed or b:3 missing")
+	}
+	stat := r.Status()
+	if stat[1].Messages != 2 || stat[1].Duplicates != 1 || stat[1].DuplicatesTotal != 1 || stat[1].Details["records"] != 3 || stat[0].Duplicates != 0 {
+		t.Errorf("status = %+v", stat)
+	}
+	if !strings.Contains(logBuf.String(), `msg="duplicate suppressed" source=b id=b:1 duplicate_of=a:1`) {
+		t.Errorf("log:\n%s", logBuf.String())
+	}
+	// Status returns copies.
+	stat[1].Details["records"] = 99
+	if r.Status()[1].Details["records"] != 3 {
+		t.Error("Status exposes internal map")
+	}
+
+	// a:1 is gone (cancelled): b:1 is no longer a duplicate.
+	r.RunOnce(context.Background())
+	if e := st.Get("b:1"); e == nil || e.Cancelled() {
+		t.Errorf("b:1 not published after a:1 was cancelled")
+	}
+	if stat := r.Status(); stat[1].Duplicates != 0 || stat[1].DuplicatesTotal != 1 {
+		t.Errorf("status = %+v", stat)
+	}
+
+	// Without deduplicator everything is stored.
+	st2 := store.New(30*time.Minute, time.Hour)
+	a.calls, b.calls = 0, 0
+	r2 := NewRunner(st2, time.Minute, log, a, b)
+	r2.RunOnce(context.Background())
+	if act, _ := st2.Counts(); act != 4 {
+		t.Errorf("without dedup: %d active", act)
+	}
+}
