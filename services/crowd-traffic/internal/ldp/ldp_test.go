@@ -210,3 +210,41 @@ func TestQuantileAndMass(t *testing.T) {
 		t.Fatalf("mass below 0 = %v", m)
 	}
 }
+
+func TestBaseCut(t *testing.T) {
+	got := BaseCut([]float64{0.8, 0.05, 0.2, -0.05}, 0.1)
+	if math.Abs(got[0]-0.8) > 1e-9 || got[1] != 0 || math.Abs(got[2]-0.2) > 1e-9 || got[3] != 0 {
+		t.Fatalf("base cut = %v", got)
+	}
+	// Nothing above the threshold: fall back to Norm-Sub.
+	got = BaseCut([]float64{0.4, 0.3, 0.3}, 0.5)
+	if math.Abs(got[0]-0.4) > 1e-9 {
+		t.Fatalf("fallback = %v", got)
+	}
+	r := New(k, 3)
+	if !math.IsInf(r.ZeroStdErr(0), 1) || math.Abs(r.ZeroStdErr(100)-math.Sqrt(r.Q*(1-r.Q)/100)/(r.P-r.Q)) > 1e-12 {
+		t.Fatal("ZeroStdErr")
+	}
+}
+
+// V85 of a spread distribution (true V85 = 67.5 km/h): Base-Cut with two standard errors is
+// unbiased, Norm-Sub alone is pulled up by residual noise in the empty high buckets.
+func TestV85WithBaseCut(t *testing.T) {
+	r := New(k, 3)
+	rnd := rand.New(rand.NewPCG(8, 8))
+	edges := []float64{0, 10, 20, 35, 55, 80, 110, 140}
+	truth := []float64{0, 0.1, 0.2, 0.4, 0.3, 0, 0}
+	const n, runs = 100, 2000
+	var sumCut, sumSub float64
+	for range runs {
+		counts := perturbAll(r, sample(truth, n, rnd), rnd)
+		f := r.Estimate(counts)
+		sumCut += Quantile(BaseCut(f, 2*r.ZeroStdErr(n)), edges, 0.85)
+		sumSub += Quantile(NormSub(f), edges, 0.85)
+	}
+	biasCut, biasSub := sumCut/runs-67.5, sumSub/runs-67.5
+	if math.Abs(biasCut) > 0.5 || math.Abs(biasCut) >= math.Abs(biasSub) {
+		t.Fatalf("V85 bias: base cut %.2f, norm-sub %.2f km/h", biasCut, biasSub)
+	}
+	t.Logf("V85 bias: base cut %.2f, norm-sub %.2f km/h", biasCut, biasSub)
+}

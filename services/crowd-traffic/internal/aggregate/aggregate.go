@@ -45,7 +45,7 @@ func DefaultConfig() Config {
 		K:             10,
 		RefHalfLife:   7 * 24 * time.Hour,
 		RefTTL:        14 * 24 * time.Hour,
-		RefMinReports: 50,
+		RefMinReports: 100,
 		FreeFlowRatio: 0.75,
 		Z:             1,
 		MaxOpenKeys:   1_000_000,
@@ -97,12 +97,14 @@ func Classify(ratio, speed, freeFlowRatio float64) State {
 }
 
 // DefaultFreeFlow is the free-flow speed (km/h) assumed per road class while too few reports
-// are known. The observed V85 is clamped to [0.6, 1.3] times this value.
+// are known. The values are deliberately low (urban roads: 50 km/h limit, urban motorways
+// 80 km/h), so that a missing reference rather hides a jam than invents one. The observed V85 is
+// clamped to [0.6, 1.3] times this value.
 var DefaultFreeFlow = map[protocol.RoadClass]float64{
-	protocol.Motorway:  110,
-	protocol.Trunk:     90,
-	protocol.Primary:   60,
-	protocol.Secondary: 50,
+	protocol.Motorway:  100,
+	protocol.Trunk:     80,
+	protocol.Primary:   50,
+	protocol.Secondary: 45,
 	protocol.Tertiary:  40,
 }
 
@@ -349,13 +351,15 @@ var edges = protocol.SpeedBucketEdges[:]
 
 // referenceSpeed returns the free-flow speed of a segment: the V85 of its de-noised long-term
 // distribution, clamped to a range around the road class default, or the default while fewer
-// than RefMinReports (decayed) reports are known.
+// than RefMinReports (decayed) reports are known. Buckets whose estimate is within two standard
+// errors of zero are cut before taking the quantile (ldp.BaseCut).
 func (a *Aggregator) referenceSpeed(k protocol.Key, ref *reference) (float64, bool) {
 	def := DefaultFreeFlow[k.Class]
 	if ref.total() < a.cfg.RefMinReports {
 		return def, false
 	}
-	shares := ldp.NormSub(a.rr.Estimate(ref.counts[:]))
+	n := ref.total()
+	shares := ldp.BaseCut(a.rr.Estimate(ref.counts[:]), 2*a.rr.ZeroStdErr(n))
 	v85 := ldp.Quantile(shares, edges, 0.85)
 	return math.Max(0.6*def, math.Min(1.3*def, v85)), true
 }
@@ -385,10 +389,14 @@ func (a *Aggregator) evaluate(k protocol.Key, agg *windowAgg, ref *reference, st
 		SlowShare:   slow,
 		SlowShareSE: se,
 		State:       state,
-		Confident:   state == FreeFlow || slow-a.cfg.Z*se >= 0.5,
-		FirstSeen:   now,
-		Published:   now,
-		Expires:     now.Add(a.cfg.Window + a.cfg.Grace),
+		// Congestion needs statistical support: the share of slow vehicles must exceed one
+		// half by Z standard errors. Without an observed reference (road class default only),
+		// mild slowdowns are not announced: the default may simply be too high for this road
+		// (e.g. an urban motorway with an 80 km/h limit).
+		Confident: state == FreeFlow || (slow-a.cfg.Z*se >= 0.5 && (observed || state != Heavy)),
+		FirstSeen: now,
+		Published: now,
+		Expires:   now.Add(a.cfg.Window + a.cfg.Grace),
 	}
 	p.From.Lat, p.From.Lon = k.Tile.EdgePoint(k.Entry, ref.entry.mode())
 	p.To.Lat, p.To.Lon = k.Tile.EdgePoint(k.Exit, ref.exit.mode())

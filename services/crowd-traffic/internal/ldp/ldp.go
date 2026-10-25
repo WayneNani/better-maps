@@ -137,6 +137,38 @@ func NormSub(f []float64) []float64 {
 	return res
 }
 
+// ZeroStdErr returns the standard error of the estimate of a bucket whose true share is zero,
+// for n reports: sqrt(q (1 − q) / n) / (p − q).
+func (r RR) ZeroStdErr(n float64) float64 {
+	if n <= 0 {
+		return math.Inf(1)
+	}
+	return math.Sqrt(r.Q*(1-r.Q)/n) / (r.P - r.Q)
+}
+
+// BaseCut sets all estimates below threshold to zero and renormalizes the rest ("Base-Cut",
+// Wang et al., NDSS 2020). With threshold = z·ZeroStdErr(n), buckets that are indistinguishable
+// from noise are dropped. This matters for tail quantiles such as V85, which Norm-Sub alone
+// overestimates because residual noise mass in empty high buckets is not removed. If no
+// estimate reaches the threshold, the Norm-Sub projection is returned.
+func BaseCut(f []float64, threshold float64) []float64 {
+	res := make([]float64, len(f))
+	total := 0.0
+	for i, v := range f {
+		if v >= threshold {
+			res[i] = v
+			total += v
+		}
+	}
+	if total <= 0 {
+		return NormSub(f)
+	}
+	for i := range res {
+		res[i] /= total
+	}
+	return res
+}
+
 // Quantile returns the q-quantile (0 < q < 1) of a distribution over buckets with the given
 // edges (len(edges) = len(shares)+1), interpolating linearly inside a bucket.
 func Quantile(shares, edges []float64, q float64) float64 {

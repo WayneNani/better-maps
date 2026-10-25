@@ -353,3 +353,28 @@ func TestConcurrentAdd(t *testing.T) {
 		t.Fatal(a.Stats())
 	}
 }
+
+// Without an observed reference, heavy traffic (mild slowdown) is not announced; clear
+// congestion is.
+func TestHeavyTrafficNeedsObservedReference(t *testing.T) {
+	cfg := DefaultConfig()
+	a := New(cfg, t0)
+	heavy := tiles.Tile{X: 1, Y: 1}
+	slow := tiles.Tile{X: 2, Y: 1}
+	a.Add(repeat(report(heavy, protocol.Motorway, protocol.BucketOf(70), t0), 30)) // 70/110 = 0.64
+	a.Add(repeat(report(slow, protocol.Motorway, protocol.BucketOf(40), t0), 30))  // 40/110 = 0.36
+	fin := finalizeAt(cfg, t0)
+	a.Tick(fin)
+	for _, p := range a.Publications(fin) {
+		switch p.Key.Tile {
+		case heavy:
+			if p.State != Heavy || p.Confident || p.Congested() {
+				t.Errorf("heavy: %+v", p)
+			}
+		case slow:
+			if p.State != Slow || !p.Congested() {
+				t.Errorf("slow: %+v", p)
+			}
+		}
+	}
+}
