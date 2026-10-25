@@ -166,8 +166,8 @@ Wichtige Tests:
 
 ## Offene Punkte
 
-- Quelle in `services/traff-server`, die `/v1/traff` abholt (nicht Teil von AP5a).
+- Erledigt (AP5c): `services/traff-server` holt `/v1/segments` als Quelle `crowd` ab und fasst benachbarte
+  Stau-Kacheln zu einer TraFF-Meldung zusammen (siehe README dort, Abschnitt „Crowd-Daten“).
 - Tageslimits (96 Meldungen, 2 pro Abschnitt) muss die App über Fahrten hinweg führen; der Referenz-Client
-  verarbeitet einzelne Fahrten.
-- Zusammenfassen benachbarter Stauabschnitte zu einer TraFF-Meldung (derzeit eine Meldung je Kachel).
+  verarbeitet einzelne Fahrten (AP5b).
 - Betreiber für das Relay, optional Privacy-Pass-Tokens gegen Sybil-Angriffe, optional DAP/Janus.
