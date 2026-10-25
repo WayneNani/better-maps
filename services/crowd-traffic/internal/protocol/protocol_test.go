@@ -14,12 +14,12 @@ import (
 const contractExample = `{
   "version": 1,
   "reports": [
-    {"window": 1793029500, "tile": {"x": 70420, "y": 42981},
-     "entry": {"side": "W", "offset": 131}, "exit": {"side": "E", "offset": 118},
-     "road_class": "MOTORWAY", "speed_bucket": 1},
-    {"window": 1793029500, "tile": {"x": 70421, "y": 42981},
-     "entry": {"side": "W", "offset": 118}, "exit": {"side": "S", "offset": 40},
-     "road_class": "MOTORWAY", "speed_bucket": 0}
+    {"window": 1793029500, "tile": {"x": 70394, "y": 43010},
+     "entry": {"side": "W", "offset": 201}, "exit": {"side": "E", "offset": 239},
+     "road_class": "MOTORWAY", "speed_bucket": 0},
+    {"window": 1793029500, "tile": {"x": 70395, "y": 43011},
+     "entry": {"side": "N", "offset": 109}, "exit": {"side": "E", "offset": 21},
+     "road_class": "MOTORWAY", "speed_bucket": 5}
   ]
 }`
 
@@ -30,14 +30,14 @@ func TestContractExample(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(b.Reports) != 2 || b.Reports[0].Entry.Side != tiles.West || b.Reports[1].Exit.Side != tiles.South ||
-		b.Reports[0].RoadClass != Motorway || b.Reports[0].Tile.X != 70420 {
+	if len(b.Reports) != 2 || b.Reports[0].Entry.Side != tiles.West || b.Reports[1].Exit.Side != tiles.East ||
+		b.Reports[0].RoadClass != Motorway || b.Reports[0].Tile.X != 70394 {
 		t.Fatalf("decoded %+v", b)
 	}
 	if err := DefaultRules().Validate(b, exampleNow()); err != nil {
 		t.Fatal(err)
 	}
-	if k := b.Reports[0].Key().String(); k != "17/70420/42981/W-E/MOTORWAY" {
+	if k := b.Reports[0].Key().String(); k != "17/70394/43010/W-E/MOTORWAY" {
 		t.Fatal(k)
 	}
 	enc, err := b.Encode()
@@ -154,7 +154,7 @@ func TestValidate(t *testing.T) {
 		{"road class", mod(func(b *Bundle) { b.Reports[0].RoadClass = 0 }), now, ReasonRoadClass},
 		{"bucket high", mod(func(b *Bundle) { b.Reports[0].SpeedBucket = NumBuckets }), now, ReasonSpeedBucket},
 		{"bucket negative", mod(func(b *Bundle) { b.Reports[0].SpeedBucket = -1 }), now, ReasonSpeedBucket},
-		{"duplicate", mod(func(b *Bundle) { b.Reports[1] = b.Reports[0]; b.Reports[1].SpeedBucket = 5 }), now, ReasonDuplicate},
+		{"duplicate", mod(func(b *Bundle) { b.Reports[1] = b.Reports[0]; b.Reports[1].SpeedBucket = 3 }), now, ReasonDuplicate},
 		{"coverage", mod(func(b *Bundle) { b.Reports[1].Tile = tiles.At(48.85, 2.35) }), now, ReasonCoverage},
 		{"spread", mod(func(b *Bundle) { b.Reports[1].Tile.X += 401 }), now, ReasonSpread},
 	}
