@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ import app.organicmaps.sdk.downloader.MapManager;
 import app.organicmaps.sdk.location.LocationListener;
 import app.organicmaps.sdk.routing.RoutingController;
 import app.organicmaps.sdk.search.OpeningHoursFilter;
+import app.organicmaps.sdk.search.QueryFilter;
 import app.organicmaps.sdk.search.SearchEngine;
 import app.organicmaps.sdk.search.SearchListener;
 import app.organicmaps.sdk.search.SearchRecents;
@@ -90,6 +92,8 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
     {
       if (!isAdded())
         return;
+
+      updateQueryFilter(query);
 
       if (TextUtils.isEmpty(query))
       {
@@ -152,6 +156,11 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
   private View mTabFrame;
   private Chip mOpenNowChip;
   private Chip mIncludeUnknownOpeningHoursChip;
+  // Opening hours filter recognized in the query, e.g. "Café offen", it's shown as the active "Open now" chip.
+  @Nullable
+  private QueryFilter mQueryFilter;
+  // Chips are being updated programmatically, ignore their listeners.
+  private boolean mUpdatingOpeningHoursChips;
   private PlaceholderView mResultsPlaceholder;
   private ExtendedFloatingActionButton mShowOnMapFab;
   private FloatingActionButton mOpenContactPicker;
@@ -351,19 +360,63 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
     final OpeningHoursFilterState state = OpeningHoursFilterState.SESSION;
     mOpenNowChip = root.findViewById(R.id.filter_open_now);
     mIncludeUnknownOpeningHoursChip = root.findViewById(R.id.filter_include_unknown_opening_hours);
-    mOpenNowChip.setChecked(state.isOpenNow());
     mIncludeUnknownOpeningHoursChip.setChecked(state.isIncludeUnknown());
-    UiUtils.showIf(state.isOpenNow(), mIncludeUnknownOpeningHoursChip);
+    updateOpeningHoursChips();
 
     mOpenNowChip.setOnCheckedChangeListener((chip, isChecked) -> {
+      if (mUpdatingOpeningHoursChips)
+        return;
+      if (!isChecked && mQueryFilter != null)
+      {
+        // The filter comes from the query: remove the filter words, it starts a new search.
+        state.setOpenNow(false);
+        setQuery(mQueryFilter.getQuery(), false);
+        return;
+      }
       state.setOpenNow(isChecked);
-      UiUtils.showIf(isChecked, mIncludeUnknownOpeningHoursChip);
+      updateOpeningHoursChips();
       onOpeningHoursFilterChanged();
     });
     mIncludeUnknownOpeningHoursChip.setOnCheckedChangeListener((chip, isChecked) -> {
+      if (mUpdatingOpeningHoursChips)
+        return;
       state.setIncludeUnknown(isChecked);
       onOpeningHoursFilterChanged();
     });
+  }
+
+  private void updateQueryFilter(@Nullable String query)
+  {
+    if (TextUtils.isEmpty(query) || isCategory())
+      mQueryFilter = null;
+    else
+      mQueryFilter = SearchEngine.detectQueryFilter(query, Language.getKeyboardLocale(requireContext()));
+    updateOpeningHoursChips();
+  }
+
+  private void updateOpeningHoursChips()
+  {
+    if (mOpenNowChip == null)
+      return;
+    final boolean checked = OpeningHoursFilterState.SESSION.isOpenNowChipChecked(mQueryFilter);
+    mUpdatingOpeningHoursChips = true;
+    mOpenNowChip.setChecked(checked);
+    mOpenNowChip.setText(getOpenNowChipText());
+    UiUtils.showIf(checked, mIncludeUnknownOpeningHoursChip);
+    mUpdatingOpeningHoursChips = false;
+  }
+
+  @NonNull
+  private String getOpenNowChipText()
+  {
+    if (mQueryFilter == null || !mQueryFilter.hasOpeningHoursTime())
+      return getString(R.string.open_now);
+
+    // "Apotheke Sonntag" -> "Open Sun 12:00".
+    final String time = DateUtils.formatDateTime(
+        requireContext(), mQueryFilter.getOpeningHoursTimeMillis(),
+        DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_ABBREV_WEEKDAY | DateUtils.FORMAT_SHOW_TIME);
+    return getString(R.string.search_filter_open_at, time);
   }
 
   private void onOpeningHoursFilterChanged()
@@ -378,9 +431,9 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
   }
 
   @NonNull
-  private static OpeningHoursFilter getOpeningHoursFilter()
+  private OpeningHoursFilter getOpeningHoursFilter()
   {
-    return OpeningHoursFilterState.SESSION.getFilter();
+    return OpeningHoursFilterState.SESSION.getFilter(mQueryFilter);
   }
 
   @Override

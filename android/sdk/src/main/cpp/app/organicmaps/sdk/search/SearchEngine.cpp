@@ -10,7 +10,12 @@
 
 #include "search/mode.hpp"
 #include "search/opening_hours_filter.hpp"
+#include "search/query_filters.hpp"
 #include "search/result.hpp"
+
+#include "indexer/categories_holder.hpp"
+
+#include "platform/preferred_languages.hpp"
 
 #include "platform/network_policy.hpp"
 
@@ -328,6 +333,32 @@ JNIEXPORT void JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeRunInt
     if (g_framework->NativeFramework()->GetSearchAPI().SearchEverywhere(std::move(eparams)))
       g_queryTimestamp = timestamp;
   }
+}
+
+JNIEXPORT jobject JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeDetectQueryFilter(JNIEnv * env,
+                                                                                               jclass clazz,
+                                                                                               jbyteArray bytes,
+                                                                                               jstring locale)
+{
+  // The same locales as search::Processor::GetCategoryLocales().
+  search::Locales locales;
+  for (auto const & l : {std::string("en"), languages::GetCurrentNorm(), jni::ToNativeString(env, locale)})
+  {
+    auto const code = CategoriesHolder::MapLocaleToInteger(l);
+    if (code != CategoriesHolder::kUnsupportedLocaleCode)
+      locales.insert(static_cast<uint64_t>(code));
+  }
+
+  auto const filters =
+      search::DetectQueryFilters(jni::ToNativeString(env, bytes), time(nullptr), GetDefaultCategories(), locales);
+  if (!filters)
+    return nullptr;
+
+  static jclass const filterClass = jni::GetGlobalClassRef(env, "app/organicmaps/sdk/search/QueryFilter");
+  static jmethodID const filterCtor = jni::GetConstructorID(env, filterClass, "(IJLjava/lang/String;)V");
+  jni::TScopedLocalRef query(env, jni::ToJavaString(env, filters->m_query));
+  return env->NewObject(filterClass, filterCtor, static_cast<jint>(filters->m_openingHoursFilter),
+                        static_cast<jlong>(filters->m_openingHoursTime.value_or(0)), query.get());
 }
 
 JNIEXPORT void JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeRunSearchMaps(JNIEnv * env, jclass clazz,

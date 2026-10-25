@@ -7,6 +7,7 @@
 #include "search/result.hpp"
 #include "search/search_params.hpp"
 
+#include "indexer/classificator.hpp"
 #include "indexer/classificator_loader.hpp"
 #include "indexer/data_source.hpp"
 #include "indexer/mwm_set.hpp"
@@ -18,6 +19,7 @@
 #include "geometry/mercator.hpp"
 #include "geometry/point2d.hpp"
 
+#include "base/assert.hpp"
 #include "base/file_name_utils.hpp"
 #include "base/logging.hpp"
 #include "base/stl_helpers.hpp"
@@ -34,6 +36,7 @@
 #include <limits>
 #include <map>
 #include <numeric>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -56,6 +59,11 @@ DEFINE_int32(top, 1, "Number of top results to show for every query");
 DEFINE_string(viewport, "", "Viewport to use when searching (default, moscow, london, zurich)");
 DEFINE_string(check_completeness, "", "Path to the file with completeness data");
 DEFINE_string(ranking_csv_file, "", "File ranking info will be exported to");
+DEFINE_string(position, "", "User position as \"lat,lon\" (none by default)");
+DEFINE_int64(opening_hours_time, 0, "Unix time to evaluate opening hours at (current time by default)");
+DEFINE_bool(prefix_free, true, "Append a space to every query, so the last token is not treated as a prefix");
+DEFINE_bool(detect_query_filters, false, "Recognize filter words in queries like the app does (\"Café offen\")");
+DEFINE_string(tsv_out, "", "File the top results are written to as TSV (query, position, name, type, ...)");
 
 string const kDefaultQueriesPathSuffix = "/../search/search_quality/search_quality_tool/queries.txt";
 string const kEmptyResult = "<empty>";
@@ -126,7 +134,68 @@ struct CompletenessQuery
 
 string MakePrefixFree(string const & query)
 {
-  return query + " ";
+  return FLAGS_prefix_free ? query + " " : query;
+}
+
+optional<m2::PointD> ParsePosition(string const & s)
+{
+  if (s.empty())
+    return {};
+  vector<string> parts;
+  Split(s, ',', parts);
+  double lat, lon;
+  CHECK(parts.size() == 2 && strings::to_double(parts[0], lat) && strings::to_double(parts[1], lon),
+        ("Bad position:", s));
+  return mercator::FromLatLon(lat, lon);
+}
+
+string OpenStateString(osm::YesNoUnknown isOpen)
+{
+  switch (isOpen)
+  {
+  case osm::Yes: return "open";
+  case osm::No: return "closed";
+  case osm::Unknown: return "unknown";
+  }
+  UNREACHABLE();
+}
+
+string Sanitize(string s)
+{
+  replace(s.begin(), s.end(), '\t', ' ');
+  replace(s.begin(), s.end(), '\n', ' ');
+  return s;
+}
+
+// Writes |top| results of the query as TSV lines:
+// query, position, name, type, address, distance to the user position (m), opening state, ranking details.
+void WriteTsv(ostream & os, string const & query, vector<Result> const & results, size_t top,
+              optional<m2::PointD> const & position)
+{
+  for (size_t i = 0; i < min(top, results.size()); ++i)
+  {
+    auto const & r = results[i];
+    string type;
+    if (r.GetResultType() == Result::Type::Feature)
+      type = classif().GetReadableObjectName(r.GetFeatureType());
+    else
+      type = DebugPrint(r.GetResultType());
+
+    string distance;
+    if (position && r.HasPoint())
+      distance = strings::to_string(static_cast<int>(mercator::DistanceOnEarth(*position, r.GetFeatureCenter())));
+
+    os << Sanitize(query) << '\t' << i + 1 << '\t' << Sanitize(r.GetString()) << '\t' << type << '\t'
+       << Sanitize(r.GetAddress()) << '\t' << distance << '\t'
+       << (r.GetResultType() == Result::Type::Feature ? OpenStateString(r.IsOpenNow()) : "") << '\t';
+    if (r.GetResultType() == Result::Type::Feature)
+    {
+      auto const & info = r.GetRankingInfo();
+      os << "rank " << info.GetLinearModelRank() << ", popularity " << static_cast<int>(info.m_popularity)
+         << ", pureCats " << info.m_pureCats;
+    }
+    os << '\n';
+  }
 }
 
 // If n == 1, prints the query and the top result separated by a tab.
@@ -289,8 +358,25 @@ void RunRequests(TestSearchEngine & engine, m2::RectD const & viewport, string q
   for (size_t i = 0; i < queries.size(); ++i)
   {
     // todo(@m) Add a bool flag to search with prefixes?
-    requests.emplace_back(
-        make_unique<TestSearchRequest>(engine, MakePrefixFree(queries[i]), locale, Mode::Everywhere, viewport));
+    SearchParams params;
+    params.m_query = MakePrefixFree(queries[i]);
+    params.m_inputLocale = locale;
+    params.m_viewport = viewport;
+    params.m_mode = Mode::Everywhere;
+    params.m_position = ParsePosition(FLAGS_position);
+    params.m_needAddress = true;
+    params.m_detectQueryFilters = FLAGS_detect_query_filters;
+    if (FLAGS_opening_hours_time != 0)
+      params.m_openingHoursTime = static_cast<time_t>(FLAGS_opening_hours_time);
+    requests.emplace_back(make_unique<TestSearchRequest>(engine, params));
+  }
+
+  ofstream tsv;
+  if (!FLAGS_tsv_out.empty())
+  {
+    tsv.open(FLAGS_tsv_out);
+    CHECK(tsv.is_open(), ("Can't open", FLAGS_tsv_out));
+    tsv << "query\tpos\tname\ttype\taddress\tdistance_m\topen\tranking\n";
   }
 
   ofstream csv;
@@ -317,6 +403,8 @@ void RunRequests(TestSearchEngine & engine, m2::RectD const & viewport, string q
     auto rt = duration_cast<milliseconds>(requests[i]->ResponseTime()).count();
     responseTimes[i] = static_cast<double>(rt) / 1000;
     PrintTopResults(MakePrefixFree(queries[i]), requests[i]->Results(), top, responseTimes[i]);
+    if (tsv.is_open())
+      WriteTsv(tsv, queries[i], requests[i]->Results(), top, ParsePosition(FLAGS_position));
 
     if (dumpCSV)
     {

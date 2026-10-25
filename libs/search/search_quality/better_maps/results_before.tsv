@@ -1,0 +1,241 @@
+query	pos	name	type	address	distance_m	open
+Café	1	Happy Tea	amenity-cafe	Berlin, Spandauer Straße, 2, Berlin, Germany	87	unknown
+Café	2	dean&david	amenity-fast_food	Berlin, Karl-Liebknecht-Straße, 7, Berlin, Germany	90	open
+Café	3	Espresso House	amenity-cafe	Berlin, Germany	99	closed
+Café	4	Wine & Coffee House	amenity-cafe	Berlin, Karl-Liebknecht-Straße, 7, Berlin, Germany	107	closed
+Café	5	Haus Ungarn	amenity-events_venue	Berlin, Karl-Liebknecht-Straße, 9, Berlin, Germany	146	unknown
+Frühstück	1	Bäcker Wiedemann	shop-bakery	Berlin, Germany	46	closed
+Frühstück	2	Happy Tea	amenity-cafe	Berlin, Spandauer Straße, 2, Berlin, Germany	87	unknown
+Frühstück	3	Espresso House	amenity-cafe	Berlin, Germany	99	closed
+Frühstück	4	Wine & Coffee House	amenity-cafe	Berlin, Karl-Liebknecht-Straße, 7, Berlin, Germany	107	closed
+Frühstück	5	Bandy Brooks	amenity-cafe	Berlin, Karl-Liebknecht-Straße, 1, Berlin, Germany	182	open
+Kaffee	1	Happy Tea	amenity-cafe	Berlin, Spandauer Straße, 2, Berlin, Germany	87	unknown
+Kaffee	2	Espresso House	amenity-cafe	Berlin, Germany	99	closed
+Kaffee	3	Wine & Coffee House	amenity-cafe	Berlin, Karl-Liebknecht-Straße, 7, Berlin, Germany	107	closed
+Kaffee	4	Bandy Brooks	amenity-cafe	Berlin, Karl-Liebknecht-Straße, 1, Berlin, Germany	182	open
+Kaffee	5	Dom Café	amenity-cafe	Berlin, Am Lustgarten, 1, Berlin, Germany	252	unknown
+Apotheke	1	Apotheke Hackesches Quartier	amenity-pharmacy	Berlin, Henriette-Herz-Platz, 3, Berlin, Germany	296	closed
+Apotheke	2	Panorama Apotheke	amenity-pharmacy	Berlin, Panoramastraße, 1, Berlin, Germany	385	closed
+Apotheke	3	Bezirksapotheke am Roten Rathaus	amenity-pharmacy	Berlin, Rathausstraße, 5, Berlin, Germany	399	closed
+Apotheke	4	MediosApotheke Hackescher Markt	amenity-pharmacy	Berlin, Rosenthaler Straße, 46-47, Berlin, Germany	525	closed
+Apotheke	5	Alexa Apotheke	amenity-pharmacy	Berlin, Grunerstraße, 20, Berlin, Germany	717	closed
+Tankstelle	1	Aral	amenity-fuel	Berlin, Holzmarktstraße, 12/14, Berlin, Germany	1332	open
+Tankstelle	2	Total	amenity-fuel	Berlin, Prenzlauer Allee, 1, Berlin, Germany	1334	open
+Tankstelle	3	freie internationale tankstelle	amenity-fast_food	Berlin, Germany	1515	open
+Tankstelle	4	Shell	amenity-fuel	Berlin, Oranienstraße, 138, Berlin, Germany	1788	unknown
+Tankstelle	5	Aral	amenity-fuel	Berlin, Prinzenstraße, 29, Berlin, Germany	2032	open
+Döner	1	mangal DÖNER (Mangal.de, comming soon)	amenity-fast_food	Berlin, Karl-Liebknecht-Straße, 13, Berlin, Germany	285	unknown
+Döner	2	Ali Baba Bistro	amenity-fast_food	Berlin, Germany	384	open
+Döner	3	Mustafa's Can Gemüse Kebap	amenity-fast_food	Berlin, Neue Promenade, 7, Berlin, Germany	395	unknown
+Döner	4	Pergamon	amenity-fast_food	Berlin, Germany	475	open
+Döner	5	Pergamon Döner & Pizza	amenity-fast_food	Berlin, Dircksenstraße, 2, Berlin, Germany	481	closed
+Supermarkt	1	REWE City	shop-supermarket	Berlin, Litfaß-Platz, 4, Berlin, Germany	289	open
+Supermarkt	2	Kaufland	shop-supermarket	Berlin, Karl-Liebknecht-Straße, 13, Berlin, Germany	321	open
+Supermarkt	3	Asia-Mekong	shop-supermarket	Berlin, Henriette-Herz-Platz, 1, Berlin, Germany	349	closed
+Supermarkt	4	Netto Marken-Discount	shop-supermarket	Berlin, Rathausstraße, 5, Berlin, Germany	351	open
+Supermarkt	5	Bio Company	amenity-cafe	Berlin, Dircksenstraße, 145-147, Berlin, Germany	356	open
+Bäckerei	1	Bäcker Wiedemann	shop-bakery	Berlin, Germany	46	closed
+Bäckerei	2	Kamps	shop-bakery	Berlin, An der Spandauer Brücke, 10, Berlin, Germany	296	closed
+Bäckerei	3	M&M Back	shop-bakery	Berlin, Germany	324	open
+Bäckerei	4	Kamps	shop-bakery	Berlin, Germany	346	unknown
+Bäckerei	5	Steinecke	shop-bakery	Berlin, Dircksenstraße, 52, Berlin, Germany	371	closed
+Restaurant	1	BLOCK HOUSE	amenity-restaurant	Berlin, Karl-Liebknecht-Straße, 7, Berlin, Germany	60	open
+Restaurant	2	Kila.	amenity-restaurant	Berlin, Spandauer Straße, 3, Berlin, Germany	90	open
+Restaurant	3	Trattoria Peretti	amenity-restaurant	Berlin, Karl-Liebknecht-Straße, 5, Berlin, Germany	128	open
+Restaurant	4	Kartoffelhaus	amenity-restaurant	Berlin, Karl-Liebknecht-Straße, 9, Berlin, Germany	152	open
+Restaurant	5	Bayerische Spreestuben	amenity-restaurant	Berlin, St. Wolfgang-Straße, 4, Berlin, Germany	157	unknown
+Geldautomat	1	Berliner Volksbank	amenity-atm	Berlin, Germany	121	unknown
+Geldautomat	2		amenity-atm	Berlin, Germany	285	open
+Geldautomat	3	Berliner Sparkasse	amenity-atm	Berlin, Karl-Liebknecht-Straße, 13, Berlin, Germany	290	unknown
+Geldautomat	4		amenity-atm	Berlin, Germany	341	unknown
+Geldautomat	5	Hackescher Markt	railway-station-light_rail-berlin	Berlin, Germany	348	unknown
+Arzt	1	Neurologie am Hackeschen Markt	amenity-doctors	Berlin, Germany	393	closed
+Arzt	2	Dagmar Steinbrück	amenity-doctors	Berlin, Münzstraße, 5, Berlin, Germany	515	unknown
+Arzt	3	Ddrmed Europe	amenity-doctors	Berlin, Germany	733	unknown
+Arzt	4	Hagedorn & Deter Neurologisch-psychiatrische Praxis	amenity-doctors	Berlin, Große Hamburger Straße, 5-11, Berlin, Germany	786	unknown
+Arzt	5	Eterno	amenity-clinic	Berlin, Schicklerstraße, 5-7, Berlin, Germany	830	unknown
+Kino	1	Hackesche Höfe Kino	amenity-cinema	Berlin, Rosenthaler Straße, 40-41, Berlin, Germany	498	unknown
+Kino	2	Zeughauskino	amenity-cinema	Berlin, Unter den Linden, 2, Berlin, Germany	535	unknown
+Kino	3	Kino Central	amenity-cinema	Berlin, Rosenthaler Straße, 39, Berlin, Germany	551	unknown
+Kino	4	Babylon	amenity-cinema	Berlin, Rosa-Luxemburg-Straße, 30, Berlin, Germany	788	open
+Kino	5	Kino in der Königstadt	amenity-cinema	Berlin, Straßburger Straße, 55, Berlin, Germany	1188	unknown
+Museum	1	Museumsinsel	railway-station-subway-berlin	Berlin, Germany	514	unknown
+Museum	2	Märkisches Museum	railway-station-subway-berlin	Berlin, Germany	922	unknown
+Museum	3	DDR-Museum	tourism-museum	Berlin, Karl-Liebknecht-Straße, 1, Berlin, Germany	196	open
+Museum	4	Illuseum Berlin	tourism-museum	Berlin, Karl-Liebknecht-Straße, 9, Berlin, Germany	211	closed
+Museum	5	Little Big City	tourism-museum	Berlin, Panoramastraße, 1A, Berlin, Germany	253	closed
+Hotel	1	Wunderflats	tourism-hostel	Berlin, Rosenstraße, 16, Berlin, Germany	148	unknown
+Hotel	2	Radisson Collection Hotel Berlin	tourism-hotel	Berlin, Karl-Liebknecht-Straße, 3, Berlin, Germany	156	unknown
+Hotel	3	Alexander Plaza	tourism-hotel	Berlin, Rosenstraße, 1, Berlin, Germany	187	unknown
+Hotel	4	Panorama Apartment Berlin City Centre	tourism-guest_house	Berlin, Rochstraße, 9, Berlin, Germany	253	unknown
+Hotel	5	Adina Apartment Hotel Berlin Hackescher Markt	tourism-hotel	Berlin, An der Spandauer Brücke, 11, Berlin, Germany	263	unknown
+Pizza	1	La Focaccia	amenity-fast_food	Berlin, Neue Promenade, 9, Berlin, Germany	406	open
+Pizza	2	San Nicola	amenity-restaurant	Berlin, Germany	449	unknown
+Pizza	3	OLLA Grill & Orient Lounge	amenity-restaurant	Berlin, Germany	465	open
+Pizza	4	Pergamon	amenity-fast_food	Berlin, Germany	475	open
+Pizza	5	Pergamon Döner & Pizza	amenity-fast_food	Berlin, Dircksenstraße, 2, Berlin, Germany	481	closed
+Spielplatz	1		leisure-playground	Berlin, Germany	260	unknown
+Spielplatz	2		leisure-playground	Berlin, Germany	341	unknown
+Spielplatz	3		leisure-playground	Berlin, Germany	480	unknown
+Spielplatz	4		leisure-playground	Berlin, Germany	597	unknown
+Spielplatz	5		leisure-playground	Berlin, Germany	604	unknown
+Toilette	1	City WC	amenity-toilets	Berlin, Spandauer Straße, 9, Berlin, Germany	185	unknown
+Toilette	2		amenity-toilets	Berlin, Germany	256	unknown
+Toilette	3	Mutter Hoppe	amenity-restaurant	Berlin, Rathausstraße, 21, Berlin, Germany	275	open
+Toilette	4		amenity-toilets	Berlin, Burgstraße, 26, Berlin, Germany	294	unknown
+Toilette	5		amenity-toilets	Berlin, Karl-Liebknecht-Straße, 13, Berlin, Germany	300	open
+Eisdiele	1	Waffel oder Becher	amenity-ice_cream	Berlin, Spandauer Straße, 2, Berlin, Germany	142	open
+Eisdiele	2	Bandy Brooks	amenity-cafe	Berlin, Karl-Liebknecht-Straße, 1, Berlin, Germany	182	open
+Eisdiele	3	Frozen Toppi	amenity-ice_cream	Berlin, Neue Promenade, 8, Berlin, Germany	397	closed
+Eisdiele	4	Softinis	amenity-ice_cream	Berlin, Germany	422	open
+Eisdiele	5	Katchi	amenity-ice_cream	Berlin, Oranienburger Straße, 89, Berlin, Germany	503	closed
+Biergarten	1	Fischer & Lustig	amenity-biergarten	Berlin, Poststraße, 26, Berlin, Germany	320	open
+Biergarten	2	Georgbräu	amenity-biergarten	Berlin, Germany	395	open
+Biergarten	3		amenity-biergarten	Berlin, Germany	1290	unknown
+Biergarten	4		amenity-biergarten	Berlin, Germany	1296	unknown
+Biergarten	5		amenity-biergarten	Berlin, Germany	1313	unknown
+Apotheke offen	1	gesundleben Apotheke Mahlsdorf	amenity-pharmacy	Berlin, Hönower Straße, 95A, Berlin, Germany	14041	closed
+Apotheke offen	2	Offenbacher Straße	highway-residential	Berlin, Germany	7470	unknown
+Apotheke offen	3	Ofener Straße	highway-residential	Berlin, Germany	5707	unknown
+Apotheke offen	4	Ofener Straße	highway-footway-sidewalk	Berlin, Germany	5702	unknown
+Café jetzt geöffnet	1	Cafeastraße	highway-residential	Berlin, Germany	7392	unknown
+Apotheke Sonntag	1	Apotheke am Ostkreuz	amenity-pharmacy	Berlin, Sonntagstraße, 12, Berlin, Germany	4399	closed
+Apotheke Sonntag	2	Kolonie Sonntagsfreude	highway-track	Berlin, Germany	10074	unknown
+Supermarkt Sonntag	1	Denns BioMarkt	shop-supermarket	Berlin, Sonntagstraße, 37, Berlin, Germany	4626	open
+Supermarkt Sonntag	2	Kolonie Sonntagsfreude	highway-track	Berlin, Germany	10074	unknown
+Restaurant heute 22 Uhr	1	Uhrmacherweg	highway-residential	Berlin, Germany	12158	unknown
+Restaurant heute 22 Uhr	2	Robert-Uhrig-Straße	highway-tertiary	Berlin, Germany	7370	unknown
+Restaurant heute 22 Uhr	3	Robert-Uhrig-Straße	highway-residential	Berlin, Germany	7333	unknown
+Restaurant heute 22 Uhr	4	Robert-Uhrig-Straße	highway-service	Berlin, Germany	7368	unknown
+Restaurant heute 22 Uhr	5	Robert-Uhrig-Straße	highway-pedestrian	Berlin, Germany	7252	unknown
+cafe open now	1	Cafeastraße	highway-residential	Berlin, Germany	7392	unknown
+cafe open now	2	U Deutsche Oper	highway-pedestrian	Berlin, Germany	6356	unknown
+cafe open now	3	U Deutsche Oper	highway-bus_stop	Berlin, Germany	6494	unknown
+cafe open now	4	Bebelplatz	highway-residential	Berlin, Germany	733	unknown
+cafe open now	5	Bebelplatz	place-square	Berlin, Germany	849	unknown
+Bäckerei am Sonntag	1	Sonntagstraße	highway-residential	Berlin, Germany	4186	unknown
+Bäckerei am Sonntag	2	Kolonie Sonntagsfreude	highway-track	Berlin, Germany	10074	unknown
+Bäckerei am Sonntag	3	Am Friedrichshain	highway-tertiary	Berlin, Germany	1560	unknown
+Bäckerei am Sonntag	4	Am Lustgarten	highway-residential	Berlin, Germany	328	unknown
+Bäckerei am Sonntag	5	Am Kupfergraben	highway-residential	Berlin, Germany	539	unknown
+Alexanderplatz	1	Alexanderplatz Station	building-train_station	Berlin, Germany	453	unknown
+Alexanderplatz	2	Alexanderplatz	railway-station-light_rail-berlin	Berlin, Dircksenstraße, 2, Berlin, Germany	459	unknown
+Alexanderplatz	3	Alexanderplatz	railway-station-subway-berlin	Berlin, Germany	628	unknown
+Alexanderplatz	4	Cinestar Cubix am Alexanderplatz	amenity-cinema	Berlin, Rathausstraße, 1, Berlin, Germany	480	open
+Alexanderplatz	5	Wache am Alexanderplatz	amenity-police	Berlin, Germany	579	open
+Hauptbahnhof	1	Hackescher Markt	railway-station-light_rail-berlin	Berlin, Germany	348	unknown
+Hauptbahnhof	2		building-train_station	Berlin, Germany	349	unknown
+Hauptbahnhof	3	S-Bahnhof Hackescher Markt	building-train_station	Berlin, Germany	356	unknown
+Hauptbahnhof	4	Berlin Alexanderplatz	railway-halt	Berlin, Dircksenstraße, 2, Berlin, Germany	442	open
+Hauptbahnhof	5	Bahnhof Alexanderplatz	building-train_station	Berlin, Germany	453	unknown
+Brandenburger Tor	1	Brandenburger Tor	railway-station-light_rail-berlin	Berlin, Germany	1617	unknown
+Brandenburger Tor	2	Brandenburger Tor	railway-station-subway-berlin	Berlin, Germany	1669	unknown
+Brandenburger Tor	3	Brandenburger Tor	historic-monument	Berlin, Pariser Platz, 1, Berlin, Germany	1894	open
+Brandenburger Tor	4	S+U Brandenburger Tor	highway-bus_stop	Berlin, Germany	1534	unknown
+Brandenburger Tor	5	Brandenburger Tor	amenity-taxi	Berlin, Germany	2022	unknown
+Fernsehturm	1	203 Bar im Fernsehturm	amenity-bar	Berlin, Panoramastraße, 1a, Berlin, Germany	310	open
+Fernsehturm	2	Fernsehturm Berlin	man_made-communications_tower	Berlin, Panoramastraße, 1a, Berlin, Germany	313	unknown
+Fernsehturm	3	Fernsehturm Müggelberge	building	Berlin, Germany	19481	unknown
+Fernsehturm	4	Wasserkaskaden am Fernsehturm	natural-water	Berlin, Germany	207	unknown
+Fernsehturm	5	Wasserkaskaden am Fernsehturm	natural-water	Berlin, Germany	225	unknown
+Tempelhofer Feld	1	Tempelhofer Feld Court	sport-basketball	Berlin, Germany	4415	unknown
+Tempelhofer Feld	2	Tanzboden auf dem Tempelhofer Feld	building-address	Berlin, Tempelhofer Damm, 85, Berlin, Germany	5525	unknown
+Tempelhofer Feld	3	Burger am Feld	amenity-fast_food	Berlin, Tempelhofer Damm, 106, Berlin, Germany	5605	open
+Tempelhofer Feld	4	Grundschule auf dem Tempelhofer Feld	amenity-school	Berlin, Schulenburgring, 7-11, Berlin, Germany	4582	unknown
+Tempelhofer Feld	5	Kirche auf dem Tempelhofer Feld	amenity-place_of_worship-christian	Berlin, Wolffring, 72, Berlin, Germany	4643	unknown
+Museumsinsel	1	Museumsinsel	railway-station-subway-berlin	Berlin, Germany	514	unknown
+Museumsinsel	2	Museumsinsel	tourism-attraction	Berlin, Germany	529	unknown
+Museumsinsel	3	U Museumsinsel	highway-bus_stop	Berlin, Germany	298	unknown
+Museumsinsel	4	Museumsinsel	railway-platform	Berlin, Germany	524	unknown
+Museumsinsel	5	Museumsinsel Berlin	tourism-information-board	Berlin, Germany	440	unknown
+Potsdamer Platz	1	U Potsdamer Platz	railway-station-subway-berlin	Berlin, Germany	2179	unknown
+Potsdamer Platz	2	Potsdamer Platz	railway-station-light_rail-berlin	Berlin, Germany	2254	unknown
+Potsdamer Platz	3	Motel One Potsdamer Platz	tourism-hotel	Berlin, Leipziger Platz, 12, Berlin, Germany	1975	open
+Potsdamer Platz	4	ibis Berlin City Potsdamer Platz	tourism-hotel	Berlin, Anhalter Straße, 4, Berlin, Germany	2210	unknown
+Potsdamer Platz	5	Novotel Suites Berlin City Potsdamer Platz	tourism-hotel	Berlin, Anhalter Straße, 2, Berlin, Germany	2257	open
+Rotes Rathaus	1	Rotes Rathaus	railway-station-subway-berlin	Berlin, Germany	245	unknown
+Rotes Rathaus	2	Rotes Rathaus	tourism-attraction	Berlin, Rathausstraße, 15, Berlin, Germany	308	closed
+Rotes Rathaus	3	U Rotes Rathaus	highway-bus_stop	Berlin, Germany	157	unknown
+Rotes Rathaus	4	Rotes Rathaus	railway-platform	Berlin, Germany	228	unknown
+Rotes Rathaus	5	Rotes Rathaus	railway-platform	Berlin, Germany	249	unknown
+Unter den Linden 1	1	Unter den Linden	railway-station-subway-berlin	Berlin, Germany	1146	unknown
+Unter den Linden 1	2	Staatsoper Unter den Linden	amenity-theatre	Berlin, Unter den Linden, 7, Berlin, Germany	784	unknown
+Unter den Linden 1	3	Unter den Linden	highway-primary	Berlin, Germany	544	unknown
+Unter den Linden 1	4	Unter den Linden	highway-residential	Berlin, Germany	727	unknown
+Unter den Linden 1	5	U Unter den Linden	highway-bus_stop	Berlin, Germany	1094	unknown
+Friedrichstraße 43	1	Friedrichstraße, 43	building-address	Berlin, Friedrichstrasse, 43, Berlin, Germany	1750	unknown
+Friedrichstraße 43	2	Checkpoint Charlie	tourism-attraction	Berlin, Friedrichstrasse, 43-45, Berlin, Germany	1714	unknown
+Friedrichstraße 43	3	Mauermuseum	tourism-museum	Berlin, Friedrichstrasse, 43-45, Berlin, Germany	1725	closed
+Friedrichstraße 43	4	Kaiser-Friedrich-Straße, 43, 44	building	Berlin, Kaiser-Friedrich-Straße, 43, 44, Berlin, Germany	7116	unknown
+Friedrichstraße 43	5	Joachim-Friedrich-Straße, 43	building-address	Berlin, Joachim-Friedrich-Straße, 43, Berlin, Germany	7754	unknown
+Torstraße 1	1	Torstraße, 1	entrance-main	Berlin, Torstraße, 1, Berlin, Germany	1101	unknown
+Torstraße 1	2	Soho House Berlin	tourism-hotel	Berlin, Torstraße, 1, Berlin, Germany	1121	unknown
+Torstraße 1	3	The Store	shop-clothes	Berlin, Torstraße, 1, Berlin, Germany	1092	unknown
+Torstraße 1	4	The Store Kitchen	amenity-cafe	Berlin, Torstraße, 1, Berlin, Germany	1109	unknown
+Torstraße 1	5	Onkel-Tom-Straße, 1	building	Berlin, Onkel-Tom-Straße, 1, Berlin, Germany	13658	unknown
+Kurfürstendamm 21	1	SKW Schwarz	office-lawyer	Berlin, Kurfürstendamm, 21, Berlin, Germany	5364	unknown
+Kurfürstendamm 21	2	FernUniversität in Hagen – Campus Berlin	amenity-university	Berlin, Kurfürstendamm, 21, Berlin, Germany	5368	closed
+Kurfürstendamm 21	3	Kurfürstendamm, 21	building	Berlin, Kurfürstendamm, 21, Berlin, Germany	5384	unknown
+Kurfürstendamm 21	4	Coffee & Greek Bakery	amenity-cafe	Berlin, Kurfürstendamm, 21, Berlin, Germany	5392	unknown
+Kurfürstendamm 21	5	dean&david	amenity-fast_food	Berlin, Kurfürstendamm, 21, Berlin, Germany	5395	open
+Oranienstraße 25	1	Oranienstraße, 25	building-address	Berlin, Oranienstraße, 25, Berlin, Germany	2365	unknown
+Oranienstraße 25	2	Humana	shop-clothes	Berlin, Oranienstraße, 25, Berlin, Germany	2372	closed
+Oranienstraße 25	3	Straße 251	highway-residential	Berlin, Germany	7156	unknown
+Oranienstraße 25	4	Straße 250	highway-residential	Berlin, Germany	7178	unknown
+Oranienstraße 25	5	Gate 25	highway-bus_stop	Berlin, Masurenallee, 4-6, Berlin, Germany	8587	unknown
+Karl-Marx-Allee 93	1	James June	amenity-biergarten	Berlin, Karl-Marx-Allee, 93, Berlin, Germany	2481	unknown
+Karl-Marx-Allee 93	2	James June	amenity-events_venue	Berlin, Karl-Marx-Allee, 93, Berlin, Germany	2487	unknown
+Karl-Marx-Allee 93	3	Karl-Marx-Allee, 93	building-address	Berlin, Karl-Marx-Allee, 93, Berlin, Germany	2518	unknown
+Karl-Marx-Allee 93	4	Computerspielemuseum	tourism-museum	Berlin, Karl-Marx-Allee, 93a, Berlin, Germany	2517	closed
+Karl-Marx-Allee 93	5	Karl-Marx-Allee, 93a	entrance	Berlin, Karl-Marx-Allee, 93a, Berlin, Germany	2526	unknown
+Unter den Linden	1	Unter den Linden	railway-station-subway-berlin	Berlin, Germany	1146	unknown
+Unter den Linden	2	Staatsoper Unter den Linden	amenity-theatre	Berlin, Unter den Linden, 7, Berlin, Germany	784	unknown
+Unter den Linden	3	Unter den Linden	highway-primary	Berlin, Germany	544	unknown
+Unter den Linden	4	Unter den Linden	highway-residential	Berlin, Germany	727	unknown
+Unter den Linden	5	U Unter den Linden	highway-bus_stop	Berlin, Germany	1094	unknown
+Sonnenallee	1	Sonnenallee	railway-station-light_rail-berlin	Berlin, Saalestraße, 50, Berlin, Germany	6260	unknown
+Sonnenallee	2	S-Bahnhof Sonnenallee	building-train_station	Berlin, Germany	6261	unknown
+Sonnenallee	3	Sonnenallee	highway-secondary	Berlin, Germany	3843	unknown
+Sonnenallee	4	Sonnenallee	highway-secondary-bridge	Berlin, Germany	6592	unknown
+Sonnenallee	5	U Hermannplatz/Sonnenallee	highway-bus_stop	Berlin, Germany	3868	unknown
+Kastanienallee	1	Kastanienallee	highway-tertiary	Berlin, Germany	1502	unknown
+Kastanienallee	2	Kastanienallee	highway-residential	Berlin, Germany	2291	unknown
+Kastanienallee	3	Kastanienallee	highway-service	Berlin, Germany	5083	unknown
+Kastanienallee	4	Kastanienallee	highway-tertiary	Berlin, Germany	7995	unknown
+Kastanienallee	5	Kastanienallee	highway-service	Berlin, Germany	8038	unknown
+Alexanderplatt	1	Bahnhof Alexanderplatz	building-train_station	Berlin, Germany	453	unknown
+Alexanderplatt	2	Alexanderplatz	railway-station-light_rail-berlin	Berlin, Dircksenstraße, 2, Berlin, Germany	459	unknown
+Alexanderplatt	3	Alexanderplatz	railway-station-subway-berlin	Berlin, Germany	628	unknown
+Alexanderplatt	4	Cinestar Cubix am Alexanderplatz	amenity-cinema	Berlin, Rathausstraße, 1, Berlin, Germany	480	open
+Alexanderplatt	5	Wache am Alexanderplatz	amenity-police	Berlin, Germany	579	open
+Brandenburgr Tor	1	Brandenburger Tor	railway-station-light_rail-berlin	Berlin, Germany	1617	unknown
+Brandenburgr Tor	2	Brandenburger Tor	railway-station-subway-berlin	Berlin, Germany	1669	unknown
+Brandenburgr Tor	3	Brandenburger Tor	historic-monument	Berlin, Pariser Platz, 1, Berlin, Germany	1894	open
+Brandenburgr Tor	4	S+U Brandenburger Tor	highway-bus_stop	Berlin, Germany	1534	unknown
+Brandenburgr Tor	5	Brandenburger Tor	amenity-taxi	Berlin, Germany	2022	unknown
+Kurfürstendam 21	1	SKW Schwarz	office-lawyer	Berlin, Kurfürstendamm, 21, Berlin, Germany	5364	unknown
+Kurfürstendam 21	2	FernUniversität in Hagen – Campus Berlin	amenity-university	Berlin, Kurfürstendamm, 21, Berlin, Germany	5368	closed
+Kurfürstendam 21	3	Kurfürstendamm, 21	building	Berlin, Kurfürstendamm, 21, Berlin, Germany	5384	unknown
+Kurfürstendam 21	4	Coffee & Greek Bakery	amenity-cafe	Berlin, Kurfürstendamm, 21, Berlin, Germany	5392	unknown
+Kurfürstendam 21	5	dean&david	amenity-fast_food	Berlin, Kurfürstendamm, 21, Berlin, Germany	5395	open
+Apoteke	1	Apotheke Hackesches Quartier	amenity-pharmacy	Berlin, Henriette-Herz-Platz, 3, Berlin, Germany	296	closed
+Apoteke	2	Panorama Apotheke	amenity-pharmacy	Berlin, Panoramastraße, 1, Berlin, Germany	385	closed
+Apoteke	3	Alexa Apotheke	amenity-pharmacy	Berlin, Grunerstraße, 20, Berlin, Germany	717	closed
+Apoteke	4	Fischerinsel-Apotheke	amenity-pharmacy	Berlin, Gertraudenstraße, 19, Berlin, Germany	737	closed
+Apoteke	5	Apotheke am Koppenplatz	amenity-pharmacy	Berlin, Germany	964	closed
+Supermakt	1	City Supermarkt	shop-supermarket	Berlin, Krausenstraße, 11, Berlin, Germany	1489	open
+Supermakt	2	Kiezshop Supermarkt	shop-convenience	Berlin, Germany	2349	unknown
+Supermakt	3	Inter Gida - İstanbul Supermarkt	shop-supermarket	Berlin, Skalitzer Straße, 138, Berlin, Germany	2454	closed
+Supermakt	4	El-Fi Supermarkt	shop-supermarket	Berlin, Germany	2923	closed
+Supermakt	5	Fish No. 1 Supermarkt	shop-seafood	Berlin, Greifswalder Straße, 80c, Berlin, Germany	3128	unknown
+Offenbach	1	Offenbacher Straße	highway-residential	Berlin, Germany	7470	unknown
+Offenbach	2	Jacques-Offenbach-Platz	highway-bus_stop	Berlin, Germany	13993	unknown
+Offenbach	3	Jacques-Offenbach-Platz	highway-pedestrian	Berlin, Germany	13988	unknown
+Offenbach	4	Offenbach am Main	place-city	Hesse, Germany	420155	unknown
+Offenbach	5	Jacques-Offenbach-Platz	landuse-grass	Berlin, Germany	14028	unknown
+Sonntagstraße	1	Sonntagstraße	highway-residential	Berlin, Germany	4186	unknown
+Sonntagstraße 1	1	Dr. Paul-Olaf Beeking und Paul Schewtschenko	amenity-dentist	Berlin, Sonntagstraße, 1, Berlin, Germany	4605	closed
+Sonntagstraße 1	2	Sonntagstraße	highway-residential	Berlin, Germany	4186	unknown
+Sonntagstraße 1	3	Toddy Tales	amenity-restaurant	Berlin, Sonntagstraße, 1, Berlin, Germany	4598	unknown
+Sonntagstraße 1	4	Ostkreuz City gGmbH	amenity-social_facility	Berlin, Sonntagstraße, 1, Berlin, Germany	4602	closed
+Sonntagstraße 1	5	Therapiezentrum am Ostkreuz GbR	healthcare-physiotherapist	Berlin, Sonntagstraße, 1, Berlin, Germany	4605	closed

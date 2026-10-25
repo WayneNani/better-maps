@@ -3,10 +3,12 @@ project(search_integration_tests)
 set(SRC
   downloader_search_test.cpp
   generate_tests.cpp
+  local_poi_ranking_test.cpp
   opening_hours_filter_test.cpp
   postcode_points_tests.cpp
   pre_ranker_test.cpp
   processor_test.cpp
+  query_filters_test.cpp
   ranker_test.cpp
   search_edited_features_test.cpp
   smoke_test.cpp

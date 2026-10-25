@@ -27,6 +27,15 @@ public enum OpeningHoursFilter
     return mNativeValue;
   }
 
+  @NonNull
+  public static OpeningHoursFilter fromNative(int nativeValue)
+  {
+    for (OpeningHoursFilter filter : values())
+      if (filter.mNativeValue == nativeValue)
+        return filter;
+    throw new IllegalArgumentException("Unknown opening hours filter " + nativeValue);
+  }
+
   /**
    * @param openNow show only POIs which are open now.
    * @param includeUnknown also show POIs with unknown opening hours, ignored if {@code openNow} is false.

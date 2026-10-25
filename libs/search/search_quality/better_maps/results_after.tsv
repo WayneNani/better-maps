@@ -1,0 +1,257 @@
+query	pos	name	type	address	distance_m	open	ranking
+Café	1	Bio Company	amenity-cafe	Berlin, Dircksenstraße, 145-147, Berlin, Germany	356	open	rank 0.530213, popularity 0, pureCats 1
+Café	2	dean&david	amenity-fast_food	Berlin, Karl-Liebknecht-Straße, 7, Berlin, Germany	90	open	rank 0.530059, popularity 0, pureCats 1
+Café	3	Bandy Brooks	amenity-cafe	Berlin, Karl-Liebknecht-Straße, 1, Berlin, Germany	182	open	rank 0.528569, popularity 0, pureCats 1
+Café	4	Eden	amenity-restaurant	Berlin, Rosenstraße, 19, Berlin, Germany	215	open	rank 0.528083, popularity 0, pureCats 1
+Café	5	La Siesta	amenity-cafe	Berlin, Garnisonkirchplatz, 2, Berlin, Germany	308	open	rank 0.52682, popularity 0, pureCats 1
+Frühstück	1	Bio Company	amenity-cafe	Berlin, Dircksenstraße, 145-147, Berlin, Germany	356	open	rank 0.530213, popularity 0, pureCats 1
+Frühstück	2	Bandy Brooks	amenity-cafe	Berlin, Karl-Liebknecht-Straße, 1, Berlin, Germany	182	open	rank 0.528569, popularity 0, pureCats 1
+Frühstück	3	Alto	amenity-restaurant	Berlin, An der Spandauer Brücke, 11, Berlin, Germany	236	open	rank 0.527784, popularity 0, pureCats 1
+Frühstück	4	La Siesta	amenity-cafe	Berlin, Garnisonkirchplatz, 2, Berlin, Germany	308	open	rank 0.52682, popularity 0, pureCats 1
+Frühstück	5	Maxim	amenity-cafe	Berlin, Karl-Liebknecht-Straße, 14, Berlin, Germany	309	open	rank 0.526803, popularity 0, pureCats 1
+Kaffee	1	Bio Company	amenity-cafe	Berlin, Dircksenstraße, 145-147, Berlin, Germany	356	open	rank 0.530213, popularity 0, pureCats 1
+Kaffee	2	Bandy Brooks	amenity-cafe	Berlin, Karl-Liebknecht-Straße, 1, Berlin, Germany	182	open	rank 0.528569, popularity 0, pureCats 1
+Kaffee	3	La Siesta	amenity-cafe	Berlin, Garnisonkirchplatz, 2, Berlin, Germany	308	open	rank 0.52682, popularity 0, pureCats 1
+Kaffee	4	Maxim	amenity-cafe	Berlin, Karl-Liebknecht-Straße, 14, Berlin, Germany	309	open	rank 0.526803, popularity 0, pureCats 1
+Kaffee	5	Tudo	amenity-cafe	Berlin, Germany	350	open	rank 0.526285, popularity 0, pureCats 1
+Apotheke	1	MediosApotheke	amenity-pharmacy	Berlin, Friedrichstrasse, 113A, Berlin, Germany	1362	open	rank 0.517972, popularity 0, pureCats 1
+Apotheke	2	MediosApotheke Hackescher Markt	amenity-pharmacy	Berlin, Rosenthaler Straße, 46-47, Berlin, Germany	525	closed	rank 0.514339, popularity 0, pureCats 1
+Apotheke	3	Apotheke Hackesches Quartier	amenity-pharmacy	Berlin, Henriette-Herz-Platz, 3, Berlin, Germany	296	closed	rank 0.512969, popularity 0, pureCats 1
+Apotheke	4	Apotheke im Berliner Hauptbahnhof	amenity-pharmacy	Berlin, Europaplatz, 1, Berlin, Germany	2479	open	rank 0.512742, popularity 0, pureCats 1
+Apotheke	5	Panorama Apotheke	amenity-pharmacy	Berlin, Panoramastraße, 1, Berlin, Germany	385	closed	rank 0.511867, popularity 0, pureCats 1
+Tankstelle	1	Total	amenity-fuel	Berlin, Prenzlauer Allee, 1, Berlin, Germany	1334	open	rank 0.520135, popularity 0, pureCats 1
+Tankstelle	2	Aral	amenity-fuel	Berlin, Holzmarktstraße, 12/14, Berlin, Germany	1332	open	rank 0.518148, popularity 0, pureCats 1
+Tankstelle	3	Aral	amenity-fuel	Berlin, Prinzenstraße, 29, Berlin, Germany	2032	open	rank 0.514577, popularity 0, pureCats 1
+Tankstelle	4	Total Station	amenity-fuel	Berlin, Margarete-Sommer-Straße, 2, Berlin, Germany	2727	open	rank 0.513826, popularity 0, pureCats 1
+Tankstelle	5	Shell	amenity-fuel	Berlin, Oranienstraße, 138, Berlin, Germany	1788	unknown	rank 0.513709, popularity 0, pureCats 1
+Döner	1	Kebab Kitchen	amenity-fast_food	Berlin, Rosenthaler Straße, 46, Berlin, Germany	514	open	rank 0.524452, popularity 0, pureCats 1
+Döner	2	Ali Baba Bistro	amenity-fast_food	Berlin, Germany	384	open	rank 0.523875, popularity 0, pureCats 1
+Döner	3	Pergamon	amenity-fast_food	Berlin, Germany	475	open	rank 0.523864, popularity 0, pureCats 1
+Döner	4	Döner Inn	amenity-fast_food	Berlin, Germany	570	open	rank 0.522882, popularity 0, pureCats 1
+Döner	5	mangal DÖNER (Mangal.de, comming soon)	amenity-fast_food	Berlin, Karl-Liebknecht-Straße, 13, Berlin, Germany	285	unknown	rank 0.522121, popularity 0, pureCats 0
+Supermarkt	1	REWE City	shop-supermarket	Berlin, Litfaß-Platz, 4, Berlin, Germany	289	open	rank 0.529063, popularity 0, pureCats 1
+Supermarkt	2	Kaufland	shop-supermarket	Berlin, Karl-Liebknecht-Straße, 13, Berlin, Germany	321	open	rank 0.526652, popularity 0, pureCats 1
+Supermarkt	3	E-Center	shop-supermarket	Berlin, Rosenthaler Straße, 43-45, Berlin, Germany	502	open	rank 0.526574, popularity 0, pureCats 1
+Supermarkt	4	Netto Marken-Discount	shop-supermarket	Berlin, Rathausstraße, 5, Berlin, Germany	351	open	rank 0.526275, popularity 0, pureCats 1
+Supermarkt	5	Edeka Schaaf	shop-supermarket	Berlin, Schillingstraße, 2, Berlin, Germany	1097	open	rank 0.525628, popularity 0, pureCats 1
+Bäckerei	1	M&M Back	shop-bakery	Berlin, Germany	324	open	rank 0.525612, popularity 0, pureCats 1
+Bäckerei	2	Ditsch	shop-bakery	Berlin, Germany	471	open	rank 0.5239, popularity 0, pureCats 1
+Bäckerei	3	Cinnamood	amenity-cafe	Berlin, Oranienburger Straße, 8, Berlin, Germany	523	open	rank 0.523354, popularity 0, pureCats 1
+Bäckerei	4	Kamps	shop-bakery	Berlin, Germany	346	unknown	rank 0.523333, popularity 0, pureCats 1
+Bäckerei	5	Steinecke	shop-bakery	Berlin, Fischerinsel, 12, Berlin, Germany	708	open	rank 0.52161, popularity 0, pureCats 1
+Restaurant	1	BLOCK HOUSE	amenity-restaurant	Berlin, Karl-Liebknecht-Straße, 7, Berlin, Germany	60	open	rank 0.530604, popularity 0, pureCats 1
+Restaurant	2	Zum Nußbaum	amenity-restaurant	Berlin, Am Nußbaum, 3, Berlin, Germany	347	open	rank 0.529453, popularity 2, pureCats 1
+Restaurant	3	Kila.	amenity-restaurant	Berlin, Spandauer Straße, 3, Berlin, Germany	90	open	rank 0.529061, popularity 0, pureCats 1
+Restaurant	4	Schlögl's Altberliner Gaststätte	amenity-restaurant	Berlin, Karl-Liebknecht-Straße, 9, Berlin, Germany	163	open	rank 0.528855, popularity 0, pureCats 1
+Restaurant	5	Trattoria Peretti	amenity-restaurant	Berlin, Karl-Liebknecht-Straße, 5, Berlin, Germany	128	open	rank 0.528417, popularity 0, pureCats 1
+Geldautomat	1		amenity-atm	Berlin, Germany	285	open	rank 0.527111, popularity 0, pureCats 1
+Geldautomat	2	Berliner Volksbank	amenity-atm	Berlin, Germany	121	unknown	rank 0.526528, popularity 0, pureCats 1
+Geldautomat	3	Berliner Sparkasse	amenity-atm	Berlin, Germany	612	open	rank 0.525478, popularity 0, pureCats 1
+Geldautomat	4	Berliner Volksbank	amenity-atm	Berlin, Germany	451	open	rank 0.525119, popularity 0, pureCats 1
+Geldautomat	5	Berliner Sparkasse	amenity-atm	Berlin, Karl-Liebknecht-Straße, 13, Berlin, Germany	290	unknown	rank 0.525043, popularity 0, pureCats 1
+Arzt	1	St. Hedwig-Krankenhaus	amenity-hospital	Berlin, Große Hamburger Straße, 5-11, Berlin, Germany	873	unknown	rank 0.522252, popularity 0, pureCats 1
+Arzt	2	Dagmar Steinbrück	amenity-doctors	Berlin, Münzstraße, 5, Berlin, Germany	515	unknown	rank 0.520433, popularity 0, pureCats 1
+Arzt	3	Hagedorn & Deter Neurologisch-psychiatrische Praxis	amenity-doctors	Berlin, Große Hamburger Straße, 5-11, Berlin, Germany	786	unknown	rank 0.519942, popularity 0, pureCats 1
+Arzt	4	Ddrmed Europe	amenity-doctors	Berlin, Germany	733	unknown	rank 0.517393, popularity 0, pureCats 1
+Arzt	5	Dr. Bek, Dr. Lozo, Dr. Föhse & Kollegen	amenity-doctors	Berlin, Friedrichstrasse, 147, Berlin, Germany	1145	unknown	rank 0.517309, popularity 0, pureCats 1
+Kino	1	Babylon	amenity-cinema	Berlin, Rosa-Luxemburg-Straße, 30, Berlin, Germany	788	open	rank 0.527181, popularity 20, pureCats 1
+Kino	2	Kino Central	amenity-cinema	Berlin, Rosenthaler Straße, 39, Berlin, Germany	551	unknown	rank 0.525072, popularity 0, pureCats 1
+Kino	3	Zeughauskino	amenity-cinema	Berlin, Unter den Linden, 2, Berlin, Germany	535	unknown	rank 0.524238, popularity 0, pureCats 1
+Kino	4	Hackesche Höfe Kino	amenity-cinema	Berlin, Rosenthaler Straße, 40-41, Berlin, Germany	498	unknown	rank 0.522611, popularity 0, pureCats 1
+Kino	5	Kino International	amenity-cinema	Berlin, Karl-Marx-Allee, 33, Berlin, Germany	1221	unknown	rank 0.521572, popularity 12, pureCats 1
+Museum	1	Museumsinsel	railway-station-subway-berlin	Berlin, Germany	514	unknown	rank 0.539452, popularity 8, pureCats 0
+Museum	2	Märkisches Museum	railway-station-subway-berlin	Berlin, Germany	922	unknown	rank 0.535875, popularity 10, pureCats 0
+Museum	3	DDR-Museum	tourism-museum	Berlin, Karl-Liebknecht-Straße, 1, Berlin, Germany	196	open	rank 0.533106, popularity 12, pureCats 1
+Museum	4	Monsterkabinett	tourism-gallery	Berlin, Rosenthaler Straße, 39, Berlin, Germany	542	open	rank 0.52416, popularity 0, pureCats 1
+Museum	5	Hošek Contemporary	tourism-gallery	Berlin, Germany	844	unknown	rank 0.523911, popularity 7, pureCats 1
+Hotel	1	Radisson Collection Hotel Berlin	tourism-hotel	Berlin, Karl-Liebknecht-Straße, 3, Berlin, Germany	156	unknown	rank 0.531971, popularity 0, pureCats 1
+Hotel	2	Park Inn by Radisson Berlin-Alexanderplatz	tourism-hotel	Berlin, Germany	615	unknown	rank 0.52789, popularity 7, pureCats 1
+Hotel	3	Hotel de Rome	tourism-hotel	Berlin, Behrenstraße, 37, Berlin, Germany	876	open	rank 0.527226, popularity 0, pureCats 1
+Hotel	4	Adina Apartment Hotel Berlin Hackescher Markt	tourism-hotel	Berlin, An der Spandauer Brücke, 11, Berlin, Germany	263	unknown	rank 0.526408, popularity 0, pureCats 1
+Hotel	5	Wunderflats	tourism-hostel	Berlin, Rosenstraße, 16, Berlin, Germany	148	unknown	rank 0.525092, popularity 0, pureCats 1
+Pizza	1	La Focaccia	amenity-fast_food	Berlin, Neue Promenade, 9, Berlin, Germany	406	open	rank 0.525624, popularity 0, pureCats 1
+Pizza	2	OLLA Grill & Orient Lounge	amenity-restaurant	Berlin, Germany	465	open	rank 0.524965, popularity 0, pureCats 1
+Pizza	3	Capvin	amenity-restaurant	Berlin, Rosenthaler Straße, 36, Berlin, Germany	558	open	rank 0.523999, popularity 0, pureCats 1
+Pizza	4	Pergamon	amenity-fast_food	Berlin, Germany	475	open	rank 0.523864, popularity 0, pureCats 1
+Pizza	5	Pizza-Scheune	amenity-restaurant	Berlin, Rosa-Luxemburg-Straße, 49, Berlin, Germany	957	open	rank 0.520615, popularity 0, pureCats 1
+Spielplatz	1		leisure-playground	Berlin, Germany	260	unknown	rank 0.522449, popularity 0, pureCats 1
+Spielplatz	2		leisure-playground	Berlin, Germany	341	unknown	rank 0.521405, popularity 0, pureCats 1
+Spielplatz	3		leisure-playground	Berlin, Germany	480	unknown	rank 0.519807, popularity 0, pureCats 1
+Spielplatz	4		leisure-playground	Berlin, Germany	597	unknown	rank 0.518623, popularity 0, pureCats 1
+Spielplatz	5		leisure-playground	Berlin, Germany	604	unknown	rank 0.518554, popularity 0, pureCats 1
+Toilette	1		amenity-toilets	Berlin, Germany	341	open	rank 0.5264, popularity 0, pureCats 1
+Toilette	2		amenity-toilets	Berlin, Germany	387	open	rank 0.525844, popularity 0, pureCats 1
+Toilette	3		amenity-toilets	Berlin, Karl-Liebknecht-Straße, 13, Berlin, Germany	300	open	rank 0.524923, popularity 0, pureCats 1
+Toilette	4	City WC	amenity-toilets	Berlin, Spandauer Straße, 9, Berlin, Germany	185	unknown	rank 0.524522, popularity 0, pureCats 1
+Toilette	5		amenity-toilets	Berlin, Große Präsidentenstraße, 1, Berlin, Germany	468	open	rank 0.523929, popularity 0, pureCats 1
+Eisdiele	1	Waffel oder Becher	amenity-ice_cream	Berlin, Spandauer Straße, 2, Berlin, Germany	142	open	rank 0.529199, popularity 0, pureCats 1
+Eisdiele	2	Softinis	amenity-ice_cream	Berlin, Germany	422	open	rank 0.523439, popularity 0, pureCats 1
+Eisdiele	3	yoli	amenity-ice_cream	Berlin, Münzstraße, 11b, Berlin, Germany	526	open	rank 0.523328, popularity 0, pureCats 1
+Eisdiele	4	Cuore Di Vetro	amenity-ice_cream	Berlin, Max-Beer-Straße, 33, Berlin, Germany	772	open	rank 0.522058, popularity 0, pureCats 1
+Eisdiele	5	Hokey Pokey	amenity-ice_cream	Berlin, Torstraße, 141, Berlin, Germany	1152	open	rank 0.519268, popularity 0, pureCats 1
+Biergarten	1	Fischer & Lustig	amenity-biergarten	Berlin, Poststraße, 26, Berlin, Germany	320	open	rank 0.526662, popularity 0, pureCats 1
+Biergarten	2	Georgbräu	amenity-biergarten	Berlin, Germany	395	open	rank 0.524751, popularity 0, pureCats 1
+Biergarten	3	republik-berlin	amenity-biergarten	Berlin, Köpenicker Straße, 74, Berlin, Germany	1316	open	rank 0.517242, popularity 0, pureCats 1
+Biergarten	4	Mauersegler	amenity-biergarten	Berlin, Bernauer Straße, 63-64, Berlin, Germany	2298	open	rank 0.513452, popularity 0, pureCats 1
+Biergarten	5		amenity-biergarten	Berlin, Germany	1290	unknown	rank 0.5134, popularity 0, pureCats 1
+Apotheke offen	1	MediosApotheke	amenity-pharmacy	Berlin, Friedrichstrasse, 113A, Berlin, Germany	1362	open	rank 0.517972, popularity 0, pureCats 1
+Apotheke offen	2	Apotheke im Berliner Hauptbahnhof	amenity-pharmacy	Berlin, Europaplatz, 1, Berlin, Germany	2479	open	rank 0.512742, popularity 0, pureCats 1
+Apotheke offen	3	Herz Apotheke	amenity-pharmacy	Berlin, Badstraße, 57, Berlin, Germany	3808	open	rank 0.50842, popularity 0, pureCats 1
+Apotheke offen	4	Sky Apotheke Kreuzberg	amenity-pharmacy	Berlin, Bergmannstraße, 5-7, Berlin, Germany	3564	open	rank 0.508122, popularity 0, pureCats 1
+Apotheke offen	5	Sky Apotheke	amenity-pharmacy	Berlin, Müllerstraße, 142, Berlin, Germany	4682	open	rank 0.50516, popularity 0, pureCats 1
+Café jetzt geöffnet	1	Bio Company	amenity-cafe	Berlin, Dircksenstraße, 145-147, Berlin, Germany	356	open	rank 0.530213, popularity 0, pureCats 1
+Café jetzt geöffnet	2	dean&david	amenity-fast_food	Berlin, Karl-Liebknecht-Straße, 7, Berlin, Germany	90	open	rank 0.530059, popularity 0, pureCats 1
+Café jetzt geöffnet	3	Bandy Brooks	amenity-cafe	Berlin, Karl-Liebknecht-Straße, 1, Berlin, Germany	182	open	rank 0.528569, popularity 0, pureCats 1
+Café jetzt geöffnet	4	Eden	amenity-restaurant	Berlin, Rosenstraße, 19, Berlin, Germany	215	open	rank 0.528083, popularity 0, pureCats 1
+Café jetzt geöffnet	5	La Siesta	amenity-cafe	Berlin, Garnisonkirchplatz, 2, Berlin, Germany	308	open	rank 0.52682, popularity 0, pureCats 1
+Apotheke Sonntag	1	Galenus-Apotheke	amenity-pharmacy	Berlin, Germany	1302	open	rank 0.518325, popularity 0, pureCats 1
+Apotheke Sonntag	2	MediosApotheke	amenity-pharmacy	Berlin, Friedrichstrasse, 113A, Berlin, Germany	1362	open	rank 0.517972, popularity 0, pureCats 1
+Apotheke Sonntag	3	Arkona Apotheke	amenity-pharmacy	Berlin, Kastanienallee, 38, Berlin, Germany	1737	open	rank 0.515959, popularity 0, pureCats 1
+Apotheke Sonntag	4	Apotheke im Regierungsviertel	amenity-pharmacy	Berlin, Wilhelmstraße, 93, Berlin, Germany	1759	open	rank 0.515849, popularity 0, pureCats 1
+Apotheke Sonntag	5	Bahnhof-Apotheke Friedrichshain	amenity-pharmacy	Berlin, Am Ostbahnhof, 5, Berlin, Germany	2246	open	rank 0.513665, popularity 0, pureCats 1
+Supermarkt Sonntag	1	Kaufland	shop-supermarket	Berlin, Karl-Liebknecht-Straße, 13, Berlin, Germany	321	open	rank 0.526652, popularity 0, pureCats 1
+Supermarkt Sonntag	2	Asia-Mekong	shop-supermarket	Berlin, Henriette-Herz-Platz, 1, Berlin, Germany	349	open	rank 0.526304, popularity 0, pureCats 1
+Supermarkt Sonntag	3	EDEKA	shop-supermarket	Berlin, Friedrichstrasse, 142, Berlin, Germany	1218	open	rank 0.520842, popularity 0, pureCats 1
+Supermarkt Sonntag	4	Go Asia	shop-supermarket	Berlin, Friedrichstrasse, 140, Berlin, Germany	1177	open	rank 0.519103, popularity 0, pureCats 1
+Supermarkt Sonntag	5	Kauf Markt	shop-supermarket	Berlin, Torstraße, 169-171, Berlin, Germany	1203	open	rank 0.517936, popularity 0, pureCats 1
+Restaurant heute 22 Uhr	1	BLOCK HOUSE	amenity-restaurant	Berlin, Karl-Liebknecht-Straße, 7, Berlin, Germany	60	open	rank 0.530604, popularity 0, pureCats 1
+Restaurant heute 22 Uhr	2	Zum Nußbaum	amenity-restaurant	Berlin, Am Nußbaum, 3, Berlin, Germany	347	open	rank 0.529453, popularity 2, pureCats 1
+Restaurant heute 22 Uhr	3	Trattoria Peretti	amenity-restaurant	Berlin, Karl-Liebknecht-Straße, 5, Berlin, Germany	128	open	rank 0.528417, popularity 0, pureCats 1
+Restaurant heute 22 Uhr	4	Eden	amenity-restaurant	Berlin, Rosenstraße, 19, Berlin, Germany	215	open	rank 0.528083, popularity 0, pureCats 1
+Restaurant heute 22 Uhr	5	Kartoffelhaus	amenity-restaurant	Berlin, Karl-Liebknecht-Straße, 9, Berlin, Germany	152	open	rank 0.528039, popularity 0, pureCats 1
+cafe open now	1	Bio Company	amenity-cafe	Berlin, Dircksenstraße, 145-147, Berlin, Germany	356	open	rank 0.530213, popularity 0, pureCats 1
+cafe open now	2	dean&david	amenity-fast_food	Berlin, Karl-Liebknecht-Straße, 7, Berlin, Germany	90	open	rank 0.530059, popularity 0, pureCats 1
+cafe open now	3	Bandy Brooks	amenity-cafe	Berlin, Karl-Liebknecht-Straße, 1, Berlin, Germany	182	open	rank 0.528569, popularity 0, pureCats 1
+cafe open now	4	Eden	amenity-restaurant	Berlin, Rosenstraße, 19, Berlin, Germany	215	open	rank 0.528083, popularity 0, pureCats 1
+cafe open now	5	La Siesta	amenity-cafe	Berlin, Garnisonkirchplatz, 2, Berlin, Germany	308	open	rank 0.52682, popularity 0, pureCats 1
+Tankstelle geöffnet	1	Total	amenity-fuel	Berlin, Prenzlauer Allee, 1, Berlin, Germany	1334	open	rank 0.520135, popularity 0, pureCats 1
+Tankstelle geöffnet	2	Aral	amenity-fuel	Berlin, Holzmarktstraße, 12/14, Berlin, Germany	1332	open	rank 0.518148, popularity 0, pureCats 1
+Tankstelle geöffnet	3	Aral	amenity-fuel	Berlin, Prinzenstraße, 29, Berlin, Germany	2032	open	rank 0.514577, popularity 0, pureCats 1
+Tankstelle geöffnet	4	Total Station	amenity-fuel	Berlin, Margarete-Sommer-Straße, 2, Berlin, Germany	2727	open	rank 0.513826, popularity 0, pureCats 1
+Tankstelle geöffnet	5	TotalEnergies Chausseestraße	amenity-fuel	Berlin, Chausseestraße, 61, Berlin, Germany	2776	open	rank 0.513651, popularity 0, pureCats 1
+Bäckerei am Sonntag	1	Bäcker Wiedemann	shop-bakery	Berlin, Germany	46	open	rank 0.529849, popularity 0, pureCats 1
+Bäckerei am Sonntag	2	Kamps	shop-bakery	Berlin, An der Spandauer Brücke, 10, Berlin, Germany	296	open	rank 0.526976, popularity 0, pureCats 1
+Bäckerei am Sonntag	3	Forum Café	amenity-cafe	Berlin, Schloßplatz, 1, Berlin, Germany	405	open	rank 0.52564, popularity 0, pureCats 1
+Bäckerei am Sonntag	4	M&M Back	shop-bakery	Berlin, Germany	324	open	rank 0.525612, popularity 0, pureCats 1
+Bäckerei am Sonntag	5	Steinecke	shop-bakery	Berlin, Dircksenstraße, 52, Berlin, Germany	371	open	rank 0.525034, popularity 0, pureCats 1
+Alexanderplatz	1	Alexanderplatz Station	building-train_station	Berlin, Germany	453	unknown	rank 0.537458, popularity 7, pureCats 0
+Alexanderplatz	2	Alexanderplatz	railway-station-light_rail-berlin	Berlin, Dircksenstraße, 2, Berlin, Germany	459	unknown	rank 0.537455, popularity 7, pureCats 0
+Alexanderplatz	3	Alexanderplatz	railway-station-subway-berlin	Berlin, Germany	628	unknown	rank 0.537375, popularity 0, pureCats 0
+Alexanderplatz	4	Cinestar Cubix am Alexanderplatz	amenity-cinema	Berlin, Rathausstraße, 1, Berlin, Germany	480	open	rank 0.517445, popularity 0, pureCats 0
+Alexanderplatz	5	Wache am Alexanderplatz	amenity-police	Berlin, Germany	579	open	rank 0.517398, popularity 0, pureCats 0
+Hauptbahnhof	1	Hauptbahnhof	railway-station-subway-berlin	Berlin, Germany	2434	unknown	rank 0.536517, popularity 0, pureCats 0
+Hauptbahnhof	2	Berlin Hauptbahnhof (tief)	railway-station	Berlin, Europaplatz, 1, Berlin, Germany	2435	unknown	rank 0.536517, popularity 69, pureCats 0
+Hauptbahnhof	3	Berlin Hauptbahnhof	railway-station	Berlin, Europaplatz, 1, Berlin, Germany	2455	unknown	rank 0.536507, popularity 69, pureCats 0
+Hauptbahnhof	4	Berlin Hauptbahnhof	building-train_station	Berlin, Germany	2471	unknown	rank 0.5365, popularity 69, pureCats 0
+Hauptbahnhof	5	Hauptbahnhof	railway-station-light_rail-berlin	Berlin, Europaplatz, 1, Berlin, Germany	2484	unknown	rank 0.536494, popularity 0, pureCats 0
+Brandenburger Tor	1	Brandenburger Tor	railway-station-light_rail-berlin	Berlin, Germany	1617	unknown	rank 0.536905, popularity 3, pureCats 0
+Brandenburger Tor	2	Brandenburger Tor	railway-station-subway-berlin	Berlin, Germany	1669	unknown	rank 0.53688, popularity 3, pureCats 0
+Brandenburger Tor	3	Brandenburger Tor	historic-monument	Berlin, Pariser Platz, 1, Berlin, Germany	1894	open	rank 0.516773, popularity 53, pureCats 0
+Brandenburger Tor	4	S+U Brandenburger Tor	highway-bus_stop	Berlin, Germany	1534	unknown	rank 0.509945, popularity 0, pureCats 0
+Brandenburger Tor	5	Brandenburger Tor	amenity-taxi	Berlin, Germany	2022	unknown	rank 0.509713, popularity 0, pureCats 0
+Fernsehturm	1	203 Bar im Fernsehturm	amenity-bar	Berlin, Panoramastraße, 1a, Berlin, Germany	310	open	rank 0.517526, popularity 0, pureCats 0
+Fernsehturm	2	Fernsehturm Berlin	man_made-communications_tower	Berlin, Panoramastraße, 1a, Berlin, Germany	313	unknown	rank 0.517525, popularity 48, pureCats 0
+Fernsehturm	3	Fernsehturm Müggelberge	building	Berlin, Germany	19481	unknown	rank 0.50342, popularity 0, pureCats 0
+Fernsehturm	4	Wasserkaskaden am Fernsehturm	natural-water	Berlin, Germany	207	unknown	rank 0.487575, popularity 0, pureCats 0
+Fernsehturm	5	Wasserkaskaden am Fernsehturm	natural-water	Berlin, Germany	225	unknown	rank 0.487567, popularity 0, pureCats 0
+Tempelhofer Feld	1	Tempelhofer Feld Court	sport-basketball	Berlin, Germany	4415	unknown	rank 0.503576, popularity 0, pureCats 0
+Tempelhofer Feld	2	Tanzboden auf dem Tempelhofer Feld	building-address	Berlin, Tempelhofer Damm, 85, Berlin, Germany	5525	unknown	rank 0.492049, popularity 0, pureCats 0
+Tempelhofer Feld	3	Burger am Feld	amenity-fast_food	Berlin, Tempelhofer Damm, 106, Berlin, Germany	5605	open	rank 0.488011, popularity 0, pureCats 0
+Tempelhofer Feld	4	Grundschule auf dem Tempelhofer Feld	amenity-school	Berlin, Schulenburgring, 7-11, Berlin, Germany	4582	unknown	rank 0.485497, popularity 0, pureCats 0
+Tempelhofer Feld	5	Kirche auf dem Tempelhofer Feld	amenity-place_of_worship-christian	Berlin, Wolffring, 72, Berlin, Germany	4643	unknown	rank 0.485468, popularity 0, pureCats 0
+Museumsinsel	1	Museumsinsel	railway-station-subway-berlin	Berlin, Germany	514	unknown	rank 0.537429, popularity 8, pureCats 0
+Museumsinsel	2	Museumsinsel	tourism-attraction	Berlin, Germany	529	unknown	rank 0.517422, popularity 25, pureCats 0
+Museumsinsel	3	U Museumsinsel	highway-bus_stop	Berlin, Germany	298	unknown	rank 0.510532, popularity 0, pureCats 0
+Museumsinsel	4	Museumsinsel	railway-platform	Berlin, Germany	524	unknown	rank 0.507424, popularity 0, pureCats 0
+Museumsinsel	5	Museumsinsel Berlin	tourism-information-board	Berlin, Germany	440	unknown	rank 0.505465, popularity 0, pureCats 0
+Potsdamer Platz	1	U Potsdamer Platz	railway-station-subway-berlin	Berlin, Germany	2179	unknown	rank 0.536638, popularity 0, pureCats 0
+Potsdamer Platz	2	Potsdamer Platz	railway-station-light_rail-berlin	Berlin, Germany	2254	unknown	rank 0.536603, popularity 33, pureCats 0
+Potsdamer Platz	3	Motel One Potsdamer Platz	tourism-hotel	Berlin, Leipziger Platz, 12, Berlin, Germany	1975	open	rank 0.516735, popularity 0, pureCats 0
+Potsdamer Platz	4	ibis Berlin City Potsdamer Platz	tourism-hotel	Berlin, Anhalter Straße, 4, Berlin, Germany	2210	unknown	rank 0.516624, popularity 0, pureCats 0
+Potsdamer Platz	5	Novotel Suites Berlin City Potsdamer Platz	tourism-hotel	Berlin, Anhalter Straße, 2, Berlin, Germany	2257	open	rank 0.516601, popularity 0, pureCats 0
+Rotes Rathaus	1	Rotes Rathaus	railway-station-subway-berlin	Berlin, Germany	245	unknown	rank 0.537557, popularity 0, pureCats 0
+Rotes Rathaus	2	Rotes Rathaus	tourism-attraction	Berlin, Rathausstraße, 15, Berlin, Germany	308	closed	rank 0.517527, popularity 4, pureCats 0
+Rotes Rathaus	3	U Rotes Rathaus	highway-bus_stop	Berlin, Germany	157	unknown	rank 0.510599, popularity 0, pureCats 0
+Rotes Rathaus	4	Rotes Rathaus	railway-platform	Berlin, Germany	228	unknown	rank 0.507565, popularity 0, pureCats 0
+Rotes Rathaus	5	Rotes Rathaus	railway-platform	Berlin, Germany	249	unknown	rank 0.507555, popularity 0, pureCats 0
+Unter den Linden 1	1	Unter den Linden	railway-station-subway-berlin	Berlin, Germany	1146	unknown	rank 0.524618, popularity 0, pureCats 0
+Unter den Linden 1	2	Staatsoper Unter den Linden	amenity-theatre	Berlin, Unter den Linden, 7, Berlin, Germany	784	unknown	rank 0.504789, popularity 23, pureCats 0
+Unter den Linden 1	3	Unter den Linden	highway-primary	Berlin, Germany	544	unknown	rank 0.499904, popularity 15, pureCats 0
+Unter den Linden 1	4	Unter den Linden	highway-residential	Berlin, Germany	727	unknown	rank 0.498816, popularity 15, pureCats 0
+Unter den Linden 1	5	U Unter den Linden	highway-bus_stop	Berlin, Germany	1094	unknown	rank 0.497642, popularity 0, pureCats 0
+Friedrichstraße 43	1	Friedrichstraße, 43	building-address	Berlin, Friedrichstrasse, 43, Berlin, Germany	1750	unknown	rank 0.513842, popularity 0, pureCats 0
+Friedrichstraße 43	2	Checkpoint Charlie	tourism-attraction	Berlin, Friedrichstrasse, 43-45, Berlin, Germany	1714	unknown	rank 0.511859, popularity 37, pureCats 0
+Friedrichstraße 43	3	Mauermuseum	tourism-museum	Berlin, Friedrichstrasse, 43-45, Berlin, Germany	1725	closed	rank 0.511854, popularity 15, pureCats 0
+Friedrichstraße 43	4	Kaiser-Friedrich-Straße, 43, 44	building	Berlin, Kaiser-Friedrich-Straße, 43, 44, Berlin, Germany	7116	unknown	rank 0.491293, popularity 0, pureCats 0
+Friedrichstraße 43	5	Joachim-Friedrich-Straße, 43	building-address	Berlin, Joachim-Friedrich-Straße, 43, Berlin, Germany	7754	unknown	rank 0.49099, popularity 0, pureCats 0
+Torstraße 1	1	Torstraße, 1	entrance-main	Berlin, Torstraße, 1, Berlin, Germany	1101	unknown	rank 0.420089, popularity 0, pureCats 0
+Torstraße 1	2	Soho House Berlin	tourism-hotel	Berlin, Torstraße, 1, Berlin, Germany	1121	unknown	rank 0.297141, popularity 0, pureCats 0
+Torstraße 1	3	The Store	shop-clothes	Berlin, Torstraße, 1, Berlin, Germany	1092	unknown	rank 0.287155, popularity 0, pureCats 0
+Torstraße 1	4	The Store Kitchen	amenity-cafe	Berlin, Torstraße, 1, Berlin, Germany	1109	unknown	rank 0.287146, popularity 0, pureCats 0
+Torstraße 1	5	Onkel-Tom-Straße, 1	building	Berlin, Onkel-Tom-Straße, 1, Berlin, Germany	13658	unknown	rank 0.214125, popularity 0, pureCats 0
+Kurfürstendamm 21	1	SKW Schwarz	office-lawyer	Berlin, Kurfürstendamm, 21, Berlin, Germany	5364	unknown	rank 0.512125, popularity 0, pureCats 0
+Kurfürstendamm 21	2	FernUniversität in Hagen – Campus Berlin	amenity-university	Berlin, Kurfürstendamm, 21, Berlin, Germany	5368	closed	rank 0.512123, popularity 0, pureCats 0
+Kurfürstendamm 21	3	Kurfürstendamm, 21	building	Berlin, Kurfürstendamm, 21, Berlin, Germany	5384	unknown	rank 0.512116, popularity 0, pureCats 0
+Kurfürstendamm 21	4	Coffee & Greek Bakery	amenity-cafe	Berlin, Kurfürstendamm, 21, Berlin, Germany	5392	unknown	rank 0.512112, popularity 0, pureCats 0
+Kurfürstendamm 21	5	dean&david	amenity-fast_food	Berlin, Kurfürstendamm, 21, Berlin, Germany	5395	open	rank 0.512111, popularity 0, pureCats 0
+Oranienstraße 25	1	Oranienstraße, 25	building-address	Berlin, Oranienstraße, 25, Berlin, Germany	2365	unknown	rank 0.51355, popularity 0, pureCats 0
+Oranienstraße 25	2	Humana	shop-clothes	Berlin, Oranienstraße, 25, Berlin, Germany	2372	closed	rank 0.513547, popularity 0, pureCats 0
+Oranienstraße 25	3	Straße 251	highway-residential	Berlin, Germany	7156	unknown	rank 0.0240597, popularity 0, pureCats 0
+Oranienstraße 25	4	Straße 250	highway-residential	Berlin, Germany	7178	unknown	rank 0.0240496, popularity 0, pureCats 0
+Oranienstraße 25	5	Gate 25	highway-bus_stop	Berlin, Masurenallee, 4-6, Berlin, Germany	8587	unknown	rank 0.0193801, popularity 0, pureCats 0
+Karl-Marx-Allee 93	1	James June	amenity-biergarten	Berlin, Karl-Marx-Allee, 93, Berlin, Germany	2481	unknown	rank 0.513495, popularity 0, pureCats 0
+Karl-Marx-Allee 93	2	James June	amenity-events_venue	Berlin, Karl-Marx-Allee, 93, Berlin, Germany	2487	unknown	rank 0.513492, popularity 0, pureCats 0
+Karl-Marx-Allee 93	3	Karl-Marx-Allee, 93	building-address	Berlin, Karl-Marx-Allee, 93, Berlin, Germany	2518	unknown	rank 0.513477, popularity 0, pureCats 0
+Karl-Marx-Allee 93	4	Computerspielemuseum	tourism-museum	Berlin, Karl-Marx-Allee, 93a, Berlin, Germany	2517	closed	rank 0.503478, popularity 8, pureCats 0
+Karl-Marx-Allee 93	5	Karl-Marx-Allee, 93a	entrance	Berlin, Karl-Marx-Allee, 93a, Berlin, Germany	2526	unknown	rank 0.503474, popularity 0, pureCats 0
+Unter den Linden	1	Unter den Linden	railway-station-subway-berlin	Berlin, Germany	1146	unknown	rank 0.537129, popularity 0, pureCats 0
+Unter den Linden	2	Staatsoper Unter den Linden	amenity-theatre	Berlin, Unter den Linden, 7, Berlin, Germany	784	unknown	rank 0.517301, popularity 23, pureCats 0
+Unter den Linden	3	Unter den Linden	highway-primary	Berlin, Germany	544	unknown	rank 0.512415, popularity 15, pureCats 0
+Unter den Linden	4	Unter den Linden	highway-residential	Berlin, Germany	727	unknown	rank 0.511328, popularity 15, pureCats 0
+Unter den Linden	5	U Unter den Linden	highway-bus_stop	Berlin, Germany	1094	unknown	rank 0.510154, popularity 0, pureCats 0
+Sonnenallee	1	Sonnenallee	railway-station-light_rail-berlin	Berlin, Saalestraße, 50, Berlin, Germany	6260	unknown	rank 0.5347, popularity 0, pureCats 0
+Sonnenallee	2	S-Bahnhof Sonnenallee	building-train_station	Berlin, Germany	6261	unknown	rank 0.514699, popularity 0, pureCats 0
+Sonnenallee	3	Sonnenallee	highway-secondary	Berlin, Germany	3843	unknown	rank 0.510848, popularity 6, pureCats 0
+Sonnenallee	4	Sonnenallee	highway-secondary-bridge	Berlin, Germany	6592	unknown	rank 0.509542, popularity 6, pureCats 0
+Sonnenallee	5	U Hermannplatz/Sonnenallee	highway-bus_stop	Berlin, Germany	3868	unknown	rank 0.508836, popularity 0, pureCats 0
+Kastanienallee	1	Kastanienallee	highway-tertiary	Berlin, Germany	1502	unknown	rank 0.51196, popularity 0, pureCats 0
+Kastanienallee	2	Kastanienallee	highway-residential	Berlin, Germany	2291	unknown	rank 0.510585, popularity 0, pureCats 0
+Kastanienallee	3	Kastanienallee	highway-service	Berlin, Germany	5083	unknown	rank 0.509259, popularity 0, pureCats 0
+Kastanienallee	4	Kastanienallee	highway-tertiary	Berlin, Germany	7995	unknown	rank 0.508876, popularity 0, pureCats 0
+Kastanienallee	5	Kastanienallee	highway-service	Berlin, Germany	8038	unknown	rank 0.507855, popularity 0, pureCats 0
+Alexanderplatt	1	Bahnhof Alexanderplatz	building-train_station	Berlin, Germany	453	unknown	rank 0.137458, popularity 7, pureCats 0
+Alexanderplatt	2	Alexanderplatz	railway-station-light_rail-berlin	Berlin, Dircksenstraße, 2, Berlin, Germany	459	unknown	rank 0.137455, popularity 7, pureCats 0
+Alexanderplatt	3	Alexanderplatz	railway-station-subway-berlin	Berlin, Germany	628	unknown	rank 0.137375, popularity 0, pureCats 0
+Alexanderplatt	4	Cinestar Cubix am Alexanderplatz	amenity-cinema	Berlin, Rathausstraße, 1, Berlin, Germany	480	open	rank 0.117445, popularity 0, pureCats 0
+Alexanderplatt	5	Wache am Alexanderplatz	amenity-police	Berlin, Germany	579	open	rank 0.117398, popularity 0, pureCats 0
+Brandenburgr Tor	1	Brandenburger Tor	railway-station-light_rail-berlin	Berlin, Germany	1617	unknown	rank 0.336905, popularity 3, pureCats 0
+Brandenburgr Tor	2	Brandenburger Tor	railway-station-subway-berlin	Berlin, Germany	1669	unknown	rank 0.33688, popularity 3, pureCats 0
+Brandenburgr Tor	3	Brandenburger Tor	historic-monument	Berlin, Pariser Platz, 1, Berlin, Germany	1894	open	rank 0.316773, popularity 53, pureCats 0
+Brandenburgr Tor	4	S+U Brandenburger Tor	highway-bus_stop	Berlin, Germany	1534	unknown	rank 0.309945, popularity 0, pureCats 0
+Brandenburgr Tor	5	Brandenburger Tor	amenity-taxi	Berlin, Germany	2022	unknown	rank 0.309713, popularity 0, pureCats 0
+Kurfürstendam 21	1	SKW Schwarz	office-lawyer	Berlin, Kurfürstendamm, 21, Berlin, Germany	5364	unknown	rank 0.312125, popularity 0, pureCats 0
+Kurfürstendam 21	2	FernUniversität in Hagen – Campus Berlin	amenity-university	Berlin, Kurfürstendamm, 21, Berlin, Germany	5368	closed	rank 0.312123, popularity 0, pureCats 0
+Kurfürstendam 21	3	Kurfürstendamm, 21	building	Berlin, Kurfürstendamm, 21, Berlin, Germany	5384	unknown	rank 0.312116, popularity 0, pureCats 0
+Kurfürstendam 21	4	Coffee & Greek Bakery	amenity-cafe	Berlin, Kurfürstendamm, 21, Berlin, Germany	5392	unknown	rank 0.312112, popularity 0, pureCats 0
+Kurfürstendam 21	5	dean&david	amenity-fast_food	Berlin, Kurfürstendamm, 21, Berlin, Germany	5395	open	rank 0.312111, popularity 0, pureCats 0
+Apoteke	1	Apotheke Hackesches Quartier	amenity-pharmacy	Berlin, Henriette-Herz-Platz, 3, Berlin, Germany	296	closed	rank 0.119969, popularity 0, pureCats 0
+Apoteke	2	Apotheke im Berliner Hauptbahnhof	amenity-pharmacy	Berlin, Europaplatz, 1, Berlin, Germany	2479	open	rank 0.119742, popularity 0, pureCats 0
+Apoteke	3	Panorama Apotheke	amenity-pharmacy	Berlin, Panoramastraße, 1, Berlin, Germany	385	closed	rank 0.118867, popularity 0, pureCats 0
+Apoteke	4	Theodor-Fontane-Apotheke im Bethanien	tourism-museum	Berlin, Mariannenplatz, 2, Berlin, Germany	2201	closed	rank 0.115853, popularity 0, pureCats 0
+Apoteke	5	Alexa Apotheke	amenity-pharmacy	Berlin, Grunerstraße, 20, Berlin, Germany	717	closed	rank 0.115524, popularity 0, pureCats 0
+Supermakt	1	City Supermarkt	shop-supermarket	Berlin, Krausenstraße, 11, Berlin, Germany	1489	open	rank 0.122251, popularity 0, pureCats 0
+Supermakt	2	Kiezshop Supermarkt	shop-convenience	Berlin, Germany	2349	unknown	rank 0.115249, popularity 0, pureCats 0
+Supermakt	3	Alnatura Supermarkt	shop-supermarket	Berlin, Turmstraße, 72, Berlin, Germany	4957	open	rank 0.114511, popularity 0, pureCats 0
+Supermakt	4	Baraka Supermarkt	shop-supermarket	Berlin, Badstraße, 58, Berlin, Germany	3801	open	rank 0.11444, popularity 0, pureCats 0
+Supermakt	5	Tariq Supermarkt	shop-supermarket	Berlin, Germany	3871	open	rank 0.114247, popularity 0, pureCats 0
+Offenbach	1	Offenbacher Straße	highway-residential	Berlin, Germany	7470	unknown	rank 0.498125, popularity 0, pureCats 0
+Offenbach	2	Jacques-Offenbach-Platz	highway-bus_stop	Berlin, Germany	13993	unknown	rank 0.484027, popularity 0, pureCats 0
+Offenbach	3	Jacques-Offenbach-Platz	highway-pedestrian	Berlin, Germany	13988	unknown	rank 0.481029, popularity 0, pureCats 0
+Offenbach	4	Offenbach am Main	place-city	Hesse, Germany	420155	unknown	rank 0.465825, popularity 46, pureCats 0
+Offenbach	5	Jacques-Offenbach-Platz	landuse-grass	Berlin, Germany	14028	unknown	rank 0.45601, popularity 0, pureCats 0
+Sonntagstraße	1	Sonntagstraße	highway-residential	Berlin, Germany	4186	unknown	rank 0.509685, popularity 0, pureCats 0
+Sonntagstraße 1	1	Dr. Paul-Olaf Beeking und Paul Schewtschenko	amenity-dentist	Berlin, Sonntagstraße, 1, Berlin, Germany	4605	closed	rank 0.485486, popularity 0, pureCats 0
+Sonntagstraße 1	2	Sonntagstraße	highway-residential	Berlin, Germany	4186	unknown	rank 0.299685, popularity 0, pureCats 0
+Sonntagstraße 1	3	Toddy Tales	amenity-restaurant	Berlin, Sonntagstraße, 1, Berlin, Germany	4598	unknown	rank 0.295489, popularity 0, pureCats 0
+Sonntagstraße 1	4	Ostkreuz City gGmbH	amenity-social_facility	Berlin, Sonntagstraße, 1, Berlin, Germany	4602	closed	rank 0.295487, popularity 0, pureCats 0
+Sonntagstraße 1	5	Therapiezentrum am Ostkreuz GbR	healthcare-physiotherapist	Berlin, Sonntagstraße, 1, Berlin, Germany	4605	closed	rank 0.295486, popularity 0, pureCats 0

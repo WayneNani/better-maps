@@ -4,6 +4,8 @@
 #include "search/ranking_utils.hpp"
 #include "search/token_range.hpp"
 
+#include "editor/yes_no_unknown.hpp"
+
 #include "indexer/ftypes_matcher.hpp"
 
 #include <array>
@@ -78,6 +80,11 @@ struct RankingInfo : public StoredRankingInfo
     , m_categorialRequest(false)
     , m_hasName(false)
     , m_nearbyMatch(false)
+    , m_categoryQuery(false)
+    , m_secondaryTypeMatch(false)
+    , m_hasCategoryType(false)
+    , m_hasWikipedia(false)
+    , m_hasBrand(false)
   {
     m_classifType.street = StreetType::Default;
   }
@@ -97,6 +104,12 @@ struct RankingInfo : public StoredRankingInfo
   NameScore GetNameScore() const;
   Model::Type GetTypeScore() const;
   PoiType GetPoiTypeScore() const;
+
+  // True for POIs (and buildings found by a category) if the query asks for a category, e.g. "Café", "Apotheke".
+  // The search for a category is a search for places nearby, see GetLocalPoiRank().
+  bool IsLocalPoiSearch() const;
+  // Rank of POIs for category queries: closer, open and more important POIs are better. Bigger is better.
+  double GetLocalPoiRank(bool viewportMode) const;
 
   // Matched parts of the query.
   // todo(@m) Using TokenType instead of ModelType here would
@@ -151,6 +164,27 @@ struct RankingInfo : public StoredRankingInfo
 
   // Nearby match: POI and Complex POI (planning POI and Street/Suburb/City).
   bool m_nearbyMatch : 1;
+
+  // The query asks for a category: all tokens are category synonyms, e.g. "Café", or the request is categorial.
+  bool m_categoryQuery : 1;
+
+  // The feature was matched by a category of its secondary type, e.g. a museum with a cafe for "Café".
+  bool m_secondaryTypeMatch : 1;
+
+  // The feature has a type of the query category, also if it's matched by name: a pharmacy named
+  // "Apotheke am Markt" for "Apotheke", but not a bar named "Apothekenbar".
+  bool m_hasCategoryType : 1;
+
+  // POI importance signals, see GetLocalPoiRank().
+  // The feature has a Wikipedia article or Wikimedia Commons page.
+  bool m_hasWikipedia : 1;
+  // The feature belongs to a brand (chain).
+  bool m_hasBrand : 1;
+  // Number of informative tags: opening hours, website, phone, contacts, operator, check date, photos.
+  uint8_t m_infoTagsCount = 0;
+
+  // Opening state of the POI at the search moment, Unknown if it has no (valid) opening hours.
+  osm::YesNoUnknown m_isOpen = osm::Unknown;
 };
 
 PoiType GetPoiType(feature::TypesHolder const & th);

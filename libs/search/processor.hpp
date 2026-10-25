@@ -68,6 +68,9 @@ public:
   void SetPreferredLocale(std::string const & locale);
   void SetInputLocale(std::string const & locale);
   void SetQuery(std::string const & query, bool categorialRequest = false);
+  // Moves opening hours filter words from the query to the filter params, see SearchParams::m_detectQueryFilters.
+  // |params.m_openingHoursTime| must be set to the search moment.
+  void ApplyQueryFilters(SearchParams & params) const;
 
   inline bool IsEmptyQuery() const { return m_query.IsEmpty(); }
 

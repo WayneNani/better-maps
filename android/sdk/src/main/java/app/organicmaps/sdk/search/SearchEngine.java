@@ -254,6 +254,19 @@ public enum SearchEngine implements SearchListener, MapSearchListener,
   private native void nativeInit();
 
   /**
+   * Recognizes opening hours filter words in the query, like the search does, e.g. "Café offen".
+   * @return null if the query has no filter words.
+   */
+  @Nullable
+  public static QueryFilter detectQueryFilter(@NonNull String query, @NonNull String locale)
+  {
+    return nativeDetectQueryFilter(query.getBytes(StandardCharsets.UTF_8), locale);
+  }
+
+  @Nullable
+  private static native QueryFilter nativeDetectQueryFilter(byte[] bytes, String locale);
+
+  /**
    * @param bytes utf-8 formatted bytes of query.
    * @param openingHoursFilter native value of {@link OpeningHoursFilter}.
    */

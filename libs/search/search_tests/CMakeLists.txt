@@ -19,6 +19,7 @@ set(SRC
   mem_search_index_tests.cpp
   opening_hours_filter_tests.cpp
   point_rect_matcher_tests.cpp
+  query_filters_tests.cpp
   query_saver_tests.cpp
   ranking_tests.cpp
   results_tests.cpp

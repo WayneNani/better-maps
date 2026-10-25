@@ -1,0 +1,57 @@
+# better-maps search evaluation set for Berlin (AP2b).
+# Columns (tab separated): id, kind, query, expectation.
+# kind: category|filter|typo_category -> expectation is a regex for the expected result types (classificator names);
+#       place|address|street|typo|collision -> expectation is a regex for the expected result ("name | address | type").
+# Queries are run as typed in the app (no trailing space), see run_eval.sh.
+c01	category	Café	^amenity-cafe
+c02	category	Frühstück	^(amenity-cafe|shop-bakery)
+c03	category	Kaffee	^(amenity-cafe|shop-coffee)
+c04	category	Apotheke	^amenity-pharmacy
+c05	category	Tankstelle	^amenity-fuel
+c06	category	Döner	^(amenity-fast_food|amenity-restaurant)
+c07	category	Supermarkt	^shop-supermarket
+c08	category	Bäckerei	^shop-bakery
+c09	category	Restaurant	^amenity-restaurant
+c10	category	Geldautomat	^amenity-atm
+c11	category	Arzt	^(amenity-doctors|healthcare)
+c12	category	Kino	^amenity-cinema
+c13	category	Museum	^tourism-museum
+c14	category	Hotel	^tourism-hotel
+c15	category	Pizza	^(amenity-restaurant|amenity-fast_food)
+c16	category	Spielplatz	^leisure-playground
+c17	category	Toilette	^amenity-toilets
+c18	category	Eisdiele	^amenity-ice_cream
+c19	category	Biergarten	^amenity-biergarten
+f01	filter	Apotheke offen	^amenity-pharmacy
+f02	filter	Café jetzt geöffnet	^amenity-cafe
+f03	filter	Apotheke Sonntag	^amenity-pharmacy
+f04	filter	Supermarkt Sonntag	^shop-supermarket
+f05	filter	Restaurant heute 22 Uhr	^amenity-restaurant
+f06	filter	cafe open now	^amenity-cafe
+f07	filter	Tankstelle geöffnet	^amenity-fuel
+f08	filter	Bäckerei am Sonntag	^shop-bakery
+p01	place	Alexanderplatz	^Alexanderplatz
+p02	place	Hauptbahnhof	Berlin Hauptbahnhof|^Hauptbahnhof
+p03	place	Brandenburger Tor	^Brandenburger Tor
+p04	place	Fernsehturm	Fernsehturm
+p05	place	Tempelhofer Feld	^Tempelhofer Feld
+p06	place	Museumsinsel	^Museumsinsel
+p07	place	Potsdamer Platz	^Potsdamer Platz
+p08	place	Rotes Rathaus	^Rotes Rathaus
+a01	address	Unter den Linden 1	Unter den Linden,? 1\b
+a02	address	Friedrichstraße 43	Friedrichstra(ß|ss)e,? 43\b
+a03	address	Torstraße 1	Torstra(ß|ss)e,? 1\b
+a04	address	Kurfürstendamm 21	Kurfürstendamm,? 21\b
+a05	address	Oranienstraße 25	Oranienstra(ß|ss)e,? 25\b
+a06	address	Karl-Marx-Allee 93	Karl-Marx-Allee,? 93\b
+s01	street	Unter den Linden	^Unter den Linden \|.*\| highway-
+s02	street	Sonnenallee	^Sonnenallee \|.*\| highway-
+s03	street	Kastanienallee	^Kastanienallee \|.*\| highway-
+t01	typo	Alexanderplatt	^Alexanderplatz
+t02	typo	Brandenburgr Tor	^Brandenburger Tor
+t03	typo	Kurfürstendam 21	Kurfürstendamm,? 21\b
+t04	typo_category	Apoteke	^amenity-pharmacy
+t05	typo_category	Supermakt	^shop-supermarket
+x01	collision	Offenbach	^Offenbach
+x02	collision	Sonntagstraße	^Sonntagstra(ß|ss)e \|.*\| highway-
+x03	collision	Sonntagstraße 1	Sonntagstra(ß|ss)e,? 1\b

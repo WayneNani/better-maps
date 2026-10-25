@@ -210,7 +210,9 @@ UNIT_CLASS_TEST(SearchTest, OpeningHoursFilter_ManyPois)
   params.m_categorialRequest = true;
   params.m_openingHoursTime = MakeLocalTime(12);
 
+  // Open cafes are ranked first, so take more results than there are open cafes (800) to see closed ones.
   params.m_openingHoursFilter = OpeningHoursFilter::Off;
+  params.m_maxNumResults = 900;
   auto results = MakeRequest(params)->Results();
   TEST_EQUAL(results.size(), params.m_maxNumResults, ());
   size_t closedCount = 0;
@@ -219,6 +221,7 @@ UNIT_CLASS_TEST(SearchTest, OpeningHoursFilter_ManyPois)
       ++closedCount;
   TEST_GREATER(closedCount, 0, ());
 
+  params.m_maxNumResults = SearchParams::kDefaultNumResultsEverywhere;
   params.m_openingHoursFilter = OpeningHoursFilter::OpenNow;
   results = MakeRequest(params)->Results();
   TEST_EQUAL(results.size(), params.m_maxNumResults, ());

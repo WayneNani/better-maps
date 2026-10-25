@@ -10,7 +10,9 @@
 #include "base/assert.hpp"
 #include "base/stl_helpers.hpp"
 
+#include <algorithm>
 #include <array>
+#include <cmath>
 #include <limits>
 #include <sstream>
 
@@ -30,6 +32,28 @@ double constexpr kCategoriesFalseCats = -1.0000000;
 
 double constexpr kDistanceToPivot = -0.95;
 double constexpr kWalkingDistanceM = 5000.0;
+
+// POIs for category queries (e.g. cafes for "Café"), see RankingInfo::GetLocalPoiRank().
+// The linear distance factors above are tiny in a city (-0.0024 for 5 km), so POIs are compared by a logarithmic
+// distance: halving the distance is worth the same at 200 m and at 2 km. The distance factor is 0 at
+// kLocalPoiNeutralDistanceM, so POIs closer than that get a bonus over other results (streets, cities) and farther
+// ones get a penalty.
+// The other factors are calibrated against the distance, e.g. kLocalPoiClosed makes a closed cafe at 100 m worse
+// than an open one at 1.5 km.
+double constexpr kLocalPoiDistance = -0.01;
+double constexpr kLocalPoiDistanceScaleM = 500.0;
+double constexpr kLocalPoiNeutralDistanceM = 2000.0;
+double constexpr kLocalPoiMaxDistanceM = 50000.0;
+double constexpr kLocalPoiOpen = 0.002;
+double constexpr kLocalPoiClosed = -0.012;
+// A museum with a cafe is a worse result for "Café" than a cafe.
+double constexpr kLocalPoiSecondaryType = -0.008;
+// Importance: a Wikipedia article (about x1.5 of the distance), a brand, informative tags.
+double constexpr kLocalPoiWikipedia = 0.004;
+double constexpr kLocalPoiPopularity = 0.002;
+double constexpr kLocalPoiBrand = 0.002;
+double constexpr kLocalPoiInfoTag = 0.001;
+uint8_t constexpr kLocalPoiMaxInfoTags = 3;
 
 // These constants are very important and checked in Famous_Cities_Rank test.
 double constexpr kRank = 0.23;
@@ -118,6 +142,12 @@ static_assert(kDistanceToPivot <= 0, "");
 static_assert(kRank >= 0, "");
 static_assert(kPopularity >= 0, "");
 static_assert(kErrorsMade <= 0, "");
+static_assert(kLocalPoiDistance < 0 && kLocalPoiClosed < 0 && kLocalPoiOpen > 0 && kLocalPoiSecondaryType < 0);
+// Local POI factors must not mix up results of different relevance (all tokens used, misprints, ...).
+static_assert(-kLocalPoiDistance * 5 /* ln(1 + 50 km / 500 m) */ - kLocalPoiClosed + kLocalPoiOpen -
+                  kLocalPoiSecondaryType + kLocalPoiWikipedia + kLocalPoiPopularity + kLocalPoiBrand +
+                  kLocalPoiInfoTag * kLocalPoiMaxInfoTags <
+              -kErrorsMade / 4);
 
 double TransformDistance(double distance)
 {
@@ -280,7 +310,11 @@ void RankingInfo::PrintCSVHeader(ostream & os)
      << ",AllTokensUsed"
      << ",ExactCountryOrCapital"
      << ",IsCategorialRequest"
-     << ",HasName";
+     << ",HasName"
+     << ",HasWikipedia"
+     << ",HasBrand"
+     << ",InfoTagsCount"
+     << ",IsOpen";
 }
 
 std::string DebugPrint(StoredRankingInfo const & info)
@@ -312,7 +346,11 @@ string DebugPrint(RankingInfo const & info)
      << ", m_commonTokensFactor: " << info.m_commonTokensFactor << ", m_matchedFraction: " << info.m_matchedFraction
      << ", m_pureCats: " << info.m_pureCats << ", m_falseCats: " << info.m_falseCats
      << ", m_allTokensUsed: " << info.m_allTokensUsed << ", m_categorialRequest: " << info.m_categorialRequest
-     << ", m_hasName: " << info.m_hasName << ", m_nearbyMatch: " << info.m_nearbyMatch << " }";
+     << ", m_hasName: " << info.m_hasName << ", m_nearbyMatch: " << info.m_nearbyMatch
+     << ", m_categoryQuery: " << info.m_categoryQuery << ", m_secondaryTypeMatch: " << info.m_secondaryTypeMatch
+     << ", m_hasCategoryType: " << info.m_hasCategoryType << ", m_hasWikipedia: " << info.m_hasWikipedia
+     << ", m_hasBrand: " << info.m_hasBrand << ", m_infoTagsCount: " << static_cast<int>(info.m_infoTagsCount)
+     << ", m_isOpen: " << DebugPrint(info.m_isOpen) << " }";
 
   return os.str();
 }
@@ -337,7 +375,11 @@ void RankingInfo::ToCSV(ostream & os) const
   os << m_falseCats << ",";
   os << (m_allTokensUsed ? 1 : 0) << ",";
   os << (m_categorialRequest ? 1 : 0) << ",";
-  os << (m_hasName ? 1 : 0);
+  os << (m_hasName ? 1 : 0) << ",";
+  os << (m_hasWikipedia ? 1 : 0) << ",";
+  os << (m_hasBrand ? 1 : 0) << ",";
+  os << static_cast<int>(m_infoTagsCount) << ",";
+  os << DebugPrint(m_isOpen);
 }
 
 double RankingInfo::GetLinearRankViewportThreshold()
@@ -407,6 +449,53 @@ double RankingInfo::GetLinearModelRank(bool viewportMode /* = false */) const
   // Trying to fix https://github.com/organicmaps/organicmaps/issues/5251.
   if (m_nearbyMatch)
     result += kAltOldName;
+
+  if (IsLocalPoiSearch())
+    result += GetLocalPoiRank(viewportMode);
+
+  return result;
+}
+
+bool RankingInfo::IsLocalPoiSearch() const
+{
+  if (!m_categorialRequest && !m_categoryQuery)
+    return false;
+  return Model::IsPoi(m_type) || (m_type == Model::TYPE_BUILDING && m_pureCats);
+}
+
+double RankingInfo::GetLocalPoiRank(bool viewportMode) const
+{
+  double result = 0.0;
+
+  // All results are in the viewport (and the user looks at it) in the viewport mode.
+  if (!viewportMode)
+  {
+    auto const distanceScore = [](double distanceM)
+    { return std::log1p(std::min(distanceM, kLocalPoiMaxDistanceM) / kLocalPoiDistanceScaleM); };
+    result += kLocalPoiDistance * (distanceScore(m_distanceToPivot) - distanceScore(kLocalPoiNeutralDistanceM));
+  }
+
+  // Other POIs (e.g. a bar named "Apothekenbar" for "Apotheke") are compared by the distance only.
+  if (!m_pureCats && !m_hasCategoryType)
+    return result;
+
+  // Prefer open places, if opening hours are known. With an "open now" filter all results are open.
+  if (m_isOpen == osm::Yes)
+    result += kLocalPoiOpen;
+  else if (m_isOpen == osm::No)
+    result += kLocalPoiClosed;
+
+  // Importance of a museum with a cafe is not the importance of the cafe.
+  if (m_secondaryTypeMatch)
+    return result + kLocalPoiSecondaryType;
+
+  if (m_hasWikipedia)
+    result += kLocalPoiWikipedia;
+  // Popularity is calculated from the length of the Wikipedia description, 255 is 100000 characters.
+  result += kLocalPoiPopularity * std::min(1.0, m_popularity / 32.0);
+  if (m_hasBrand)
+    result += kLocalPoiBrand;
+  result += kLocalPoiInfoTag * std::min(m_infoTagsCount, kLocalPoiMaxInfoTags);
 
   return result;
 }
