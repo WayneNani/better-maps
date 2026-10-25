@@ -1,0 +1,55 @@
+# Self-hosted MOTIS (public transport routing, API /api/v6 as used by the app).
+#
+# Normally driven by the scripts in scripts/ (they set the variables below). Direct use:
+#   export MOTIS_CACHE=$HOME/.cache/bettermaps-motis MOTIS_PROFILE=berlin
+#   podman-compose -p bettermaps-motis run --rm import   # once / after new data
+#   podman-compose -p bettermaps-motis up -d motis
+#
+# Rootless Podman: the containers run as root inside the user namespace (= your host user), so the files
+# in $MOTIS_CACHE stay owned by you. ":z" relabels the volumes for SELinux.
+
+x-motis: &motis
+  image: ghcr.io/motis-project/motis:${MOTIS_VERSION:-2.11.4}
+  user: "0:0"
+  mem_limit: ${MOTIS_MEMORY:-6g}
+  memswap_limit: ${MOTIS_MEMORY:-6g}
+  cpus: ${MOTIS_CPUS:-3}
+
+services:
+  # Preprocessing: reads /input (OSM, GTFS) and the profile's config.yml, writes /work/$MOTIS_IMPORT_DIR.
+  # Prints duration and peak memory (cgroup memory.peak of the container) at the end.
+  import:
+    <<: *motis
+    profiles: ["import"]
+    working_dir: /work
+    environment:
+      MOTIS_IMPORT_DIR: ${MOTIS_IMPORT_DIR:-data}
+    volumes:
+      - ${MOTIS_CACHE:?set MOTIS_CACHE}/input:/input:ro,z
+      - ${MOTIS_CACHE}/${MOTIS_PROFILE:-berlin}:/work:z
+    command:
+      - sh
+      - -c
+      - >-
+        start=$$(date +%s);
+        nice -n 15 /motis import -c /work/config.yml -d "/work/$$MOTIS_IMPORT_DIR"; rc=$$?;
+        echo "import-stats: exit=$$rc seconds=$$(( $$(date +%s) - start ))
+        memory_peak_bytes=$$(cat /sys/fs/cgroup/memory.peak 2>/dev/null || echo unknown)";
+        exit $$rc
+
+  # API server. Only needs the imported data directory (it contains a copy of config.yml).
+  motis:
+    <<: *motis
+    restart: unless-stopped
+    ports:
+      - "${MOTIS_BIND:-127.0.0.1}:${MOTIS_PORT:-18090}:8080"
+    volumes:
+      # Writable: MOTIS keeps memory-mapped files and may update caches in the data directory.
+      - ${MOTIS_CACHE:?set MOTIS_CACHE}/${MOTIS_PROFILE:-berlin}/data:/data:z
+    command: ["/motis", "server", "-d", "/data"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/api/v1/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3

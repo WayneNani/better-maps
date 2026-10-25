@@ -1,0 +1,49 @@
+# MOTIS 2.11 configuration, profile "berlin-rt": like "berlin", plus realtime data (delays, cancellations).
+#
+# Realtime sources (both free, no account):
+# - VBB GTFS-RT (https://production.gtfsrt.vbb.de, CC BY 4.0) for the VBB timetable: all VBB modes.
+# - gtfs.de GTFS-RT (https://gtfs.de/de/realtime/, CC BY-SA 4.0) for the gtfs.de regional rail timetable
+#   (de_rv, all of Germany). This is the source a Germany-wide setup would use; its trip IDs only match
+#   gtfs.de timetables. Trains present in both VBB and gtfs.de are merged (merge_dupes_inter_src).
+#   Long-distance trains (de_fv) would need a second dataset that polls the same 13 MB feed again, so
+#   they are left out of this test profile.
+#
+# input: berlin-latest.osm.pbf https://download.geofabrik.de/europe/germany/berlin-latest.osm.pbf
+# input: vbb.gtfs.zip https://www.vbb.de/vbbgtfs
+# input: gtfsde-rv.gtfs.zip https://download.gtfs.de/germany/rv_free/latest.zip
+
+server:
+  port: 8080
+  web_folder: /ui
+  data_attribution_link: https://gtfs.de/de/realtime/
+
+osm: /input/berlin-latest.osm.pbf
+
+timetable:
+  first_day: TODAY
+  num_days: 21
+  railviz: false
+  with_shapes: true
+  merge_dupes_inter_src: true
+  update_interval: 60     # gtfs.de updates every 10 s; the free feed is ~13 MB, so do not poll more often
+  http_timeout: 30
+  datasets:
+    de-VBB:
+      path: /input/vbb.gtfs.zip
+      rt:
+        # Free, no account; max. 60 requests/min, an informative User-Agent is required.
+        - url: https://production.gtfsrt.vbb.de/data
+          headers:
+            User-Agent: better-maps-motis/1.0 (self-hosted MOTIS test setup)
+    de-gtfsdeRV:
+      path: /input/gtfsde-rv.gtfs.zip
+      rt:
+        - url: https://realtime.gtfs.de/realtime-free.pb
+
+street_routing: true
+osr_footpath: true
+geocoding: true
+reverse_geocoding: true
+
+logging:
+  log_level: info

@@ -1,0 +1,8 @@
+# Downloads and import results belong in $MOTIS_CACHE (default ~/.cache/bettermaps-motis), never in the repo.
+# These entries only guard against a MOTIS_CACHE pointing into this directory.
+/input/
+/berlin*/
+/brandenburg*/
+*.osm.pbf
+*.gtfs.zip
+.env
