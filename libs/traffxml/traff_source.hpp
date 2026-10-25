@@ -9,6 +9,8 @@
 #include "platform/http_client.hpp"
 
 #include <chrono>
+#include <cstdint>
+#include <functional>
 #include <set>
 #include <string>
 
@@ -480,10 +482,11 @@ public:
    * Prior to calling `Poll()` on a source, the caller should always first call `IsPollNeeded()` and
    * poll the source only if the result is true.
    *
-   * @todo Document how the result is calculated. For example:
-   * This implementation uses `m_nextRequestTime` to determine when the next poll is due. When a
-   * feed is received, `m_nextRequestTime` is set to a point in time 5 minutes in the future. As
-   * long as `m_nextRequestTime` is in the future, this method returns false.
+   * This implementation uses `m_nextRequestTime` to determine when the next poll is due. Whenever
+   * the service responds successfully (with or without messages), `m_nextRequestTime` is set to
+   * `GetPollInterval()` in the future. After a failed subscription attempt, it is set to the same
+   * interval in the future, so that the attempt is repeated by a later poll. As long as
+   * `m_nextRequestTime` is in the future, this method returns false.
    *
    * @return true if the source should be polled, false if not.
    */
@@ -491,8 +494,20 @@ public:
 
   /**
    * @brief Polls the traffic service for updates.
+   *
+   * If there is no subscription (e.g. because the initial subscription attempt failed, or the
+   * service no longer recognized the subscription), this method subscribes to the currently active
+   * MWMs instead.
    */
   virtual void Poll() override;
+
+  /**
+   * @brief Returns the interval between two poll operations.
+   *
+   * This is the default update interval (5 minutes). If the service has indicated a subscription
+   * timeout, the interval is limited to half that timeout, ensuring the subscription is kept alive.
+   */
+  std::chrono::steady_clock::duration GetPollInterval() const;
 
 protected:
   /**
@@ -502,7 +517,58 @@ protected:
    */
   HttpTraffSource(TraffSourceManager & manager, std::string const & url);
 
+  /**
+   * @brief Sends a TraFF request to the service and returns the response.
+   *
+   * This method blocks until a response has been received or the request has failed. It is only
+   * called from within tasks passed to `RunAsync()`. Tests may override it to simulate a service.
+   *
+   * @param data The TraFF request, in XML format.
+   * @return The response. Network or HTTP errors are reported as `ResponseStatus::InternalError`.
+   */
+  virtual TraffResponse Post(std::string const & data);
+
+  /**
+   * @brief Runs a task asynchronously.
+   *
+   * The default implementation runs the task on a new, detached thread. Tests may override it to
+   * control when tasks are run.
+   *
+   * @param task The task to run.
+   */
+  virtual void RunAsync(std::function<void()> && task);
+
 private:
+  /**
+   * @brief Subscribes to the currently active MWMs, unless subscribed already.
+   *
+   * The set of active MWMs is retrieved from the traffic source manager. If it is empty, or if a
+   * subscribe request is already pending, this method is a no-op.
+   *
+   * The caller must not hold `m_mutex`.
+   */
+  void SubscribeToActiveMwms();
+
+  /**
+   * @brief Handles a `SUBSCRIPTION_UNKNOWN` response.
+   *
+   * Clears the subscription ID and subscribes again to the currently active MWMs.
+   *
+   * The caller must not hold `m_mutex`.
+   */
+  void OnSubscriptionUnknown();
+
+  /**
+   * @brief Updates the timestamps and availability after a successful response.
+   */
+  void OnResponseOk();
+
+  /**
+   * @brief Updates timestamps and availability after an unsuccessful response.
+   * @param status The status reported in the response.
+   */
+  void OnResponseFailed(ResponseStatus status);
+
   /**
    * @brief Processes a TraFF feed.
    * @param feed The feed.
@@ -542,5 +608,17 @@ private:
    * @brief The URL for the TraFF service.
    */
   const std::string m_url;
+
+  /**
+   * @brief The subscription timeout reported by the service, in seconds; 0 if unknown.
+   */
+  std::atomic<uint32_t> m_timeout = 0;
+
+  /**
+   * @brief Whether a subscribe request has been sent and no response has been processed yet.
+   *
+   * Access must be protected by `m_mutex`.
+   */
+  bool m_isSubscribePending = false;
 };
 }  // namespace traffxml

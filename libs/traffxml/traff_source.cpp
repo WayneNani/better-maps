@@ -136,6 +136,28 @@ HttpTraffSource::HttpTraffSource(TraffSourceManager & manager, std::string const
   , m_url(url)
 {}
 
+TraffResponse HttpTraffSource::Post(std::string const & data)
+{
+  return HttpPost(m_url, data);
+}
+
+void HttpTraffSource::RunAsync(std::function<void()> && task)
+{
+  threads::SimpleThread thread(std::move(task));
+  thread.detach();
+}
+
+std::chrono::steady_clock::duration HttpTraffSource::GetPollInterval() const
+{
+  std::chrono::steady_clock::duration interval = m_updateInterval;
+  uint32_t const timeout = m_timeout;
+  if (timeout > 0)
+    // poll well before the service considers the subscription inactive
+    interval = std::min(interval, std::chrono::duration_cast<std::chrono::steady_clock::duration>(
+                                      std::chrono::seconds(timeout)) / 2);
+  return interval;
+}
+
 void HttpTraffSource::Close()
 {
   std::string data;
@@ -150,8 +172,9 @@ void HttpTraffSource::Close()
 
   LOG(LDEBUG, ("Sending request:\n", data));
 
-  threads::SimpleThread thread([this, data]() {
-    TraffResponse response = HttpPost(m_url, data);
+  // The source may be destroyed before the request completes, do not access any members.
+  threads::SimpleThread thread([url = m_url, data]() {
+    TraffResponse response = HttpPost(url, data);
     return;
   });
   thread.detach();
@@ -165,20 +188,70 @@ void HttpTraffSource::Subscribe(std::set<MwmSet::MwmId> & mwms)
       + "</request>";
   LOG(LDEBUG, ("Sending request:\n", data));
 
-  threads::SimpleThread thread([this, data]() {
+  m_isSubscribePending = true;
+  m_lastRequestTime = std::chrono::steady_clock::now();
+  RunAsync([this, data]() {
     // TODO sometimes the request gets sent (and processed) twice
-    TraffResponse response = HttpPost(m_url, data);
+    TraffResponse response = Post(data);
     OnSubscribeResponse(response);
-    return;
   });
-  thread.detach();
+}
+
+void HttpTraffSource::SubscribeToActiveMwms()
+{
+  // retrieve MWMs before locking, as this locks the manager
+  std::set<MwmSet::MwmId> mwms;
+  m_manager.GetActiveMwms(mwms);
+
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (IsSubscribed() || m_isSubscribePending)
+    return;
+  if (mwms.empty())
+  {
+    LOG(LDEBUG, ("No active MWMs, not subscribing yet"));
+    return;
+  }
+  Subscribe(mwms);
+}
+
+void HttpTraffSource::OnSubscriptionUnknown()
+{
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    LOG(LWARNING, ("Subscription", m_subscriptionId, "unknown to service, subscribing again"));
+    m_subscriptionId.clear();
+  }
+  SubscribeToActiveMwms();
+}
+
+void HttpTraffSource::OnResponseOk()
+{
+  m_lastResponseTime = std::chrono::steady_clock::now();
+  m_nextRequestTime = std::chrono::steady_clock::now() + GetPollInterval();
+  m_retriesCount = 0;
+  m_lastAvailability = Availability::IsAvailable;
+}
+
+void HttpTraffSource::OnResponseFailed(ResponseStatus status)
+{
+  m_lastResponseTime = std::chrono::steady_clock::now();
+  switch (status)
+  {
+  case ResponseStatus::NotCovered:
+    m_lastAvailability = Availability::NotCovered;
+    break;
+  case ResponseStatus::SubscriptionRejected:
+    m_lastAvailability = Availability::SubscriptionRejected;
+    break;
+  default:
+    m_lastAvailability = Availability::Error;
+    ++m_retriesCount;
+  }
 }
 
 void HttpTraffSource::OnFeedReceived(TraffFeed & feed)
 {
-  m_lastResponseTime = std::chrono::steady_clock::now();
-  m_nextRequestTime = std::chrono::steady_clock::now() + m_updateInterval;
-  m_lastAvailability = Availability::IsAvailable;
+  OnResponseOk();
   m_manager.ReceiveFeed(feed);
 }
 
@@ -188,22 +261,44 @@ void HttpTraffSource::OnSubscribeResponse(TraffResponse & response)
       || response.m_status == ResponseStatus::PartiallyCovered)
   {
     if (response.m_subscriptionId.empty())
+    {
       LOG(LWARNING, ("Server replied with", response.m_status, "but subscription ID is empty; ignoring"));
+      {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_isSubscribePending = false;
+      }
+      OnResponseFailed(ResponseStatus::Invalid);
+      // retry with the next poll
+      m_nextRequestTime = std::chrono::steady_clock::now() + m_updateInterval;
+    }
     else
     {
       {
         std::lock_guard<std::mutex> lock(m_mutex);
+        m_isSubscribePending = false;
         m_subscriptionId = response.m_subscriptionId;
-        // TODO timeout
       }
+      m_timeout = response.m_timeout;
       if (response.m_feed && !response.m_feed.value().empty())
         OnFeedReceived(response.m_feed.value());
       else
+      {
+        OnResponseOk();
         Poll();
+      }
     }
   }
   else
+  {
     LOG(LWARNING, ("Subscribe request failed:", response.m_status));
+    {
+      std::lock_guard<std::mutex> lock(m_mutex);
+      m_isSubscribePending = false;
+    }
+    OnResponseFailed(response.m_status);
+    // retry with the next poll (or earlier, if the set of active MWMs changes)
+    m_nextRequestTime = std::chrono::steady_clock::now() + m_updateInterval;
+  }
 }
 
 void HttpTraffSource::ChangeSubscription(std::set<MwmSet::MwmId> & mwms)
@@ -215,12 +310,11 @@ void HttpTraffSource::ChangeSubscription(std::set<MwmSet::MwmId> & mwms)
       + "</request>";
   LOG(LDEBUG, ("Sending request:\n", data));
 
-  threads::SimpleThread thread([this, data]() {
-    TraffResponse response = HttpPost(m_url, data);
+  m_lastRequestTime = std::chrono::steady_clock::now();
+  RunAsync([this, data]() {
+    TraffResponse response = Post(data);
     OnChangeSubscriptionResponse(response);
-    return;
   });
-  thread.detach();
 }
 
 void HttpTraffSource::OnChangeSubscriptionResponse(TraffResponse & response)
@@ -228,21 +322,23 @@ void HttpTraffSource::OnChangeSubscriptionResponse(TraffResponse & response)
   if (response.m_status == ResponseStatus::Ok
       || response.m_status == ResponseStatus::PartiallyCovered)
   {
+    if (response.m_timeout > 0)
+      m_timeout = response.m_timeout;
     if (response.m_feed && !response.m_feed.value().empty())
       OnFeedReceived(response.m_feed.value());
     else
-      Poll();
-  }
-  else if (response.m_status == ResponseStatus::SubscriptionUnknown)
-  {
-    LOG(LWARNING, ("Change Subscription returned", response.m_status, " – removing subscription", m_subscriptionId));
     {
-      std::lock_guard<std::mutex> lock(m_mutex);
-      m_subscriptionId.clear();
+      OnResponseOk();
+      Poll();
     }
   }
+  else if (response.m_status == ResponseStatus::SubscriptionUnknown)
+    OnSubscriptionUnknown();
   else
+  {
     LOG(LWARNING, ("Change Subscription request failed:", response.m_status));
+    OnResponseFailed(response.m_status);
+  }
 }
 
 void HttpTraffSource::Unsubscribe()
@@ -258,12 +354,10 @@ void HttpTraffSource::Unsubscribe()
 
   LOG(LDEBUG, ("Sending request:\n", data));
 
-  threads::SimpleThread thread([this, data]() {
-    TraffResponse response = HttpPost(m_url, data);
+  RunAsync([this, data]() {
+    TraffResponse response = Post(data);
     OnUnsubscribeResponse(response);
-    return;
   });
-  thread.detach();
 }
 
 void HttpTraffSource::OnUnsubscribeResponse(TraffResponse & response)
@@ -281,7 +375,6 @@ void HttpTraffSource::OnUnsubscribeResponse(TraffResponse & response)
 
 bool HttpTraffSource::IsPollNeeded()
 {
-  // TODO revisit logic
   return m_nextRequestTime.load() <= std::chrono::steady_clock::now();
 }
 
@@ -291,38 +384,44 @@ void HttpTraffSource::Poll()
   {
     std::lock_guard<std::mutex> lock(m_mutex);
 
-    if (m_subscriptionId.empty())
-      return;
-    data = "<request operation=\"POLL\" subscription_id=\"" + m_subscriptionId + "\"/>";
+    if (!m_subscriptionId.empty())
+      data = "<request operation=\"POLL\" subscription_id=\"" + m_subscriptionId + "\"/>";
+  }
+
+  if (data.empty())
+  {
+    // not subscribed (yet or any more), e.g. because a previous subscription attempt failed
+    SubscribeToActiveMwms();
+    return;
   }
 
   LOG(LDEBUG, ("Sending request:\n", data));
 
-  threads::SimpleThread thread([this, data]() {
+  m_lastRequestTime = std::chrono::steady_clock::now();
+  RunAsync([this, data]() {
     // TODO sometimes the request gets sent (and processed) twice
-    TraffResponse response = HttpPost(m_url, data);
+    TraffResponse response = Post(data);
     OnPollResponse(response);
-    return;
   });
-  thread.detach();
 }
 
 void HttpTraffSource::OnPollResponse(TraffResponse & response)
 {
-  if (response.m_status == ResponseStatus::Ok)
+  if (response.m_status == ResponseStatus::Ok
+      || response.m_status == ResponseStatus::PartiallyCovered)
   {
     if (response.m_feed && !response.m_feed.value().empty())
       OnFeedReceived(response.m_feed.value());
+    else
+      // an empty feed is a successful response, too: wait for the poll interval to elapse
+      OnResponseOk();
   }
   else if (response.m_status == ResponseStatus::SubscriptionUnknown)
-  {
-    LOG(LWARNING, ("Poll returned", response.m_status, " – removing subscription", m_subscriptionId));
-    {
-      std::lock_guard<std::mutex> lock(m_mutex);
-      m_subscriptionId.clear();
-    }
-  }
+    OnSubscriptionUnknown();
   else
+  {
     LOG(LWARNING, ("Poll returned", response.m_status));
+    OnResponseFailed(response.m_status);
+  }
 }
 }  // namespace traffxml
