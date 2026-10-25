@@ -67,8 +67,8 @@ UNIT_CLASS_TEST(SearchUtilsTest, Utils)
   for (char const * s : {"post_office", "post_box", "parcel_locker"})
     TEST(binary_search(typesPost.begin(), typesPost.end(), classif().GetTypeByPath({"amenity", s})), (s));
 
-  // Now "Cafe" and "Restaurant" are synonyms in categories.
-  TEST_EQUAL(typesCafe, typesRestaurant, ());
+  // "Cafe" and "Restaurant" are separate categories (they were synonyms before).
+  TEST_NOT_EQUAL(typesCafe, typesRestaurant, ());
   TEST_NOT_EQUAL(typesCafe, typesBar, ());
 
   for (auto const t : typesCafe)
@@ -87,11 +87,11 @@ UNIT_CLASS_TEST(SearchUtilsTest, Utils)
     TEST_EQUAL(features.size(), expectedCount, ());
   };
 
-  // |cafe| and |restaurant|.
-  testTypes(typesCafe, 2);
+  // |cafe|.
+  testTypes(typesCafe, 1);
 
-  // |cafe| and |restaurant|.
-  testTypes(typesRestaurant, 2);
+  // |restaurant|.
+  testTypes(typesRestaurant, 1);
 
   // |bar|.
   testTypes(typesBar, 1);
