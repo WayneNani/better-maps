@@ -27,8 +27,10 @@ set -euo pipefail
 REPO_ROOT="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
 FIXTURE="$REPO_ROOT/tools/better-maps/traffic-e2e/autobahn"
 MAPS_DIR="${TRAFF_E2E_MAPS_DIR:-$HOME/.cache/bettermaps-maps}"
-PORT="${TRAFF_E2E_PORT:-18081}"
-API_PORT="${TRAFF_E2E_API_PORT:-18082}"
+# Freie Ports wählen lassen: feste Ports kollidieren mit parallel laufenden Tests anderer Worktrees.
+free_port() { python3 -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1",0)); print(s.getsockname()[1])'; }
+PORT="${TRAFF_E2E_PORT:-$(free_port)}"
+API_PORT="${TRAFF_E2E_API_PORT:-$(free_port)}"
 URL="http://127.0.0.1:${PORT}/"
 
 log() { echo "[traffic-e2e] $*" >&2; }
