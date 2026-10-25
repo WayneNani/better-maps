@@ -210,7 +210,7 @@
         "defaultMessage": "3Busbahnhof|3Bushaltestelle|3Haltestelle|2Bus|4Autobus|ÖPNV|ZOB|4Fernbus|5Fernbusbahnhof|4Busterminal|5Omnibusbahnhof|U+1F68C|U+1F68F|U+1F68D"
     },
     "railway-station|railway-halt|building-train_station|@category_transport": {
-        "defaultMessage": "4Bahnhof|3Haltepunkt|3Station|2Zug|2Bahn|ÖPNV|2Hbf|2Bhf|4Hauptbahnhof|4Bahnstation|5Zughaltestelle|3S-Bahn|4S-Bahnhof|3Sbahn|U+1F684|U+1F685|U+1F689|U+1F682|U+1F686|U+1F688|U+1F68A|U+1F68B"
+        "defaultMessage": "4Bahnhof|3Haltepunkt|3Station|2Zug|2Bahn|ÖPNV|2Hbf|2Bhf|4Bahnstation|5Zughaltestelle|3S-Bahn|4S-Bahnhof|3Sbahn|U+1F684|U+1F685|U+1F689|U+1F682|U+1F686|U+1F688|U+1F68A|U+1F68B"
     },
     "railway-station-funicular": {
         "defaultMessage": "5Standseilbahn|6Seilbahn"

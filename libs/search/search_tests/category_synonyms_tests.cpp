@@ -127,7 +127,6 @@ UNIT_TEST(CategorySynonyms_German)
                        {"Trambahn", "railway-tram_stop"},
                        {"Fernbus", "amenity-bus_station"},
                        {"Busterminal", "amenity-bus_station"},
-                       {"Hauptbahnhof", "railway-station"},
                        {"Bahnstation", "railway-station"},
                        {"Zughaltestelle", "railway-station"},
                        {"Sbahn", "railway-station"},
@@ -216,6 +215,9 @@ UNIT_TEST(CategorySynonyms_German)
                        {"Park", "amenity-parking"},
                        {"Waschstraße", "shop-laundry"},
                        {"Geld abheben", "amenity-bank"},
+                       // A name of the main station, not a category: "Hauptbahnhof" should find "Berlin Hauptbahnhof",
+                       // not the closest stations.
+                       {"Hauptbahnhof", "railway-station"},
                    },
                    false /* shouldMatch */);
 }
