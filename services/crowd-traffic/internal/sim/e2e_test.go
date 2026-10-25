@@ -207,6 +207,9 @@ func checkSnapshots(t *testing.T, snaps []snapshot, sc Scenario) {
 				congested[s.ID] = true
 			}
 		}
+		if res := Check(sn.doc, sc); len(congested) > 0 && !res.OK() {
+			t.Errorf("check failed:\n%s", res)
+		}
 		// The TraFF feed contains exactly the congested segments and is accepted by the client.
 		body := strings.SplitN(sn.feed, "\n", 2)[1]
 		res, err := clientcheck.ParseResponse([]byte(`<response status="OK">` + body + `</response>`))
@@ -263,5 +266,32 @@ func TestScenarioGeometry(t *testing.T) {
 	}
 	if lat, _, _ := pl.at(1e9); lat != 52.01 {
 		t.Fatal("at > length")
+	}
+}
+
+func TestCheckDetectsProblems(t *testing.T) {
+	sc := Berlin()
+	in, _, _ := sc.Roads[0].SegmentZones()
+	_, _, west := sc.Roads[1].SegmentZones()
+	_, _, village := sc.Roads[3].SegmentZones()
+	one := func(m map[protocol.Key]bool) string {
+		for k := range m {
+			return export.MessageID(k)
+		}
+		return ""
+	}
+	doc := export.Document{K: 10, Segments: []export.Segment{
+		{ID: one(in), Reports: 12, Congested: true},
+		{ID: one(west), Reports: 12, Congested: true},
+		{ID: one(village), Reports: 12},
+		{ID: one(in), Reports: 3},
+		{ID: "org.bettermaps.crowd:17/1/1/N-S/PRIMARY", Reports: 50},
+	}}
+	res := Check(doc, sc)
+	if res.OK() || len(res.Problems) != 4 || res.JamFound != 1 || res.String() == "" {
+		t.Fatalf("problems %v\n%s", res.Problems, res)
+	}
+	if res := Check(export.Document{K: 10}, sc); res.OK() {
+		t.Fatal("empty export passes")
 	}
 }
