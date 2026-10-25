@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed>
+  <message id="de.autobahn.warning:INRIX--vi-avl.2026-10-25_15-25-00-000_008.de0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-25T15:25:00Z" cancellation="false" forecast="false">
+    <location country="DE" destination="Stuttgart" directionality="ONE_DIRECTION" origin="Karlsruhe" road_class="MOTORWAY" road_ref="A 8">
+      <from>+48.909928 +8.695321</from>
+      <via>+48.922007 +8.738849</via>
+      <to>+48.914064 +8.765017</to>
+    </location>
+    <events>
+      <event class="CONGESTION" type="CONGESTION_STATIONARY_TRAFFIC"></event>
+      <event class="DELAY" type="DELAY_DELAY" q_duration="00:11"></event>
+    </events>
+  </message>
+  <message id="de.autobahn.warning:INRIX--vi-avl.2026-10-25_08-31-00-000_003.de0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-25T08:31:00Z" cancellation="false" forecast="false">
+    <location country="DE" destination="München" directionality="ONE_DIRECTION" origin="Salzburg" road_class="MOTORWAY" road_ref="A 8">
+      <from>+47.796139 +12.205644</from>
+      <via>+47.802357 +12.184816</via>
+      <to>+47.805133 +12.150462</to>
+    </location>
+    <events>
+      <event class="CONGESTION" type="CONGESTION_STATIONARY_TRAFFIC"></event>
+      <event class="DELAY" type="DELAY_DELAY" q_duration="00:19"></event>
+    </events>
+  </message>
+  <message id="de.autobahn.warning:INRIX--vi-avl.2026-10-25_09-13-00-000_011.de0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-25T09:13:00Z" cancellation="false" forecast="false">
+    <location country="DE" destination="München" directionality="ONE_DIRECTION" origin="Salzburg" road_class="MOTORWAY" road_ref="A 8">
+      <from>+47.768447 +12.943230</from>
+      <via>+47.768301 +12.936037</via>
+      <to>+47.767465 +12.925401</to>
+    </location>
+    <events>
+      <event class="CONGESTION" type="CONGESTION_STATIONARY_TRAFFIC" speed="15"></event>
+      <event class="DELAY" type="DELAY_DELAY" q_duration="00:04"></event>
+    </events>
+  </message>
+  <message id="de.autobahn.warning:INRIX--vi-zus.2026-10-25_14-29-29-000.de0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-25T14:29:00Z" cancellation="false" forecast="false">
+    <location country="DE" destination="Stuttgart" directionality="ONE_DIRECTION" origin="München" road_class="MOTORWAY" road_ref="A 8">
+      <from>+48.412774 +10.433410</from>
+      <via>+48.430666 +10.371743</via>
+      <to>+48.432547 +10.295021</to>
+    </location>
+    <events>
+      <event class="INCIDENT" type="INCIDENT_ACCIDENT"></event>
+      <event class="HAZARD" type="HAZARD_PEOPLE_ON_ROAD"></event>
+      <event class="RESTRICTION" type="RESTRICTION_LANE_CLOSED"></event>
+      <event class="DELAY" type="DELAY_DELAY" q_duration="00:05"></event>
+    </events>
+  </message>
+</feed>

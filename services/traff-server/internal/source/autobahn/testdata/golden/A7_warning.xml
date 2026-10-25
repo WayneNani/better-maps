@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed>
+  <message id="de.autobahn.warning:INRIX--vi-avl.2026-10-25_15-08-00-000_009.de0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-25T15:08:00Z" cancellation="false" forecast="false">
+    <location country="DE" destination="Fulda" directionality="ONE_DIRECTION" origin="Würzburg" road_class="MOTORWAY" road_ref="A 7">
+      <from>+50.302025 +9.848275</from>
+      <via>+50.315713 +9.845064</via>
+      <to>+50.319385 +9.838167</to>
+    </location>
+    <events>
+      <event class="CONGESTION" type="CONGESTION_STATIONARY_TRAFFIC"></event>
+      <event class="DELAY" type="DELAY_DELAY" q_duration="00:12"></event>
+    </events>
+  </message>
+  <message id="de.autobahn.warning:INRIX--vi-avl.2026-10-25_14-51-00-000_011.de0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-25T14:51:00Z" cancellation="false" forecast="false">
+    <location country="DE" destination="Hamburg" directionality="ONE_DIRECTION" origin="Hannover" road_class="MOTORWAY" road_ref="A 7">
+      <from>+53.314452 +10.067130</from>
+      <via>+53.330936 +10.044200</via>
+      <to>+53.342447 +10.038999</to>
+    </location>
+    <events>
+      <event class="CONGESTION" type="CONGESTION_STATIONARY_TRAFFIC" speed="20"></event>
+      <event class="DELAY" type="DELAY_DELAY" q_duration="00:08"></event>
+    </events>
+  </message>
+  <message id="de.autobahn.warning:INRIX--vi-avl.2026-10-25_12-40-00-000_016.de0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-25T12:40:00Z" cancellation="false" forecast="false">
+    <location country="DE" destination="Hamburg" directionality="ONE_DIRECTION" origin="Hannover" road_class="MOTORWAY" road_ref="A 7">
+      <from>+53.513426 +9.915945</from>
+      <via>+53.530205 +9.933962</via>
+      <to>+53.546744 +9.906962</to>
+    </location>
+    <events>
+      <event class="CONGESTION" type="CONGESTION_QUEUE" speed="30"></event>
+      <event class="DELAY" type="DELAY_DELAY" q_duration="00:06"></event>
+    </events>
+  </message>
+</feed>
