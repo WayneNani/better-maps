@@ -55,12 +55,13 @@ func run(args []string, env func(string) string, stderr io.Writer) error {
 }
 
 type app struct {
-	cfg    config.Config
-	log    *slog.Logger
-	store  *store.Store
-	subs   *subscription.Manager
-	runner *source.Runner
-	srv    *server.Server
+	cfg          config.Config
+	janitorEvery time.Duration
+	log          *slog.Logger
+	store        *store.Store
+	subs         *subscription.Manager
+	runner       *source.Runner
+	srv          *server.Server
 }
 
 func build(cfg config.Config, logger *slog.Logger) (*app, error) {
@@ -83,7 +84,7 @@ func build(cfg config.Config, logger *slog.Logger) (*app, error) {
 		Store: st, Subs: subs, Coverage: runner.Coverage, Status: runner.Status,
 		MaxFilters: cfg.MaxFilters, Log: logger,
 	}
-	return &app{cfg: cfg, log: logger, store: st, subs: subs, runner: runner, srv: srv}, nil
+	return &app{cfg: cfg, janitorEvery: time.Minute, log: logger, store: st, subs: subs, runner: runner, srv: srv}, nil
 }
 
 func (a *app) serve(ctx context.Context, stderr io.Writer) error {
@@ -120,7 +121,7 @@ func (a *app) serve(ctx context.Context, stderr io.Writer) error {
 
 // janitor expires idle subscriptions and purges old messages.
 func (a *app) janitor(ctx context.Context) {
-	t := time.NewTicker(time.Minute)
+	t := time.NewTicker(a.janitorEvery)
 	defer t.Stop()
 	for {
 		select {

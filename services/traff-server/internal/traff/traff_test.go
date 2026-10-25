@@ -362,3 +362,18 @@ func TestLatLon(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestCancellationHasNoEvents(t *testing.T) {
+	m := Message{ID: "x", Cancellation: true}
+	data, err := xml.Marshal(m)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(data), "events") || !strings.HasPrefix(string(data), `<message id="x"`) || !strings.Contains(string(data), `cancellation="true"`) {
+		t.Errorf("cancellation = %s", data)
+	}
+	var back Message
+	if err := xml.Unmarshal(data, &back); err != nil || !back.Cancellation || back.Events != nil {
+		t.Errorf("round trip = %+v %v", back, err)
+	}
+}
