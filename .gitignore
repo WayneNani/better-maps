@@ -224,3 +224,4 @@ tools/unix/maps/settings.sh
 
 # better-maps: Worktrees der Subagenten
 /.worktrees/
+/.venv

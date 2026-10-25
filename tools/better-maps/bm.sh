@@ -16,6 +16,9 @@ export ANDROID_SDK_ROOT="$ANDROID_HOME"
 export ANDROID_AVD_HOME="${ANDROID_AVD_HOME:-$HOME/.config/.android/avd}"
 export JAVA_HOME="${BM_JAVA_HOME:-$HOME/java/jdk-21.0.12.1+1}"
 export PATH="$JAVA_HOME/bin:$ANDROID_HOME/cmake/3.22.1/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+# In der Distrobox meldet die JVM Cgroup-Warnungen auf stdout; die landen sonst in von AGP
+# ausgewerteten Ausgaben (z. B. jmod --module-version) und brechen den Build.
+export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:--Xlog:os+container=off}"
 export CCACHE_DIR="${CCACHE_DIR:-$HOME/.cache/ccache-bettermaps}"
 export CCACHE_BASEDIR="$MAIN_ROOT"
 export CCACHE_NOHASHDIR=true
@@ -63,9 +66,21 @@ emulator_running() { adb devices 2>/dev/null | grep -q '^emulator-.*device$'; }
 
 emulator_start() {
   if emulator_running; then log "Emulator läuft bereits"; return 0; fi
-  log "Starte Emulator $AVD (headless, 2 Kerne, 3 GB)"
-  nohup emulator -avd "$AVD" -no-window -gpu swiftshader_indirect -memory 3072 -cores 2 \
-    -no-snapshot -no-audio -no-boot-anim -no-metrics >"$LOCK_DIR/emulator.log" 2>&1 &
+  log "Starte Emulator $AVD auf dem Host (headless, 2 Kerne, 3 GB)"
+  # Erfahrungen auf diesem Rechner (Fedora-Host, Debian-Distrobox):
+  # - In der Distrobox stürzt qemu beim Start ab (Segfault).
+  # - Auf dem Host stürzen -gpu swiftshader_indirect und -gpu guest ab (auch mit -feature -Vulkan);
+  #   nur -gpu host bootet (~25 s).
+  # - Ein per distrobox-host-exec gestarteter Hintergrundprozess wird mit der Shell beendet, darum
+  #   läuft der Emulator als transiente systemd-User-Unit auf dem Host.
+  # adb in der Distrobox erreicht ihn über das gemeinsame Netzwerk.
+  local host=()
+  command -v distrobox-host-exec >/dev/null && [[ -e /run/.containerenv ]] && host=(distrobox-host-exec)
+  "${host[@]}" systemctl --user reset-failed bettermaps-emulator >/dev/null 2>&1 || true
+  "${host[@]}" systemd-run --user --unit=bettermaps-emulator --collect \
+    --setenv=ANDROID_AVD_HOME="$ANDROID_AVD_HOME" --setenv=ANDROID_HOME="$ANDROID_HOME" \
+    bash -c "exec nice -n 5 '$ANDROID_HOME/emulator/emulator' -avd '$AVD' -no-window -gpu host \
+-memory 3072 -cores 2 -no-snapshot -no-audio -no-boot-anim -no-metrics >'$LOCK_DIR/emulator.log' 2>&1" >/dev/null
   adb wait-for-device
   for _ in $(seq 1 120); do
     [[ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" == "1" ]] && { log "Emulator bereit"; return 0; }
@@ -74,7 +89,17 @@ emulator_start() {
   log "Emulator bootet nicht, siehe $LOCK_DIR/emulator.log"; return 1
 }
 
-emulator_stop() { emulator_running && adb emu kill || true; }
+emulator_stop() {
+  emulator_running && adb emu kill || true
+  if command -v distrobox-host-exec >/dev/null && [[ -e /run/.containerenv ]]; then
+    distrobox-host-exec systemctl --user stop bettermaps-emulator >/dev/null 2>&1 || true
+  else
+    systemctl --user stop bettermaps-emulator >/dev/null 2>&1 || true
+  fi
+}
+
+# Screenshot des Emulators, z. B. für UI-Prüfungen: bm.sh emulator-screenshot /pfad/bild.png
+emulator_screenshot() { adb exec-out screencap -p >"${1:?Zieldatei fehlt}"; log "Screenshot: $1"; }
 
 android_build() {
   cd "$REPO_ROOT/android"
@@ -130,10 +155,29 @@ go_test() {
 # Kopiert generierte, nicht versionierte Dateien (configure.sh) und Submodule aus dem Haupt-Checkout.
 worktree_setup() {
   [[ "$REPO_ROOT" != "$MAIN_ROOT" ]] || { log "Nur in einem Worktree nötig"; return 0; }
-  log "Initialisiere Submodule aus dem Haupt-Checkout"
-  git -C "$REPO_ROOT" submodule foreach --quiet true 2>/dev/null || true
-  git -C "$REPO_ROOT" -c protocol.file.allow=always submodule update --init --recursive --depth 1 \
-    --reference "$MAIN_ROOT/.git" >/dev/null 2>&1 || git -C "$REPO_ROOT" submodule update --init --recursive --depth 1
+  log "Initialisiere Submodule aus dem Haupt-Checkout (lokal, ohne Netz)"
+  # Jede Submodul-URL (auch rekursive und die relativen ../kothic.git usw., die sonst auf den
+  # GitHub-Spiegel zeigen würden) auf das bereits ausgecheckte Submodul im Haupt-Checkout umleiten.
+  local -a redirects=(-c protocol.file.allow=always)
+  while read -r path url; do
+    [[ -n "$url" ]] && redirects+=(-c "url.$MAIN_ROOT/$path.insteadOf=$url")
+  done < <(git -C "$MAIN_ROOT" submodule foreach --quiet --recursive \
+             'echo "$displaypath $(git remote get-url origin)"')
+  local origin_base; origin_base="$(dirname "$(git -C "$MAIN_ROOT" remote get-url origin)")"
+  while read -r path rel; do
+    redirects+=(-c "url.$MAIN_ROOT/$path.insteadOf=$origin_base/${rel#../}")
+  done < <(git -C "$MAIN_ROOT" config -f .gitmodules --get-regexp '^submodule\..*\.url$' \
+             | awk '$2 ~ /^\.\.\// {sub(/^submodule\./,"",$1); sub(/\.url$/,"",$1); print $1, $2}')
+  git -C "$REPO_ROOT" "${redirects[@]}" submodule update --init --recursive >/dev/null 2>&1 || true
+  # Der erste Lauf hinterlässt teils leere Arbeitsverzeichnisse; ein zweiter Lauf behebt das.
+  git -C "$REPO_ROOT" submodule foreach --quiet --recursive 'git reset -q --hard HEAD' 2>/dev/null || true
+  git -C "$REPO_ROOT" "${redirects[@]}" submodule update --init --recursive >/dev/null
+  if git -C "$REPO_ROOT" submodule status --recursive | grep -qE '^[-+U]'; then
+    log "Submodule nicht sauber:"; git -C "$REPO_ROOT" submodule status --recursive | grep -E '^[-+U]' >&2; return 1
+  fi
+  # Boost-Header entstehen erst durch "b2 headers" und sind im Submodul ignoriert.
+  [[ -d "$MAIN_ROOT/3party/boost/boost" && ! -e "$REPO_ROOT/3party/boost/boost" ]] && \
+    cp -a --reflink=auto "$MAIN_ROOT/3party/boost/boost" "$REPO_ROOT/3party/boost/"
   log "Übernehme generierte Dateien aus configure.sh"
   (cd "$MAIN_ROOT" && git ls-files --others --ignored --exclude-standard -- data libs/platform android \
      | grep -vE '(^|/)(build|\.gradle|\.cxx)/|\.bak$' \
@@ -151,6 +195,7 @@ case "$cmd" in
   emulator)        with_emulator "$@" ;;
   emulator-start)  emulator_start ;;
   emulator-stop)   emulator_stop ;;
+  emulator-screenshot) emulator_screenshot "$@" ;;
   cpp-test)        cpp_test "$@" ;;
   go-test)         go_test "$@" ;;
   worktree-setup)  worktree_setup ;;
