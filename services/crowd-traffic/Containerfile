@@ -1,0 +1,25 @@
+# Crowd-traffic aggregation server for better-maps (AP5a).
+#
+# Build:  podman build -t crowd-traffic -f Containerfile .
+# Run:    podman run --rm -p 8080:8080 -e CROWD_OHTTP_MASTER_KEY=<64 hex digits> crowd-traffic
+#
+# The image also contains the development relay (/usr/local/bin/ohttp-relay) and the simulator
+# (/usr/local/bin/crowd-sim) for smoke tests.
+
+# --- build stage -------------------------------------------------------------------------------
+FROM docker.io/library/golang:1.24 AS build
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY cmd ./cmd
+COPY internal ./internal
+RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /out/ ./cmd/...
+
+# --- runtime stage -----------------------------------------------------------------------------
+# distroless/static runs as an unprivileged user (uid 65532) and contains no shell.
+FROM gcr.io/distroless/static-debian12:nonroot
+COPY --from=build /out/crowd-traffic /out/ohttp-relay /out/crowd-sim /usr/local/bin/
+USER 65532:65532
+ENV CROWD_LISTEN=:8080
+EXPOSE 8080
+ENTRYPOINT ["/usr/local/bin/crowd-traffic"]
