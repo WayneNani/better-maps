@@ -4,11 +4,16 @@
 // New sources (DATEX II from Mobilithek, crowd-sourced congestion data, ...) implement Source and
 // are registered with a Runner. Each source owns the message IDs it produces; IDs should carry a
 // source-specific prefix (e.g. "de.autobahn.warning:...") so that they never collide.
+//
+// The order of registration is the priority: with a Deduplicator, a message is dropped if it
+// duplicates an active message of a source registered earlier.
 package source
 
 import (
 	"context"
 	"log/slog"
+	"maps"
+	"slices"
 	"sync"
 	"time"
 
@@ -30,13 +35,33 @@ type Source interface {
 	Fetch(ctx context.Context, now time.Time) ([]traff.Message, error)
 }
 
+// DetailsReporter is implemented by sources that report additional counters (e.g. skipped
+// records by reason). The counters appear in Status.Details.
+type DetailsReporter interface {
+	Details() map[string]int
+}
+
+// Deduplicator removes messages that duplicate messages of other sources.
+type Deduplicator interface {
+	// Filter returns the messages of msgs that do not duplicate a message in ref, and for each
+	// dropped message the ID of the message it duplicates.
+	Filter(msgs, ref []traff.Message) (kept []traff.Message, suppressed map[string]string)
+}
+
 // Status describes the outcome of the latest fetch of a source.
 type Status struct {
 	Name        string    `json:"name"`
 	LastAttempt time.Time `json:"last_attempt"`
 	LastSuccess time.Time `json:"last_success"`
 	LastError   string    `json:"last_error,omitempty"`
-	Messages    int       `json:"messages"`
+	// Messages is the number of messages the source delivered in its last successful fetch,
+	// including duplicates.
+	Messages int `json:"messages"`
+	// Duplicates is the number of messages of the last successful fetch that were suppressed
+	// as duplicates of a source with higher priority; DuplicatesTotal sums up all fetches.
+	Duplicates      int            `json:"duplicates"`
+	DuplicatesTotal int            `json:"duplicates_total"`
+	Details         map[string]int `json:"details,omitempty"`
 }
 
 // Runner periodically fetches all sources into a store.
@@ -46,6 +71,7 @@ type Runner struct {
 	interval time.Duration
 	now      func() time.Time
 	log      *slog.Logger
+	dedup    Deduplicator
 
 	mu     sync.Mutex
 	status map[string]*Status
@@ -59,6 +85,15 @@ func NewRunner(st *store.Store, interval time.Duration, log *slog.Logger, source
 	}
 	return r
 }
+
+// maxLoggedDuplicates limits the debug output per fetch.
+const maxLoggedDuplicates = 20
+
+// SetClock replaces the clock (for tests). It must be called before Run.
+func (r *Runner) SetClock(now func() time.Time) { r.now = now }
+
+// SetDeduplicator enables the merge step; nil disables it. It must be called before Run.
+func (r *Runner) SetDeduplicator(d Deduplicator) { r.dedup = d }
 
 // Coverage returns the union of the coverage lists of all sources. If any source has global
 // coverage, the result is empty (global).
@@ -77,9 +112,22 @@ func (r *Runner) Coverage() []traff.BBox {
 // RunOnce fetches every source once and updates the store. Sources are fetched one after the
 // other; an error in one source does not affect the others.
 func (r *Runner) RunOnce(ctx context.Context) {
-	for _, s := range r.sources {
+	for i, s := range r.sources {
 		start := r.now()
 		msgs, err := s.Fetch(ctx, start)
+		total := len(msgs)
+		dups := 0
+		if msgs != nil && r.dedup != nil && i > 0 {
+			var suppressed map[string]string
+			msgs, suppressed = r.dedup.Filter(msgs, r.activeMessages(r.sources[:i]))
+			dups = len(suppressed)
+			if dups > 0 && r.log.Enabled(ctx, slog.LevelDebug) {
+				ids := slices.Sorted(maps.Keys(suppressed))
+				for _, id := range ids[:min(len(ids), maxLoggedDuplicates)] {
+					r.log.Debug("duplicate suppressed", "source", s.Name(), "id", id, "duplicate_of", suppressed[id])
+				}
+			}
+		}
 		r.mu.Lock()
 		st := r.status[s.Name()]
 		st.LastAttempt = start
@@ -90,7 +138,12 @@ func (r *Runner) RunOnce(ctx context.Context) {
 		}
 		if msgs != nil {
 			st.LastSuccess = start
-			st.Messages = len(msgs)
+			st.Messages = total
+			st.Duplicates = dups
+			st.DuplicatesTotal += dups
+		}
+		if dr, ok := s.(DetailsReporter); ok {
+			st.Details = dr.Details()
 		}
 		r.mu.Unlock()
 		if msgs == nil {
@@ -100,7 +153,7 @@ func (r *Runner) RunOnce(ctx context.Context) {
 			continue
 		}
 		stats := r.store.Replace(s.Name(), msgs, r.now())
-		attrs := []any{"source", s.Name(), "messages", len(msgs), "new", stats.New, "changed", stats.Changed,
+		attrs := []any{"source", s.Name(), "messages", total, "duplicates", dups, "new", stats.New, "changed", stats.Changed,
 			"renewed", stats.Renewed, "cancelled", stats.Cancelled, "skipped", stats.Skipped, "duration", r.now().Sub(start).Round(time.Millisecond)}
 		if err != nil {
 			r.log.Warn("source fetch partially failed", append(attrs, "err", err)...)
@@ -109,6 +162,21 @@ func (r *Runner) RunOnce(ctx context.Context) {
 		}
 	}
 	r.store.Purge(r.now())
+}
+
+// activeMessages returns the active (not cancelled) messages of the given sources.
+func (r *Runner) activeMessages(sources []Source) []traff.Message {
+	names := make(map[string]bool, len(sources))
+	for _, s := range sources {
+		names[s.Name()] = true
+	}
+	var res []traff.Message
+	r.store.ForEach(func(e *store.Entry) {
+		if names[e.Source] && !e.Cancelled() {
+			res = append(res, e.Msg)
+		}
+	})
+	return res
 }
 
 // Run calls RunOnce immediately and then every interval until ctx is cancelled.
@@ -131,7 +199,9 @@ func (r *Runner) Status() []Status {
 	defer r.mu.Unlock()
 	res := make([]Status, 0, len(r.sources))
 	for _, s := range r.sources {
-		res = append(res, *r.status[s.Name()])
+		st := *r.status[s.Name()]
+		st.Details = maps.Clone(st.Details)
+		res = append(res, st)
 	}
 	return res
 }

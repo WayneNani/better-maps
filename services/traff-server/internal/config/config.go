@@ -9,9 +9,13 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"net/url"
+	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 )
 
 // Config holds all settings.
@@ -28,6 +32,27 @@ type Config struct {
 	MaxSubscriptions        int
 	MaxFilters              int
 	LogLevel                slog.Level
+
+	// DATEX II feeds (empty = DATEX II source disabled).
+	Datex2Feeds    []Datex2Feed
+	Datex2Interval time.Duration
+	Datex2Horizon  time.Duration
+	Datex2Timeout  time.Duration
+
+	// Duplicate suppression across sources.
+	DedupEnabled  bool
+	DedupDistance int // metres
+}
+
+// Datex2Feed is one configured DATEX II publication. Credentials only come from environment
+// variables or files, never from flags (flags are visible in the process list).
+type Datex2Feed struct {
+	Name     string
+	URL      string
+	Username string
+	Password string
+	// PEM files for TLS client authentication (Mobilithek) and an additional CA.
+	ClientCert, ClientKey, CACert string
 }
 
 // Defaults.
@@ -41,6 +66,9 @@ const (
 	DefaultMessageLease            = 30 * time.Minute
 	DefaultMaxSubscriptions        = 10000
 	DefaultMaxFilters              = 128
+	DefaultDatex2Horizon           = 7 * 24 * time.Hour
+	DefaultDatex2Timeout           = time.Minute
+	DefaultDedupDistance           = 500
 )
 
 type envFunc func(string) string
@@ -107,6 +135,12 @@ func Parse(args []string, env func(string) string, out io.Writer) (Config, error
 	fs.IntVar(&c.MaxSubscriptions, "max-subscriptions", intEnv("TRAFF_MAX_SUBSCRIPTIONS", DefaultMaxSubscriptions), "maximum number of concurrent subscriptions (env TRAFF_MAX_SUBSCRIPTIONS)")
 	fs.IntVar(&c.MaxFilters, "max-filters", intEnv("TRAFF_MAX_FILTERS", DefaultMaxFilters), "maximum number of filter items per request (env TRAFF_MAX_FILTERS)")
 	level := fs.String("log-level", envString(env, "TRAFF_LOG_LEVEL", "info"), "log level: debug, info, warn, error (env TRAFF_LOG_LEVEL)")
+	feeds := fs.String("datex2-feeds", envString(env, "TRAFF_DATEX2_FEEDS", ""), "DATEX II feeds as comma-separated name=URL list, empty = disabled (env TRAFF_DATEX2_FEEDS)")
+	fs.DurationVar(&c.Datex2Interval, "datex2-interval", durEnv("TRAFF_DATEX2_INTERVAL", 0), "minimum time between two downloads of a DATEX II feed, 0 = every poll (env TRAFF_DATEX2_INTERVAL)")
+	fs.DurationVar(&c.Datex2Horizon, "datex2-horizon", durEnv("TRAFF_DATEX2_HORIZON", DefaultDatex2Horizon), "skip DATEX II records starting later than this, 0 = no limit (env TRAFF_DATEX2_HORIZON)")
+	fs.DurationVar(&c.Datex2Timeout, "datex2-timeout", durEnv("TRAFF_DATEX2_TIMEOUT", DefaultDatex2Timeout), "timeout for downloading a DATEX II feed (env TRAFF_DATEX2_TIMEOUT)")
+	fs.BoolVar(&c.DedupEnabled, "dedup", boolEnv("TRAFF_DEDUP_ENABLED", true), "suppress messages that duplicate a message of a source with higher priority (env TRAFF_DEDUP_ENABLED)")
+	fs.IntVar(&c.DedupDistance, "dedup-distance", intEnv("TRAFF_DEDUP_DISTANCE", DefaultDedupDistance), "maximum distance in metres between duplicates (env TRAFF_DEDUP_DISTANCE)")
 
 	if err := fs.Parse(args); err != nil {
 		return c, err
@@ -131,8 +165,80 @@ func Parse(args []string, env func(string) string, out io.Writer) (Config, error
 	if c.MessageLease < c.PollInterval*2 {
 		errs = append(errs, errors.New("message lease must be at least twice the poll interval"))
 	}
-	if c.AutobahnRequestInterval < 0 || c.MaxSubscriptions < 0 || c.MaxFilters < 0 {
+	if c.AutobahnRequestInterval < 0 || c.MaxSubscriptions < 0 || c.MaxFilters < 0 || c.Datex2Interval < 0 ||
+		c.Datex2Horizon < 0 || c.Datex2Timeout <= 0 || c.DedupDistance <= 0 {
 		errs = append(errs, errors.New("negative limits are not allowed"))
 	}
+	var err error
+	if c.Datex2Feeds, err = parseFeeds(*feeds, env); err != nil {
+		errs = append(errs, err)
+	}
 	return c, errors.Join(errs...)
+}
+
+var reFeedName = regexp.MustCompile(`^[a-z0-9][a-z0-9_-]{0,31}$`)
+
+// FeedEnvPrefix returns the prefix of the per-feed environment variables, e.g.
+// "TRAFF_DATEX2_BW_INCIDENTS_" for the feed "bw-incidents".
+func FeedEnvPrefix(name string) string {
+	return "TRAFF_DATEX2_" + strings.ToUpper(strings.ReplaceAll(name, "-", "_")) + "_"
+}
+
+// parseFeeds parses "name=URL" entries separated by commas or white space and reads the
+// credentials of each feed from the environment:
+//
+//	TRAFF_DATEX2_<NAME>_USERNAME, TRAFF_DATEX2_<NAME>_PASSWORD or TRAFF_DATEX2_<NAME>_PASSWORD_FILE
+//	TRAFF_DATEX2_<NAME>_CLIENT_CERT, ..._CLIENT_KEY, ..._CA_CERT (fallback: TRAFF_DATEX2_CLIENT_CERT, ...)
+//
+// Basic-auth credentials are per feed only, so that they are never sent to another server.
+func parseFeeds(spec string, env envFunc) ([]Datex2Feed, error) {
+	var res []Datex2Feed
+	var errs []error
+	seen := map[string]bool{}
+	for _, item := range strings.FieldsFunc(spec, func(r rune) bool { return r == ',' || unicode.IsSpace(r) }) {
+		name, rawURL, ok := strings.Cut(item, "=")
+		name = strings.TrimSpace(name)
+		if !ok || !reFeedName.MatchString(name) {
+			errs = append(errs, fmt.Errorf("datex2 feed %q: expected name=URL with a name of lower-case letters, digits, - and _", item))
+			continue
+		}
+		if seen[name] {
+			errs = append(errs, fmt.Errorf("datex2 feed %q: duplicate name", name))
+			continue
+		}
+		seen[name] = true
+		u, err := url.Parse(rawURL)
+		if err != nil || !(u.Scheme == "http" || u.Scheme == "https" || u.Scheme == "file") || (u.Scheme != "file" && u.Host == "") {
+			errs = append(errs, fmt.Errorf("datex2 feed %q: invalid URL (http, https or file required)", name))
+			continue
+		}
+		p := FeedEnvPrefix(name)
+		f := Datex2Feed{
+			Name:       name,
+			URL:        rawURL,
+			Username:   strings.TrimSpace(env(p + "USERNAME")),
+			Password:   env(p + "PASSWORD"),
+			ClientCert: envString(env, p+"CLIENT_CERT", envString(env, "TRAFF_DATEX2_CLIENT_CERT", "")),
+			ClientKey:  envString(env, p+"CLIENT_KEY", envString(env, "TRAFF_DATEX2_CLIENT_KEY", "")),
+			CACert:     envString(env, p+"CA_CERT", envString(env, "TRAFF_DATEX2_CA_CERT", "")),
+		}
+		if file := strings.TrimSpace(env(p + "PASSWORD_FILE")); file != "" {
+			if f.Password != "" {
+				errs = append(errs, fmt.Errorf("datex2 feed %q: set either %sPASSWORD or %sPASSWORD_FILE", name, p, p))
+				continue
+			}
+			data, err := os.ReadFile(file)
+			if err != nil {
+				errs = append(errs, fmt.Errorf("datex2 feed %q: cannot read password file", name))
+				continue
+			}
+			f.Password = strings.TrimRight(string(data), "\r\n")
+		}
+		if (f.ClientCert == "") != (f.ClientKey == "") {
+			errs = append(errs, fmt.Errorf("datex2 feed %q: client certificate and key must be set together", name))
+			continue
+		}
+		res = append(res, f)
+	}
+	return res, errors.Join(errs...)
 }

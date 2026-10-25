@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed>
+  <message id="de.datex2.test:mc-1_1" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" cancellation="false" forecast="false">
+    <location country="DE" directionality="ONE_DIRECTION">
+      <at>+51.576767 +7.487334</at>
+    </location>
+    <events>
+      <event class="INCIDENT" type="INCIDENT_BROKEN_DOWN_HGV"></event>
+    </events>
+  </message>
+</feed>

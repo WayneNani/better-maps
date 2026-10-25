@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Not a SituationPublication: the parser must reject it (better-maps test fixture). -->
+<d2LogicalModel xmlns="http://datex2.eu/schema/2/2_0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" modelBaseVersion="2">
+  <exchange><supplierIdentification><country>de</country><nationalIdentifier>DE-TEST</nationalIdentifier></supplierIdentification></exchange>
+  <payloadPublication xsi:type="MeasuredDataPublication" lang="de"><publicationTime>2026-10-25T15:00:00Z</publicationTime></payloadPublication>
+</d2LogicalModel>

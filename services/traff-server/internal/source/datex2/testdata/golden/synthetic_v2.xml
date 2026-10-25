@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed>
+  <message id="de.datex2.test:syn-speed.0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-25T10:00:00Z" cancellation="false" forecast="false">
+    <location country="DE" directionality="ONE_DIRECTION" road_class="MOTORWAY" road_ref="A 9">
+      <from>+48.350000 +11.600000</from>
+      <via>+48.370000 +11.610000</via>
+      <to>+48.380000 +11.615000</to>
+    </location>
+    <events>
+      <event class="RESTRICTION" type="RESTRICTION_SPEED_LIMIT" speed="60"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:syn-animals.0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" cancellation="false" forecast="false" urgency="X_URGENT">
+    <location country="DE" directionality="ONE_DIRECTION">
+      <at>+52.400000 +13.050000</at>
+    </location>
+    <events>
+      <event class="HAZARD" type="HAZARD_LARGE_ANIMALS_ON_ROAD"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:syn-infra.0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" cancellation="false" forecast="false" urgency="URGENT">
+    <location country="DE" directionality="ONE_DIRECTION">
+      <at>+50.110000 +8.680000</at>
+    </location>
+    <events>
+      <event class="HAZARD" type="HAZARD_GAS_LEAK"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:syn-ice.0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-25T05:00:00Z" end_time="2026-10-26T09:00:00Z" cancellation="false" forecast="false">
+    <location country="DE" directionality="ONE_DIRECTION" road_class="PRIMARY" road_ref="B 2">
+      <from>+49.450000 +11.010000</from>
+      <via>+49.460000 +11.020000</via>
+      <to>+49.470000 +11.030000</to>
+    </location>
+    <events>
+      <event class="HAZARD" type="HAZARD_BLACK_ICE"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:syn-oil.0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" cancellation="false" forecast="false">
+    <location country="DE" destination="Beispielstadt" directionality="ONE_DIRECTION" origin="Musterdorf" road_class="TERTIARY" road_ref="K 1234">
+      <at>+48.700000 +9.100000</at>
+    </location>
+    <events>
+      <event class="HAZARD" type="HAZARD_OIL_ON_ROAD"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:syn-periods.0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-25T08:00:00Z" end_time="2026-10-25T20:00:00Z" cancellation="false" forecast="false">
+    <location country="DE" directionality="ONE_DIRECTION" road_class="MOTORWAY">
+      <from>+51.200000 +6.800000</from>
+      <to>+51.210000 +6.805000</to>
+    </location>
+    <events>
+      <event class="CONSTRUCTION" type="CONSTRUCTION_RESURFACING_WORK"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:syn-group.0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" cancellation="false" forecast="false">
+    <location country="DE" directionality="BOTH_DIRECTIONS" road_class="MOTORWAY" road_ref="A 3">
+      <from>+50.040000 +8.530000</from>
+      <to>+50.050000 +8.550000</to>
+    </location>
+    <events>
+      <event class="RESTRICTION" type="RESTRICTION_LANE_CLOSED" q_int="2"></event>
+      <event class="DELAY" type="DELAY_DELAY" q_duration="00:15"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:syn-utm.0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" cancellation="false" forecast="false">
+    <location country="DE" directionality="ONE_DIRECTION">
+      <from>+51.606952 +7.768621</from>
+      <to>+51.606930 +7.767425</to>
+    </location>
+    <events>
+      <event class="CONSTRUCTION" type="CONSTRUCTION_CONSTRUCTION_WORK"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:syn-bypoints.0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-25T10:00:00Z" cancellation="false" forecast="false">
+    <location country="DE" directionality="ONE_DIRECTION" road_name="Hauptstraße">
+      <from>+49.978600 +8.398900</from>
+      <via>+49.978600 +8.400400</via>
+      <to>+49.978500 +8.404100</to>
+    </location>
+    <events>
+      <event class="RESTRICTION" type="RESTRICTION_CONTRAFLOW"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:syn-wrongway.0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" cancellation="false" forecast="false">
+    <location country="DE" destination="Köln" directionality="ONE_DIRECTION" origin="Frankfurt" road_class="MOTORWAY" road_ref="A 3">
+      <from>+50.370000 +8.090000</from>
+      <to>+50.410000 +8.060000</to>
+    </location>
+    <events>
+      <event class="HAZARD" type="HAZARD_WRONG_WAY_DRIVER"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:syn-defaults.0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" cancellation="false" forecast="false">
+    <location country="DE" directionality="ONE_DIRECTION">
+      <at>+54.320000 +10.130000</at>
+    </location>
+    <events>
+      <event class="HAZARD" type="HAZARD_OBSTRUCTION"></event>
+      <event class="CONGESTION" type="CONGESTION_TRAFFIC_PROBLEM"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:syn-dupid.0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" cancellation="false" forecast="false">
+    <location country="DE" directionality="ONE_DIRECTION">
+      <at>+53.070000 +8.800000</at>
+    </location>
+    <events>
+      <event class="INCIDENT" type="INCIDENT_MULTI_VEHICLE_ACCIDENT"></event>
+    </events>
+  </message>
+</feed>

@@ -62,14 +62,20 @@ func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
 	}
 	active, cancelled := s.Store.Counts()
 	body := struct {
-		Status        string          `json:"status"`
-		Messages      int             `json:"messages"`
-		Cancellations int             `json:"cancellations"`
-		Subscriptions int             `json:"subscriptions"`
-		Sources       []source.Status `json:"sources,omitempty"`
+		Status        string `json:"status"`
+		Messages      int    `json:"messages"`
+		Cancellations int    `json:"cancellations"`
+		Subscriptions int    `json:"subscriptions"`
+		// Duplicates is the number of messages suppressed in the last fetch of all sources
+		// because they duplicate a message of a source with higher priority.
+		Duplicates int             `json:"duplicates_suppressed"`
+		Sources    []source.Status `json:"sources,omitempty"`
 	}{Status: "ok", Messages: active, Cancellations: cancelled, Subscriptions: s.Subs.Count()}
 	if s.Status != nil {
 		body.Sources = s.Status()
+		for _, st := range body.Sources {
+			body.Duplicates += st.Duplicates
+		}
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "no-store")

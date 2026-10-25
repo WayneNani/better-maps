@@ -73,3 +73,29 @@ func TestBuildWithAutobahn(t *testing.T) {
 		t.Errorf("autobahn source not registered")
 	}
 }
+
+func TestBuildWithDatex2(t *testing.T) {
+	envs := map[string]string{"TRAFF_DATEX2_FEEDS": "bw=https://example.org/a.xml,local=file:///tmp/x.xml"}
+	cfg, err := config.Parse([]string{"-autobahn-roads", "A7"}, func(k string) string { return envs[k] }, io.Discard)
+	if err != nil {
+		t.Fatal(err)
+	}
+	a, err := build(cfg, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	st := a.runner.Status()
+	if len(st) != 3 || st[0].Name != "autobahn" || st[1].Name != "datex2-bw" || st[2].Name != "datex2-local" {
+		t.Errorf("sources = %+v", st)
+	}
+
+	// Unreadable client certificates are reported at start-up.
+	envs["TRAFF_DATEX2_CLIENT_CERT"], envs["TRAFF_DATEX2_CLIENT_KEY"] = "/nonexistent/c.pem", "/nonexistent/k.pem"
+	cfg, err = config.Parse([]string{"-autobahn=false", "-dedup=false"}, func(k string) string { return envs[k] }, io.Discard)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := build(cfg, slog.New(slog.NewTextHandler(io.Discard, nil))); err == nil || !strings.Contains(err.Error(), "client certificate") {
+		t.Errorf("build = %v", err)
+	}
+}
