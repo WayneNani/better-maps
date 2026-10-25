@@ -18,6 +18,8 @@ import app.organicmaps.sdk.util.concurrency.AsyncResult;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.stream.MalformedJsonException;
+import java.io.EOFException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -217,24 +219,42 @@ public class OnlineTransitService implements TransitService
   @NonNull
   static TransitServiceException toServiceException(@NonNull ApiException e, int statusCode)
   {
-    final int code = e.getCode() != 0 ? e.getCode() : statusCode;
     final Throwable cause = e.getCause() != null ? e.getCause() : e;
-    if (code == 0)
+    if (e.getCode() == 0)
     {
-      if (cause instanceof IOException)
-        return new TransitServiceException(TransitServiceException.Kind.NETWORK, 0, null,
+      // No HTTP error status: either no response at all, or reading/parsing the body failed.
+      // Reading errors arrive wrapped, e.g. a read timeout as JsonSyntaxException(SocketTimeoutException).
+      if (isNetworkFailure(cause))
+        return new TransitServiceException(TransitServiceException.Kind.NETWORK, statusCode, null,
                                            "Network error: " + cause.getMessage(), cause);
-      return new TransitServiceException(TransitServiceException.Kind.INVALID_RESPONSE, 0, null,
-                                         "Request failed: " + cause.getMessage(), cause);
+      return new TransitServiceException(TransitServiceException.Kind.INVALID_RESPONSE, statusCode, null,
+                                         "Invalid response: " + cause.getMessage(), cause);
     }
+    final int code = e.getCode();
     if (code >= 200 && code < 300)
       return new TransitServiceException(TransitServiceException.Kind.INVALID_RESPONSE, code, null,
-                                         "Invalid response: " + cause.getMessage(), cause);
+                                         "Invalid response: " + e.getMessage(), e);
     final String serverMessage = parseServerMessage(e.getResponseBody());
     final TransitServiceException.Kind kind =
         code >= 500 ? TransitServiceException.Kind.SERVER_ERROR : TransitServiceException.Kind.CLIENT_ERROR;
     return new TransitServiceException(kind, code, serverMessage,
                                        "HTTP " + code + (serverMessage != null ? ": " + serverMessage : ""), e);
+  }
+
+  /**
+   * @return true if an I/O error (connection, timeout, TLS, truncated transfer) is in the cause chain. Malformed
+   *         or prematurely ending JSON from a complete response is not a network failure.
+   */
+  static boolean isNetworkFailure(@Nullable Throwable error)
+  {
+    for (int depth = 0; error != null && depth < 10; ++depth, error = error.getCause())
+    {
+      if (error instanceof MalformedJsonException || error instanceof EOFException)
+        return false;
+      if (error instanceof IOException)
+        return true;
+    }
+    return false;
   }
 
   /** Extracts the message from a MOTIS error response: {"error": "..."}. */
