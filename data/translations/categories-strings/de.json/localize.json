@@ -18,7 +18,7 @@
         "defaultMessage": "4Einkaufen|3Laden|2Läden|3Bummeln|3Shoppen|3Geschäfte"
     },
     "@category_hotel": {
-        "defaultMessage": "3Hotel|3Hotels|3Übernachtung|3übernachten|4Schlaf|4schlafen|3Unterkunft"
+        "defaultMessage": "3Hotel|3Hotels|3Übernachtung|3übernachten|4Schlaf|4schlafen|3Unterkunft|5Übernachtungsmöglichkeit"
     },
     "@category_tourism": {
         "defaultMessage": "4Sehenswürdigkeit|4Attraktion|4Tourismus|3Touristenattraktion|3Sehenswürdigkeiten|3Wahrzeichen|3Attraktionen"
@@ -39,7 +39,7 @@
         "defaultMessage": "6Einrichtungen für Wohnmobile|4Wohnmobile|4Wohnmobilstellplatz|3Campingbus"
     },
     "amenity-atm|@category_atm": {
-        "defaultMessage": "5Geldautomat|5Bankautomat|5Bankomat|4Bargeld|3Geld"
+        "defaultMessage": "5Geldautomat|5Bankautomat|5Bankomat|4Bargeld|3Geld|5Geld abheben|5Geldabheben|5Geldausgabeautomat"
     },
     "@category_bank": {
         "defaultMessage": "3Bank|4Geldbank|4Kreditinstitut"
@@ -48,7 +48,7 @@
         "defaultMessage": "3Second-hand|3Second Hand|3Gebrauchte Ware|3Gebrauchte Artikel|5Brockenhaus|5Brockenstube"
     },
     "amenity-bank|@category_bank": {
-        "defaultMessage": "3Bankfiliale|3Geld"
+        "defaultMessage": "3Bankfiliale|3Geld|4Banken|4Geldinstitut"
     },
     "@category_recycling": {
         "defaultMessage": "3Recycling|3Abfallverwertung|3Recyclebares Material|3Getrennte Müllsammlung|2Müllsortierung|4Wiederverwendung|4Wiederverwertung|3Entsorgung"
@@ -57,25 +57,25 @@
         "defaultMessage": "3Geldwechselstelle|3Wechselstube|3Geld|3Geldumtausch"
     },
     "amenity-bar|amenity-pub|@category_eat|@category_nightlife": {
-        "defaultMessage": "2Bar|2Pub|4Kneipe|3Bier|4Trinken|4Gaststätte|4Bars und Kneipen|4Brauhaus|4Cocktail-Lounge|3Lokal"
+        "defaultMessage": "2Bar|2Pub|4Kneipe|3Bier|4Trinken|4Gaststätte|4Bars und Kneipen|4Brauhaus|4Cocktail-Lounge|3Lokal|4Eckkneipe|4Schänke|4Schenke|4Bierbar|5Cocktailbar|3Beisl|3Beiz"
     },
     "amenity-cafe|@category_eat": {
-        "defaultMessage": "3Café|6Kaffeehaus|3Kaffeebar|3Cafeteria|3Kaffee|3Bistro"
+        "defaultMessage": "3Café|6Kaffeehaus|3Kaffeebar|3Cafeteria|3Kaffee|3Bistro|4Frühstück|4frühstücken|4Brunch|5Kaffeestube"
     },
     "amenity-fast_food|@category_eat": {
-        "defaultMessage": "4Fast Food|3Imbiss |7Schnellimbiss|3Junkfood |3Essen zum Mitnehmen"
+        "defaultMessage": "4Fast Food|3Imbiss |7Schnellimbiss|3Junkfood |3Essen zum Mitnehmen|4Imbissbude|4Imbissstube|6Schnellrestaurant|5Snackbar|4Takeaway"
     },
     "amenity-restaurant|@category_eat": {
-        "defaultMessage": "3Restaurant|4Gasthaus|4Gaststube|6Speiselokal|4Gastwirtschaft|U+1F356|U+1F357|U+1F35A|U+1F35B|U+1F35C|U+1F35D|U+1F363|U+1F366|U+1F367|U+1F368|U+1F369|U+1F370|U+1F372|U+1F374|U+1F377|U+1F60B"
+        "defaultMessage": "3Restaurant|4Gasthaus|4Gaststube|6Speiselokal|4Gastwirtschaft|4Wirtshaus|4Gaststätte|5Mittagessen|5Abendessen|5Mittagstisch|U+1F356|U+1F357|U+1F35A|U+1F35B|U+1F35C|U+1F35D|U+1F363|U+1F366|U+1F367|U+1F368|U+1F369|U+1F370|U+1F372|U+1F374|U+1F377|U+1F60B"
     },
     "amenity-fuel|@category_fuel": {
-        "defaultMessage": "3Tankstelle|3Zapfsäule|U+26FD"
+        "defaultMessage": "3Tankstelle|3Zapfsäule|4Tankstopp|3Tanke|4volltanken|U+26FD"
     },
     "@shop": {
         "defaultMessage": "3Verbrauchermarkt|5Geschäft|5Laden|3Shop|4Einkaufen|4Einzelhandel|5Detailgeschäft|4Einkaufsladen"
     },
     "shop-bakery|shop-pastry|@category_eat|@category_food|@shop": {
-        "defaultMessage": "3Bäckerei|3Bäckerladen|3Bäcker|4Konditorei|3Konditor|3Backwaren|3Kuchen|3Brot"
+        "defaultMessage": "3Bäckerei|3Bäckerladen|3Bäcker|4Konditorei|3Konditor|3Backwaren|3Kuchen|3Brot|4Brötchen|4Semmel|4Schrippe|4Brezel|4Breze|4Backshop|5Backstube|4Frühstück"
     },
     "shop-cosmetics|@category_shopping|@shop": {
         "defaultMessage": "4Kosmetikgeschäft|4Kosmetik|5Schönheitspflege|5Make Up|Make-Up|5Makeup|5Schönheitssalon|4Schminke"
@@ -156,7 +156,7 @@
         "defaultMessage": "3Sportgeschäft|3Sportartikel|3Fitnessgeschäft|U+1F3BF|U+1F3A3|U+1F3C2|U+1F6B4|U+26BD|U+1F3C0|U+1F3C8|U+26BE|U+1F3BE|U+1F3C9|U+26F3"
     },
     "shop-supermarket|@category_food|@shop": {
-        "defaultMessage": "3Supermarkt|3Kaufhalle|3Discounter"
+        "defaultMessage": "3Supermarkt|3Kaufhalle|3Discounter|5Lebensmittelmarkt|5Vollsortimenter|5Einkaufsmarkt"
     },
     "shop-mall|@category_shopping|@shop": {
         "defaultMessage": "5Einkaufszentrum|5Ladenstraße|4Einkaufsgalerie|4Einkaufen|4Einkaufspassage|3Kaufhalle|8Vergnügungszentrum|4Einzelhandel|5Shoppingcenter|5Einkaufscenter|2EKZ|7Shoppingmall"
@@ -180,7 +180,7 @@
         "defaultMessage": "3Spielwarengeschäft|3Spielzeuggeschäft|3Spielzeug"
     },
     "amenity-marketplace|@category_food": {
-        "defaultMessage": "3Marktplatz|3Markt|3Wochenmarkt"
+        "defaultMessage": "3Marktplatz|3Markt|3Wochenmarkt|4Bauernmarkt|4Markthalle"
     },
     "amenity-money_transfer": {
         "defaultMessage": "4Geldtransfer|5Geldtransferbüro|4Geldversand"
@@ -201,22 +201,22 @@
         "defaultMessage": "3Kiosk|3Späti|3Spätverkauf|3Spätkauf|4Trinkhalle|3Bude|3Büdchen|3Stützer|4Kaffeeklappe|4Minimarkt|4Getränkestützpunkt|U+1F4F0"
     },
     "highway-bus_stop|@category_transport": {
-        "defaultMessage": "3Bushaltestelle|3Haltestelle|2Bus|4Autobus|ÖPNV|2Omnibushaltestelle|U+1F68C|U+1F68F|U+1F68E|U+1F690"
+        "defaultMessage": "3Bushaltestelle|3Haltestelle|2Bus|4Autobus|ÖPNV|2Omnibushaltestelle|4Bushalte|4Bushalt|5Bushäuschen|U+1F68C|U+1F68F|U+1F68E|U+1F690"
     },
     "railway-tram_stop|@category_transport": {
-        "defaultMessage": "3Straßenbahnhaltestelle|2Tramhaltestelle|3Haltestelle|2Tram|ÖPNV|3Straßenbahn|U+1F683"
+        "defaultMessage": "3Straßenbahnhaltestelle|2Tramhaltestelle|3Haltestelle|2Tram|ÖPNV|3Straßenbahn|4Trambahn|4Tramhalt|U+1F683"
     },
     "amenity-bus_station|@category_transport": {
-        "defaultMessage": "3Busbahnhof|3Bushaltestelle|3Haltestelle|2Bus|4Autobus|ÖPNV|ZOB|U+1F68C|U+1F68F|U+1F68D"
+        "defaultMessage": "3Busbahnhof|3Bushaltestelle|3Haltestelle|2Bus|4Autobus|ÖPNV|ZOB|4Fernbus|5Fernbusbahnhof|4Busterminal|5Omnibusbahnhof|U+1F68C|U+1F68F|U+1F68D"
     },
     "railway-station|railway-halt|building-train_station|@category_transport": {
-        "defaultMessage": "4Bahnhof|3Haltepunkt|3Station|2Zug|2Bahn|ÖPNV|2Hbf|2Bhf|U+1F684|U+1F685|U+1F689|U+1F682|U+1F686|U+1F688|U+1F68A|U+1F68B"
+        "defaultMessage": "4Bahnhof|3Haltepunkt|3Station|2Zug|2Bahn|ÖPNV|2Hbf|2Bhf|4Hauptbahnhof|4Bahnstation|5Zughaltestelle|3S-Bahn|4S-Bahnhof|3Sbahn|U+1F684|U+1F685|U+1F689|U+1F682|U+1F686|U+1F688|U+1F68A|U+1F68B"
     },
     "railway-station-funicular": {
         "defaultMessage": "5Standseilbahn|6Seilbahn"
     },
     "railway-station-subway|@category_transport": {
-        "defaultMessage": "2U-Bahn|3Metro|ÖPNV|2U-Bahn-Station|4Stadtbahn|3Untergrundbahn|2U-Bahn-Haltestelle|4Stadtbahnstation|U+1F687"
+        "defaultMessage": "2U-Bahn|3Metro|ÖPNV|2U-Bahn-Station|4Stadtbahn|3Untergrundbahn|2U-Bahn-Haltestelle|4Stadtbahnstation|3U-Bahnhof|3Ubahn|U+1F687"
     },
     "amenity-ferry_terminal|@category_transport": {
         "defaultMessage": "2Fähre|2Fähranleger|3Terminal|3Fährhafen|U+1F6A2|U+1F6A4|U+2693"
@@ -225,7 +225,7 @@
         "defaultMessage": "3Taxistand|3Taxenstand|3Taxi|3Taxe|3Droschke|3Taxistandplatz|U+1F695|U+1F696"
     },
     "amenity-townhall": {
-        "defaultMessage": "3Rathaus|4Gemeindeamt|Amt"
+        "defaultMessage": "3Rathaus|4Gemeindeamt|Amt|4Bürgeramt|4Bürgerbüro|5Bürgerservice|5Stadtverwaltung|5Gemeindeverwaltung|5Stadthaus|5Bezirksamt"
     },
     "tourism-attraction|@category_tourism": {
         "defaultMessage": "4Attraktion|3Sehenswürdigkeit|U+1F3A0|U+1F3A1|U+1F3A2|U+1F3AA"
@@ -381,7 +381,7 @@
         "defaultMessage": "4Sitzbank|4Parkbank|3Bank"
     },
     "amenity-bicycle_rental": {
-        "defaultMessage": "4Fahrradverleih|4Fahrrad|4Fahrradvermietung|4Radfahren|4Radverleih|3Velo|3Veloverleih|3Velovermietung|5Verleih|5Vermietung|U+1F6B2|U+1F510|U+1F6B4|U+1F6B5"
+        "defaultMessage": "4Fahrradverleih|4Fahrrad|4Fahrradvermietung|4Radfahren|4Radverleih|3Velo|3Veloverleih|3Velovermietung|5Verleih|5Vermietung|4Leihrad|4Leihfahrrad|4Mietrad|4Mietfahrrad|4Bikesharing|U+1F6B2|U+1F510|U+1F6B4|U+1F6B5"
     },
     "amenity-bicycle_repair_station": {
         "defaultMessage": "4Fahrradreparatur|4Radservicestation|4Radreparatur|Velomechaniker|Veloreparatur|U+1F6B2|U+1F527|U+1F529|U+26D3|U+1FA9B|U+1F6DE"
@@ -396,7 +396,7 @@
         "defaultMessage": "5Motorradvermietung|5Motorrad|5Motorrad mieten|5Mofa mieten|5Motorroller mieten|3Töffvermietung|3Töffverleih|U+1F3CD|U+1F6F5"
     },
     "amenity-cinema|@category_entertainment": {
-        "defaultMessage": "3Kino|4Cinema|4Filmtheater|4Film|4Filme|5Lichtspielhaus|U+1F3A6|U+1F3AC"
+        "defaultMessage": "3Kino|4Cinema|4Filmtheater|4Film|4Filme|5Lichtspielhaus|3Kinos|4Lichtspiele|U+1F3A6|U+1F3AC"
     },
     "leisure-bowling_alley|@category_entertainment": {
         "defaultMessage": "3Bowlingbahn|3Bowlen|3Bowling|3Bowlingcenter|3Bowling-Center|3Bowling Center|3Bowling-Bahn|3Bowling Bahn|3Bowlingzentrum|3Kegelbahn|3Kegeln|U+1F3B3"
@@ -441,16 +441,16 @@
         "defaultMessage": "4Krankenhaus"
     },
     "amenity-hospital|@category_hospital": {
-        "defaultMessage": "3Spital|3Klinik|3Arzt|3Doktor|3Medizinische Einrichtung|3Medizinisches Zentrum|3Gesundheitswesen|3Ambulanz|3Gesundheitsdienstleistungen|3Erste Hilfe|3Notfall|U+1F691|U+1F3E5|U+1F489|U+1F48A"
+        "defaultMessage": "3Spital|3Klinik|3Arzt|3Doktor|3Medizinische Einrichtung|3Medizinisches Zentrum|3Gesundheitswesen|3Ambulanz|3Gesundheitsdienstleistungen|3Erste Hilfe|3Notfall|4Notaufnahme|4Klinikum|4Uniklinik|5Universitätsklinikum|U+1F691|U+1F3E5|U+1F489|U+1F48A"
     },
     "amenity-clinic|@category_hospital": {
         "defaultMessage": "3Klinik|3Krankenhaus|3Ambulanz|3Arzt|3Diagnostik|3Gesundheitsdienstleistungen|3Doktor|3Spital"
     },
     "amenity-doctors|@category_hospital": {
-        "defaultMessage": "3Arztpraxis|3Arzt|5Allgemeinmediziner|3Ärztezentrum|3Ärztehaus|U+1F489|U+1F3E5|U+1F691"
+        "defaultMessage": "3Arztpraxis|3Arzt|5Allgemeinmediziner|3Ärztezentrum|3Ärztehaus|4Hausarzt|4Hausärztin|4Ärztin|4Ärzte|5Allgemeinarzt|5Allgemeinmedizin|5Mediziner|3Doc|U+1F489|U+1F3E5|U+1F691"
     },
     "amenity-dentist": {
-        "defaultMessage": "3Zahnarzt"
+        "defaultMessage": "3Zahnarzt|4Zahnärztin|4Zahnarztpraxis|5Zahnmedizin|5Zahnklinik|5Zahnschmerzen"
     },
     "healthcare-laboratory": {
         "defaultMessage": "3Medizinisches Labor|3Labor"
@@ -492,13 +492,13 @@
         "defaultMessage": "3Bibliothek|4Bücherei|5Stadtbibliothek|3Bib|3Uni-Bib|4Uni-Bibliothek|U+1F4D6|U+1F4DA|U+1F3DB|U+1F3E2"
     },
     "amenity-parking|amenity-parking_entrance|@category_parking": {
-        "defaultMessage": "4Parkplatz|4Parken|4Parkhaus|4Tiefgarage|4Parkgarage|4Garage|5Autoparkplatz|U+1F697|U+1F17F|U+1F698|U+1F699"
+        "defaultMessage": "4Parkplatz|4Parken|4Parkhaus|4Tiefgarage|4Parkgarage|4Garage|5Autoparkplatz|5Parkmöglichkeit|4Parkdeck|U+1F697|U+1F17F|U+1F698|U+1F699"
     },
     "@category_pharmacy": {
         "defaultMessage": "3Apotheke|3Pharmazie|3Pharma|4Medikamente|4Arzneimittel"
     },
     "amenity-pharmacy|@category_pharmacy": {
-        "defaultMessage": "3Apotheke|3Drogerie|3Medikamente|U+1F489|U+1F48A"
+        "defaultMessage": "3Apotheke|3Drogerie|3Medikamente|4Arznei|5Notapotheke|5Notdienstapotheke|3Apo|U+1F489|U+1F48A"
     },
     "@category_post": {
         "defaultMessage": "3Post"
@@ -507,7 +507,7 @@
         "defaultMessage": "3Briefkasten|3Postfach|3Post|U+2709|U+1F4E8|U+1F4E9|U+1F4EA|U+1F4EB|U+1F4EE|U+1F4EC|U+1F4ED|3Postkasten"
     },
     "amenity-post_office|post_office-post_partner|@category_post": {
-        "defaultMessage": "3Postfiliale|3Postamt|U+2709|U+1F3E3|U+1F4E8|U+1F4E9|U+1F3E4|U+1F4EF"
+        "defaultMessage": "3Postfiliale|3Postamt|4Paket|4Pakete|4Päckchen|4Briefmarken|5Postagentur|5Postpartner|4Paketshop|U+2709|U+1F3E3|U+1F4E8|U+1F4E9|U+1F3E4|U+1F4EF"
     },
     "amenity-vehicle_inspection": {
         "defaultMessage": "4Fahrzeuginspektion"
@@ -648,10 +648,10 @@
         "defaultMessage": "3Herberge|3Hostel|3Gasthaus|3Unterkunft|3Jugendherberge|3Jugendgästehaus|5Naturfreundehaus|U+1F3E8"
     },
     "tourism-hotel|@category_hotel": {
-        "defaultMessage": "4Gasthaus|3Motel|4Gasthof|4Rasthof|4Raststätte|4Autohof"
+        "defaultMessage": "4Gasthaus|3Motel|4Gasthof|4Rasthof|4Raststätte|4Autohof|4Hotelzimmer|4Zimmer"
     },
     "tourism-guest_house|@category_hotel": {
-        "defaultMessage": "3Pension|3Unterkunft|3Herberge|3Wohnheim|3Gästehaus|3Fremdenzimmer|U+1F3E8"
+        "defaultMessage": "3Pension|3Unterkunft|3Herberge|3Wohnheim|3Gästehaus|3Fremdenzimmer|4Gästezimmer|4Zimmer|5Privatzimmer|5Frühstückspension|U+1F3E8"
     },
     "tourism-motel|@category_hotel": {
         "defaultMessage": "3Motel|3Gasthaus|3Wohnheim|3Raststätte|3Rasthaus|3Autohof|U+1F3E8"
@@ -669,13 +669,13 @@
         "defaultMessage": "4Stadion|5Sport|4Olympiastadion|5Sportanlage|5Sportstadion|5Sportkomplex|5Sporthalle|3Arena|U+26BD|U+26BE|U+1F3BE|U+1F3C0|U+1F3C8|U+1F4AA|U+1F3C9|U+1F3DF"
     },
     "leisure-playground|@category_children": {
-        "defaultMessage": "4Spielplatz|5Sandkasten|5Sandkiste|5Abenteuerspielplatz"
+        "defaultMessage": "4Spielplatz|5Sandkasten|5Sandkiste|5Abenteuerspielplatz|4Kinderspielplatz"
     },
     "leisure-sports_centre": {
         "defaultMessage": "4Sportzentrum|4Sport|4Fitness-Zentrum|4Fitness-Center|4Sportkomplex|5Sportforum|5Sporthalle|4Sportanlage|U+26BD|U+26BE|U+1F3BE|U+1F4AA|U+1F3C8|U+1F3C0|U+1F3C9"
     },
     "leisure-sports_centre-sport-swimming": {
-        "defaultMessage": "4Schwimmbad|4Freibad|4Hallenbad|4Schwimmhalle"
+        "defaultMessage": "4Schwimmbad|4Freibad|4Hallenbad|4Schwimmhalle|4Badeanstalt|4Stadtbad|3Badi"
     },
     "leisure-fitness_centre-sport-yoga": {
         "defaultMessage": "Yoga-Studio"
@@ -786,7 +786,7 @@
         "defaultMessage": "3Polizeistation|3Polizei|3Wache"
     },
     "amenity-police|@category_police": {
-        "defaultMessage": "4Polizeiwache|4Polizeistation|4Polizeirevier|4Polizei|4Polizeidienststelle|4Polizeiinspektion|4Kommisariat|U+1F693|U+1F46E|U+1F694|U+1F482|U+1F6A8"
+        "defaultMessage": "4Polizeiwache|4Polizeistation|4Polizeirevier|4Polizei|4Polizeidienststelle|4Polizeiinspektion|4Kommisariat|5Polizeiposten|U+1F693|U+1F46E|U+1F694|U+1F482|U+1F6A8"
     },
     "office-diplomatic": {
         "defaultMessage": "4Botschaft|4Konsulat|4Verbindungsbüro|4diplomatische Vertretung|5konsularische Vertretung|4Verbindungsbüro|5ständige Vertretung|4Auslandsvertretung|4Diplomatische Vertretung|U+1F3E2|U+1F3DB"
@@ -798,7 +798,7 @@
         "defaultMessage": "3Wasser"
     },
     "amenity-drinking_water|drinking_water-yes|@category_water": {
-        "defaultMessage": "4Trinkwasser|4Trinkbrunnen|U+1F6B0"
+        "defaultMessage": "4Trinkwasser|4Trinkbrunnen|5Trinkwasserbrunnen|5Trinkwasserspender|5Wasserspender|U+1F6B0"
     },
     "natural-hot_spring|@category_water": {
         "defaultMessage": "4Heiße Quelle|3Thermalquelle"
@@ -852,7 +852,7 @@
         "defaultMessage": "3Firmenbüro|4Niederlassung"
     },
     "office-government": {
-        "defaultMessage": "3Regierungsstelle|3Amt|3Behörde|4Verwaltung|3öffentliche Verwaltung|3Dienststelle|5Ministerium|3Regierung|4staatliche Institution|3Amtssitz|U+1F3E2|U+1F3DB"
+        "defaultMessage": "3Regierungsstelle|3Amt|3Behörde|4Verwaltung|3öffentliche Verwaltung|3Dienststelle|5Ministerium|3Regierung|4staatliche Institution|3Amtssitz|4Bürgeramt|4Bürgerbüro|5Landratsamt|5Kreisverwaltung|4Behörden|U+1F3E2|U+1F3DB"
     },
     "office-lawyer": {
         "defaultMessage": "5Anwaltskanzlei|4Anwaltsbüro|4Anwalt|4Rechtsanwalt|3Jurist|4Gerichtsanwalt|4Rechtsbeistand|4Rechtsberater|4Verteidiger|U+2696"
@@ -987,13 +987,13 @@
         "defaultMessage": "4Reifenhändler|4Autoreifen|4Reifen|4Reifenwechsel|U+1F6DE"
     },
     "amenity-car_wash": {
-        "defaultMessage": "4Autowaschanlage|Autowäsche"
+        "defaultMessage": "4Autowaschanlage|Autowäsche|4Waschstraße|4Waschanlage|5Autowaschstraße|4Waschbox|4Autowaschen"
     },
     "amenity-veterinary": {
         "defaultMessage": "4Tierarzt|4Tierärztin|4Tierarztpraxis|4Tierpraxis|4Tierdoktor|5Hundearzt|5Katzenarzt|4Haustiere|U+2695"
     },
     "@charging_station": {
-        "defaultMessage": "4Ladestation|4aufladen|Ladesäule|Ladepunkt|Ladestelle|Stromtankstelle"
+        "defaultMessage": "4Ladestation|4aufladen|Ladesäule|Ladepunkt|Ladestelle|Stromtankstelle|5Elektrotankstelle|5Schnellladestation|5Schnelllader"
     },
     "amenity-charging_station-bicycle|@charging_station": {
         "defaultMessage": "5Fahrradladestation|Fahrrad aufladen|E-Bike aufladen|Fahrrad laden|E-Bike laden"
@@ -1017,7 +1017,7 @@
         "defaultMessage": "4Notruftelefon|Nottelefon"
     },
     "leisure-fitness_centre": {
-        "defaultMessage": "3Fitnessstudio|3Fitnesscenter|3Fitness|3Fitnessraum|4Sport|3Fitnessclub|5Gesundheitsclub|4Training|4Trainingsraum|4Turnhalle|U+1F4AA|U+1F3CB"
+        "defaultMessage": "3Fitnessstudio|3Fitnesscenter|3Fitness|3Fitnessraum|4Sport|3Fitnessclub|5Gesundheitsclub|4Training|4Trainingsraum|4Turnhalle|4Muckibude|U+1F4AA|U+1F3CB"
     },
     "leisure-sauna": {
         "defaultMessage": "3Sauna|Schwitzbad|Schwitzhütte|Dampfbad|Dampfsauna|Saunakabine"
@@ -1197,7 +1197,7 @@
         "defaultMessage": "4Sprachschule"
     },
     "amenity-ice_cream": {
-        "defaultMessage": "2Eis|3Eisstand|3Eisdiele|3Eisladen|4Eisgeschäft|4Eissalon|4Speiseeis|Sorbet"
+        "defaultMessage": "2Eis|3Eisstand|3Eisdiele|3Eisladen|4Eisgeschäft|4Eissalon|4Speiseeis|Sorbet|4Eiscafé|4Gelateria|4Softeis"
     },
     "amenity-internet_cafe": {
         "defaultMessage": "3Internetcafé"
