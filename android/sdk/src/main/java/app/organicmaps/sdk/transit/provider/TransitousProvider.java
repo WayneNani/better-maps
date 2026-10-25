@@ -19,10 +19,22 @@ public class TransitousProvider implements TransitRoutingProvider, TransitDepart
 
   @NonNull
   private final TransitService mService;
+  @NonNull
+  private final String mName;
+  @NonNull
+  private final String mAttributionUrl;
 
   public TransitousProvider(@NonNull TransitService service)
   {
+    this(service, "Transitous", SOURCES_URL);
+  }
+
+  /** For another MOTIS server with the same API, e.g. an own server with its own name and data sources page. */
+  public TransitousProvider(@NonNull TransitService service, @NonNull String name, @NonNull String attributionUrl)
+  {
     mService = service;
+    mName = name;
+    mAttributionUrl = attributionUrl;
   }
 
   @NonNull
@@ -36,14 +48,14 @@ public class TransitousProvider implements TransitRoutingProvider, TransitDepart
   @Override
   public String getName()
   {
-    return "Transitous";
+    return mName;
   }
 
   @NonNull
   @Override
   public String getAttributionUrl()
   {
-    return SOURCES_URL;
+    return mAttributionUrl;
   }
 
   @NonNull
