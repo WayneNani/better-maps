@@ -193,5 +193,8 @@ SMOKE_OFFLINE=1 scripts/smoke.sh                  # dito ohne Netzzugriff auf di
   Tempolimit oder Sperrung (nur `CONSTRUCTION_ROADWORKS`, `RESTRICTION_LANE_CLOSED`, …) kommen daher derzeit in der
   App nicht an – sie hätten im Client ohnehin keine Auswirkung auf Routing und Einfärbung.
 - Der Client braucht mindestens zwei der Punkte `from`/`to`/`at`; Meldungen mit nur einem Punkt (`at`) ignoriert er.
-- Der Client wertet `timeout` noch nicht aus und erneuert ein abgelaufenes Abo erst beim nächsten
-  `SubscribeOrChangeSubscription()`.
+- Der Client wertet `timeout` noch nicht aus. Auf `SUBSCRIPTION_UNKNOWN` (z. B. nach einem Server-Neustart oder
+  abgelaufenem Abo) löscht er die ID, abonniert aber erst neu, wenn sich die aktiven MWMs ändern
+  (`TrafficManager::SubscribeOrChangeSubscription()` ist sonst ein No-op). Das sollte in AP4a behoben werden.
+- Der Client pollt höchstens einmal pro Minute; nach einem leeren Feed setzt `HttpTraffSource` den nächsten
+  Poll-Zeitpunkt nicht hoch, pollt also im Minutentakt. Die Abo-TTL von 1 h ist dafür großzügig bemessen.
