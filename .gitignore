@@ -221,3 +221,6 @@ tools/unix/maps/settings.sh
 
 # Zed
 .zed
+
+# better-maps: Worktrees der Subagenten
+/.worktrees/
