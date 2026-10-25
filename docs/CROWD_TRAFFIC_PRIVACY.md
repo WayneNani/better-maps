@@ -468,7 +468,8 @@ auf Android-Seite:
 **Datenquelle.** Map-Matching ist das Route-Matching der Navigation: Die Position wird auf die Routenlinie
 projiziert (`FollowedPolyline`), die seit dem letzten Fix passierten Routenpunkte werden mit nach Strecke
 interpolierter Zeit eingefügt, die Straßenklasse kommt aus `RouteSegment::RoadNameInfo` (`m_highwayClass`,
-`m_isLink` ⇒ nicht meldbar). Restdistanz zum Ziel: `Route::GetCurrentDistanceToEndMeters()`. Nur echte
+`m_isLink` ⇒ nicht meldbar; der Router setzt die Klasse nur im ersten Segment eines Features, sie wird bis
+zum nächsten Feature fortgeschrieben, Fake-Segmente sind nicht meldbar). Restdistanz zum Ziel: `Route::GetCurrentDistanceToEndMeters()`. Nur echte
 GPS-Fixes werden verwendet (keine extrapolierten Positionen). Abseits der Route, beim Neuberechnen oder ohne
 Treffer wird eine Lücke markiert: Die betroffenen Kacheln entfallen (Klasse „gemischt“).
 

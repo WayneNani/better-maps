@@ -58,6 +58,25 @@ RoadClass CrowdTrafficRecorder::ToRoadClass(ftypes::HighwayClass cls, bool isLin
   }
 }
 
+std::vector<RoadClass> CrowdTrafficRecorder::RouteClasses(std::vector<routing::RouteSegment> const & segments)
+{
+  std::vector<RoadClass> res(segments.size(), RoadClass::None);
+  auto current = ftypes::HighwayClass::Undefined;
+  for (size_t i = 0; i < segments.size(); ++i)
+  {
+    auto const & rni = segments[i].GetRoadNameInfo();
+    if (!segments[i].GetSegment().IsRealSegment())
+    {
+      current = ftypes::HighwayClass::Undefined;
+      continue;
+    }
+    if (rni.m_highwayClass != ftypes::HighwayClass::Undefined)
+      current = rni.m_highwayClass;
+    res[i] = ToRoadClass(current, rni.m_isLink);
+  }
+  return res;
+}
+
 void CrowdTrafficRecorder::OnFollowRoute(m2::PointD const & destination,
                                          std::vector<m2::PointD> const & intermediateStops)
 {
@@ -123,15 +142,12 @@ void CrowdTrafficRecorder::OnLocation(location::GpsInfo const & raw, routing::Ro
   auto const toLatLon = [](m2::PointD const & p)
   { return crowd_traffic::LatLon{mercator::YToLat(p.y), mercator::XToLon(p.x)}; };
   bool const sameRoute = m_lastRoute.lock() == route;
+  if (!sameRoute || m_routeClasses.size() != segments.size())
+    m_routeClasses = RouteClasses(segments);
   auto const samples = m_follower.Next(sameRoute, iter.m_ind, toLatLon(iter.m_pt), raw.m_timestamp,
                                        route->GetCurrentDistanceToEndMeters(), [&](size_t k)
   { return toLatLon(line.GetPoint(std::min(k, line.GetSize() - 1))); }, [&](size_t k)
-  {
-    if (k >= segments.size())
-      return RoadClass::None;
-    auto const & rni = segments[k].GetRoadNameInfo();
-    return ToRoadClass(rni.m_highwayClass, rni.m_isLink);
-  });
+  { return k < m_routeClasses.size() ? m_routeClasses[k] : RoadClass::None; });
   for (auto const & sample : samples)
     m_client->AddSample(sample);
   m_lastRoute = route;

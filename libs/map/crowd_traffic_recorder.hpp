@@ -54,6 +54,10 @@ public:
   crowd_traffic::Client & GetClient() { return *m_client; }
 
   static crowd_traffic::RoadClass ToRoadClass(ftypes::HighwayClass cls, bool isLink);
+  // Road class of every route segment. The router stores the highway class only in the first
+  // segment of each feature (the following ones have HighwayClass::Undefined), so it is carried
+  // forward; links and fake segments (connections to the road graph) are not reportable.
+  static std::vector<crowd_traffic::RoadClass> RouteClasses(std::vector<routing::RouteSegment> const & segments);
 
 private:
   void EndTrip();
@@ -64,4 +68,5 @@ private:
 
   crowd_traffic::RouteFollower m_follower;
   std::weak_ptr<routing::Route> m_lastRoute;
+  std::vector<crowd_traffic::RoadClass> m_routeClasses;
 };
