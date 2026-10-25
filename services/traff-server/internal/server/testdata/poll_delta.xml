@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response status="OK" subscription_id="SUB0001">
+  <feed>
+    <message id="de.autobahn.warning:INRIX--vi-avl.2026-10-25_08-31-00-000_003.de0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:05:00Z" expiration_time="2026-10-25T17:05:00Z" cancellation="true" forecast="false"></message>
+    <message id="de.autobahn.warning:INRIX--vi-avl.2026-10-25_09-13-00-000_011.de0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:05:00Z" expiration_time="2026-10-25T16:35:00Z" start_time="2026-10-25T09:13:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="München" directionality="ONE_DIRECTION" origin="Salzburg" road_class="MOTORWAY" road_ref="A 8">
+        <from>+47.768447 +12.943230</from>
+        <via>+47.768301 +12.936037</via>
+        <to>+47.767465 +12.925401</to>
+      </location>
+      <events>
+        <event class="CONGESTION" type="CONGESTION_SLOW_TRAFFIC"></event>
+      </events>
+    </message>
+  </feed>
+</response>

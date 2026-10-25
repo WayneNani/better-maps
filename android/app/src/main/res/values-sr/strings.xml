@@ -188,7 +188,7 @@
     <string name="pref_zoom_summary">Прикажи на мапи</string>
     <string name="prefs_group_advanced">Напредно</string>
     <string name="download_resources_custom_url_title">Сопствени сервер мапа</string>
-    <string name="download_resources_custom_url_message">Замени подразумевани сервер за преузимање мапа који се користи за преузимања мапа. Оставите празно да бисте користили CoMaps сервер.</string>
+    <string name="download_resources_custom_url_message">Замените подразумевани сервер за преузимање мапа. Оставите празно да бисте користили подразумевани CoMaps сервер.</string>
     <string name="download_resources_custom_url_summary_none">Није постављено</string>
     <string name="download_resources_custom_url_error_scheme">Унесите пуну УРЛ адресу која почиње са https:// и која се завршава са /</string>
     <!-- Settings «Map» category: «Night style» title -->
@@ -450,7 +450,7 @@
     <string name="editor_report_problem_other_title">Други проблем</string>
     <string name="message_invalid_feature_position">Објекат не може бити на овом месту</string>
     <!-- Text in About and OSM Login screens. First %@ is replaced by a local, human readable date. -->
-    <string name="osm_presentation">Подаци са OpenStreetMap-а које је креирала заједница до %s. Научите више о томе како да мењате и ажурирате мапу на OpenStreetMap.org</string>
+    <string name="osm_presentation">Подаци са OpenStreetMap-а које је креирала заједница до %s Научите више о томе како да мењате и ажурирате мапу на OpenStreetMap.org</string>
     <!-- OSM explanation on Android login screen -->
     <string name="login_osm_presentation">OpenStreetMap.org (OSM) је пројекат заједнице који има за циљ прављење бесплатне, слободне и отворене мапе. OSM је главни извор података за мапе у CoMaps-у и функционише на сличан начин као Википедија. Можете додати или променити места и ваше промене постају видљиве милионима корисника широм света. \nПридружите се заједници и помозите да направимо бољу мапу која је доступна свима!</string>
     <string name="login_to_make_edits_visible">Пријавите се на openstreetmap.org да бисте објавили ваше промене остатку света</string>
@@ -515,17 +515,17 @@
     <string name="accept">Прихвати</string>
     <!-- For the first routing -->
     <string name="decline">Одбиј</string>
-    <string name="mobile_data_dialog">Користи мобилни интернет ради приказа детљних информација?</string>
+    <string name="mobile_data_dialog">Користи мобилни интернет?</string>
     <string name="mobile_data_option_always">Увек користи</string>
     <string name="mobile_data_option_today">Само данас</string>
     <string name="mobile_data_option_not_today">Немој данас</string>
     <string name="mobile_data">Мобилни интернет</string>
     <!-- NOTE to translators: please synchronize your translation with the English one. -->
-    <string name="mobile_data_description">Мобилни интернет је потребан за обавештења о ажурирању мапе и за слање измена</string>
+    <string name="mobile_data_description">Мобилни интернет је потребан за обавештења о ажурирању мапе, слање измена и сајтове са рецензијама</string>
     <string name="mobile_data_option_never">Никад не користи</string>
     <string name="mobile_data_option_ask">Увек ме питај</string>
     <string name="traffic_update_maps_text">Да би се приказали подаци о саобраћају, мапа мора да се ажурира</string>
-    <string name="big_font">Увећана слова на мапи</string>
+    <string name="increase_font_size">Увећана слова на мапи</string>
     <string name="traffic_update_app">Молим Вас да ажурирате CoMaps</string>
     <!-- "traffic" as in "road congestion" -->
     <string name="traffic_data_unavailable">Подаци о саобраћају нису доступни</string>
@@ -853,7 +853,7 @@
     <string name="closed_now">Затворено сада</string>
     <string name="open_now">Сада је отворено</string>
     <string name="at">на %s</string>
-    <string name="about_headline">Отворени пројекат који покреће заједница</string>
+    <string name="about_headline">Отворени пројекат који развија заједница</string>
     <string name="delete_track_dialog_title">Обрисати %s?</string>
     <string name="share_track">Подели путању</string>
     <string name="existence_confirmed_time_ago">Проверено да постоји %s</string>
@@ -980,4 +980,20 @@
     <string name="prefs_group_advanced_summary">Снимање лог фајлова</string>
     <string name="planning_route_preview">Преглед</string>
     <string name="recalculate_route">Прерачунај</string>
+    <string name="pref_font_size">Увећана слова на мапи</string>
+    <string name="decrease_font_size">Смањи величину слова</string>
+    <string name="bookmarks_text_placement_title">Прикажи имена маркера на мапи</string>
+    <string name="place_reviews_title">Рецензије места</string>
+    <string name="place_reviews">%1$s рецензија/е</string>
+    <string name="rating_stars_description">звездица: %.1f</string>
+    <string name="reviews_by_mangrove">Рецензије са Mangrove-a</string>
+    <string name="add_review">Додајте рецензију путем %1$s-а</string>
+    <string name="add_review_url_resolution_failed">Место није пронађено на OpenStreetMap-у.</string>
+    <string name="add_review_url_resolution_failed_dev">Место није пронађено на DEV OpenStreetMap-у.</string>
+    <string name="internet_unavailable">Нема конекције са Интернетом</string>
+    <string name="stars_1">1 звездица</string>
+    <string name="stars_2">2 звездице</string>
+    <string name="stars_3">3 звездице</string>
+    <string name="stars_4">4 звездице</string>
+    <string name="stars_5">5 звездица</string>
 </resources>

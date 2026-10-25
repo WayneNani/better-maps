@@ -18,7 +18,7 @@ DRULES_NOT_GENERATED=
 SYMBOLS_NOT_GENERATED=
 STRINGS_NOT_GENERATED=
 
-DRULES_FILES=(drules_proto.bin drules_proto_default_dark.bin drules_proto_default_light.bin drules_proto_outdoors_dark.bin drules_proto_outdoors_light.bin drules_proto_vehicle_dark.bin drules_proto_vehicle_light.bin classificator.txt types.txt visibility.txt colors.txt patterns.txt)
+DRULES_FILES=(drules_proto.bin drules_proto_default_dark.bin drules_proto_default_light.bin drules_proto_outdoors_dark.bin drules_proto_outdoors_light.bin drules_proto_walking_light.bin drules_proto_walking_outdoor_light.bin drules_proto_walking_dark.bin drules_proto_walking_outdoor_dark.bin drules_proto_cycling_light.bin drules_proto_cycling_outdoor_light.bin drules_proto_cycling_dark.bin drules_proto_cycling_outdoor_dark.bin drules_proto_driving_light.bin drules_proto_driving_outdoor_light.bin drules_proto_driving_dark.bin drules_proto_driving_outdoor_dark.bin drules_proto_public-transport_light.bin drules_proto_public-transport_outdoor_light.bin drules_proto_public-transport_dark.bin drules_proto_public-transport_outdoor_dark.bin drules_proto_vehicle_light.bin drules_proto_vehicle_dark.bin classificator.txt types.txt visibility.txt colors.txt patterns.txt)
 SYMBOLS_FILES=(xhdpi/light/symbols.png xhdpi/light/symbols.sdf xhdpi/dark/symbols.png xhdpi/dark/symbols.sdf mdpi/light/symbols.png mdpi/light/symbols.sdf mdpi/dark/symbols.png mdpi/dark/symbols.sdf 6plus/light/symbols.png 6plus/light/symbols.sdf 6plus/dark/symbols.png 6plus/dark/symbols.sdf xxxhdpi/light/symbols.png xxxhdpi/light/symbols.sdf xxxhdpi/dark/symbols.png xxxhdpi/dark/symbols.sdf hdpi/light/symbols.png hdpi/light/symbols.sdf hdpi/dark/symbols.png hdpi/dark/symbols.sdf xxhdpi/light/symbols.png xxhdpi/light/symbols.sdf xxhdpi/dark/symbols.png xxhdpi/dark/symbols.sdf)
 
 for f in ${DRULES_FILES[*]}; do
@@ -110,30 +110,29 @@ if [ -z "$SKIP_MAP_DOWNLOAD" ]; then
 
   mkdir -p "$MWM_PATH"
 
-  # TODO: if needed World map file version exists already then we need to update a symlink to point to it anyway
+  # TODO: compare World* checksums with countries.txt and resume download / redownload if needed
   if [ ! -f "$WORLD_PATH" ]; then
-    echo "Downloading world map..."
+    echo "Downloading World map to $WORLD_PATH"
     # mapgen-fi-1 is supposed to have all historic prod map versions as well as recent test maps
     if ! curl -fL -o "$WORLD_PATH" "$MAPS_BASE_URL/World.mwm"; then
       echo "ERROR: could not download World.mwm from $MAPS_BASE_URL" >&2
       exit 1
     fi
-    rm -f World.mwm; ln -s "$WORLD_PATH" World.mwm
   fi
   if [ ! -f "$WORLD_PATH2" ]; then
+    echo "Downloading WorldCoasts map to $WORLD_PATH2"
     if ! curl -fL -o "$WORLD_PATH2" "$MAPS_BASE_URL/WorldCoasts.mwm"; then
       echo "ERROR: could not download WorldCoasts.mwm from $MAPS_BASE_URL" >&2
       exit 1
     fi
-    rm -f WorldCoasts.mwm; ln -s "$WORLD_PATH2" WorldCoasts.mwm
   fi
 
-  if [ ! -f "World.mwm" ]; then
-    ln -s "$WORLD_PATH" World.mwm
-  fi
-  if [ ! -f "WorldCoasts.mwm" ]; then
-    ln -s "$WORLD_PATH2" WorldCoasts.mwm
-  fi
+  # Re-create symlinks to point to the right version as per countries.txt
+  rm -f World.mwm; ln -s "$WORLD_PATH" World.mwm
+  rm -f WorldCoasts.mwm; ln -s "$WORLD_PATH2" WorldCoasts.mwm
+
+  echo "World maps in use:"
+  ls -l World*.mwm
 
   popd
 else

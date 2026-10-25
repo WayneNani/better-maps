@@ -45,7 +45,7 @@
         "defaultMessage": "4Банка|3Banka"
     },
     "@category_secondhand": {
-        "defaultMessage": "6Секонд-хенд|6Sekond-hend"
+        "defaultMessage": "5Половна одећа|5Секонд-хенд|5Polovna odeća|5Sekond-hend"
     },
     "amenity-bank|@category_bank": {
         "defaultMessage": "новац|novac"
@@ -921,7 +921,7 @@
         "defaultMessage": "Рибарница|Риба|Ribarnica|Riba"
     },
     "shop-second_hand|@category_shopping|@shop|@category_secondhand": {
-        "defaultMessage": "5Секонд хенд|5Sekond hend"
+        "defaultMessage": "5Половна одећа|5Секонд-хенд|5Polovna odeća|5Sekond-hend"
     },
     "shop-charity|@shop|@category_secondhand": {
         "defaultMessage": "5Добротворна организација|5Dobrotvorna organizacija"
@@ -951,7 +951,7 @@
         "defaultMessage": "5Хелиодром|5Heliodrom"
     },
     "barrier-border_control": {
-        "defaultMessage": "Гранични прелаз|Granični prelaz"
+        "defaultMessage": "5Гранични прелаз|5Granični prelaz"
     },
     "leisure-water_park|@category_tourism|@category_children": {
         "defaultMessage": "4Аква парк|4Водени парк|4Akva park|4Vodeni park"
@@ -1332,7 +1332,7 @@
         "defaultMessage": "Нудле|Nudle"
     },
     "cuisine-pancake|cuisine-crepe": {
-        "defaultMessage": "Палачинка|Палачинке|Palačinka|Palačinke"
+        "defaultMessage": "5Палачинке|6Америчке палачинке|5Palačinke|6Američke palačinke"
     },
     "cuisine-pasta": {
         "defaultMessage": "Тестенина|Паста|Testenina|Pasta"

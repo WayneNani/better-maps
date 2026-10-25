@@ -84,6 +84,10 @@ iphone/**/*.swp
 iphone/**/*.mode1v3
 iphone/**/*.mode2v3
 iphone/**/*.perspectivev3
+*.xcresult
+*.xcarchive
+*.ipa
+Payload/
 
 # Carthage
 iphone/Maps/3party/Carthage/Checkouts
@@ -168,7 +172,7 @@ libs/platform/localized_types_map.cpp
 # CMake
 cmake-build-*
 build/
-build-skin_generator_tool/
+build_skin_generator_tool/
 
 qt/res/Info.plist
 
@@ -214,3 +218,10 @@ tools/unix/maps/settings.sh
 # VS Code
 .vscode
 .cache
+
+# Zed
+.zed
+
+# better-maps: Worktrees der Subagenten
+/.worktrees/
+/.venv

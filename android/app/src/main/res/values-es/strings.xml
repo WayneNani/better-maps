@@ -526,17 +526,17 @@
     <string name="accept">Aceptar</string>
     <!-- For the first routing -->
     <string name="decline">Rechazar</string>
-    <string name="mobile_data_dialog">¿Usar Internet móvil para mostrar información detallada?</string>
+    <string name="mobile_data_dialog">¿Usar datos móviles?</string>
     <string name="mobile_data_option_always">Usar siempre</string>
     <string name="mobile_data_option_today">Sólo hoy</string>
     <string name="mobile_data_option_not_today">No usar hoy</string>
     <string name="mobile_data">Internet móvil</string>
     <!-- NOTE to translators: please synchronize your translation with the English one. -->
-    <string name="mobile_data_description">Se requiere conexión a Internet para recibir notificaciones de actualización de mapas y cargar ediciones</string>
+    <string name="mobile_data_description">Se requiere conexión de datos móviles para las notificaciones de actualización del mapa, subir las ediciones y enlazar con sitios web de reseñas</string>
     <string name="mobile_data_option_never">No usar nunca</string>
     <string name="mobile_data_option_ask">Preguntar siempre</string>
     <string name="traffic_update_maps_text">Para mostrar los datos de tráfico, deben actualizarse los mapas</string>
-    <string name="big_font">Aumentar tamaño del texto en el mapa</string>
+    <string name="increase_font_size">Aumentar tamaño del texto en el mapa</string>
     <string name="traffic_update_app">Actualiza CoMaps</string>
     <!-- "traffic" as in "road congestion" -->
     <string name="traffic_data_unavailable">Los datos de tráfico no están disponibles</string>
@@ -988,4 +988,20 @@
     <string name="pref_enable_auto_reroute_description">Si se activa esta opción, se creará automáticamente una nueva ruta en cuanto te desvíes de la ruta planificada.</string>
     <string name="recalculate_route">Recalcular</string>
     <string name="off_route">Te has desviado de la ruta</string>
+    <string name="bookmarks_text_placement_title">Mostrar nombres de los favoritos en el mapa</string>
+    <string name="place_reviews_title">Reseñas de lugares</string>
+    <string name="place_reviews">%1$s Reseñas</string>
+    <string name="rating_stars_description">estrellas: %.1f</string>
+    <string name="reviews_by_mangrove">Reseñas de Mangrove.</string>
+    <string name="pref_font_size">Tamaño de letra para etiquetas de mapas</string>
+    <string name="decrease_font_size">Reducir el tamaño de las etiquetas del mapa</string>
+    <string name="internet_unavailable">Sin conexión a internet</string>
+    <string name="add_review_url_resolution_failed_dev">Lugar no encontrado en el servidor DEV de OpenStreetMap.</string>
+    <string name="add_review_url_resolution_failed">Lugar no encontrado en la última versión de OpenStreetMap.</string>
+    <string name="add_review">Añadir una reseña a través de %1$s</string>
+    <string name="stars_1">1-estrella</string>
+    <string name="stars_2">2-estrellas</string>
+    <string name="stars_3">3-estrellas</string>
+    <string name="stars_4">4-estrellas</string>
+    <string name="stars_5">5-estrellas</string>
 </resources>

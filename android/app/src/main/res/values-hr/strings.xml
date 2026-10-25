@@ -396,7 +396,7 @@
     <string name="mobile_data_description">Za obavijesti o ažuriranjima karata i prijenos izmjena potreban je mobilni internet</string>
     <string name="mobile_data_option_never">Nikad ne koristite</string>
     <string name="traffic_update_maps_text">Za prikaz podataka o prometu, karte moraju biti ažurirane</string>
-    <string name="big_font">Povećaj veličinu oznaka na karti</string>
+    <string name="increase_font_size">Povećaj veličinu oznaka na karti</string>
     <string name="traffic_update_app">Molimo ažurirajte CoMaps</string>
     <string name="traffic_data_unavailable">Podaci o prometu nisu dostupni</string>
     <string name="enable_logging">Omogući zapisivanje</string>
@@ -500,7 +500,7 @@
     <string name="elevation_profile_time">Vrijeme:</string>
     <string name="medicine">Lijekovi</string>
     <string name="search_in_the_list">Traži u popisu</string>
-    <string name="religious_places">Vjerska mjesta</string>
+    <string name="religious_places">Religiozna mjesta</string>
     <string name="select_list">Odaberi popis</string>
     <string name="transit_not_found">Navigacija podzemnom željeznicom u ovoj regiji još nije dostupna</string>
     <string name="dialog_pedestrian_route_is_long_header">Nije pronađena ruta podzemne željeznice</string>

@@ -1,10 +1,8 @@
-• Visning af aktiverede ruteindstillinger og en knap til at ændre dem, når der oprettes en rute
-• Forhåndsvisning af navigationsvejledning
-• Separate ruteindstillinger for hver transportform
-• Forbedrede svinginstruktioner for bl.a. rundkørsler og u-vendinger
-• Destination og mellemstop i navigationsfremskridsbjælken
-• Tilføjet vejskilte for næste sving samt forbedrede beskrivelser af sving
-• Søgning i alle favoritlister
-• Indstillinger opdelt i undersider
+• Tilføjet link for at tilføje anmeldelser til POI-info
+• Vis nuværende hastighed i Android Auto
+• Vis anmeldelsesvurderinger i søgeresultater
+• Vis stjerner for hoteller/restauranter som tekst
+• Tilføjet værktøjsudlejningssteder og værktøjsbiblioteker, vejskilte tilføjet i Rumænien og Marokko og rettet for Augsburg og A-veje i Cypern
+• Erstattet knapper Forhåndsvisning og Gem med ikoner på ruteplanlægningsskærmen
 
 Flere detaljer på comaps.app/latest

@@ -262,8 +262,7 @@ NSString *const kNavigationControlViewXibName = @"NavigationControlView";
 #pragma mark - MWMNavigationControlView
 
 - (IBAction)ttsButtonAction {
-  BOOL const isEnabled = [MWMTextToSpeech tts].active;
-  [MWMTextToSpeech tts].active = !isEnabled;
+  [[MWMTextToSpeech tts] cycleNavigationSoundMode];
 }
 
 - (IBAction)settingsButtonAction {
@@ -329,8 +328,8 @@ NSString *const kNavigationControlViewXibName = @"NavigationControlView";
   _state = state;
   [[MapViewController sharedController] updateStatusBarStyle];
   // Restore bottom buttons only if they were not already hidden by tapping anywhere on an empty map.
-  if (!MWMMapViewControlsManager.manager.hidden)
-    BottomTabBarViewController.controller.isHidden = state != MWMNavigationDashboardStateHidden;
+    if (!MWMMapViewControlsManager.manager.hidden)
+      MapControls.areMapControlsHidden = state != MWMNavigationDashboardStateHidden;
 }
 
 @synthesize routePreview = _routePreview;

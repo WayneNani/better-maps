@@ -20,7 +20,7 @@
     <string name="type.aeroway.runway">Pista de pouso e decolagem</string>
     <string name="type.aeroway.taxiway">Pista de táxi</string>
     <string name="type.aeroway.terminal">Terminal</string>
-    <string name="type.amenity">Amenidades</string>
+    <string name="type.amenity">Serviço</string>
     <string name="type.amenity.atm">Caixa eletrônico</string>
     <string name="type.amenity.bank">Banco</string>
     <string name="type.amenity.bar">Drinqueria</string>
@@ -1270,7 +1270,7 @@
     <string name="type.natural.orchard">Pomar</string>
     <string name="type.natural.peak">Pico</string>
     <string name="type.natural.rock">Pedra</string>
-    <string name="type.natural.scrub">Esfregar</string>
+    <string name="type.natural.scrub">Matagal</string>
     <string name="type.natural.spring">Nascente</string>
     <string name="type.natural.spring.drinking_water_no">Nascente</string>
     <string name="type.natural.strait">Estreito</string>
@@ -1529,4 +1529,14 @@
     <string name="type.amenity.planetarium">Planetário</string>
     <string name="type.amenity.toilets.customers">Acesso para clientes</string>
     <string name="type.amenity.toilets.private">Acesso privado</string>
+    <string name="type.landuse.military.danger_area">Área de perigo militar</string>
+    <string name="type.building.abandoned">Edifício abandonado</string>
+    <string name="type.amenity.parking.customers">Estacionamento para clientes</string>
+    <string name="type.railway.station.subway.boston">Estação de metrô</string>
+    <string name="type.railway.subway_entrance.boston">Entrada do metrô</string>
+    <string name="type.railway.subway_entrance.qingdao">Entrada de metrô</string>
+    <string name="type.amenity.tool_library">Biblioteca de ferramentas</string>
+    <string name="type.barrier.bus_trap">Barreira seletiva para ônibus</string>
+    <string name="type.barrier.sump_buster">Lombada seletiva</string>
+    <string name="type.shop.tool_hire">Aluguel de ferramentas</string>
 </resources>

@@ -1,10 +1,8 @@
-• Mostra opções de percurso ativadas e botão para alterar ao criar
-• Pré-visualização das instruções de navegação passo a passo
-• Opções de percurso por meio de transporte
-• Instruções melhoradas para rotundas, inversões e outros casos
-• Ícones de destino e paragens na barra de progresso
-• Adicionados símbolos de estrada aos sinais de direção e melhores descrições de manobra
-• Pesquisa em todas as listas de favoritos
-• Definições divididas em subpáginas
+• Link para adicionar novas avaliações na página do local
+• Velocidade atual no Android Auto
+• Classificações das avaliações nos resultados de pesquisa
+• Estrelas de hotéis/restaurantes como texto
+• Adicionadas lojas de aluguer e bibliotecas de ferramentas, sinais de trânsito da Roménia e de Marrocos; corrigidos os de Augsburg (Alemanha) e das estradas A de Chipre
+• Alterar a pré-visualização e o botão "Guardar" para ícones no ecrã de planeamento de percursos
 
 Mais detalhes em comaps.app/latest

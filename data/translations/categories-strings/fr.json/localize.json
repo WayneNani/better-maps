@@ -3,7 +3,7 @@
         "defaultMessage": "Où manger|Nourriture|Manger"
     },
     "@category_food": {
-        "defaultMessage": "4Epiceries|5Nourriture|5Alimentation"
+        "defaultMessage": "Épicerie|4Epiceries|5Nourriture|5Alimentation"
     },
     "@category_transport": {
         "defaultMessage": "5Transport"
@@ -45,10 +45,10 @@
         "defaultMessage": "3Banque|Agence Bancaire"
     },
     "@category_secondhand": {
-        "defaultMessage": "D'occasion|Seconde main"
+        "defaultMessage": "D’occasion|D'occasion|Seconde main"
     },
     "amenity-bank|@category_bank": {
-        "defaultMessage": "argent"
+        "defaultMessage": "Banque|Argent"
     },
     "@category_recycling": {
         "defaultMessage": "4Recyclage|Traitement des déchets|Dépôt de matières recyclables|Tri de déchets|Tri des déchets|Réutilisation"
@@ -564,7 +564,7 @@
         "defaultMessage": "3Toilettes"
     },
     "amenity-toilets|toilets-yes|@category_toilet": {
-        "defaultMessage": "wc"
+        "defaultMessage": "wc|toilettes"
     },
     "amenity-university": {
         "defaultMessage": "4Université|école supérieure"
@@ -993,7 +993,7 @@
         "defaultMessage": "Parking à vélo|Stationnement vélo"
     },
     "amenity-waste_basket": {
-        "defaultMessage": "Poubelle"
+        "defaultMessage": "4Poubelle|3Ordures"
     },
     "emergency-phone": {
         "defaultMessage": "3Téléphone d'urgence"
@@ -1170,7 +1170,7 @@
         "defaultMessage": "École de langue"
     },
     "amenity-ice_cream": {
-        "defaultMessage": "Stand de crème glacée|Marchand de glaces|Glacier"
+        "defaultMessage": "Stand de glace|Marchand de glaces|Glacier"
     },
     "amenity-internet_cafe": {
         "defaultMessage": "5Cybercafé"
@@ -1386,7 +1386,7 @@
         "defaultMessage": "Salle de sport"
     },
     "amenity-arts_centre|@category_tourism": {
-        "defaultMessage": "Centre artistique"
+        "defaultMessage": "Centre artistique|Centre culturel"
     },
     "amenity-prison": {
         "defaultMessage": "prison|centre pénitentiaire|centre de détention"
@@ -1545,7 +1545,7 @@
         "defaultMessage": "Hot-dog"
     },
     "cuisine-ice_cream": {
-        "defaultMessage": "Crème glacée"
+        "defaultMessage": "Glace|Crème glacée"
     },
     "cuisine-kebab|@fastfood": {
         "defaultMessage": "Kebab"
@@ -1563,7 +1563,7 @@
         "defaultMessage": "Pizza"
     },
     "cuisine-ramen": {
-        "defaultMessage": "Râmen"
+        "defaultMessage": "Rāmen"
     },
     "cuisine-sandwich|@fastfood": {
         "defaultMessage": "Sandwich"
@@ -1572,7 +1572,7 @@
         "defaultMessage": "Saucisse"
     },
     "cuisine-seafood|cuisine-fish": {
-        "defaultMessage": "Fruits de mer|Poisson"
+        "defaultMessage": "4Fruits de mer|4Poisson|5Restaurant de poissons"
     },
     "cuisine-soba": {
         "defaultMessage": "Soba"
@@ -1624,5 +1624,107 @@
     },
     "amenity-planetarium|@category_tourism": {
         "defaultMessage": "Planétarium|U+1FA90|Astronomie"
+    },
+    "shop-beauty-nails": {
+        "defaultMessage": "Institut de beauté|4Ésthéticien|5ongles"
+    },
+    "recycling-cartons|@category_recycling": {
+        "defaultMessage": "5Recyclage de cartons|Cartons de recyclage"
+    },
+    "man_made-telescope|man_made-telescope-optical|man_made-telescope-radio|man_made-telescope-gamma": {
+        "defaultMessage": "6Télescope|Télescope radio"
+    },
+    "amenity-animal_boarding": {
+        "defaultMessage": "Pet-Sitter|7Gardiennage d'animaux"
+    },
+    "amenity-sailing_school": {
+        "defaultMessage": "École de voilier"
+    },
+    "amenity-flight_school": {
+        "defaultMessage": "École aéronautique"
+    },
+    "shop|@shop": {
+        "defaultMessage": "magasin"
+    },
+    "amenity-mobile_money_agent": {
+        "defaultMessage": "Crédit téléphonique|Unité téléphonique|4Forfait téléphonique"
+    },
+    "amenity-gambling|@gambling": {
+        "defaultMessage": "4Jetons"
+    },
+    "leisure-hackerspace": {
+        "defaultMessage": "5Cybercafé|Hacklab"
+    },
+    "sport-boules": {
+        "defaultMessage": "Boules|Pétanque"
+    },
+    "sport-four_square": {
+        "defaultMessage": "City|4Terrain de jeu"
+    },
+    "natural-water|@waterbody": {
+        "defaultMessage": "Cours d'eau|5Étendues d'eau"
+    },
+    "waterway-fuel": {
+        "defaultMessage": "9Dépôt de carburant maritime"
+    },
+    "amenity-charging_station|@charging_station": {
+        "defaultMessage": "Station de recharge"
+    },
+    "amenity-community_centre-youth_centre": {
+        "defaultMessage": "Foyer"
+    },
+    "shop-water|@category_water|@category_food|@shop": {
+        "defaultMessage": "3Eau potable"
+    },
+    "power-generator-wind": {
+        "defaultMessage": "Éolienne"
+    },
+    "tourism-information-guidepost": {
+        "defaultMessage": "Point d'information"
+    },
+    "building-abandoned": {
+        "defaultMessage": "Bâtiment abandonné|abandonné"
+    },
+    "shop-beauty-day_spa": {
+        "defaultMessage": "Spa|bien-être"
+    },
+    "leisure-indoor_play": {
+        "defaultMessage": "Aire de jeux d'intérieur|aire de jeux couverte"
+    },
+    "leisure-fitness_centre-sport-yoga": {
+        "defaultMessage": "4Salle de yoga|3Cours de yoga"
+    },
+    "amenity-car_pooling|@category_parking": {
+        "defaultMessage": "3Covoiturage"
+    },
+    "emergency-life_ring": {
+        "defaultMessage": "4Bouée de sauvetage"
+    },
+    "amenity-give_box": {
+        "defaultMessage": "Boîte à dons|Dons"
+    },
+    "amenity-tool_library": {
+        "defaultMessage": "3Prêt d'outils|4Location d'outils|3Outils"
+    },
+    "amenity-bicycle_parking-covered": {
+        "defaultMessage": "4Parking à vélos couvert|3Abri à vélos"
+    },
+    "amenity-vending_machine": {
+        "defaultMessage": "5Distributeur automatique"
+    },
+    "tourism-information-tactile_map": {
+        "defaultMessage": "5Carte touristique|Plan|4Information|Plan interactif"
+    },
+    "barrier-toll_booth": {
+        "defaultMessage": "4Barrière de péage"
+    },
+    "amenity-payment_centre": {
+        "defaultMessage": "3Guichet de paiement"
+    },
+    "leisure-marina": {
+        "defaultMessage": "3Marina|3Port"
+    },
+    "shop-telecommunication|@shop": {
+        "defaultMessage": "4Boutique télécoms|4Boutique de téléphones|5Téléphonie"
     }
 }

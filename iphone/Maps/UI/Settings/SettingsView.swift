@@ -14,8 +14,12 @@ struct SettingsView: View {
     
     /// The selected mobile data policy
     @State private var selectedMobileDataPolicy: Settings.MobileDataPolicy = .always
-    
-    
+
+
+    /// The saved custom map server shown in the settings row
+    @State private var customMapDownloadUrl: String = ""
+
+
     /// The selected power saving mode
     @State private var selectedPowerSavingMode: Settings.PowerSavingMode = .never
     
@@ -26,26 +30,22 @@ struct SettingsView: View {
     
     /// The selected appearance
     @State private var selectedAppearance: Settings.Appearance = .auto
+
     
-    
-    /// The selected left button type
-    @State private var selectedLeftButtonType: Settings.LeftButtonType = .help
+    /// The selected custom button type
+    @State private var selectedCustomButtonKind: MapCustomButton.Kind = .favourites
     
     
     /// If zoom buttons should be displayed
-    @State private var hasZoomButtons: Bool = true
+    @State private var hasZoomButtons: Bool = false
     
     
     /// The selected map appearance
     @State private var selectedMapAppearance: Settings.Appearance = .auto
     
     
-    /// If an increased font size should be used for map labels
-    @State private var hasIncreasedFontsize: Bool = false
-    
-    
-    /// If 3D buildings should be displayed
-    @State private var has3dBuildings: Bool = true
+    /// Font size to use for map labels
+    @State private var fontScaleFactor: Double = 1.0
     
     
     /// The selected language for the map
@@ -58,6 +58,9 @@ struct SettingsView: View {
     
     /// If names should be transliterated to Latin
     @State private var shouldTransliterateToLatin: Bool = false
+    
+    /// The selected bookmarks label position
+    @State private var showBookmarkLabels: Bool = false
     
     
     /// If the bookmarks should be synced via iCloud
@@ -113,6 +116,7 @@ struct SettingsView: View {
                     } label: {
                         Text("mobile_data")
                     }
+
                     
                     Picker(selection: $selectedPowerSavingMode) {
                         ForEach(Settings.PowerSavingMode.allCases) { powerSavingMode in
@@ -147,12 +151,12 @@ struct SettingsView: View {
                         Text("pref_appearance_title")
                     }
                     
-                    Picker(selection: $selectedLeftButtonType) {
-                        ForEach(Settings.LeftButtonType.allCases) { leftButtonType in
-                            Text(leftButtonType.description)
+                    Picker(selection: $selectedCustomButtonKind) {
+                        ForEach(MapCustomButton.Kind.allCases) { customButtonKind in
+                            Text(customButtonKind.description)
                         }
                     } label: {
-                        Text("pref_left_button_type")
+                        Text("pref_custom_button_type")
                     }
                     
                     Toggle("pref_zoom_title", isOn: $hasZoomButtons)
@@ -174,23 +178,22 @@ struct SettingsView: View {
                     } label: {
                         Text("pref_mapappearance_title")
                     }
-                    
-                    Toggle("big_font", isOn: $hasIncreasedFontsize)
-                        .tint(.accent)
-                    
-                    Toggle(isOn: $has3dBuildings) {
-                        VStack(alignment: .leading) {
-                            Text("pref_map_3d_buildings_title")
-                            
-                            if selectedPowerSavingMode == .maximum {
-                                Text("pref_map_3d_buildings_disabled_summary")
-                                    .font(.footnote)
-                                    .foregroundStyle(.secondary)
-                            }
+
+                    VStack(alignment: .leading) {
+                        Text("pref_font_size")
+                        Slider(
+                            value: $fontScaleFactor,
+                            in: 1.0...4.0,
+                            step: 0.25,
+                        ) {
+                            Text("font_size")
+                        } minimumValueLabel: {
+                            Text(verbatim: "100%")
+                        } maximumValueLabel: {
+                            Text(verbatim: "400%")
                         }
+                            .tint(.accent)
                     }
-                    .tint(.accent)
-                    .disabled(selectedPowerSavingMode == .maximum)
                     
                     Picker(selection: $selectedLanguageForMap) {
                         ForEach(Settings.availableLanguagesForMap) { languageForMap in
@@ -204,6 +207,9 @@ struct SettingsView: View {
                     } label: {
                         Text("pref_maplanguage_title")
                     }
+                    
+                    Toggle("bookmarks_text_placement_title", isOn: $showBookmarkLabels)
+                        .tint(.accent)
                     
                     Picker(selection: $alternativeMapLanguageHandling) {
                         ForEach(Settings.AlternativeMapLanguageHandling.allCases) { alternativeMapLanguageHandling in
@@ -251,7 +257,6 @@ struct SettingsView: View {
                                 Image(systemName: "icloud")
                                 
                                 Text("icloud_sync")
-                                    .lineLimit(1)
                             }
                             
                             if !isSyncPossible {
@@ -299,6 +304,25 @@ struct SettingsView: View {
                 }
                 
                 Section {
+                    NavigationLink {
+                        CustomMapServerView { url in
+                            customMapDownloadUrl = url
+                        }
+                    } label: {
+                        HStack {
+                            Text("custom_map_server")
+                            Spacer()
+                            if customMapDownloadUrl.isEmpty {
+                                Text("not_set")
+                                    .foregroundStyle(.gray)
+                            } else {
+                                Text(customMapDownloadUrl)
+                                    .foregroundStyle(.gray)
+                                    .lineLimit(1)
+                            }
+                        }
+                    }
+
                     Toggle(isOn: $isLogging) {
                         VStack(alignment: .leading) {
                             Text("enable_logging")
@@ -340,17 +364,18 @@ struct SettingsView: View {
         .onAppear {
             hasAutomaticDownload = Settings.hasAutomaticDownload
             selectedMobileDataPolicy = Settings.mobileDataPolicy
+            customMapDownloadUrl = Settings.customMapDownloadUrl
             selectedPowerSavingMode = Settings.powerSavingMode
             selectedDistanceUnit = Settings.distanceUnit
             selectedAppearance = Settings.appearance
-            selectedLeftButtonType = Settings.leftButtonType
+            selectedCustomButtonKind = Settings.customButtonKind
             hasZoomButtons = Settings.hasZoomButtons
             selectedMapAppearance = Settings.mapAppearance
-            hasIncreasedFontsize = Settings.hasIncreasedFontsize
-            has3dBuildings = Settings.has3dBuildings
+            fontScaleFactor = Settings.fontScaleFactor
             selectedLanguageForMap = Settings.languageForMap
             alternativeMapLanguageHandling = Settings.alternativeMapLanguageHandling
             shouldTransliterateToLatin = Settings.shouldTransliterateToLatin
+            showBookmarkLabels = Settings.showBookmarkLabels
             shouldSync = Settings.shouldSync
             isLogging = Settings.isLogging
         }
@@ -369,8 +394,8 @@ struct SettingsView: View {
         .onChange(of: selectedAppearance) { changedSelectedAppearance in
             Settings.appearance = changedSelectedAppearance
         }
-        .onChange(of: selectedLeftButtonType) { changedSelectedLeftButtonType in
-            Settings.leftButtonType = changedSelectedLeftButtonType
+        .onChange(of: selectedCustomButtonKind) { changedSelectedCustomButtonKind in
+            Settings.customButtonKind = changedSelectedCustomButtonKind
         }
         .onChange(of: hasZoomButtons) { changedHasZoomButtons in
             Settings.hasZoomButtons = changedHasZoomButtons
@@ -378,11 +403,8 @@ struct SettingsView: View {
         .onChange(of: selectedMapAppearance) { changedSelectedMapAppearance in
             Settings.mapAppearance = changedSelectedMapAppearance
         }
-        .onChange(of: hasIncreasedFontsize) { changedHasIncreasedFontsize in
-            Settings.hasIncreasedFontsize = changedHasIncreasedFontsize
-        }
-        .onChange(of: has3dBuildings) { changedHas3dBuildings in
-            Settings.has3dBuildings = changedHas3dBuildings
+        .onChange(of: fontScaleFactor) { changedFontScaleFactor in
+            Settings.fontScaleFactor = changedFontScaleFactor
         }
         .onChange(of: selectedLanguageForMap) { changedSelectedLanguageForMap in
             if let changedSelectedLanguageForMap {
@@ -394,6 +416,9 @@ struct SettingsView: View {
         }
         .onChange(of: shouldTransliterateToLatin) { changedShouldTransliterateToLatin in
             Settings.shouldTransliterateToLatin = changedShouldTransliterateToLatin
+        }
+        .onChange(of: showBookmarkLabels) { showBookmarkLabels in
+            Settings.showBookmarkLabels = showBookmarkLabels
         }
         .onChange(of: shouldSync) { changedShouldSync in
             if changedShouldSync, !Settings.hasShownSyncBetaAlert {
@@ -411,4 +436,5 @@ struct SettingsView: View {
         }
         .accentColor(.toolbarAccent)
     }
+
 }

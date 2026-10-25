@@ -10,6 +10,8 @@
 #include "platform/local_country_file_utils.hpp"
 #include "platform/network_policy_ios.h"
 
+#include <cmath>
+
 @implementation MWMFrameworkHelper
 
 + (void)processFirstLaunch:(BOOL)hasLocation {
@@ -21,44 +23,59 @@
 }
 
 + (void)setVisibleViewport:(CGRect)rect scaleFactor:(CGFloat)scale {
+  if (!std::isfinite(scale) || scale <= 0)
+    return;
   CGFloat const x0 = rect.origin.x * scale;
   CGFloat const y0 = rect.origin.y * scale;
   CGFloat const x1 = x0 + rect.size.width * scale;
   CGFloat const y1 = y0 + rect.size.height * scale;
+  // Drop degenerate viewports that often happen on CarPlay scene handovers
+  if (!std::isfinite(x0) || !std::isfinite(y0) || !std::isfinite(x1) || !std::isfinite(y1) ||
+      x1 <= x0 || y1 <= y0)
+    return;
   GetFramework().SetVisibleViewport(m2::RectD(x0, y0, x1, y1));
 }
 
 + (void)setTheme:(MWMTheme)theme {
   auto &f = GetFramework();
 
-  auto const style = f.GetMapStyle();
-  auto const isOutdoor = ^BOOL(MapStyle style) {
-    switch (style) {
-      case MapStyleOutdoorsLight:
-      case MapStyleOutdoorsDark:
-        return YES;
-      default:
-        return NO;
-    }
-  }(style);
-  auto const newStyle = ^MapStyle(MWMTheme theme) {
+  auto const mapAppearance = f.CurrentMapAppearance();
+  auto const newMapAppearance = ^MapAppearance(MWMTheme theme) {
     switch (theme) {
       case MWMThemeDay:
-        return isOutdoor ? MapStyleOutdoorsLight : MapStyleDefaultLight;
+        return MapAppearance::Light;
       case MWMThemeVehicleDay:
-        return MapStyleVehicleLight;
+        return MapAppearance::Light;
       case MWMThemeNight:
-        return isOutdoor ? MapStyleOutdoorsDark : MapStyleDefaultDark;
+        return MapAppearance::Dark;
       case MWMThemeVehicleNight:
-        return MapStyleVehicleDark;
+        return MapAppearance::Dark;
       case MWMThemeAuto:
         NSAssert(NO, @"Invalid theme");
-        return MapStyleDefaultLight;
+        return MapAppearance::Light;
     }
   }(theme);
+  if (mapAppearance != newMapAppearance)
+    f.SwitchToMapAppearance(newMapAppearance);
 
-  if (style != newStyle)
-    f.SetMapStyle(newStyle);
+  auto const isUsingVehicleStyle = f.IsUsingVehicleStyle();
+  auto const newIsUsingVehicleStyle = ^bool(MWMTheme theme) {
+    switch (theme) {
+      case MWMThemeDay:
+        return false;
+      case MWMThemeVehicleDay:
+        return true;
+      case MWMThemeNight:
+        return false;
+      case MWMThemeVehicleNight:
+        return true;
+      case MWMThemeAuto:
+        NSAssert(NO, @"Invalid theme");
+        return false;
+    }
+  }(theme);
+  if (isUsingVehicleStyle != newIsUsingVehicleStyle)
+    f.SwitchToUsingVehicleStyle(newIsUsingVehicleStyle);
 }
 
 + (MWMDayTime)daytimeAtLocation:(CLLocation *)location {

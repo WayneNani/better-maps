@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- SECTION: Types -->
-    <string name="type.addr_interpolation">Adresa/blok</string>
-    <string name="type.addr_interpolation.even">Adresa/blok</string>
-    <string name="type.addr_interpolation.odd">Adresa/blok</string>
+    <string name="type.addr_interpolation">Adresa/Blok</string>
+    <string name="type.addr_interpolation.even">Adresa/Blok</string>
+    <string name="type.addr_interpolation.odd">Adresa/Blok</string>
     <string name="type.aerialway.station">Stanice lanové dráhy</string>
     <string name="type.aeroway.aerodrome">Letiště</string>
     <string name="type.aeroway.aerodrome.international">Mezinárodní letiště</string>
@@ -13,7 +13,7 @@
     <string name="type.amenity.bank">Banka</string>
     <string name="type.amenity.bbq">Grilování</string>
     <string name="type.amenity.bench">Lavička</string>
-    <string name="type.amenity.bicycle_parking">Parkování kol</string>
+    <string name="type.amenity.bicycle_parking">Parkoviště kol</string>
     <string name="type.amenity.bicycle_rental">Půjčovna kol</string>
     <string name="type.amenity.bicycle_repair_station">Stanice na opravu jízdních kol</string>
     <string name="type.amenity.biergarten">Hospoda se zahrádkou</string>
@@ -737,7 +737,7 @@
     <string name="type.railway.station.monorail">Stanice monorailu</string>
     <string name="type.railway.station.subway">Stanice metra</string>
     <string name="type.railway.station.subway.adana">Stanice metra</string>
-    <string name="type.railway.station.subway.algiers">Stanice metra v Alžíru</string>
+    <string name="type.railway.station.subway.algiers">Stanice metra</string>
     <string name="type.railway.station.subway.almaty">Stanice metra</string>
     <string name="type.railway.station.subway.amsterdam">Stanice metra</string>
     <string name="type.railway.station.subway.ankara">Stanice metra</string>
@@ -1399,7 +1399,7 @@
     <string name="type.natural.wetland.tidalflat">Wattové pobřeží</string>
     <string name="type.leisure.escape_game">Úniková hra</string>
     <string name="type.post_office.post_partner">Poštovní partner</string>
-    <string name="type.amenity.bicycle_parking.covered">Kryté parkování kol</string>
+    <string name="type.amenity.bicycle_parking.covered">Kryté parkoviště kol</string>
     <string name="type.amenity.luggage_locker">Úschovná skříňka</string>
     <string name="type.amenity.ranger_station">Správci parku</string>
     <string name="type.amenity.animal_shelter">Útulek pro zvířata</string>
@@ -1446,7 +1446,7 @@
     <string name="type.disusedbusiness">Neobsazený prostor</string>
     <string name="type.leisure.fitness_centre.sport.yoga">Studio jógy</string>
     <string name="type.amenity.boat_rental">Půjčovna lodí</string>
-    <string name="type.amenity.mobile_money_agent">Mobilní peněžní agent</string>
+    <string name="type.amenity.mobile_money_agent">Agent Mobile Money</string>
     <string name="type.amenity.payment_centre">Platební centrum</string>
     <string name="type.leisure.indoor_play">Vnitřní herní centrum</string>
     <string name="type.shop.telecommunication">Telekomunikační obchod</string>
@@ -1537,4 +1537,12 @@
     <string name="type.amenity.toilets.customers">Pouze pro zákazníky</string>
     <string name="type.amenity.toilets.private">Soukromé</string>
     <string name="type.amenity.animal_boarding">Hotel pro zvířata</string>
+    <string name="type.landuse.military.danger_area">Nebezpečná vojenská oblast</string>
+    <string name="type.railway.station.subway.boston">Stanice metra</string>
+    <string name="type.railway.subway_entrance.boston">Vchod do metra</string>
+    <string name="type.railway.subway_entrance.qingdao">Vchod do metra</string>
+    <string name="type.amenity.tool_library">Knihovna nářadí</string>
+    <string name="type.building.abandoned">Opuštěná budova</string>
+    <string name="type.shop.tool_hire">Půjčovna nářadí</string>
+    <string name="type.amenity.parking.customers">Parkoviště pro zákazníky</string>
 </resources>

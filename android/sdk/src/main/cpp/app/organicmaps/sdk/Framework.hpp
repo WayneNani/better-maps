@@ -15,6 +15,7 @@
 #include "drape/pointers.hpp"
 
 #include "indexer/feature_decl.hpp"
+#include "indexer/map_object.hpp"
 #include "indexer/map_style.hpp"
 
 #include "platform/country_defines.hpp"
@@ -111,9 +112,12 @@ public:
   void PauseSurfaceRendering();
   void ResumeSurfaceRendering();
 
-  void SetMapStyle(MapStyle mapStyle);
-  void MarkMapStyle(MapStyle mapStyle);
-  MapStyle GetMapStyle() const;
+  void SwitchToMapAppearance(MapAppearance mapAppearance);
+  MapAppearance CurrentMapAppearance();
+  void SwitchToMapMode(MapMode mapMode);
+  MapMode CurrentMapMode();
+  void SwitchToUsingVehicleStyle(bool enabled);
+  bool IsUsingVehicleStyle();
 
   void SetupMeasurementSystem();
 
@@ -212,6 +216,7 @@ public:
   void CleanWidgets();
 
   place_page::Info & GetPlacePageInfo();
+  osm::MapObject GetMapObjectByID(FeatureID const & featureId) const;
 
   bool IsAutoRetryDownloadFailed();
   bool IsDownloadOn3gEnabled();

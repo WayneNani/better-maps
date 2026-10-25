@@ -189,7 +189,7 @@
     <string name="type.barrier.yes">Баријера</string>
     <string name="type.barrier.block">Блок</string>
     <string name="type.barrier.bollard">Стуб</string>
-    <string name="type.barrier.border_control">Гранична контрола</string>
+    <string name="type.barrier.border_control">Гранични прелаз</string>
     <string name="type.barrier.chain">Ланац</string>
     <string name="type.barrier.city_wall">Градски зид / Бедем</string>
     <string name="type.barrier.cycle_barrier">Баријера за бицикле</string>
@@ -211,7 +211,7 @@
     <string name="type.boundary">Граница</string>
     <string name="type.boundary.administrative">Административна граница</string>
     <!-- Borders between countries. -->
-    <string name="type.boundary.administrative.2">Гранични прелаз</string>
+    <string name="type.boundary.administrative.2">Државна граница</string>
     <!-- Country's primary subdivision borders, e.g. between regions, provinces, states.. -->
     <string name="type.boundary.administrative.3">Регионална граница</string>
     <!-- Country's primary subdivision borders, e.g. between regions, provinces, states.. -->
@@ -319,7 +319,7 @@
     <string name="type.cuisine.moroccan">Мароканска</string>
     <string name="type.cuisine.noodles">Нудле</string>
     <string name="type.cuisine.oriental">Оријентална</string>
-    <string name="type.cuisine.pancake">Палачинке</string>
+    <string name="type.cuisine.pancake">Америчке палачинке</string>
     <string name="type.cuisine.pasta">Паста</string>
     <string name="type.cuisine.persian">Персијска</string>
     <string name="type.cuisine.peruvian">Перуанска</string>
@@ -1540,4 +1540,14 @@
     <string name="type.amenity.toilets.customers">Само за муштерије</string>
     <string name="type.amenity.toilets.private">Приватни</string>
     <string name="type.amenity.animal_boarding">Хотел за љубимце</string>
+    <string name="type.landuse.military.danger_area">Војна зона опасности</string>
+    <string name="type.railway.station.subway.boston">Метро станица</string>
+    <string name="type.railway.subway_entrance.boston">Улаз у метро</string>
+    <string name="type.railway.subway_entrance.qingdao">Улаз у метро</string>
+    <string name="type.building.abandoned">Напуштена зграда</string>
+    <string name="type.amenity.parking.customers">Паркинг за муштерије</string>
+    <string name="type.amenity.tool_library">Позајмљивање алата</string>
+    <string name="type.barrier.bus_trap">Аутобуска замка</string>
+    <string name="type.barrier.sump_buster">Разбијач картера</string>
+    <string name="type.shop.tool_hire">Изнајмљивање алата</string>
 </resources>

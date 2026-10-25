@@ -545,6 +545,7 @@
 # === 130
 
 # building                                          # area z14- (also has caption z17-)
+# building-abandoned                                # area z14- (also has caption z17-)
 # building-garage                                   # area z14- (also has caption z17-)
 # building-guardhouse                               # area z14- (also has icon z18-, caption(optional) z18-)
 # building-has_parts                                # area z14- (also has caption z17-)
@@ -618,5 +619,5 @@
 # man_made-bridge                                   # area z14-
 # === 10
 
-# natural-tree_row                                  # line z18-
+# natural-tree_row                                  # line z17-
 # === 5
