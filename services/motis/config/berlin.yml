@@ -1,0 +1,36 @@
+# MOTIS 2.11 configuration, profile "berlin": VBB timetable (Berlin-Brandenburg) + OSM Berlin.
+#
+# Input files, downloaded by scripts/fetch-data.sh into $MOTIS_CACHE/input (mounted as /input):
+# input: berlin-latest.osm.pbf https://download.geofabrik.de/europe/germany/berlin-latest.osm.pbf
+# input: vbb.gtfs.zip https://www.vbb.de/vbbgtfs
+#
+# The dataset tag "de-VBB" equals the one used by Transitous, so stop and trip IDs have the same form
+# ("de-VBB_de:11000:900100003") and IDs stored by the app keep working when switching the server.
+# The OSM extract only covers Berlin: stops in Brandenburg are routable, but walking to/from coordinates
+# outside Berlin is not.
+
+server:
+  port: 8080
+  web_folder: /ui
+  data_attribution_link: https://www.vbb.de/vbb-services/api-open-data/datensaetze/
+
+osm: /input/berlin-latest.osm.pbf
+
+timetable:
+  first_day: TODAY
+  # Weekly re-import + two weeks of look-ahead. Fewer days = less RAM.
+  num_days: 21
+  railviz: false          # vehicle positions on the web map, not used by the app
+  with_shapes: true       # leg geometries for the app
+  update_interval: 60
+  datasets:
+    de-VBB:
+      path: /input/vbb.gtfs.zip
+
+street_routing: true      # walking to/from stops (first/last mile, transfers)
+osr_footpath: true
+geocoding: true
+reverse_geocoding: true   # the app finds the nearest stop via /api/v1/reverse-geocode?type=STOP
+
+logging:
+  log_level: info

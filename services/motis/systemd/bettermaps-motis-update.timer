@@ -1,0 +1,11 @@
+[Unit]
+Description=Weekly better-maps MOTIS data update
+
+[Timer]
+# Monday night; gtfs.de and VBB publish new timetables during the week, Geofabrik daily.
+OnCalendar=Mon *-*-* 03:30
+RandomizedDelaySec=30min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
