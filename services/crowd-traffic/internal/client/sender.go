@@ -102,6 +102,13 @@ func (s *Sender) FetchKeys(ctx context.Context) error {
 	return ohttp.ErrUnsupportedSuite
 }
 
+// KeyConfig returns the key configuration in use (nil before FetchKeys).
+func (s *Sender) KeyConfig() *ohttp.KeyConfig {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.config
+}
+
 // EncodeRequest builds the binary HTTP request for a bundle: POST /v1/reports with Date and
 // Content-Type headers, padded to protocol.PadTo bytes.
 func EncodeRequest(reports []protocol.Report, now time.Time, authority string) ([]byte, error) {

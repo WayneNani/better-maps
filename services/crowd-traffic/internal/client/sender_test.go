@@ -39,7 +39,7 @@ func TestSenderAgainstGateway(t *testing.T) {
 	if err := s.Send(context.Background(), oneReport(now)); err != nil {
 		t.Fatal(err)
 	}
-	if srv.Health().Aggregator.ReportsAccepted != 1 {
+	if s.KeyConfig() == nil || srv.Health().Aggregator.ReportsAccepted != 1 {
 		t.Fatal("report not counted")
 	}
 }

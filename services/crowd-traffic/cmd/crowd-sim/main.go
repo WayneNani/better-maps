@@ -11,14 +11,16 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	"io"
-	"math/rand/v2"
+	mrand "math/rand/v2"
 	"net/http"
 	"os"
 	"os/signal"
@@ -28,8 +30,10 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/WayneNani/better-maps/services/crowd-traffic/internal/bhttp"
 	"github.com/WayneNani/better-maps/services/crowd-traffic/internal/client"
 	"github.com/WayneNani/better-maps/services/crowd-traffic/internal/export"
+	"github.com/WayneNani/better-maps/services/crowd-traffic/internal/ohttp"
 	"github.com/WayneNani/better-maps/services/crowd-traffic/internal/protocol"
 	"github.com/WayneNani/better-maps/services/crowd-traffic/internal/sim"
 )
@@ -51,6 +55,7 @@ type options struct {
 	window, grace       time.Duration
 	seed                uint64
 	dryRun, check       bool
+	replayCheck         bool
 	concurrency         int
 }
 
@@ -66,6 +71,7 @@ func parse(args []string, out io.Writer) (options, error) {
 	fs.Uint64Var(&o.seed, "seed", 1, "random seed of the simulation (the OHTTP layer always uses crypto/rand)")
 	fs.BoolVar(&o.dryRun, "dry-run", false, "only print statistics and an example bundle")
 	fs.BoolVar(&o.check, "check", false, "wait for the evaluation and verify the export")
+	fs.BoolVar(&o.replayCheck, "replay-check", false, "only send one encapsulated request twice and verify that the replay is rejected")
 	fs.IntVar(&o.concurrency, "concurrency", 8, "parallel requests")
 	if err := fs.Parse(args); err != nil {
 		return o, err
@@ -88,8 +94,11 @@ func run(ctx context.Context, args []string, out io.Writer, now func() time.Time
 	if err != nil {
 		return err
 	}
+	if o.replayCheck {
+		return replayCheck(ctx, o, out, now)
+	}
 	sc := sim.Berlin()
-	rnd := rand.New(rand.NewPCG(o.seed, 0x5eed))
+	rnd := mrand.New(mrand.NewPCG(o.seed, 0x5eed))
 	ccfg := client.DefaultConfig()
 	virtualStart := now().Truncate(ccfg.Window)
 	bundles := sim.Plan(sc.Trips(virtualStart, ccfg.Window, rnd), ccfg, rnd)
@@ -238,4 +247,53 @@ func getJSON(ctx context.Context, url string, v any) error {
 		return fmt.Errorf("%s: status %d", url, resp.StatusCode)
 	}
 	return json.NewDecoder(resp.Body).Decode(v)
+}
+
+// replayCheck sends the same encapsulated request twice. The gateway must process the first one
+// and reject the second one as a replay (inside the encapsulated response).
+func replayCheck(ctx context.Context, o options, out io.Writer, now func() time.Time) error {
+	s := &client.Sender{KeysURL: o.keys}
+	if err := s.FetchKeys(ctx); err != nil {
+		return err
+	}
+	cfg := s.KeyConfig()
+	plain, err := client.EncodeRequest([]protocol.Report{}, now(), client.DefaultAuthority)
+	if err != nil {
+		return err
+	}
+	enc, cctx, err := ohttp.EncapsulateRequest(*cfg, plain, rand.Reader)
+	if err != nil {
+		return err
+	}
+	var statuses []int
+	for range 2 {
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, o.relay, bytes.NewReader(enc))
+		if err != nil {
+			return err
+		}
+		req.Header.Set("Content-Type", ohttp.ContentTypeRequest)
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return err
+		}
+		body, _ := io.ReadAll(resp.Body)
+		resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			return fmt.Errorf("outer status %d", resp.StatusCode)
+		}
+		pt, err := cctx.DecapsulateResponse(body)
+		if err != nil {
+			return err
+		}
+		inner, err := bhttp.UnmarshalResponse(pt, 1<<16)
+		if err != nil {
+			return err
+		}
+		statuses = append(statuses, inner.Status)
+		if len(statuses) == 2 && !strings.Contains(string(inner.Body), "replay") {
+			return fmt.Errorf("second request not rejected as replay: %d %s", inner.Status, inner.Body)
+		}
+	}
+	fmt.Fprintf(out, "replay check OK (inner status %d, then %d)\n", statuses[0], statuses[1])
+	return nil
 }

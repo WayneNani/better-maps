@@ -129,3 +129,24 @@ func TestErrors(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestReplayCheck(t *testing.T) {
+	clk := &clock{t: time.Now()}
+	srv, hs := testServer(t, clk, time.Minute)
+	out := &bytes.Buffer{}
+	if err := run(context.Background(), []string{"-relay", hs.URL + "/gateway", "-replay-check"}, out, time.Now); err != nil {
+		t.Fatalf("%v\n%s", err, out)
+	}
+	if !strings.Contains(out.String(), "replay check OK") || srv.Health().Gateway.Replays != 1 {
+		t.Fatalf("output %s, health %+v", out, srv.Health().Gateway)
+	}
+	// Against something that is not a gateway.
+	for _, relay := range []string{hs.URL + "/v1/traff", "http://127.0.0.1:1/gateway"} {
+		if err := run(context.Background(), []string{"-relay", relay, "-keys", hs.URL + "/ohttp-keys", "-replay-check"}, io.Discard, time.Now); err == nil {
+			t.Errorf("%s: no error", relay)
+		}
+	}
+	if err := run(context.Background(), []string{"-relay", "http://127.0.0.1:1/x", "-replay-check"}, io.Discard, time.Now); err == nil {
+		t.Error("unreachable keys")
+	}
+}
