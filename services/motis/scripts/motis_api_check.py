@@ -33,6 +33,7 @@ ALEX = "52.521900,13.413200"
 COTTBUS = "51.756300,14.332900"
 POTSDAM = "52.391700,13.066100"
 ALEX_STOP = "de-VBB_de:11000:900100003"
+POTSDAM_HBF_STOP = "de-VBB_de:12054:900230999"
 
 
 class Result:
@@ -143,11 +144,10 @@ def check_stoptimes(r, data, now, label, min_count=1):
             continue
         t = parse_time(dep)
         r.check(now - dt.timedelta(hours=1) <= t <= now + dt.timedelta(hours=24), f"{q}: time {dep} plausible")
-        sched = place.get("scheduledDeparture") or place.get("scheduledArrival")
-        if prev is not None and sched:
-            r.check(parse_time(sched) >= prev - dt.timedelta(seconds=1), f"{q}: sorted by scheduled time")
-        if sched:
-            prev = parse_time(sched)
+        # MOTIS sorts by the actual (realtime) time.
+        if prev is not None:
+            r.check(t >= prev - dt.timedelta(seconds=1), f"{q}: sorted by time")
+        prev = t
         r.check(bool(st.get("routeShortName") or st.get("displayName")), f"{q}: has a line name")
         r.check(bool(st.get("headsign")), f"{q}: has a headsign")
         r.check(st.get("mode") in TRANSIT_MODES, f"{q}: transit mode ({st.get('mode')})")
@@ -191,23 +191,28 @@ def smoke(args):
         check_stoptimes(r, data, now, "stoptimes", min_count=10)
 
     if args.expect_realtime:
-        print("realtime (regional trains around Berlin)")
+        print("realtime (departures around Berlin Hbf and Alexanderplatz)")
         all_sts = []
         status, matches, _, _ = get(base, "/api/v1/reverse-geocode", [("place", HBF), ("type", "STOP")])
         stop_ids = [m["id"] for m in matches if isinstance(m, dict) and m.get("id")][:6] if status == 200 else []
         for stop_id in stop_ids + [ALEX_STOP]:
-            status, data, _, _ = get(base, "/api/v6/stoptimes",
-                                     [("stopId", stop_id), ("n", "100"), ("mode", "REGIONAL_RAIL,REGIONAL_FAST_RAIL,SUBURBAN,LONG_DISTANCE,HIGHSPEED_RAIL"),
-                                      ("time", iso(now))])
+            status, data, _, _ = get(base, "/api/v6/stoptimes", [("stopId", stop_id), ("n", "100"), ("time", iso(now))])
             if status == 200:
                 all_sts += data.get("stopTimes") or []
         rt, delays = realtime_stats(all_sts)
-        print(f"  {len(rt)} of {len(all_sts)} rail departures with realtime data; "
+        modes = {}
+        for st in all_sts:
+            m = modes.setdefault(st.get("mode"), [0, 0])
+            m[0] += 1
+            m[1] += 1 if st.get("realTime") else 0
+        print("  realtime share by mode: " + ", ".join(f"{k} {v[1]}/{v[0]}" for k, v in sorted(modes.items())))
+        print(f"  {len(rt)} of {len(all_sts)} departures with realtime data, "
+              f"{sum(1 for d in delays if d >= 1)} delayed by >= 1 min; "
               f"delays (min): {sorted(round(d) for d in delays)[-10:]}")
         r.check(len(rt) >= 1, "realtime: at least one departure with realTime=true")
-        r.check(any(abs(d) >= 1 for d in delays) or len(delays) > 0, "realtime: delays computable")
-        status, data, _, _ = get(base, "/api/v6/plan", [("fromPlace", HBF), ("toPlace", POTSDAM),
-                                                        ("transitModes", "REGIONAL_RAIL,REGIONAL_FAST_RAIL"),
+        r.check(len(delays) > 0, "realtime: delays computable (departure - scheduledDeparture)")
+        status, data, _, _ = get(base, "/api/v6/plan", [("fromPlace", HBF), ("toPlace", POTSDAM_HBF_STOP),
+                                                        ("transitModes", "REGIONAL_RAIL,REGIONAL_FAST_RAIL,SUBURBAN"),
                                                         ("time", iso(now))])
         if status == 200:
             legs = [l for it in data.get("itineraries", []) for l in it["legs"] if l["mode"] in TRANSIT_MODES]
@@ -352,7 +357,7 @@ def compat(args):
                    ("maxPostTransitTime", "900"), ("searchWindow", "3600"), ("realtimeMode", "OFF")]
     d = call("plan, all options (to Cottbus)", "/api/v6/plan", all_options)
     if d is not None and not n_its(d):
-        r.warn("plan to Cottbus: no itinerary (destination outside the Berlin OSM extract)")
+        r.warn("plan to Cottbus with all options: no itinerary (restrictive options, or outside the OSM extract)")
     # Same options inside Berlin, where results are expected.
     inside = [(k, ALEX if k == "toPlace" else v) for k, v in all_options]
     call("plan, all options (to Alexanderplatz)", "/api/v6/plan", inside, n_its)

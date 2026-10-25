@@ -54,10 +54,14 @@ sha256sum "$MOTIS_CONFIG" | awk '{print $1 "  config.yml"}' >>"$next/inputs.sha2
 } | tee "$MOTIS_PROFILE_DIR/import-stats.txt" >&2
 { tr '\n' ' ' <"$MOTIS_PROFILE_DIR/import-stats.txt"; echo; } >>"$MOTIS_PROFILE_DIR/import-history.txt"
 
+# Restart the server only if it currently serves this profile.
 was_running=false
-if [[ "$(podman_cmd ps --filter name=bettermaps-motis_motis --format '{{.Names}}')" ]]; then
-  was_running=true
-fi
+for c in $(podman_cmd ps --filter name=bettermaps-motis_motis --format '{{.Names}}'); do
+  if podman_cmd inspect "$c" --format '{{range .Mounts}}{{.Source}} {{end}}' |
+      grep -qF "$MOTIS_PROFILE_DIR/data "; then
+    was_running=true
+  fi
+done
 rm -rf "$MOTIS_PROFILE_DIR/data.prev"
 [[ -d "$MOTIS_PROFILE_DIR/data" ]] && mv "$MOTIS_PROFILE_DIR/data" "$MOTIS_PROFILE_DIR/data.prev"
 mv "$next" "$MOTIS_PROFILE_DIR/data"
