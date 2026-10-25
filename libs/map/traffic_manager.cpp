@@ -1099,7 +1099,7 @@ void TrafficManager::SetHttpTraffSource(bool enabled, std::string url)
       if (traffxml::HttpTraffSource* httpSource = dynamic_cast<traffxml::HttpTraffSource*>(it->get()))
       {
         httpSource->Close();
-        m_trafficSources.erase(it);
+        it = m_trafficSources.erase(it);
       }
       else
         ++it;
@@ -1114,7 +1114,7 @@ void TrafficManager::RemoveTraffSourceIf(const std::function<bool(traffxml::Traf
 
   for (auto it = m_trafficSources.begin(); it != m_trafficSources.end(); )
     if (pred(it->get()))
-      m_trafficSources.erase(it);
+      it = m_trafficSources.erase(it);
     else
       ++it;
 }
