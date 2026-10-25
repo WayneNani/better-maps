@@ -127,7 +127,9 @@ android_install_run() {
 android_connected() {
   emulator_start
   cd "$REPO_ROOT/android"
-  with_build_slot ./gradlew --no-daemon --max-workers=4 -Px86_64 -Pnjobs="$NJOBS" connectedFdroidDebugAndroidTest "$@"
+  # leaveApksInstalledAfterRun: sonst deinstalliert Gradle die App und löscht die Karten im gemeinsamen Emulator.
+  with_build_slot ./gradlew --no-daemon --max-workers=4 -Px86_64 -Pnjobs="$NJOBS" \
+    -Pandroid.injected.androidTest.leaveApksInstalledAfterRun=true connectedFdroidDebugAndroidTest "$@"
 }
 
 cpp_configure() {
