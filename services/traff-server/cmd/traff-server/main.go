@@ -19,10 +19,12 @@ import (
 	_ "time/tzdata" // the container image has no zoneinfo; Europe/Berlin is needed by the Autobahn source
 
 	"github.com/WayneNani/better-maps/services/traff-server/internal/config"
+	"github.com/WayneNani/better-maps/services/traff-server/internal/dedup"
 	"github.com/WayneNani/better-maps/services/traff-server/internal/logging"
 	"github.com/WayneNani/better-maps/services/traff-server/internal/server"
 	"github.com/WayneNani/better-maps/services/traff-server/internal/source"
 	"github.com/WayneNani/better-maps/services/traff-server/internal/source/autobahn"
+	"github.com/WayneNani/better-maps/services/traff-server/internal/source/datex2"
 	"github.com/WayneNani/better-maps/services/traff-server/internal/store"
 	"github.com/WayneNani/better-maps/services/traff-server/internal/subscription"
 )
@@ -79,7 +81,22 @@ func build(cfg config.Config, logger *slog.Logger) (*app, error) {
 		client := autobahn.NewClient(cfg.AutobahnURL, cfg.UserAgent, cfg.AutobahnRequestInterval)
 		sources = append(sources, autobahn.NewSource(client, cfg.AutobahnRoads, tz, logger))
 	}
+	// DATEX II feeds come after the Autobahn API: on duplicates, the Autobahn message wins.
+	for _, f := range cfg.Datex2Feeds {
+		client, err := datex2.NewClient(datex2.ClientConfig{
+			Name: f.Name, URL: f.URL, UserAgent: cfg.UserAgent, Timeout: cfg.Datex2Timeout,
+			Username: f.Username, Password: f.Password,
+			ClientCertFile: f.ClientCert, ClientKeyFile: f.ClientKey, CAFile: f.CACert,
+		})
+		if err != nil {
+			return nil, err
+		}
+		sources = append(sources, datex2.NewSource(datex2.SourceConfig{Feed: f.Name, MinInterval: cfg.Datex2Interval, Horizon: cfg.Datex2Horizon}, client, logger))
+	}
 	runner := source.NewRunner(st, cfg.PollInterval, logger, sources...)
+	if cfg.DedupEnabled {
+		runner.SetDeduplicator(dedup.New(dedup.Config{MaxDistance: float64(cfg.DedupDistance)}))
+	}
 	srv := &server.Server{
 		Store: st, Subs: subs, Coverage: runner.Coverage, Status: runner.Status,
 		MaxFilters: cfg.MaxFilters, Log: logger,
