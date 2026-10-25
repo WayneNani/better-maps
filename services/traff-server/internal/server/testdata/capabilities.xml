@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response status="OK">
+  <capabilities min_version="0.8" target_version="0.8"></capabilities>
+</response>

@@ -1,7 +1,7 @@
 {
     "data_format": 1,
     "data_url": "https://codeberg.org/comaps/comaps/raw/branch/main/data/taginfo.json",
-    "data_updated": "20260720T232721Z",
+    "data_updated": "20261006T173232Z",
     "project": {
         "name": "CoMaps",
         "description": "CoMaps is a community-focused privacy navigation iOS & Android app for travelers - drivers, hikers, and cyclists.",
@@ -1161,6 +1161,12 @@
             "icon_url": "https://codeberg.org/comaps/comaps/raw/branch/main/data/styles/default/light/symbols/toilets_private-m.svg"
         },
         {
+            "description": "amenity=tool_library",
+            "key": "amenity",
+            "value": "tool_library",
+            "icon_url": "https://codeberg.org/comaps/comaps/raw/branch/main/data/styles/default/light/symbols/doityourself-m.svg"
+        },
+        {
             "description": "amenity=townhall",
             "key": "amenity",
             "value": "townhall",
@@ -1326,6 +1332,12 @@
             "icon_url": "https://codeberg.org/comaps/comaps/raw/branch/main/data/styles/default/light/symbols/bcontrol-m.svg"
         },
         {
+            "description": "barrier=bus_trap",
+            "key": "barrier",
+            "value": "bus_trap",
+            "icon_url": "https://codeberg.org/comaps/comaps/raw/branch/main/data/styles/default/light/symbols/dot-m.svg"
+        },
+        {
             "description": "barrier=chain",
             "key": "barrier",
             "value": "chain",
@@ -1365,6 +1377,12 @@
             "description": "barrier=stile",
             "key": "barrier",
             "value": "stile",
+            "icon_url": "https://codeberg.org/comaps/comaps/raw/branch/main/data/styles/default/light/symbols/dot-m.svg"
+        },
+        {
+            "description": "barrier=sump_buster",
+            "key": "barrier",
+            "value": "sump_buster",
             "icon_url": "https://codeberg.org/comaps/comaps/raw/branch/main/data/styles/default/light/symbols/dot-m.svg"
         },
         {
@@ -4306,6 +4324,12 @@
             "icon_url": "https://codeberg.org/comaps/comaps/raw/branch/main/data/styles/default/light/symbols/furniture-m.svg"
         },
         {
+            "description": "shop=games",
+            "key": "shop",
+            "value": "games",
+            "icon_url": "https://codeberg.org/comaps/comaps/raw/branch/main/data/styles/default/light/symbols/games-m.svg"
+        },
+        {
             "description": "shop=garden_centre",
             "key": "shop",
             "value": "garden_centre",
@@ -4586,6 +4610,18 @@
             "key": "shop",
             "value": "tobacco",
             "icon_url": "https://codeberg.org/comaps/comaps/raw/branch/main/data/styles/default/light/symbols/tobacco-m.svg"
+        },
+        {
+            "description": "shop=swimming_pool",
+            "key": "shop",
+            "value": "swimming_pool",
+            "icon_url": "https://codeberg.org/comaps/comaps/raw/branch/main/data/styles/default/light/symbols/shop-m.svg"
+        },
+        {
+            "description": "shop=tool_hire",
+            "key": "shop",
+            "value": "tool_hire",
+            "icon_url": "https://codeberg.org/comaps/comaps/raw/branch/main/data/styles/default/light/symbols/doityourself-m.svg"
         },
         {
             "description": "shop=toys",
