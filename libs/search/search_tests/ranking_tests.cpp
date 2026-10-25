@@ -301,4 +301,113 @@ UNIT_TEST(PreRanker_ForEachMwmOrder)
     TEST_EQUAL(3, UniqueMwmIdCount(test), ());
   }
 }
+namespace
+{
+// A cafe found by the "cafe" category.
+RankingInfo MakeCafeInfo(double distanceM, osm::YesNoUnknown isOpen = osm::Unknown)
+{
+  RankingInfo info;
+  info.m_distanceToPivot = distanceM;
+  info.m_type = Model::TYPE_SUBPOI;
+  info.m_classifType.poi = PoiType::Eat;
+  info.m_tokenRanges[Model::TYPE_SUBPOI] = TokenRange(0, 1);
+  info.m_numTokens = 1;
+  info.m_nameScore = NameScore::FULL_PREFIX;
+  info.m_errorsMade = ErrorsMade(0);
+  info.m_matchedFraction = 1;
+  info.m_allTokensUsed = true;
+  info.m_pureCats = true;
+  info.m_categoryQuery = true;
+  info.m_isOpen = isOpen;
+  return info;
+}
+}  // namespace
+
+UNIT_TEST(RankingInfo_LocalPoi_Distance)
+{
+  // The logarithmic distance: 100 m vs 200 m is a difference like 1 km vs 2 km, and it is noticeable.
+  auto const rank = [](double distanceM) { return MakeCafeInfo(distanceM).GetLinearModelRank(); };
+  TEST_GREATER(rank(100) - rank(200), 0.001, ());
+  TEST_GREATER(rank(1000) - rank(2000), 0.004, ());
+  TEST_GREATER(rank(2000), rank(5000), ());
+  TEST_GREATER(rank(20000), rank(100000), ());
+
+  // Not in the viewport mode.
+  TEST_ALMOST_EQUAL_ABS(MakeCafeInfo(100).GetLinearModelRank(true /* viewportMode */),
+                        MakeCafeInfo(5000).GetLinearModelRank(true /* viewportMode */), 1e-9, ());
+}
+
+UNIT_TEST(RankingInfo_LocalPoi_OpeningHours)
+{
+  auto const rank = [](double distanceM, osm::YesNoUnknown isOpen)
+  { return MakeCafeInfo(distanceM, isOpen).GetLinearModelRank(); };
+
+  TEST_GREATER(rank(1000, osm::Yes), rank(1000, osm::Unknown), ());
+  TEST_GREATER(rank(1000, osm::Unknown), rank(1000, osm::No), ());
+  // An open cafe 1.5 km away is better than a closed one next door, but not a far one.
+  TEST_GREATER(rank(1500, osm::Yes), rank(100, osm::No), ());
+  TEST_LESS(rank(10000, osm::Yes), rank(100, osm::No), ());
+}
+
+UNIT_TEST(RankingInfo_LocalPoi_Importance)
+{
+  auto plain = MakeCafeInfo(700);
+  auto important = MakeCafeInfo(1000);
+  important.m_hasWikipedia = true;
+  important.m_hasBrand = true;
+  important.m_infoTagsCount = 2;
+  TEST_GREATER(important.GetLinearModelRank(), plain.GetLinearModelRank(), ());
+  // But not much farther.
+  important.m_distanceToPivot = 3000;
+  TEST_LESS(important.GetLinearModelRank(), plain.GetLinearModelRank(), ());
+
+  // Popularity (length of the Wikipedia description) counts too.
+  auto popular = MakeCafeInfo(700);
+  popular.m_popularity = 20;
+  TEST_GREATER(popular.GetLinearModelRank(), plain.GetLinearModelRank(), ());
+
+  // Importance of a museum is not the importance of its cafe.
+  auto museum = important;
+  museum.m_distanceToPivot = 700;
+  museum.m_secondaryTypeMatch = true;
+  TEST_LESS(museum.GetLinearModelRank(), plain.GetLinearModelRank(), ());
+}
+
+UNIT_TEST(RankingInfo_LocalPoi_OnlyForCategoryQueries)
+{
+  auto cafe = MakeCafeInfo(100, osm::No);
+  TEST(cafe.IsLocalPoiSearch(), ());
+
+  cafe.m_categoryQuery = false;
+  TEST(!cafe.IsLocalPoiSearch(), ());
+  cafe.m_categorialRequest = true;
+  TEST(cafe.IsLocalPoiSearch(), ());
+
+  // Streets and cities are not changed.
+  auto street = MakeCafeInfo(100);
+  street.m_type = Model::TYPE_STREET;
+  street.m_classifType.street = StreetType::Default;
+  TEST(!street.IsLocalPoiSearch(), ());
+
+  // Buildings only if they are found by the category.
+  auto building = MakeCafeInfo(100);
+  building.m_type = Model::TYPE_BUILDING;
+  TEST(building.IsLocalPoiSearch(), ());
+  building.m_pureCats = false;
+  TEST(!building.IsLocalPoiSearch(), ());
+
+  // POIs matched by name without the category type are compared by the distance only.
+  auto closedBar = MakeCafeInfo(100, osm::No);
+  auto openBar = MakeCafeInfo(100, osm::Yes);
+  closedBar.m_pureCats = openBar.m_pureCats = false;
+  TEST_ALMOST_EQUAL_ABS(closedBar.GetLinearModelRank(), openBar.GetLinearModelRank(), 1e-9, ());
+  closedBar.m_hasCategoryType = true;
+  TEST_LESS(closedBar.GetLinearModelRank(), openBar.GetLinearModelRank(), ());
+
+  // The name query rank doesn't depend on the opening state.
+  auto open = MakeCafeInfo(100, osm::Yes);
+  auto closed = MakeCafeInfo(100, osm::No);
+  open.m_categoryQuery = closed.m_categoryQuery = false;
+  TEST_ALMOST_EQUAL_ABS(open.GetLinearModelRank(), closed.GetLinearModelRank(), 1e-9, ());
+}
 }  // namespace ranking_tests

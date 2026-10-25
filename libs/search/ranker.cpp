@@ -15,6 +15,7 @@
 #include "search/token_slice.hpp"
 
 #include "indexer/brands_holder.hpp"
+#include "indexer/classificator.hpp"
 #include "indexer/data_source.hpp"
 #include "indexer/feature.hpp"
 #include "indexer/feature_algo.hpp"
@@ -44,6 +45,7 @@
 #include "base/string_utils.hpp"
 
 #include <algorithm>
+#include <initializer_list>
 #include <memory>
 #include <optional>
 
@@ -300,6 +302,52 @@ ftypes::LocalityType GetLocalityIndex(feature::TypesHolder const & types)
   UNREACHABLE();
 }
 
+// Counts informative tags of a POI, a sign of a well maintained (and likely a more important) place.
+uint8_t CountInfoTags(FeatureType & ft)
+{
+  using feature::Metadata;
+  using Group = std::initializer_list<Metadata::EType>;
+  uint8_t count = 0;
+  for (Group const group :
+       {Group{Metadata::FMD_OPEN_HOURS}, Group{Metadata::FMD_WEBSITE, Metadata::FMD_WEBSITE_MENU},
+        Group{Metadata::FMD_PHONE_NUMBER},
+        Group{Metadata::FMD_EMAIL, Metadata::FMD_CONTACT_FACEBOOK, Metadata::FMD_CONTACT_INSTAGRAM,
+              Metadata::FMD_CONTACT_TWITTER, Metadata::FMD_CONTACT_VK, Metadata::FMD_CONTACT_LINE,
+              Metadata::FMD_CONTACT_FEDIVERSE, Metadata::FMD_CONTACT_BLUESKY},
+        Group{Metadata::FMD_OPERATOR}, Group{Metadata::FMD_CHECK_DATE, Metadata::FMD_CHECK_DATE_OPEN_HOURS},
+        Group{Metadata::FMD_PANORAMAX}})
+  {
+    if (base::AnyOf(group, [&ft](Metadata::EType type) { return ft.HasMetadata(type); }))
+      ++count;
+  }
+  return count;
+}
+
+// Returns true if the main type of the result is not the one matched by the category, e.g. a museum with a cafe
+// for "Café". Cuisines are never the main types, they are skipped.
+bool IsSecondaryTypeMatch(RankerResult const & result, vector<uint32_t> const & preferredTypes)
+{
+  static uint32_t const cuisineType = classif().GetTypeByPath({"cuisine"});
+  auto const matchedType = result.GetBestType(&preferredTypes);
+  if (ftype::Trunc(matchedType, 1) == cuisineType)
+    return false;
+  return matchedType != result.GetBestType();
+}
+
+// Returns true if the query asks for a category: each token is a category synonym (misprints are allowed),
+// e.g. "Café", "Apoteke", "Hotel Restaurant", but not "Unter den Linden" or "Café Einstein".
+bool IsCategoryQuery(QueryParams const & params)
+{
+  if (params.IsCategorialRequest())
+    return true;
+  if (params.IsEmpty())
+    return false;
+  for (size_t i = 0; i < params.GetNumTokens(); ++i)
+    if (!params.IsCategorySynonym(i))
+      return false;
+  return true;
+}
+
 // TODO: Format street and house number according to local country's rules.
 string FormatStreetAndHouse(ReverseGeocoder::Address const & addr)
 {
@@ -337,7 +385,17 @@ public:
     , m_reverseGeocoder(reverseGeocoder)
     , m_params(params)
     , m_isViewportMode(m_params.m_mode == Mode::Viewport)
-  {}
+    , m_isCategoryQuery(IsCategoryQuery(m_params))
+  {
+    if (m_isCategoryQuery)
+    {
+      Classificator const & c = classif();
+      for (size_t i = 0; i < m_params.GetNumTokens(); ++i)
+        for (uint32_t const index : m_params.GetTypeIndices(i))
+          m_categoryTypes.push_back(c.GetTypeForIndex(index));
+      base::SortUnique(m_categoryTypes);
+    }
+  }
 
   optional<RankerResult> operator()(PreRankerResult const & preResult)
   {
@@ -353,6 +411,20 @@ public:
 
     RankingInfo info;
     InitRankingInfo(*ft, center, preResult, info);
+
+    info.m_categoryQuery = m_isCategoryQuery;
+    if (Model::IsPoiOrBuilding(info.m_type))
+    {
+      info.m_hasCategoryType = HasCategoryType(res.GetTypes());
+      // Importance, opening state and the matched type, used for category queries.
+      if (info.m_categorialRequest || info.m_pureCats)
+        info.m_secondaryTypeMatch = IsSecondaryTypeMatch(res, m_params.m_preferredTypes);
+      info.m_hasWikipedia = ft->HasMetadata(feature::Metadata::FMD_WIKIPEDIA) ||
+                            ft->HasMetadata(feature::Metadata::FMD_WIKIMEDIA_COMMONS);
+      info.m_hasBrand = ft->HasMetadata(feature::Metadata::FMD_BRAND);
+      info.m_infoTagsCount = CountInfoTags(*ft);
+      info.m_isOpen = res.m_details.m_isOpenNow;
+    }
 
     if (info.m_type == Model::TYPE_STREET)
     {
@@ -417,6 +489,20 @@ public:
 
 private:
   bool IsSameLoader(FeatureID const & id) const { return (m_loader && m_loader->GetId() == id.m_mwmId); }
+
+  // Returns true if the feature has a type of the query category, e.g. a pharmacy named "Apotheke am Markt" for
+  // "Apotheke", but not a bar named "Apothekenbar".
+  bool HasCategoryType(feature::TypesHolder const & types) const
+  {
+    for (uint32_t type : types)
+    {
+      // Categories may have general types: "railway-station" for "railway-station-subway-berlin".
+      for (uint8_t level = ftype::GetLevel(type); level > 0; --level)
+        if (std::binary_search(m_categoryTypes.begin(), m_categoryTypes.end(), ftype::Trunc(type, level)))
+          return true;
+    }
+    return false;
+  }
 
   unique_ptr<FeatureType> LoadFeature(FeatureID const & id)
   {
@@ -691,6 +777,9 @@ private:
   ReverseGeocoder const & m_reverseGeocoder;
   Geocoder::Params const & m_params;
   bool m_isViewportMode;
+  bool m_isCategoryQuery;
+  // Sorted types of the query categories, for category queries only.
+  vector<uint32_t> m_categoryTypes;
 
   unique_ptr<FeaturesLoaderGuard> m_loader;
 };
