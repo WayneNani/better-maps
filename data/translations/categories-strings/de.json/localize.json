@@ -69,7 +69,7 @@
         "defaultMessage": "3Restaurant|4Gasthaus|4Gaststube|6Speiselokal|4Gastwirtschaft|4Wirtshaus|4Gaststätte|5Mittagessen|5Abendessen|5Mittagstisch|U+1F356|U+1F357|U+1F35A|U+1F35B|U+1F35C|U+1F35D|U+1F363|U+1F366|U+1F367|U+1F368|U+1F369|U+1F370|U+1F372|U+1F374|U+1F377|U+1F60B"
     },
     "amenity-fuel|@category_fuel": {
-        "defaultMessage": "3Tankstelle|3Zapfsäule|4Tankstopp|U+26FD"
+        "defaultMessage": "3Tankstelle|3Zapfsäule|4Tankstopp|3Tanke|4volltanken|U+26FD"
     },
     "@shop": {
         "defaultMessage": "3Verbrauchermarkt|5Geschäft|5Laden|3Shop|4Einkaufen|4Einzelhandel|5Detailgeschäft|4Einkaufsladen"
@@ -447,7 +447,7 @@
         "defaultMessage": "3Klinik|3Krankenhaus|3Ambulanz|3Arzt|3Diagnostik|3Gesundheitsdienstleistungen|3Doktor|3Spital"
     },
     "amenity-doctors|@category_hospital": {
-        "defaultMessage": "3Arztpraxis|3Arzt|5Allgemeinmediziner|3Ärztezentrum|3Ärztehaus|4Hausarzt|4Hausärztin|4Ärztin|4Ärzte|5Allgemeinarzt|5Allgemeinmedizin|5Mediziner|U+1F489|U+1F3E5|U+1F691"
+        "defaultMessage": "3Arztpraxis|3Arzt|5Allgemeinmediziner|3Ärztezentrum|3Ärztehaus|4Hausarzt|4Hausärztin|4Ärztin|4Ärzte|5Allgemeinarzt|5Allgemeinmedizin|5Mediziner|3Doc|U+1F489|U+1F3E5|U+1F691"
     },
     "amenity-dentist": {
         "defaultMessage": "3Zahnarzt|4Zahnärztin|4Zahnarztpraxis|5Zahnmedizin|5Zahnklinik|5Zahnschmerzen"
@@ -498,7 +498,7 @@
         "defaultMessage": "3Apotheke|3Pharmazie|3Pharma|4Medikamente|4Arzneimittel"
     },
     "amenity-pharmacy|@category_pharmacy": {
-        "defaultMessage": "3Apotheke|3Drogerie|3Medikamente|4Arznei|5Notapotheke|5Notdienstapotheke|U+1F489|U+1F48A"
+        "defaultMessage": "3Apotheke|3Drogerie|3Medikamente|4Arznei|5Notapotheke|5Notdienstapotheke|3Apo|U+1F489|U+1F48A"
     },
     "@category_post": {
         "defaultMessage": "3Post"
@@ -1017,7 +1017,7 @@
         "defaultMessage": "4Notruftelefon|Nottelefon"
     },
     "leisure-fitness_centre": {
-        "defaultMessage": "3Fitnessstudio|3Fitnesscenter|3Fitness|3Fitnessraum|4Sport|3Fitnessclub|5Gesundheitsclub|4Training|4Trainingsraum|4Turnhalle|U+1F4AA|U+1F3CB"
+        "defaultMessage": "3Fitnessstudio|3Fitnesscenter|3Fitness|3Fitnessraum|4Sport|3Fitnessclub|5Gesundheitsclub|4Training|4Trainingsraum|4Turnhalle|4Muckibude|U+1F4AA|U+1F3CB"
     },
     "leisure-sauna": {
         "defaultMessage": "3Sauna|Schwitzbad|Schwitzhütte|Dampfbad|Dampfsauna|Saunakabine"
