@@ -215,7 +215,7 @@ UNIT_CLASS_TEST(ApplyingTrafficTest, XXGraph_ChangingTraffic)
 
   // Heavy traffic (SpeedGroup::G0) on F3.
   TrafficInfo::Coloring const coloringHeavyF3 = {
-      {{3 /* feature id */, 0 /* segment id */, TrafficInfo::RoadSegmentId::kForwardDirection}, SpeedGroup::G0}};
+      {{{3 /* feature id */, 0 /* segment id */, TrafficInfo::RoadSegmentId::kForwardDirection}, SpeedGroup::G0}}, {}};
   SetTrafficColoring(make_shared<TrafficInfo::Coloring const>(coloringHeavyF3));
   {
     vector<m2::PointD> const heavyF3Geom = {{2 /* x */, -1 /* y */}, {2, 0}, {3, 0}, {3, 1}, {2, 2}, {3, 3}};

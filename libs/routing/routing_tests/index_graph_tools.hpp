@@ -23,6 +23,7 @@
 
 #include <map>
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "3party/ankerl/unordered_dense.h"
@@ -161,7 +162,8 @@ public:
   ~WeightedEdgeEstimator() override = default;
 
   double CalcSegmentWeight(Segment const & segment, RoadGeometry const & /* road */,
-                           EdgeEstimator::Purpose purpose) const override;
+                           EdgeEstimator::Purpose purpose,
+                           std::optional<double> const & weightToSegment = std::nullopt) const override;
 
   double GetUTurnPenalty(Purpose purpose) const override;
   double GetTurnPenalty(Purpose purpose, double angle, RoadGeometry const & from_road, RoadGeometry const & to_road,
