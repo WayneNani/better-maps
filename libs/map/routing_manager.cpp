@@ -332,6 +332,7 @@ RoutingManager::RoutingManager(Callbacks && callbacks, Delegate & delegate)
   : m_callbacks(std::move(callbacks))
   , m_delegate(delegate)
   , m_extrapolator([this](location::GpsInfo const & gpsInfo) { this->OnExtrapolatedLocationUpdate(gpsInfo); })
+  , m_crowdTraffic(std::make_unique<CrowdTrafficRecorder>(GetPlatform().WritablePathForFile("crowd_traffic_limits.bin")))
 {
   m_extrapolator.Enable(true);  // Keeps smooth arrow movement whether routing or not
   m_routingSession.Init(
@@ -488,6 +489,7 @@ void RoutingManager::OnRoutePointPassed(RouteMarkType type, size_t intermediateI
 
 void RoutingManager::OnLocationUpdate(location::GpsInfo const & info)
 {
+  m_crowdTraffic->OnRealLocation(info.m_timestamp);
   m_extrapolator.OnLocationUpdate(info);
 }
 
@@ -563,6 +565,8 @@ void RoutingManager::SetRouterImpl(RouterType type)
 
 void RoutingManager::RemoveRoute(bool deactivateFollowing)
 {
+  if (deactivateFollowing)
+    m_crowdTraffic->OnNavigationEnded();
   GetPlatform().RunTask(Platform::Thread::Gui, [this, deactivateFollowing]()
   {
     {
@@ -919,6 +923,15 @@ void RoutingManager::FollowRoute()
   HideRoutePoint(RouteMarkType::Start);
   SetPointsFollowingMode(true /* enabled */);
 
+  if (m_currentRouterType == RouterType::Vehicle)
+  {
+    std::vector<m2::PointD> stops;
+    for (auto const & p : GetRoutePoints())
+      if (p.m_pointType == RouteMarkType::Intermediate)
+        stops.push_back(p.m_position);
+    m_crowdTraffic->OnFollowRoute(m_routingSession.GetEndPoint(), stops);
+  }
+
   CancelRecommendation(Recommendation::RebuildAfterPointsLoading);
 }
 
@@ -927,6 +940,7 @@ void RoutingManager::CloseRouting(bool removeRoutePoints)
   // Hide preview.
   HidePreviewSegments();
 
+  m_crowdTraffic->OnNavigationEnded();
   if (m_routingSession.IsBuilt())
     m_routingSession.EmitCloseRoutingEvent();
   m_routingSession.Reset();
@@ -1268,6 +1282,7 @@ bool RoutingManager::DisableFollowMode()
   bool const disabled = m_routingSession.DisableFollowMode();
   if (disabled)
   {
+    m_crowdTraffic->OnNavigationEnded();
     m_transitReadManager->BlockTransitSchemeMode(false /* isBlocked */);
     m_drapeEngine.SafeCall(&df::DrapeEngine::DeactivateRouteFollowing);
   }
@@ -1675,6 +1690,8 @@ void RoutingManager::OnExtrapolatedLocationUpdate(location::GpsInfo const & info
 
   auto routeMatchingInfo = GetRouteMatchingInfo(gpsInfo);
   auto const route = m_routingSession.GetRouteForTests();
+  if (IsRoutingActive())
+    m_crowdTraffic->OnLocation(info, m_routingSession, route);
   auto subPoly = route ? route->GetFollowedPolyline().ExtractSubPolyline(df::NavigationContext::kSubPolylineDistanceM)
                        : std::vector<m2::PointD>();
   m2::PointD const routePt = route ? route->GetFollowedPolyline().GetCurrentIter().m_pt : m2::PointD::Zero();

@@ -14,6 +14,8 @@ set(SRC
   bookmarks_search_params.hpp
   chart_generator.cpp
   chart_generator.hpp
+  crowd_traffic_recorder.cpp
+  crowd_traffic_recorder.hpp
   elevation_info.cpp
   elevation_info.hpp
   everywhere_search_callback.cpp
@@ -90,6 +92,7 @@ target_link_libraries(${PROJECT_NAME}
   PUBLIC
     base
     coding
+    crowd_traffic
     drape
     drape_frontend
     editor
