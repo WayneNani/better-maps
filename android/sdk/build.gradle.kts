@@ -145,6 +145,7 @@ dependencies {
     implementation(libs.google.guava)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
+    testImplementation(libs.okhttp.mockwebserver)
     coreLibraryDesugaring(libs.android.tools.desugar)
 }
 
@@ -190,27 +191,30 @@ project.afterEvaluate {
 
 tasks.named<GenerateTask>("openApiGenerate") {
     generatorName.set("java")
+    library.set("okhttp-gson")
     inputSpec.set(motisOpenApiSpec.asFile.path)
-    outputDir.set(motisOpenApiOutput.map { it.asFile.path })
+    outputDir.set(motisOpenApiOutput)
     apiPackage.set("app.organicmaps.sdk.motis.api")
     modelPackage.set("app.organicmaps.sdk.motis.model")
     invokerPackage.set("app.organicmaps.sdk.motis.invoker")
+    generateApiTests.set(false)
+    generateModelTests.set(false)
+    generateApiDocumentation.set(false)
+    generateModelDocumentation.set(false)
     configOptions.set(
         mapOf(
-            "library" to "okhttp-gson",
             "dateLibrary" to "java8",
             "useBeanValidation" to "false",
-            "java8" to "true",
-            "parcelableModel" to "false",
-            "generateSupportingFiles" to "false",
             "hideGenerationTimestamp" to "true",
             "useJakartaEe" to "true",
-            "useGson" to "true",
             "disallowAdditionalPropertiesIfNotPresent" to "false",
             "generateBuilders" to "true",
-            "useSingleRequestParameter" to "static",
             "sortParamsByRequiredFlag" to "true",
-            "asyncNative" to "true",
+            // Fluent request builders: api.plan(from, to).arriveBy(true).executeAsync(...)
+            "useSingleRequestParameter" to "true",
+            // Newer MOTIS servers may add enum values (e.g. transport modes); map them to
+            // UNKNOWN_DEFAULT_OPEN_API instead of failing the whole response.
+            "enumUnknownDefaultCase" to "true",
         )
     )
     // Declare inputs and outputs for incremental builds.
