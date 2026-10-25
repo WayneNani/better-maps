@@ -291,6 +291,27 @@ public class OnlineSearchPresenterTest
   }
 
   @Test
+  public void partialOfflineMatchesDontCount()
+  {
+    // "Marienplatz München" searched in Berlin: the Marienplatz in Berlin and "Münchener Straße" are no answer.
+    mConsent.grant(1);
+    type("Marienplatz München", BERLIN);
+    mPresenter.onOfflineResults(
+        Arrays.asList(new OfflinePlace("Marienplatz", 52.44, 13.36, null, OfflinePlace.Match.PARTIAL),
+                      new OfflinePlace("Marienplatz", 52.44, 13.36, null, OfflinePlace.Match.PARTIAL),
+                      new OfflinePlace("Münchener Straße", 52.49, 13.34, null, OfflinePlace.Match.PARTIAL),
+                      new OfflinePlace("Münchner Straße", 52.50, 13.35, null, OfflinePlace.Match.UNHIGHLIGHTED),
+                      new OfflinePlace("Müncheberger Straße", 52.51, 13.45, null, OfflinePlace.Match.UNHIGHLIGHTED)));
+    mPresenter.onOfflineSearchFinished();
+    assertEquals(OnlineSearchPolicy.Decision.FEW_OFFLINE_RESULTS, mPresenter.getDecision());
+    debounce();
+    assertEquals(1, mProvider.mRequests.size());
+    // The Marienplatz in Munich is far from the one in Berlin: it is no duplicate.
+    mProvider.answerLast(MARIENPLATZ);
+    assertEquals(Collections.singletonList("Marienplatz W259055080"), titles());
+  }
+
+  @Test
   public void enoughOfflineResultsStayOffline()
   {
     mConsent.grant(1);

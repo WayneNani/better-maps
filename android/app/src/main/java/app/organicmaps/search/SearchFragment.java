@@ -784,8 +784,9 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
   }
 
   @NonNull
-  private static List<OfflinePlace> toOfflinePlaces(@Nullable SearchResult[] results)
+  private List<OfflinePlace> toOfflinePlaces(@Nullable SearchResult[] results)
   {
+    final String query = getQuery();
     final List<OfflinePlace> places = new ArrayList<>();
     if (results == null)
       return places;
@@ -796,7 +797,8 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
       final String name = !TextUtils.isEmpty(result.name)
                             ? result.name
                             : (result.description != null ? result.description.localizedFeatureType : "");
-      places.add(new OfflinePlace(name != null ? name : "", result.lat, result.lon));
+      places.add(new OfflinePlace(name != null ? name : "", result.lat, result.lon, null,
+                                  OfflinePlace.match(query, result.highlightRanges, result.descHighlightRanges)));
     }
     return places;
   }

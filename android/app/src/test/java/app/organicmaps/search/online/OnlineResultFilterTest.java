@@ -57,7 +57,8 @@ public class OnlineResultFilterTest
   @Test
   public void sameOsmReferenceOfflineIsHidden()
   {
-    final List<OfflinePlace> offline = Collections.singletonList(new OfflinePlace("Other name", 0, 0, "R7366154"));
+    final List<OfflinePlace> offline =
+        Collections.singletonList(new OfflinePlace("Other name", 0, 0, "R7366154", OfflinePlace.Match.FULL));
     assertEquals(Arrays.asList("W259055080", "N1"),
                  refs(OnlineResultFilter.filter(Arrays.asList(MARIENPLATZ_STREET, MARIENPLATZ_SQUARE, CAFE), offline)));
   }

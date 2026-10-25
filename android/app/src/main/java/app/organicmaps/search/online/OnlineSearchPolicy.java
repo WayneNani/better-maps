@@ -11,7 +11,9 @@ import androidx.annotation.Nullable;
  * letters) and never for category searches picked from the category list (Photon is no category search);</li>
  * <li>right away (in parallel to the offline search) if the search center, i.e. the map center or the user's position,
  * lies in a map region that is not downloaded;</li>
- * <li>otherwise after the offline search finished with fewer than {@link #FEW_RESULTS} results;</li>
+ * <li>otherwise after the offline search finished with fewer than {@link #FEW_RESULTS} results that match the whole
+ * query ({@link OfflinePlace#countAnswers}): searching "Marienplatz München" in Berlin finds the Marienplatz in Berlin
+ * and some "Münchener Straße", but none of them is what the user wants;</li>
  * <li>otherwise not.</li>
  * </ol>
  * The user's consent is checked separately; without it nothing is sent.
@@ -30,7 +32,7 @@ public final class OnlineSearchPolicy
     REGION_NOT_DOWNLOADED(true),
     /** The offline search is still running: decide when it has finished. */
     WAIT_FOR_OFFLINE(false),
-    /** The offline search found nothing or only a few results. */
+    /** The offline search found nothing or only a few results that match the whole query. */
     FEW_OFFLINE_RESULTS(true),
     ENOUGH_OFFLINE_RESULTS(false);
 
@@ -52,7 +54,7 @@ public final class OnlineSearchPolicy
 
   /**
    * @param centerRegion map region at the search center, null if unknown or none (e.g. sea).
-   * @param offlineResults number of offline results (places, without query suggestions) so far.
+   * @param offlineResults number of offline results (places, without query suggestions) that match the whole query.
    * @param offlineFinished true if the offline search has finished.
    */
   @NonNull
