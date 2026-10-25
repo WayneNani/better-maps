@@ -3,6 +3,7 @@ project(search_tests)
 set(SRC
   algos_tests.cpp
   bookmarks_processor_tests.cpp
+  category_synonyms_tests.cpp
   feature_offset_match_tests.cpp
   highlighting_tests.cpp
   house_detector_tests.cpp
