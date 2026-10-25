@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthetic DATEX II v3 SituationPublication (better-maps test fixture). Namespaces and element
+     names follow the DATEX II 3.x schema (situation, common, locationReferencing); content is made
+     up. Reference time of the tests: 2026-10-25T16:00:00Z. -->
+<d2:payload xmlns:d2="http://datex2.eu/schema/3/d2Payload" xmlns:sit="http://datex2.eu/schema/3/situation" xmlns:com="http://datex2.eu/schema/3/common" xmlns:loc="http://datex2.eu/schema/3/locationReferencing" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="sit:SituationPublication" lang="de" modelBaseVersion="3">
+  <com:publicationTime>2026-10-25T15:55:00.123Z</com:publicationTime>
+  <com:publicationCreator><com:country>DE</com:country><com:nationalIdentifier>DE-TEST-V3</com:nationalIdentifier></com:publicationCreator>
+
+  <!-- Serious accident at a point, road number in supplementaryPositionalDescription. -->
+  <sit:situation id="v3-accident">
+    <sit:overallSeverity>high</sit:overallSeverity>
+    <sit:headerInformation><com:confidentiality>noRestriction</com:confidentiality><com:informationStatus>real</com:informationStatus><com:urgency>urgent</com:urgency></sit:headerInformation>
+    <sit:situationRecord xsi:type="sit:Accident" id="v3-accident_1" version="2">
+      <sit:situationRecordCreationTime>2026-10-25T15:40:00Z</sit:situationRecordCreationTime>
+      <sit:situationRecordVersionTime>2026-10-25T15:50:00Z</sit:situationRecordVersionTime>
+      <sit:probabilityOfOccurrence>certain</sit:probabilityOfOccurrence>
+      <sit:validity>
+        <com:validityStatus>definedByValidityTimeSpec</com:validityStatus>
+        <com:validityTimeSpecification><com:overallStartTime>2026-10-25T15:40:00Z</com:overallStartTime></com:validityTimeSpecification>
+      </sit:validity>
+      <sit:generalPublicComment><sit:comment><com:values><com:value lang="de">Schwerer Unfall, Rettungskräfte im Einsatz</com:value></com:values></sit:comment><sit:commentType>description</sit:commentType></sit:generalPublicComment>
+      <sit:locationReference xsi:type="loc:PointLocation">
+        <loc:supplementaryPositionalDescription>
+          <loc:roadInformation><loc:roadNumber>A7</loc:roadNumber><loc:roadName><com:values><com:value lang="de">Bundesautobahn 7</com:value></com:values></loc:roadName></loc:roadInformation>
+        </loc:supplementaryPositionalDescription>
+        <loc:pointByCoordinates>
+          <loc:bearing>10</loc:bearing>
+          <loc:pointCoordinates><loc:latitude>50.312000</loc:latitude><loc:longitude>9.843000</loc:longitude></loc:pointCoordinates>
+        </loc:pointByCoordinates>
+      </sit:locationReference>
+      <sit:accidentType>seriousAccident</sit:accidentType>
+    </sit:situationRecord>
+    <!-- The queue behind the accident has its own location and becomes a second message. -->
+    <sit:situationRecord xsi:type="sit:AbnormalTraffic" id="v3-accident_2" version="2">
+      <sit:probabilityOfOccurrence>certain</sit:probabilityOfOccurrence>
+      <sit:validity><com:validityStatus>active</com:validityStatus></sit:validity>
+      <sit:impact><sit:delays><sit:delayBand>upToThirtyMinutes</sit:delayBand><sit:delayTimeValue>1500.0</sit:delayTimeValue></sit:delays></sit:impact>
+      <sit:locationReference xsi:type="loc:SingleRoadLinearLocation">
+        <loc:supplementaryPositionalDescription><loc:roadInformation><loc:roadNumber>A7</loc:roadNumber></loc:roadInformation></loc:supplementaryPositionalDescription>
+        <loc:gmlLineString srsName="EPSG:4326"><loc:posList>50.290000 9.850000 50.300000 9.848000 50.311000 9.844000</loc:posList></loc:gmlLineString>
+      </sit:locationReference>
+      <sit:abnormalTrafficType>stationaryTraffic</sit:abnormalTrafficType>
+      <sit:queueLength>2300</sit:queueLength>
+    </sit:situationRecord>
+  </sit:situation>
+
+  <!-- Carriageway closure with TPEG linear location. -->
+  <sit:situation id="v3-closure">
+    <sit:headerInformation><com:confidentiality>noRestriction</com:confidentiality><com:informationStatus>real</com:informationStatus></sit:headerInformation>
+    <sit:situationRecord xsi:type="sit:RoadOrCarriagewayOrLaneManagement" id="v3-closure_1" version="1">
+      <sit:probabilityOfOccurrence>certain</sit:probabilityOfOccurrence>
+      <sit:validity>
+        <com:validityStatus>definedByValidityTimeSpec</com:validityStatus>
+        <com:validityTimeSpecification><com:overallStartTime>2026-10-25T20:00:00+01:00</com:overallStartTime><com:overallEndTime>2026-10-26T05:00:00+01:00</com:overallEndTime></com:validityTimeSpecification>
+      </sit:validity>
+      <sit:locationReference xsi:type="loc:SingleRoadLinearLocation">
+        <loc:supplementaryPositionalDescription><loc:roadInformation><loc:roadNumber>B 27</loc:roadNumber></loc:roadInformation></loc:supplementaryPositionalDescription>
+        <loc:tpegLinearLocation>
+          <loc:tpegDirection>northBound</loc:tpegDirection>
+          <loc:tpegLinearLocationType>segment</loc:tpegLinearLocationType>
+          <loc:to xsi:type="loc:TpegNonJunctionPoint"><loc:pointCoordinates><loc:latitude>48.7300</loc:latitude><loc:longitude>9.1600</loc:longitude></loc:pointCoordinates></loc:to>
+          <loc:from xsi:type="loc:TpegNonJunctionPoint"><loc:pointCoordinates><loc:latitude>48.7200</loc:latitude><loc:longitude>9.1550</loc:longitude></loc:pointCoordinates></loc:from>
+        </loc:tpegLinearLocation>
+      </sit:locationReference>
+      <sit:complianceOption>mandatory</sit:complianceOption>
+      <sit:roadOrCarriagewayOrLaneManagementType>carriagewayClosures</sit:roadOrCarriagewayOrLaneManagementType>
+    </sit:situationRecord>
+  </sit:situation>
+
+  <!-- Roadworks with valid periods; itinerary of a GML line and an ALERT-C reference. -->
+  <sit:situation id="v3-works">
+    <sit:headerInformation><com:confidentiality>noRestriction</com:confidentiality><com:informationStatus>real</com:informationStatus></sit:headerInformation>
+    <sit:situationRecord xsi:type="sit:MaintenanceWorks" id="v3-works_1" version="5">
+      <sit:probabilityOfOccurrence>certain</sit:probabilityOfOccurrence>
+      <sit:validity>
+        <com:validityStatus>definedByValidityTimeSpec</com:validityStatus>
+        <com:validityTimeSpecification>
+          <com:overallStartTime>2026-10-01T00:00:00Z</com:overallStartTime>
+          <com:overallEndTime>2026-11-30T00:00:00Z</com:overallEndTime>
+          <com:validPeriod><com:startOfPeriod>2026-10-25T18:00:00Z</com:startOfPeriod><com:endOfPeriod>2026-10-26T04:00:00Z</com:endOfPeriod></com:validPeriod>
+        </com:validityTimeSpecification>
+      </sit:validity>
+      <sit:impact><sit:numberOfLanesRestricted>1</sit:numberOfLanesRestricted></sit:impact>
+      <sit:locationReference xsi:type="loc:ItineraryByIndexedLocations">
+        <loc:locationContainedInItinerary index="0">
+          <loc:location xsi:type="loc:SingleRoadLinearLocation">
+            <loc:alertCLinear xsi:type="loc:AlertCMethod4Linear"><loc:alertCLocationCountryCode>D</loc:alertCLocationCountryCode><loc:alertCLocationTableNumber>1</loc:alertCLocationTableNumber><loc:alertCLocationTableVersion>22.0</loc:alertCLocationTableVersion></loc:alertCLinear>
+          </loc:location>
+        </loc:locationContainedInItinerary>
+        <loc:locationContainedInItinerary index="1">
+          <loc:location xsi:type="loc:LinearLocation">
+            <loc:supplementaryPositionalDescription><loc:roadInformation><loc:roadNumber>A8</loc:roadNumber></loc:roadInformation></loc:supplementaryPositionalDescription>
+            <loc:gmlLineString srsName="WGS 84"><loc:posList>48.400000 9.900000 48.405000 9.950000 48.410000 10.000000 48.415000 10.050000</loc:posList></loc:gmlLineString>
+          </loc:location>
+        </loc:locationContainedInItinerary>
+      </sit:locationReference>
+      <sit:roadMaintenanceType>resurfacingWork</sit:roadMaintenanceType>
+    </sit:situationRecord>
+    <!-- Lane closure at the same location: merged into the roadworks message. -->
+    <sit:situationRecord xsi:type="sit:RoadOrCarriagewayOrLaneManagement" id="v3-works_2" version="5">
+      <sit:probabilityOfOccurrence>certain</sit:probabilityOfOccurrence>
+      <sit:validity>
+        <com:validityStatus>definedByValidityTimeSpec</com:validityStatus>
+        <com:validityTimeSpecification>
+          <com:overallStartTime>2026-10-01T00:00:00Z</com:overallStartTime>
+          <com:overallEndTime>2026-11-30T00:00:00Z</com:overallEndTime>
+          <com:validPeriod><com:startOfPeriod>2026-10-25T18:00:00Z</com:startOfPeriod><com:endOfPeriod>2026-10-26T04:00:00Z</com:endOfPeriod></com:validPeriod>
+        </com:validityTimeSpecification>
+      </sit:validity>
+      <sit:impact><sit:numberOfLanesRestricted>1</sit:numberOfLanesRestricted></sit:impact>
+      <sit:locationReference xsi:type="loc:ItineraryByIndexedLocations">
+        <loc:locationContainedInItinerary index="0">
+          <loc:location xsi:type="loc:LinearLocation">
+            <loc:supplementaryPositionalDescription><loc:roadInformation><loc:roadNumber>A8</loc:roadNumber></loc:roadInformation></loc:supplementaryPositionalDescription>
+            <loc:gmlLineString srsName="WGS 84"><loc:posList>48.400000 9.900000 48.405000 9.950000 48.410000 10.000000 48.415000 10.050000</loc:posList></loc:gmlLineString>
+          </loc:location>
+        </loc:locationContainedInItinerary>
+      </sit:locationReference>
+      <sit:roadOrCarriagewayOrLaneManagementType>laneClosures</sit:roadOrCarriagewayOrLaneManagementType>
+    </sit:situationRecord>
+  </sit:situation>
+
+  <!-- Vehicle fire, OpenLR line location (v3 element names), FRC1. -->
+  <sit:situation id="v3-fire">
+    <sit:headerInformation><com:confidentiality>noRestriction</com:confidentiality><com:informationStatus>real</com:informationStatus><com:urgency>extremelyUrgent</com:urgency></sit:headerInformation>
+    <sit:situationRecord xsi:type="sit:VehicleObstruction" id="v3-fire_1" version="1">
+      <sit:probabilityOfOccurrence>certain</sit:probabilityOfOccurrence>
+      <sit:validity><com:validityStatus>active</com:validityStatus></sit:validity>
+      <sit:locationReference xsi:type="loc:SingleRoadLinearLocation">
+        <loc:openlrLinear>
+          <loc:firstDirection>
+            <loc:openlrLocationReferencePoint>
+              <loc:openlrCoordinate><loc:latitude>52.5200</loc:latitude><loc:longitude>13.3000</loc:longitude></loc:openlrCoordinate>
+              <loc:openlrLineAttributes><loc:openlrFunctionalRoadClass>FRC1</loc:openlrFunctionalRoadClass><loc:openlrFormOfWay>multipleCarriageway</loc:openlrFormOfWay><loc:openlrBearing>80</loc:openlrBearing></loc:openlrLineAttributes>
+            </loc:openlrLocationReferencePoint>
+            <loc:openlrLocationReferencePoint>
+              <loc:openlrCoordinate><loc:latitude>52.5210</loc:latitude><loc:longitude>13.3100</loc:longitude></loc:openlrCoordinate>
+            </loc:openlrLocationReferencePoint>
+            <loc:openlrLastLocationReferencePoint>
+              <loc:openlrCoordinate><loc:latitude>52.5220</loc:latitude><loc:longitude>13.3200</loc:longitude></loc:openlrCoordinate>
+            </loc:openlrLastLocationReferencePoint>
+          </loc:firstDirection>
+        </loc:openlrLinear>
+      </sit:locationReference>
+      <sit:vehicleObstructionType>vehicleOnFire</sit:vehicleObstructionType>
+    </sit:situationRecord>
+  </sit:situation>
+
+  <!-- Fog over an area given by ALERT-C only (skipped) and gusts at a display point. -->
+  <sit:situation id="v3-weather">
+    <sit:headerInformation><com:confidentiality>noRestriction</com:confidentiality><com:informationStatus>real</com:informationStatus></sit:headerInformation>
+    <sit:situationRecord xsi:type="sit:PoorEnvironmentConditions" id="v3-weather_1" version="1">
+      <sit:probabilityOfOccurrence>certain</sit:probabilityOfOccurrence>
+      <sit:validity><com:validityStatus>active</com:validityStatus></sit:validity>
+      <sit:locationReference xsi:type="loc:AreaLocation">
+        <loc:alertCArea><loc:alertCLocationCountryCode>D</loc:alertCLocationCountryCode><loc:alertCLocationTableNumber>1</loc:alertCLocationTableNumber><loc:alertCLocationTableVersion>22.0</loc:alertCLocationTableVersion><loc:areaLocation><loc:specificLocation>913</loc:specificLocation></loc:areaLocation></loc:alertCArea>
+      </sit:locationReference>
+      <sit:poorEnvironmentType>denseFog</sit:poorEnvironmentType>
+    </sit:situationRecord>
+    <sit:situationRecord xsi:type="sit:PoorEnvironmentConditions" id="v3-weather_2" version="1">
+      <sit:probabilityOfOccurrence>certain</sit:probabilityOfOccurrence>
+      <sit:validity><com:validityStatus>planned</com:validityStatus><com:validityTimeSpecification><com:overallStartTime>2026-10-25T18:00:00Z</com:overallStartTime><com:overallEndTime>2026-10-25T23:00:00Z</com:overallEndTime></com:validityTimeSpecification></sit:validity>
+      <sit:locationReference xsi:type="loc:PointLocation">
+        <loc:coordinatesForDisplay><loc:latitude>54.4000</loc:latitude><loc:longitude>9.5000</loc:longitude></loc:coordinatesForDisplay>
+      </sit:locationReference>
+      <sit:poorEnvironmentType>strongGustsOfWind</sit:poorEnvironmentType>
+    </sit:situationRecord>
+  </sit:situation>
+
+  <!-- Variable speed limit and people on the road. -->
+  <sit:situation id="v3-misc">
+    <sit:headerInformation><com:confidentiality>noRestriction</com:confidentiality><com:informationStatus>real</com:informationStatus></sit:headerInformation>
+    <sit:situationRecord xsi:type="sit:SpeedManagement" id="v3-misc_1" version="1">
+      <sit:probabilityOfOccurrence>certain</sit:probabilityOfOccurrence>
+      <sit:validity><com:validityStatus>active</com:validityStatus></sit:validity>
+      <sit:locationReference xsi:type="loc:SingleRoadLinearLocation">
+        <loc:supplementaryPositionalDescription><loc:roadInformation><loc:roadNumber>A1</loc:roadNumber></loc:roadInformation></loc:supplementaryPositionalDescription>
+        <loc:gmlLineString><loc:posList>53.500000 10.100000 53.520000 10.150000</loc:posList></loc:gmlLineString>
+      </sit:locationReference>
+      <sit:speedManagementType>speedRestrictionInOperation</sit:speedManagementType>
+      <sit:temporarySpeedLimit>80.0</sit:temporarySpeedLimit>
+    </sit:situationRecord>
+    <sit:situationRecord xsi:type="sit:GeneralObstruction" id="v3-misc_2" version="1">
+      <sit:probabilityOfOccurrence>certain</sit:probabilityOfOccurrence>
+      <sit:validity><com:validityStatus>active</com:validityStatus></sit:validity>
+      <sit:locationReference xsi:type="loc:SingleRoadLinearLocation">
+        <loc:supplementaryPositionalDescription><loc:roadInformation><loc:roadNumber>A1</loc:roadNumber></loc:roadInformation></loc:supplementaryPositionalDescription>
+        <loc:gmlLineString><loc:posList>53.500000 10.100000 53.520000 10.150000</loc:posList></loc:gmlLineString>
+      </sit:locationReference>
+      <sit:obstructionType>peopleOnRoadway</sit:obstructionType>
+    </sit:situationRecord>
+    <sit:situationRecord xsi:type="sit:ReroutingManagement" id="v3-misc_3" version="1">
+      <sit:probabilityOfOccurrence>certain</sit:probabilityOfOccurrence>
+      <sit:validity><com:validityStatus>active</com:validityStatus></sit:validity>
+      <sit:reroutingManagementType>followDiversionSigns</sit:reroutingManagementType>
+    </sit:situationRecord>
+    <sit:situationRecord xsi:type="sit:Accident" id="v3-misc_4" version="1">
+      <sit:probabilityOfOccurrence>certain</sit:probabilityOfOccurrence>
+      <sit:validity><com:validityStatus>suspended</com:validityStatus></sit:validity>
+      <sit:locationReference xsi:type="loc:PointLocation"><loc:coordinatesForDisplay><loc:latitude>53.51</loc:latitude><loc:longitude>10.12</loc:longitude></loc:coordinatesForDisplay></sit:locationReference>
+      <sit:accidentType>accident</sit:accidentType>
+    </sit:situationRecord>
+  </sit:situation>
+</d2:payload>

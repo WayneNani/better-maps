@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed>
+  <message id="de.datex2.test:102981039-102981041-102981044-102981054" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-05-12T22:00:00Z" end_time="2027-12-31T22:59:00Z" cancellation="false" forecast="false">
+    <location country="DE" directionality="ONE_DIRECTION" road_class="SECONDARY" road_ref="L 110">
+      <from>+48.082333 +7.890027</from>
+      <via>+48.083254 +7.889873</via>
+      <to>+48.084269 +7.889889</to>
+    </location>
+    <events>
+      <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:128196478-128209027-128209028-128209033" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-08-05T22:00:00Z" end_time="2026-10-31T22:59:00Z" cancellation="false" forecast="false">
+    <location country="DE" directionality="ONE_DIRECTION">
+      <from>+48.653990 +9.366099</from>
+      <via>+48.654240 +9.366221</via>
+      <to>+48.654450 +9.366320</to>
+    </location>
+    <events>
+      <event class="CONSTRUCTION" type="CONSTRUCTION_CONSTRUCTION_WORK"></event>
+      <event class="RESTRICTION" type="RESTRICTION_CLOSED"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:150866740-150866742-150866745-150867141" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-08T22:00:00Z" end_time="2026-11-13T22:59:00Z" cancellation="false" forecast="false">
+    <location country="DE" directionality="ONE_DIRECTION">
+      <from>+48.573010 +9.454841</from>
+      <to>+48.573040 +9.455010</to>
+    </location>
+    <events>
+      <event class="CONSTRUCTION" type="CONSTRUCTION_NEW_ROADWORKS_LAYOUT"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:152122944-152122946-152122949-152127429" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-11T22:00:00Z" end_time="2026-10-30T22:59:00Z" cancellation="false" forecast="false">
+    <location country="DE" directionality="ONE_DIRECTION">
+      <from>+48.634690 +9.516249</from>
+      <via>+48.634450 +9.516350</via>
+      <to>+48.634340 +9.516170</to>
+    </location>
+    <events>
+      <event class="CONSTRUCTION" type="CONSTRUCTION_ROADWORKS"></event>
+      <event class="RESTRICTION" type="RESTRICTION_CLOSED"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:85898845-85898847-85898850-85898856" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-02-25T23:00:00Z" end_time="2026-10-30T22:59:00Z" cancellation="false" forecast="false">
+    <location country="DE" directionality="ONE_DIRECTION" road_class="PRIMARY" road_ref="B 19">
+      <from>+49.002440 +9.758093</from>
+      <via>+49.002223 +9.758602</via>
+      <to>+49.002142 +9.758967</to>
+    </location>
+    <events>
+      <event class="CONSTRUCTION" type="CONSTRUCTION_CONSTRUCTION_WORK"></event>
+    </events>
+  </message>
+</feed>

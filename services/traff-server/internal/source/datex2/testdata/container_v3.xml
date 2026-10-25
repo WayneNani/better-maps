@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Synthetic DATEX II v3 publication wrapped in a messageContainer, as published e.g. by the
+     Dutch NDW (better-maps test fixture, made-up content). -->
+<mc:messageContainer xmlns:mc="http://datex2.eu/schema/3/messageContainer" xmlns:sit="http://datex2.eu/schema/3/situation" xmlns:com="http://datex2.eu/schema/3/common" xmlns:loc="http://datex2.eu/schema/3/locationReferencing" xmlns:ex="http://datex2.eu/schema/3/exchangeInformation" modelBaseVersion="3">
+  <mc:exchangeInformation><ex:exchangeContext><ex:codedExchangeProtocol>snapshotPull</ex:codedExchangeProtocol></ex:exchangeContext></mc:exchangeInformation>
+  <mc:payload xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="sit:SituationPublication" lang="de" modelBaseVersion="3">
+    <com:publicationTime>2026-10-25T15:59:00Z</com:publicationTime>
+    <com:publicationCreator><com:country>de</com:country><com:nationalIdentifier>DE-TEST-MC</com:nationalIdentifier></com:publicationCreator>
+    <sit:situation id="mc-1">
+      <sit:headerInformation><com:confidentiality>noRestriction</com:confidentiality><com:informationStatus>real</com:informationStatus></sit:headerInformation>
+      <sit:situationRecord xsi:type="sit:VehicleObstruction" id="mc-1_1" version="2">
+        <sit:validity><com:validityStatus>active</com:validityStatus></sit:validity>
+        <sit:locationReference xsi:type="loc:PointLocation">
+          <loc:pointByCoordinates><loc:pointCoordinates><loc:latitude>51.576767</loc:latitude><loc:longitude>7.487334</loc:longitude></loc:pointCoordinates></loc:pointByCoordinates>
+        </sit:locationReference>
+        <sit:vehicleObstructionType>brokenDownHeavyLorry</sit:vehicleObstructionType>
+      </sit:situationRecord>
+    </sit:situation>
+  </mc:payload>
+</mc:messageContainer>

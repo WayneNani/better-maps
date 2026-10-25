@@ -1,0 +1,1959 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<d2LogicalModel modelBaseVersion="2" xmlns="http://datex2.eu/schema/2/2_0">
+    <exchange>
+        <supplierIdentification>
+            <country>de</country>
+            <nationalIdentifier>DE-MDM-Straßenbauverwaltung Baden-Württemberg - Ministerium für Verkehr Baden-Württemberg</nationalIdentifier>
+        </supplierIdentification>
+    </exchange>
+    <payloadPublication xsi:type="SituationPublication" lang="DE" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <publicationTime>2026-10-23T18:04:46.306+02:00</publicationTime>
+        <publicationCreator>
+            <country>de</country>
+            <nationalIdentifier>DE-MDM-Straßenbauverwaltung Baden-Württemberg - Ministerium für Verkehr Baden-Württemberg</nationalIdentifier>
+        </publicationCreator>
+        <situation id="102981039" version="4">
+            <overallSeverity>low</overallSeverity>
+            <situationVersionTime>2026-05-13T13:30:18.746+02:00</situationVersionTime>
+            <headerInformation>
+                <confidentiality>noRestriction</confidentiality>
+                <informationStatus>real</informationStatus>
+            </headerInformation>
+            <situationRecord xsi:type="MaintenanceWorks" id="102981039-102981041-102981044-102981054" version="4">
+                <situationRecordCreationTime>2026-05-13T13:29:30.032+02:00</situationRecordCreationTime>
+                <situationRecordVersionTime>2026-05-13T13:30:18.746+02:00</situationRecordVersionTime>
+                <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                <validity>
+                    <validityStatus>definedByValidityTimeSpec</validityStatus>
+                    <validityTimeSpecification>
+                        <overallStartTime>2026-05-13T00:00:00.000+02:00</overallStartTime>
+                        <overallEndTime>2027-12-31T23:59:00.000+01:00</overallEndTime>
+                    </validityTimeSpecification>
+                </validity>
+                <impact>
+                    <capacityRemaining>1550.0</capacityRemaining>
+                    <numberOfLanesRestricted>0</numberOfLanesRestricted>
+                    <originalNumberOfLanes>1</originalNumberOfLanes>
+                    <residualRoadWidth>3.0</residualRoadWidth>
+                    <impactExtension>
+                        <impactExtended>
+                            <laneStatusCoded>2o</laneStatusCoded>
+                            <laneRestriction>
+                                <lane>allLanesCompleteCarriageway</lane>
+                            </laneRestriction>
+                        </impactExtended>
+                    </impactExtension>
+                </impact>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Bauphase</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksName</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Sonstiges</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksType</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <groupOfLocations xsi:type="Linear">
+                    <locationForDisplay>
+                        <latitude>48.082333</latitude>
+                        <longitude>7.8900275</longitude>
+                    </locationForDisplay>
+                    <supplementaryPositionalDescription>
+                        <affectedCarriagewayAndLanes>
+                            <carriageway>mainCarriageway</carriageway>
+                            <lengthAffected>215.9113</lengthAffected>
+                        </affectedCarriagewayAndLanes>
+                    </supplementaryPositionalDescription>
+                    <linearWithinLinearElement>
+                        <directionRelativeOnLinearSection>aligned</directionRelativeOnLinearSection>
+                        <linearElement>
+                            <roadName>
+                                <values>
+                                    <value lang="de">Denzlingen-Sexau</value>
+                                </values>
+                            </roadName>
+                            <roadNumber>L110</roadNumber>
+                        </linearElement>
+                        <fromPoint xsi:type="DistanceFromLinearElementReferent">
+                            <distanceAlong>2440.0</distanceAlong>
+                            <fromReferent>
+                                <referentIdentifier>7913046O</referentIdentifier>
+                                <referentType>referenceMarker</referentType>
+                            </fromReferent>
+                            <towardsReferent>
+                                <referentIdentifier>7913025O</referentIdentifier>
+                                <referentType>referenceMarker</referentType>
+                            </towardsReferent>
+                        </fromPoint>
+                        <toPoint xsi:type="DistanceFromLinearElementReferent">
+                            <distanceAlong>2656.0</distanceAlong>
+                            <fromReferent>
+                                <referentIdentifier>7913046O</referentIdentifier>
+                                <referentType>referenceMarker</referentType>
+                            </fromReferent>
+                            <towardsReferent>
+                                <referentIdentifier>7913025O</referentIdentifier>
+                                <referentType>referenceMarker</referentType>
+                            </towardsReferent>
+                        </toPoint>
+                    </linearWithinLinearElement>
+                    <linearExtension>
+                        <linearExtended>
+                            <gmlLineString>
+                                <srsName>WGS84 EPSG 4326</srsName>
+                                <posList>48.082333 7.890027 48.082334 7.890027 48.082401 7.890012 48.082513 7.889989 48.082613 7.889968 48.082721 7.889946 48.082829 7.889928 48.082928 7.889910 48.083034 7.889896 48.083145 7.889882 48.083254 7.889873 48.083360 7.889865 48.083463 7.889860 48.083576 7.889857 48.083681 7.889856 48.083789 7.889857 48.083899 7.889859 48.084005 7.889865 48.084112 7.889874 48.084220 7.889883 48.084269 7.889889</posList>
+                                <roadInformation>
+                                    <roadNumber>L110</roadNumber>
+                                </roadInformation>
+                            </gmlLineString>
+                        </linearExtended>
+                    </linearExtension>
+                </groupOfLocations>
+                <situationRecordExtension>
+                    <situationRecordExtended>
+                        <extendedLaneStatusCoded>2o</extendedLaneStatusCoded>
+                    </situationRecordExtended>
+                </situationRecordExtension>
+                <actionPlanIdentifier>S1</actionPlanIdentifier>
+                <operatorActionStatus>requested</operatorActionStatus>
+                <roadworksDuration>longTerm</roadworksDuration>
+                <mobility>
+                    <mobilityType>stationary</mobilityType>
+                </mobility>
+                <roadMaintenanceType>other</roadMaintenanceType>
+            </situationRecord>
+            <situationExtension>
+                <situationExtended>
+                    <overallSituation xsi:type="MaintenanceWorks" id="102981039-gesamt" version="4">
+                        <situationRecordCreationTime>2026-05-13T13:29:30.031+02:00</situationRecordCreationTime>
+                        <situationRecordVersionTime>2026-05-13T13:30:18.746+02:00</situationRecordVersionTime>
+                        <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                        <validity>
+                            <validityStatus>definedByValidityTimeSpec</validityStatus>
+                            <validityTimeSpecification>
+                                <overallStartTime>2026-05-13T00:00:00.000+02:00</overallStartTime>
+                                <overallEndTime>2027-12-31T23:59:00.000+01:00</overallEndTime>
+                            </validityTimeSpecification>
+                        </validity>
+                        <generalPublicComment>
+                            <comment>
+                                <values>
+                                    <value lang="DE">Sonstiges</value>
+                                </values>
+                            </comment>
+                            <commentExtension>
+                                <commentExtended>
+                                    <commentType2>roadworksType</commentType2>
+                                </commentExtended>
+                            </commentExtension>
+                        </generalPublicComment>
+                        <generalPublicComment>
+                            <comment>
+                                <values>
+                                    <value lang="DE">L110 Sonstiges</value>
+                                </values>
+                            </comment>
+                            <commentExtension>
+                                <commentExtended>
+                                    <commentType2>roadworksName</commentType2>
+                                </commentExtended>
+                            </commentExtension>
+                        </generalPublicComment>
+                        <groupOfLocations xsi:type="Linear">
+                            <locationForDisplay>
+                                <latitude>48.082333</latitude>
+                                <longitude>7.8900275</longitude>
+                            </locationForDisplay>
+                            <supplementaryPositionalDescription>
+                                <affectedCarriagewayAndLanes>
+                                    <carriageway>mainCarriageway</carriageway>
+                                    <lengthAffected>215.9113</lengthAffected>
+                                </affectedCarriagewayAndLanes>
+                            </supplementaryPositionalDescription>
+                            <linearWithinLinearElement>
+                                <directionRelativeOnLinearSection>aligned</directionRelativeOnLinearSection>
+                                <linearElement>
+                                    <roadName>
+                                        <values>
+                                            <value lang="de">Denzlingen-Sexau</value>
+                                        </values>
+                                    </roadName>
+                                    <roadNumber>L110</roadNumber>
+                                </linearElement>
+                                <fromPoint xsi:type="DistanceFromLinearElementReferent">
+                                    <distanceAlong>2440.0</distanceAlong>
+                                    <fromReferent>
+                                        <referentIdentifier>7913046O</referentIdentifier>
+                                        <referentType>referenceMarker</referentType>
+                                    </fromReferent>
+                                    <towardsReferent>
+                                        <referentIdentifier>7913025O</referentIdentifier>
+                                        <referentType>referenceMarker</referentType>
+                                    </towardsReferent>
+                                </fromPoint>
+                                <toPoint xsi:type="DistanceFromLinearElementReferent">
+                                    <distanceAlong>2656.0</distanceAlong>
+                                    <fromReferent>
+                                        <referentIdentifier>7913046O</referentIdentifier>
+                                        <referentType>referenceMarker</referentType>
+                                    </fromReferent>
+                                    <towardsReferent>
+                                        <referentIdentifier>7913025O</referentIdentifier>
+                                        <referentType>referenceMarker</referentType>
+                                    </towardsReferent>
+                                </toPoint>
+                            </linearWithinLinearElement>
+                            <linearExtension>
+                                <linearExtended>
+                                    <gmlLineString>
+                                        <srsName>WGS84 EPSG 4326</srsName>
+                                        <posList>48.082333 7.890027 48.082334 7.890027 48.082401 7.890012 48.082513 7.889989 48.082613 7.889968 48.082721 7.889946 48.082829 7.889928 48.082928 7.889910 48.083034 7.889896 48.083145 7.889882 48.083254 7.889873 48.083360 7.889865 48.083463 7.889860 48.083576 7.889857 48.083681 7.889856 48.083789 7.889857 48.083899 7.889859 48.084005 7.889865 48.084112 7.889874 48.084220 7.889883 48.084269 7.889889</posList>
+                                        <roadInformation>
+                                            <roadNumber>L110</roadNumber>
+                                        </roadInformation>
+                                    </gmlLineString>
+                                </linearExtended>
+                            </linearExtension>
+                        </groupOfLocations>
+                        <actionPlanIdentifier>S1</actionPlanIdentifier>
+                        <roadworksDuration>longTerm</roadworksDuration>
+                        <roadMaintenanceType>other</roadMaintenanceType>
+                    </overallSituation>
+                </situationExtended>
+            </situationExtension>
+        </situation><situation id="128196478" version="49">
+            <overallSeverity>low</overallSeverity>
+            <situationVersionTime>2026-08-13T13:23:03.858+02:00</situationVersionTime>
+            <headerInformation>
+                <confidentiality>noRestriction</confidentiality>
+                <informationStatus>real</informationStatus>
+            </headerInformation>
+            <situationRecord xsi:type="ConstructionWorks" id="128196478-128209027-128209028-128209033" version="49">
+                <situationRecordCreationTime>2026-08-05T11:02:35.045+02:00</situationRecordCreationTime>
+                <situationRecordVersionTime>2026-08-13T13:23:03.859+02:00</situationRecordVersionTime>
+                <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                <validity>
+                    <validityStatus>definedByValidityTimeSpec</validityStatus>
+                    <validityTimeSpecification>
+                        <overallStartTime>2026-08-06T00:00:00.000+02:00</overallStartTime>
+                        <overallEndTime>2026-10-31T23:59:00.000+01:00</overallEndTime>
+                    </validityTimeSpecification>
+                </validity>
+                <impact>
+                    <capacityRemaining>0.0</capacityRemaining>
+                    <impactExtension>
+                        <impactExtended>
+                            <laneStatusCoded>x2x</laneStatusCoded>
+                            <laneRestriction>
+                                <lane>allLanesCompleteCarriageway</lane>
+                            </laneRestriction>
+                        </impactExtended>
+                    </impactExtension>
+                </impact>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Bauphase</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksName</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Straßenneubau</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksType</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Froschländer - Daimlerstraße - Neckarstraße - Mörikestraße - Nürtinger Straße - Unterboihinger Straße</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>routeRecommendation</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Oberboihingen, Unterboihinger Straße: Kreuzung Amselweg bis Gebäude 53</value>
+                        </values>
+                    </comment>
+                </generalPublicComment>
+                <groupOfLocations xsi:type="Linear">
+                    <locationForDisplay>
+                        <latitude>48.65399</latitude>
+                        <longitude>9.366099</longitude>
+                    </locationForDisplay>
+                    <linearExtension>
+                        <linearExtended>
+                            <gmlLineString>
+                                <srsName>WGS84 EPSG 4326</srsName>
+                                <posList>48.653990 9.366099 48.654180 9.366190 48.654240 9.366221 48.654450 9.366320</posList>
+                                <roadInformation/>
+                            </gmlLineString>
+                        </linearExtended>
+                    </linearExtension>
+                </groupOfLocations>
+                <situationRecordExtension>
+                    <situationRecordExtended>
+                        <extendedLaneStatusCoded>x2x</extendedLaneStatusCoded>
+                    </situationRecordExtended>
+                </situationRecordExtension>
+                <actionPlanIdentifier>A1</actionPlanIdentifier>
+                <operatorActionStatus>implemented</operatorActionStatus>
+                <roadworksDuration>longTerm</roadworksDuration>
+                <mobility>
+                    <mobilityType>stationary</mobilityType>
+                </mobility>
+                <constructionWorkType>constructionWork</constructionWorkType>
+            </situationRecord>
+            <situationRecord xsi:type="RoadOrCarriagewayOrLaneManagement" id="128196478-128209027-128209028-128209033-sperrung" version="49">
+                <situationRecordCreationTime>2026-08-05T11:02:35.045+02:00</situationRecordCreationTime>
+                <situationRecordVersionTime>2026-08-13T13:23:03.859+02:00</situationRecordVersionTime>
+                <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                <validity>
+                    <validityStatus>definedByValidityTimeSpec</validityStatus>
+                    <validityTimeSpecification>
+                        <overallStartTime>2026-08-06T00:00:00.000+02:00</overallStartTime>
+                        <overallEndTime>2026-10-31T23:59:00.000+01:00</overallEndTime>
+                    </validityTimeSpecification>
+                </validity>
+                <cause xsi:type="ManagedCause">
+                    <managedCause targetClass="SituationRecord" id="128196478-128209027-128209028-128209033" version="49"/>
+                </cause>
+                <groupOfLocations xsi:type="Linear">
+                    <locationForDisplay>
+                        <latitude>48.65399</latitude>
+                        <longitude>9.366099</longitude>
+                    </locationForDisplay>
+                    <linearExtension>
+                        <linearExtended>
+                            <gmlLineString>
+                                <srsName>WGS84 EPSG 4326</srsName>
+                                <posList>48.653990 9.366099 48.654180 9.366190 48.654240 9.366221 48.654450 9.366320</posList>
+                                <roadInformation/>
+                            </gmlLineString>
+                        </linearExtended>
+                    </linearExtension>
+                </groupOfLocations>
+                <actionPlanIdentifier>SP1</actionPlanIdentifier>
+                <operatorActionStatus>implemented</operatorActionStatus>
+                <complianceOption>mandatory</complianceOption>
+                <roadOrCarriagewayOrLaneManagementType>roadClosed</roadOrCarriagewayOrLaneManagementType>
+            </situationRecord>
+            <situationRecord xsi:type="ConstructionWorks" id="128196478-128209027-128209028-128209033-gegen" version="49">
+                <situationRecordCreationTime>2026-08-05T11:02:35.045+02:00</situationRecordCreationTime>
+                <situationRecordVersionTime>2026-08-13T13:23:03.859+02:00</situationRecordVersionTime>
+                <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                <validity>
+                    <validityStatus>definedByValidityTimeSpec</validityStatus>
+                    <validityTimeSpecification>
+                        <overallStartTime>2026-08-06T00:00:00.000+02:00</overallStartTime>
+                        <overallEndTime>2026-10-31T23:59:00.000+01:00</overallEndTime>
+                    </validityTimeSpecification>
+                </validity>
+                <impact>
+                    <capacityRemaining>0.0</capacityRemaining>
+                    <impactExtension>
+                        <impactExtended>
+                            <laneStatusCoded>x2x</laneStatusCoded>
+                            <laneRestriction>
+                                <lane>allLanesCompleteCarriageway</lane>
+                            </laneRestriction>
+                        </impactExtended>
+                    </impactExtension>
+                </impact>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Bauphase</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksName</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Straßenneubau</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksType</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Froschländer - Daimlerstraße - Neckarstraße - Mörikestraße - Nürtinger Straße - Unterboihinger Straße</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>routeRecommendation</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Oberboihingen, Unterboihinger Straße: Kreuzung Amselweg bis Gebäude 53</value>
+                        </values>
+                    </comment>
+                </generalPublicComment>
+                <groupOfLocations xsi:type="Linear">
+                    <locationForDisplay>
+                        <latitude>48.65399</latitude>
+                        <longitude>9.366099</longitude>
+                    </locationForDisplay>
+                    <linearExtension>
+                        <linearExtended>
+                            <gmlLineString>
+                                <srsName>WGS84 EPSG 4326</srsName>
+                                <posList>48.653990 9.366099 48.654180 9.366190 48.654240 9.366221 48.654450 9.366320</posList>
+                                <roadInformation/>
+                            </gmlLineString>
+                        </linearExtended>
+                    </linearExtension>
+                </groupOfLocations>
+                <situationRecordExtension>
+                    <situationRecordExtended>
+                        <extendedLaneStatusCoded>x2x</extendedLaneStatusCoded>
+                    </situationRecordExtended>
+                </situationRecordExtension>
+                <actionPlanIdentifier>A1</actionPlanIdentifier>
+                <operatorActionStatus>implemented</operatorActionStatus>
+                <roadworksDuration>longTerm</roadworksDuration>
+                <mobility>
+                    <mobilityType>stationary</mobilityType>
+                </mobility>
+                <constructionWorkType>constructionWork</constructionWorkType>
+            </situationRecord>
+            <situationRecord xsi:type="RoadOrCarriagewayOrLaneManagement" id="128196478-128209027-128209028-128209033-gegen-sperrung" version="49">
+                <situationRecordCreationTime>2026-08-05T11:02:35.045+02:00</situationRecordCreationTime>
+                <situationRecordVersionTime>2026-08-13T13:23:03.859+02:00</situationRecordVersionTime>
+                <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                <validity>
+                    <validityStatus>definedByValidityTimeSpec</validityStatus>
+                    <validityTimeSpecification>
+                        <overallStartTime>2026-08-06T00:00:00.000+02:00</overallStartTime>
+                        <overallEndTime>2026-10-31T23:59:00.000+01:00</overallEndTime>
+                    </validityTimeSpecification>
+                </validity>
+                <cause xsi:type="ManagedCause">
+                    <managedCause targetClass="SituationRecord" id="128196478-128209027-128209028-128209033-gegen" version="49"/>
+                </cause>
+                <groupOfLocations xsi:type="Linear">
+                    <locationForDisplay>
+                        <latitude>48.65399</latitude>
+                        <longitude>9.366099</longitude>
+                    </locationForDisplay>
+                    <linearExtension>
+                        <linearExtended>
+                            <gmlLineString>
+                                <srsName>WGS84 EPSG 4326</srsName>
+                                <posList>48.653990 9.366099 48.654180 9.366190 48.654240 9.366221 48.654450 9.366320</posList>
+                                <roadInformation/>
+                            </gmlLineString>
+                        </linearExtended>
+                    </linearExtension>
+                </groupOfLocations>
+                <actionPlanIdentifier>SP1</actionPlanIdentifier>
+                <operatorActionStatus>implemented</operatorActionStatus>
+                <complianceOption>mandatory</complianceOption>
+                <roadOrCarriagewayOrLaneManagementType>roadClosed</roadOrCarriagewayOrLaneManagementType>
+            </situationRecord>
+            <situationExtension>
+                <situationExtended>
+                    <overallSituation xsi:type="ConstructionWorks" id="128196478-gesamt" version="49">
+                        <situationRecordCreationTime>2026-08-05T10:06:44.718+02:00</situationRecordCreationTime>
+                        <situationRecordVersionTime>2026-08-13T13:23:03.858+02:00</situationRecordVersionTime>
+                        <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                        <validity>
+                            <validityStatus>definedByValidityTimeSpec</validityStatus>
+                            <validityTimeSpecification>
+                                <overallStartTime>2026-08-06T00:00:00.000+02:00</overallStartTime>
+                                <overallEndTime>2026-10-31T23:59:00.000+01:00</overallEndTime>
+                            </validityTimeSpecification>
+                        </validity>
+                        <generalPublicComment>
+                            <comment>
+                                <values>
+                                    <value lang="DE">Straßenneubau</value>
+                                </values>
+                            </comment>
+                            <commentExtension>
+                                <commentExtended>
+                                    <commentType2>roadworksType</commentType2>
+                                </commentExtended>
+                            </commentExtension>
+                        </generalPublicComment>
+                        <generalPublicComment>
+                            <comment>
+                                <values>
+                                    <value lang="DE">Oberboihingen, Unterboihinger Straße Straßenneubau</value>
+                                </values>
+                            </comment>
+                            <commentExtension>
+                                <commentExtended>
+                                    <commentType2>roadworksName</commentType2>
+                                </commentExtended>
+                            </commentExtension>
+                        </generalPublicComment>
+                        <groupOfLocations xsi:type="NonOrderedLocationGroupByList">
+                            <locationContainedInGroup xsi:type="Linear">
+                                <locationForDisplay>
+                                    <latitude>48.65399</latitude>
+                                    <longitude>9.366099</longitude>
+                                </locationForDisplay>
+                                <linearExtension>
+                                    <linearExtended>
+                                        <gmlLineString>
+                                            <srsName>WGS84 EPSG 4326</srsName>
+                                            <posList>48.653990 9.366099 48.654180 9.366190 48.654240 9.366221 48.654450 9.366320</posList>
+                                            <roadInformation/>
+                                        </gmlLineString>
+                                    </linearExtended>
+                                </linearExtension>
+                            </locationContainedInGroup>
+                            <locationContainedInGroup xsi:type="Linear">
+                                <locationForDisplay>
+                                    <latitude>48.65399</latitude>
+                                    <longitude>9.366099</longitude>
+                                </locationForDisplay>
+                                <linearExtension>
+                                    <linearExtended>
+                                        <gmlLineString>
+                                            <srsName>WGS84 EPSG 4326</srsName>
+                                            <posList>48.653990 9.366099 48.654180 9.366190 48.654240 9.366221 48.654450 9.366320</posList>
+                                            <roadInformation/>
+                                        </gmlLineString>
+                                    </linearExtended>
+                                </linearExtension>
+                            </locationContainedInGroup>
+                        </groupOfLocations>
+                        <actionPlanIdentifier>A1</actionPlanIdentifier>
+                        <roadworksDuration>longTerm</roadworksDuration>
+                        <constructionWorkType>constructionWork</constructionWorkType>
+                    </overallSituation>
+                </situationExtended>
+            </situationExtension>
+        </situation><situation id="145493390" version="10">
+            <overallSeverity>low</overallSeverity>
+            <situationVersionTime>2026-09-22T09:59:17.747+02:00</situationVersionTime>
+            <headerInformation>
+                <confidentiality>noRestriction</confidentiality>
+                <informationStatus>real</informationStatus>
+            </headerInformation>
+            <situationRecord xsi:type="MaintenanceWorks" id="145493390-145493392-145493395-145493656" version="10">
+                <situationRecordCreationTime>2026-09-22T09:53:50.996+02:00</situationRecordCreationTime>
+                <situationRecordVersionTime>2026-09-22T09:59:14.865+02:00</situationRecordVersionTime>
+                <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                <validity>
+                    <validityStatus>definedByValidityTimeSpec</validityStatus>
+                    <validityTimeSpecification>
+                        <overallStartTime>2026-09-28T00:00:00.000+02:00</overallStartTime>
+                        <overallEndTime>2026-10-24T23:59:00.000+02:00</overallEndTime>
+                    </validityTimeSpecification>
+                </validity>
+                <impact>
+                    <capacityRemaining>0.0</capacityRemaining>
+                    <impactExtension>
+                        <impactExtended>
+                            <laneStatusCoded>x2x</laneStatusCoded>
+                            <laneRestriction>
+                                <lane>allLanesCompleteCarriageway</lane>
+                            </laneRestriction>
+                        </impactExtended>
+                    </impactExtension>
+                </impact>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Bauphase</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksName</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Leitungsarbeiten</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksType</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Lenningen-Schopfloch, Feldweg - Radweg </value>
+                        </values>
+                    </comment>
+                </generalPublicComment>
+                <groupOfLocations xsi:type="Linear">
+                    <locationForDisplay>
+                        <latitude>48.53004</latitude>
+                        <longitude>9.53643</longitude>
+                    </locationForDisplay>
+                    <linearExtension>
+                        <linearExtended>
+                            <gmlLineString>
+                                <srsName>WGS84 EPSG 4326</srsName>
+                                <posList>48.530040 9.536430 48.530010 9.536400 48.529990 9.537130 48.530020 9.537491 48.530070 9.537850 48.530160 9.538219 48.530270 9.538590 48.530601 9.539480 48.530930 9.540380 48.531580 9.542130 48.531730 9.542571 48.531830 9.542970 48.531900 9.543430</posList>
+                                <roadInformation/>
+                            </gmlLineString>
+                        </linearExtended>
+                    </linearExtension>
+                </groupOfLocations>
+                <situationRecordExtension>
+                    <situationRecordExtended>
+                        <extendedLaneStatusCoded>x2x</extendedLaneStatusCoded>
+                    </situationRecordExtended>
+                </situationRecordExtension>
+                <actionPlanIdentifier>AA3</actionPlanIdentifier>
+                <operatorActionStatus>implemented</operatorActionStatus>
+                <roadworksDuration>longTerm</roadworksDuration>
+                <mobility>
+                    <mobilityType>stationary</mobilityType>
+                </mobility>
+                <subjects>
+                    <subjectTypeOfWorks>buriedCables</subjectTypeOfWorks>
+                </subjects>
+                <roadMaintenanceType>installationWork</roadMaintenanceType>
+            </situationRecord>
+            <situationRecord xsi:type="RoadOrCarriagewayOrLaneManagement" id="145493390-145493392-145493395-145493656-sperrung" version="10">
+                <situationRecordCreationTime>2026-09-22T09:53:50.996+02:00</situationRecordCreationTime>
+                <situationRecordVersionTime>2026-09-22T09:59:14.865+02:00</situationRecordVersionTime>
+                <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                <validity>
+                    <validityStatus>definedByValidityTimeSpec</validityStatus>
+                    <validityTimeSpecification>
+                        <overallStartTime>2026-09-28T00:00:00.000+02:00</overallStartTime>
+                        <overallEndTime>2026-10-24T23:59:00.000+02:00</overallEndTime>
+                    </validityTimeSpecification>
+                </validity>
+                <cause xsi:type="ManagedCause">
+                    <managedCause targetClass="SituationRecord" id="145493390-145493392-145493395-145493656" version="10"/>
+                </cause>
+                <groupOfLocations xsi:type="Linear">
+                    <locationForDisplay>
+                        <latitude>48.53004</latitude>
+                        <longitude>9.53643</longitude>
+                    </locationForDisplay>
+                    <linearExtension>
+                        <linearExtended>
+                            <gmlLineString>
+                                <srsName>WGS84 EPSG 4326</srsName>
+                                <posList>48.530040 9.536430 48.530010 9.536400 48.529990 9.537130 48.530020 9.537491 48.530070 9.537850 48.530160 9.538219 48.530270 9.538590 48.530601 9.539480 48.530930 9.540380 48.531580 9.542130 48.531730 9.542571 48.531830 9.542970 48.531900 9.543430</posList>
+                                <roadInformation/>
+                            </gmlLineString>
+                        </linearExtended>
+                    </linearExtension>
+                </groupOfLocations>
+                <actionPlanIdentifier>SP1</actionPlanIdentifier>
+                <operatorActionStatus>implemented</operatorActionStatus>
+                <complianceOption>mandatory</complianceOption>
+                <roadOrCarriagewayOrLaneManagementType>roadClosed</roadOrCarriagewayOrLaneManagementType>
+            </situationRecord>
+            <situationRecord xsi:type="MaintenanceWorks" id="145493390-145493392-145493395-145493656-gegen" version="10">
+                <situationRecordCreationTime>2026-09-22T09:53:50.996+02:00</situationRecordCreationTime>
+                <situationRecordVersionTime>2026-09-22T09:59:14.865+02:00</situationRecordVersionTime>
+                <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                <validity>
+                    <validityStatus>definedByValidityTimeSpec</validityStatus>
+                    <validityTimeSpecification>
+                        <overallStartTime>2026-09-28T00:00:00.000+02:00</overallStartTime>
+                        <overallEndTime>2026-10-24T23:59:00.000+02:00</overallEndTime>
+                    </validityTimeSpecification>
+                </validity>
+                <impact>
+                    <capacityRemaining>0.0</capacityRemaining>
+                    <impactExtension>
+                        <impactExtended>
+                            <laneStatusCoded>x2x</laneStatusCoded>
+                            <laneRestriction>
+                                <lane>allLanesCompleteCarriageway</lane>
+                            </laneRestriction>
+                        </impactExtended>
+                    </impactExtension>
+                </impact>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Bauphase</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksName</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Leitungsarbeiten</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksType</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Lenningen-Schopfloch, Feldweg - Radweg </value>
+                        </values>
+                    </comment>
+                </generalPublicComment>
+                <groupOfLocations xsi:type="Linear">
+                    <locationForDisplay>
+                        <latitude>48.53004</latitude>
+                        <longitude>9.53643</longitude>
+                    </locationForDisplay>
+                    <linearExtension>
+                        <linearExtended>
+                            <gmlLineString>
+                                <srsName>WGS84 EPSG 4326</srsName>
+                                <posList>48.530040 9.536430 48.530010 9.536400 48.529990 9.537130 48.530020 9.537491 48.530070 9.537850 48.530160 9.538219 48.530270 9.538590 48.530601 9.539480 48.530930 9.540380 48.531580 9.542130 48.531730 9.542571 48.531830 9.542970 48.531900 9.543430</posList>
+                                <roadInformation/>
+                            </gmlLineString>
+                        </linearExtended>
+                    </linearExtension>
+                </groupOfLocations>
+                <situationRecordExtension>
+                    <situationRecordExtended>
+                        <extendedLaneStatusCoded>x2x</extendedLaneStatusCoded>
+                    </situationRecordExtended>
+                </situationRecordExtension>
+                <actionPlanIdentifier>AA3</actionPlanIdentifier>
+                <operatorActionStatus>implemented</operatorActionStatus>
+                <roadworksDuration>longTerm</roadworksDuration>
+                <mobility>
+                    <mobilityType>stationary</mobilityType>
+                </mobility>
+                <subjects>
+                    <subjectTypeOfWorks>buriedCables</subjectTypeOfWorks>
+                </subjects>
+                <roadMaintenanceType>installationWork</roadMaintenanceType>
+            </situationRecord>
+            <situationRecord xsi:type="RoadOrCarriagewayOrLaneManagement" id="145493390-145493392-145493395-145493656-gegen-sperrung" version="10">
+                <situationRecordCreationTime>2026-09-22T09:53:50.996+02:00</situationRecordCreationTime>
+                <situationRecordVersionTime>2026-09-22T09:59:14.865+02:00</situationRecordVersionTime>
+                <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                <validity>
+                    <validityStatus>definedByValidityTimeSpec</validityStatus>
+                    <validityTimeSpecification>
+                        <overallStartTime>2026-09-28T00:00:00.000+02:00</overallStartTime>
+                        <overallEndTime>2026-10-24T23:59:00.000+02:00</overallEndTime>
+                    </validityTimeSpecification>
+                </validity>
+                <cause xsi:type="ManagedCause">
+                    <managedCause targetClass="SituationRecord" id="145493390-145493392-145493395-145493656-gegen" version="10"/>
+                </cause>
+                <groupOfLocations xsi:type="Linear">
+                    <locationForDisplay>
+                        <latitude>48.53004</latitude>
+                        <longitude>9.53643</longitude>
+                    </locationForDisplay>
+                    <linearExtension>
+                        <linearExtended>
+                            <gmlLineString>
+                                <srsName>WGS84 EPSG 4326</srsName>
+                                <posList>48.530040 9.536430 48.530010 9.536400 48.529990 9.537130 48.530020 9.537491 48.530070 9.537850 48.530160 9.538219 48.530270 9.538590 48.530601 9.539480 48.530930 9.540380 48.531580 9.542130 48.531730 9.542571 48.531830 9.542970 48.531900 9.543430</posList>
+                                <roadInformation/>
+                            </gmlLineString>
+                        </linearExtended>
+                    </linearExtension>
+                </groupOfLocations>
+                <actionPlanIdentifier>SP1</actionPlanIdentifier>
+                <operatorActionStatus>implemented</operatorActionStatus>
+                <complianceOption>mandatory</complianceOption>
+                <roadOrCarriagewayOrLaneManagementType>roadClosed</roadOrCarriagewayOrLaneManagementType>
+            </situationRecord>
+            <situationExtension>
+                <situationExtended>
+                    <overallSituation xsi:type="MaintenanceWorks" id="145493390-gesamt" version="10">
+                        <situationRecordCreationTime>2026-09-22T09:53:50.996+02:00</situationRecordCreationTime>
+                        <situationRecordVersionTime>2026-09-22T09:59:17.747+02:00</situationRecordVersionTime>
+                        <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                        <validity>
+                            <validityStatus>definedByValidityTimeSpec</validityStatus>
+                            <validityTimeSpecification>
+                                <overallStartTime>2026-09-28T00:00:00.000+02:00</overallStartTime>
+                                <overallEndTime>2026-10-24T23:59:00.000+02:00</overallEndTime>
+                            </validityTimeSpecification>
+                        </validity>
+                        <generalPublicComment>
+                            <comment>
+                                <values>
+                                    <value lang="DE">Leitungsarbeiten</value>
+                                </values>
+                            </comment>
+                            <commentExtension>
+                                <commentExtended>
+                                    <commentType2>roadworksType</commentType2>
+                                </commentExtended>
+                            </commentExtension>
+                        </generalPublicComment>
+                        <generalPublicComment>
+                            <comment>
+                                <values>
+                                    <value lang="DE">Lenningen-Schopfloch, Feldweg - Radweg  Leitungsarbeiten</value>
+                                </values>
+                            </comment>
+                            <commentExtension>
+                                <commentExtended>
+                                    <commentType2>roadworksName</commentType2>
+                                </commentExtended>
+                            </commentExtension>
+                        </generalPublicComment>
+                        <groupOfLocations xsi:type="NonOrderedLocationGroupByList">
+                            <locationContainedInGroup xsi:type="Linear">
+                                <locationForDisplay>
+                                    <latitude>48.53004</latitude>
+                                    <longitude>9.53643</longitude>
+                                </locationForDisplay>
+                                <linearExtension>
+                                    <linearExtended>
+                                        <gmlLineString>
+                                            <srsName>WGS84 EPSG 4326</srsName>
+                                            <posList>48.530040 9.536430 48.530010 9.536400 48.529990 9.537130 48.530020 9.537491 48.530070 9.537850 48.530160 9.538219 48.530270 9.538590 48.530601 9.539480 48.530930 9.540380 48.531580 9.542130 48.531730 9.542571 48.531830 9.542970 48.531900 9.543430</posList>
+                                            <roadInformation/>
+                                        </gmlLineString>
+                                    </linearExtended>
+                                </linearExtension>
+                            </locationContainedInGroup>
+                            <locationContainedInGroup xsi:type="Linear">
+                                <locationForDisplay>
+                                    <latitude>48.53004</latitude>
+                                    <longitude>9.53643</longitude>
+                                </locationForDisplay>
+                                <linearExtension>
+                                    <linearExtended>
+                                        <gmlLineString>
+                                            <srsName>WGS84 EPSG 4326</srsName>
+                                            <posList>48.530040 9.536430 48.530010 9.536400 48.529990 9.537130 48.530020 9.537491 48.530070 9.537850 48.530160 9.538219 48.530270 9.538590 48.530601 9.539480 48.530930 9.540380 48.531580 9.542130 48.531730 9.542571 48.531830 9.542970 48.531900 9.543430</posList>
+                                            <roadInformation/>
+                                        </gmlLineString>
+                                    </linearExtended>
+                                </linearExtension>
+                            </locationContainedInGroup>
+                        </groupOfLocations>
+                        <actionPlanIdentifier>AA3</actionPlanIdentifier>
+                        <roadworksDuration>longTerm</roadworksDuration>
+                        <roadMaintenanceType>installationWork</roadMaintenanceType>
+                    </overallSituation>
+                </situationExtended>
+            </situationExtension>
+        </situation><situation id="145930872" version="9">
+            <overallSeverity>low</overallSeverity>
+            <situationVersionTime>2026-10-02T11:27:51.628+02:00</situationVersionTime>
+            <headerInformation>
+                <confidentiality>noRestriction</confidentiality>
+                <informationStatus>real</informationStatus>
+            </headerInformation>
+            <situationRecord xsi:type="RoadOrCarriagewayOrLaneManagement" id="145930872-145930874-145930877-145931136" version="9">
+                <situationRecordCreationTime>2026-09-23T14:24:39.312+02:00</situationRecordCreationTime>
+                <situationRecordVersionTime>2026-10-02T11:27:48.616+02:00</situationRecordVersionTime>
+                <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                <validity>
+                    <validityStatus>definedByValidityTimeSpec</validityStatus>
+                    <validityTimeSpecification>
+                        <overallStartTime>2026-09-24T00:00:00.000+02:00</overallStartTime>
+                        <overallEndTime>2026-10-23T23:59:00.000+02:00</overallEndTime>
+                    </validityTimeSpecification>
+                </validity>
+                <impact>
+                    <capacityRemaining>1670.0</capacityRemaining>
+                    <residualRoadWidth>3.0</residualRoadWidth>
+                    <impactExtension>
+                        <impactExtended>
+                            <laneStatusCoded>2e</laneStatusCoded>
+                            <laneRestriction>
+                                <lane>allLanesCompleteCarriageway</lane>
+                            </laneRestriction>
+                        </impactExtended>
+                    </impactExtension>
+                </impact>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Bauphase</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksName</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Sperrung Richtungsfahrbahn</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksType</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Hans-Hege-Straße</value>
+                        </values>
+                    </comment>
+                </generalPublicComment>
+                <groupOfLocations xsi:type="Linear">
+                    <locationForDisplay>
+                        <latitude>49.18516</latitude>
+                        <longitude>9.62255</longitude>
+                    </locationForDisplay>
+                    <linearExtension>
+                        <linearExtended>
+                            <gmlLineString>
+                                <srsName>WGS84 EPSG 4326</srsName>
+                                <posList>49.185160 9.622550 49.185200 9.622690</posList>
+                                <roadInformation/>
+                            </gmlLineString>
+                        </linearExtended>
+                    </linearExtension>
+                </groupOfLocations>
+                <situationRecordExtension>
+                    <situationRecordExtended>
+                        <extendedLaneStatusCoded>2e</extendedLaneStatusCoded>
+                    </situationRecordExtended>
+                </situationRecordExtension>
+                <actionPlanIdentifier>SP1</actionPlanIdentifier>
+                <operatorActionStatus>implemented</operatorActionStatus>
+                <complianceOption>mandatory</complianceOption>
+                <roadOrCarriagewayOrLaneManagementType>roadClosed</roadOrCarriagewayOrLaneManagementType>
+            </situationRecord>
+            <situationExtension>
+                <situationExtended>
+                    <overallSituation xsi:type="RoadOrCarriagewayOrLaneManagement" id="145930872-gesamt" version="9">
+                        <situationRecordCreationTime>2026-09-23T14:24:39.311+02:00</situationRecordCreationTime>
+                        <situationRecordVersionTime>2026-10-02T11:27:51.628+02:00</situationRecordVersionTime>
+                        <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                        <validity>
+                            <validityStatus>definedByValidityTimeSpec</validityStatus>
+                            <validityTimeSpecification>
+                                <overallStartTime>2026-09-24T00:00:00.000+02:00</overallStartTime>
+                                <overallEndTime>2026-10-23T23:59:00.000+02:00</overallEndTime>
+                            </validityTimeSpecification>
+                        </validity>
+                        <generalPublicComment>
+                            <comment>
+                                <values>
+                                    <value lang="DE">Sperrung Richtungsfahrbahn</value>
+                                </values>
+                            </comment>
+                            <commentExtension>
+                                <commentExtended>
+                                    <commentType2>roadworksType</commentType2>
+                                </commentExtended>
+                            </commentExtension>
+                        </generalPublicComment>
+                        <generalPublicComment>
+                            <comment>
+                                <values>
+                                    <value lang="DE">Waldenburg, Hans-Hege-Straße 7</value>
+                                </values>
+                            </comment>
+                            <commentExtension>
+                                <commentExtended>
+                                    <commentType2>roadworksName</commentType2>
+                                </commentExtended>
+                            </commentExtension>
+                        </generalPublicComment>
+                        <groupOfLocations xsi:type="Linear">
+                            <locationForDisplay>
+                                <latitude>49.18516</latitude>
+                                <longitude>9.62255</longitude>
+                            </locationForDisplay>
+                            <linearExtension>
+                                <linearExtended>
+                                    <gmlLineString>
+                                        <srsName>WGS84 EPSG 4326</srsName>
+                                        <posList>49.185160 9.622550 49.185200 9.622690</posList>
+                                        <roadInformation/>
+                                    </gmlLineString>
+                                </linearExtended>
+                            </linearExtension>
+                        </groupOfLocations>
+                        <actionPlanIdentifier>SP1</actionPlanIdentifier>
+                        <complianceOption>mandatory</complianceOption>
+                        <roadOrCarriagewayOrLaneManagementType>roadClosed</roadOrCarriagewayOrLaneManagementType>
+                    </overallSituation>
+                </situationExtended>
+            </situationExtension>
+        </situation><situation id="150866740" version="10">
+            <overallSeverity>low</overallSeverity>
+            <situationVersionTime>2026-10-06T11:15:45.033+02:00</situationVersionTime>
+            <headerInformation>
+                <confidentiality>noRestriction</confidentiality>
+                <informationStatus>real</informationStatus>
+            </headerInformation>
+            <situationRecord xsi:type="RoadOrCarriagewayOrLaneManagement" id="150866740-150866742-150866745-150867141" version="10">
+                <situationRecordCreationTime>2026-10-06T11:07:03.157+02:00</situationRecordCreationTime>
+                <situationRecordVersionTime>2026-10-06T11:15:41.553+02:00</situationRecordVersionTime>
+                <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                <validity>
+                    <validityStatus>definedByValidityTimeSpec</validityStatus>
+                    <validityTimeSpecification>
+                        <overallStartTime>2026-10-09T00:00:00.000+02:00</overallStartTime>
+                        <overallEndTime>2026-11-13T23:59:00.000+01:00</overallEndTime>
+                    </validityTimeSpecification>
+                </validity>
+                <impact>
+                    <capacityRemaining>0.0</capacityRemaining>
+                    <impactExtension>
+                        <impactExtended>
+                            <laneStatusCoded>w2x</laneStatusCoded>
+                            <laneRestriction>
+                                <lane>allLanesCompleteCarriageway</lane>
+                            </laneRestriction>
+                        </impactExtended>
+                    </impactExtension>
+                </impact>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Bauphase</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksName</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Baustelleneinrichtung</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksType</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Lenningen-Brucken, Obere Straße 9</value>
+                        </values>
+                    </comment>
+                </generalPublicComment>
+                <groupOfLocations xsi:type="Linear">
+                    <locationForDisplay>
+                        <latitude>48.57301</latitude>
+                        <longitude>9.454841</longitude>
+                    </locationForDisplay>
+                    <linearExtension>
+                        <linearExtended>
+                            <gmlLineString>
+                                <srsName>WGS84 EPSG 4326</srsName>
+                                <posList>48.573010 9.454841 48.573040 9.455010</posList>
+                                <roadInformation/>
+                            </gmlLineString>
+                        </linearExtended>
+                    </linearExtension>
+                </groupOfLocations>
+                <situationRecordExtension>
+                    <situationRecordExtended>
+                        <extendedLaneStatusCoded>w2x</extendedLaneStatusCoded>
+                    </situationRecordExtended>
+                </situationRecordExtension>
+                <actionPlanIdentifier>VF3</actionPlanIdentifier>
+                <operatorActionStatus>implemented</operatorActionStatus>
+                <complianceOption>mandatory</complianceOption>
+                <roadOrCarriagewayOrLaneManagementType>newRoadworksLayout</roadOrCarriagewayOrLaneManagementType>
+            </situationRecord>
+            <situationRecord xsi:type="RoadOrCarriagewayOrLaneManagement" id="150866740-150866742-150866745-150867141-gegen" version="10">
+                <situationRecordCreationTime>2026-10-06T11:07:03.157+02:00</situationRecordCreationTime>
+                <situationRecordVersionTime>2026-10-06T11:15:41.553+02:00</situationRecordVersionTime>
+                <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                <validity>
+                    <validityStatus>definedByValidityTimeSpec</validityStatus>
+                    <validityTimeSpecification>
+                        <overallStartTime>2026-10-09T00:00:00.000+02:00</overallStartTime>
+                        <overallEndTime>2026-11-13T23:59:00.000+01:00</overallEndTime>
+                    </validityTimeSpecification>
+                </validity>
+                <impact>
+                    <capacityRemaining>0.0</capacityRemaining>
+                    <residualRoadWidth>3.05</residualRoadWidth>
+                    <impactExtension>
+                        <impactExtended>
+                            <laneStatusCoded>x2w</laneStatusCoded>
+                            <laneRestriction>
+                                <lane>allLanesCompleteCarriageway</lane>
+                            </laneRestriction>
+                        </impactExtended>
+                    </impactExtension>
+                </impact>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Bauphase</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksName</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Baustelleneinrichtung</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksType</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Lenningen-Brucken, Obere Straße 9</value>
+                        </values>
+                    </comment>
+                </generalPublicComment>
+                <groupOfLocations xsi:type="Linear">
+                    <locationForDisplay>
+                        <latitude>48.57301</latitude>
+                        <longitude>9.454841</longitude>
+                    </locationForDisplay>
+                    <linearExtension>
+                        <linearExtended>
+                            <gmlLineString>
+                                <srsName>WGS84 EPSG 4326</srsName>
+                                <posList>48.573010 9.454841 48.573040 9.455010</posList>
+                                <roadInformation/>
+                            </gmlLineString>
+                        </linearExtended>
+                    </linearExtension>
+                </groupOfLocations>
+                <situationRecordExtension>
+                    <situationRecordExtended>
+                        <extendedLaneStatusCoded>x2w</extendedLaneStatusCoded>
+                    </situationRecordExtended>
+                </situationRecordExtension>
+                <actionPlanIdentifier>VF3</actionPlanIdentifier>
+                <operatorActionStatus>implemented</operatorActionStatus>
+                <complianceOption>mandatory</complianceOption>
+                <roadOrCarriagewayOrLaneManagementType>newRoadworksLayout</roadOrCarriagewayOrLaneManagementType>
+            </situationRecord>
+            <situationExtension>
+                <situationExtended>
+                    <overallSituation xsi:type="RoadOrCarriagewayOrLaneManagement" id="150866740-gesamt" version="10">
+                        <situationRecordCreationTime>2026-10-06T11:07:03.152+02:00</situationRecordCreationTime>
+                        <situationRecordVersionTime>2026-10-06T11:15:45.033+02:00</situationRecordVersionTime>
+                        <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                        <validity>
+                            <validityStatus>definedByValidityTimeSpec</validityStatus>
+                            <validityTimeSpecification>
+                                <overallStartTime>2026-10-09T00:00:00.000+02:00</overallStartTime>
+                                <overallEndTime>2026-11-13T23:59:00.000+01:00</overallEndTime>
+                            </validityTimeSpecification>
+                        </validity>
+                        <generalPublicComment>
+                            <comment>
+                                <values>
+                                    <value lang="DE">Baustelleneinrichtung</value>
+                                </values>
+                            </comment>
+                            <commentExtension>
+                                <commentExtended>
+                                    <commentType2>roadworksType</commentType2>
+                                </commentExtended>
+                            </commentExtension>
+                        </generalPublicComment>
+                        <generalPublicComment>
+                            <comment>
+                                <values>
+                                    <value lang="DE">Lenningen-Brucken, Obere Straße 9 Kranstellung, Containerstellung </value>
+                                </values>
+                            </comment>
+                            <commentExtension>
+                                <commentExtended>
+                                    <commentType2>roadworksName</commentType2>
+                                </commentExtended>
+                            </commentExtension>
+                        </generalPublicComment>
+                        <groupOfLocations xsi:type="NonOrderedLocationGroupByList">
+                            <locationContainedInGroup xsi:type="Linear">
+                                <locationForDisplay>
+                                    <latitude>48.57301</latitude>
+                                    <longitude>9.454841</longitude>
+                                </locationForDisplay>
+                                <linearExtension>
+                                    <linearExtended>
+                                        <gmlLineString>
+                                            <srsName>WGS84 EPSG 4326</srsName>
+                                            <posList>48.573010 9.454841 48.573040 9.455010</posList>
+                                            <roadInformation/>
+                                        </gmlLineString>
+                                    </linearExtended>
+                                </linearExtension>
+                            </locationContainedInGroup>
+                            <locationContainedInGroup xsi:type="Linear">
+                                <locationForDisplay>
+                                    <latitude>48.57301</latitude>
+                                    <longitude>9.454841</longitude>
+                                </locationForDisplay>
+                                <linearExtension>
+                                    <linearExtended>
+                                        <gmlLineString>
+                                            <srsName>WGS84 EPSG 4326</srsName>
+                                            <posList>48.573010 9.454841 48.573040 9.455010</posList>
+                                            <roadInformation/>
+                                        </gmlLineString>
+                                    </linearExtended>
+                                </linearExtension>
+                            </locationContainedInGroup>
+                        </groupOfLocations>
+                        <actionPlanIdentifier>VF3</actionPlanIdentifier>
+                        <complianceOption>mandatory</complianceOption>
+                        <roadOrCarriagewayOrLaneManagementType>newRoadworksLayout</roadOrCarriagewayOrLaneManagementType>
+                    </overallSituation>
+                </situationExtended>
+            </situationExtension>
+        </situation><situation id="152122944" version="16">
+            <overallSeverity>low</overallSeverity>
+            <situationVersionTime>2026-10-09T11:32:25.513+02:00</situationVersionTime>
+            <headerInformation>
+                <confidentiality>noRestriction</confidentiality>
+                <informationStatus>real</informationStatus>
+            </headerInformation>
+            <situationRecord xsi:type="MaintenanceWorks" id="152122944-152122946-152122949-152127429" version="16">
+                <situationRecordCreationTime>2026-10-09T10:41:43.956+02:00</situationRecordCreationTime>
+                <situationRecordVersionTime>2026-10-09T11:32:21.651+02:00</situationRecordVersionTime>
+                <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                <validity>
+                    <validityStatus>definedByValidityTimeSpec</validityStatus>
+                    <validityTimeSpecification>
+                        <overallStartTime>2026-10-12T00:00:00.000+02:00</overallStartTime>
+                        <overallEndTime>2026-10-30T23:59:00.000+01:00</overallEndTime>
+                    </validityTimeSpecification>
+                </validity>
+                <impact>
+                    <capacityRemaining>0.0</capacityRemaining>
+                    <impactExtension>
+                        <impactExtended>
+                            <laneStatusCoded>2</laneStatusCoded>
+                            <laneRestriction>
+                                <lane>allLanesCompleteCarriageway</lane>
+                            </laneRestriction>
+                        </impactExtended>
+                    </impactExtension>
+                </impact>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Bauphase</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksName</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Arbeiten an Geh-/Radwegen</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksType</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Holzmaden, Friedhofstraße 6</value>
+                        </values>
+                    </comment>
+                </generalPublicComment>
+                <groupOfLocations xsi:type="Linear">
+                    <locationForDisplay>
+                        <latitude>48.63469</latitude>
+                        <longitude>9.51625</longitude>
+                    </locationForDisplay>
+                    <linearExtension>
+                        <linearExtended>
+                            <gmlLineString>
+                                <srsName>WGS84 EPSG 4326</srsName>
+                                <posList>48.634690 9.516249 48.634630 9.516290 48.634590 9.516280 48.634520 9.516411 48.634450 9.516350 48.634450 9.516350 48.634390 9.516299 48.634390 9.516299 48.634330 9.516259 48.634290 9.516230 48.634340 9.516170</posList>
+                                <roadInformation/>
+                            </gmlLineString>
+                        </linearExtended>
+                    </linearExtension>
+                </groupOfLocations>
+                <situationRecordExtension>
+                    <situationRecordExtended>
+                        <extendedLaneStatusCoded>2G</extendedLaneStatusCoded>
+                    </situationRecordExtended>
+                </situationRecordExtension>
+                <actionPlanIdentifier>AA4</actionPlanIdentifier>
+                <operatorActionStatus>implemented</operatorActionStatus>
+                <roadworksDuration>longTerm</roadworksDuration>
+                <mobility>
+                    <mobilityType>stationary</mobilityType>
+                </mobility>
+                <roadMaintenanceType>roadsideWork</roadMaintenanceType>
+            </situationRecord>
+            <situationRecord xsi:type="RoadOrCarriagewayOrLaneManagement" id="152122944-152122946-152122949-152127429-sperrung" version="16">
+                <situationRecordCreationTime>2026-10-09T10:41:43.956+02:00</situationRecordCreationTime>
+                <situationRecordVersionTime>2026-10-09T11:32:21.651+02:00</situationRecordVersionTime>
+                <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                <validity>
+                    <validityStatus>definedByValidityTimeSpec</validityStatus>
+                    <validityTimeSpecification>
+                        <overallStartTime>2026-10-12T00:00:00.000+02:00</overallStartTime>
+                        <overallEndTime>2026-10-30T23:59:00.000+01:00</overallEndTime>
+                    </validityTimeSpecification>
+                </validity>
+                <cause xsi:type="ManagedCause">
+                    <managedCause targetClass="SituationRecord" id="152122944-152122946-152122949-152127429" version="16"/>
+                </cause>
+                <groupOfLocations xsi:type="Linear">
+                    <locationForDisplay>
+                        <latitude>48.63469</latitude>
+                        <longitude>9.51625</longitude>
+                    </locationForDisplay>
+                    <linearExtension>
+                        <linearExtended>
+                            <gmlLineString>
+                                <srsName>WGS84 EPSG 4326</srsName>
+                                <posList>48.634690 9.516249 48.634630 9.516290 48.634590 9.516280 48.634520 9.516411 48.634450 9.516350 48.634450 9.516350 48.634390 9.516299 48.634390 9.516299 48.634330 9.516259 48.634290 9.516230 48.634340 9.516170</posList>
+                                <roadInformation/>
+                            </gmlLineString>
+                        </linearExtended>
+                    </linearExtension>
+                </groupOfLocations>
+                <actionPlanIdentifier>SP1</actionPlanIdentifier>
+                <operatorActionStatus>implemented</operatorActionStatus>
+                <complianceOption>mandatory</complianceOption>
+                <roadOrCarriagewayOrLaneManagementType>roadClosed</roadOrCarriagewayOrLaneManagementType>
+            </situationRecord>
+            <situationExtension>
+                <situationExtended>
+                    <overallSituation xsi:type="MaintenanceWorks" id="152122944-gesamt" version="16">
+                        <situationRecordCreationTime>2026-10-09T10:41:43.955+02:00</situationRecordCreationTime>
+                        <situationRecordVersionTime>2026-10-09T11:32:25.513+02:00</situationRecordVersionTime>
+                        <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                        <validity>
+                            <validityStatus>definedByValidityTimeSpec</validityStatus>
+                            <validityTimeSpecification>
+                                <overallStartTime>2026-10-12T00:00:00.000+02:00</overallStartTime>
+                                <overallEndTime>2026-10-30T23:59:00.000+01:00</overallEndTime>
+                            </validityTimeSpecification>
+                        </validity>
+                        <generalPublicComment>
+                            <comment>
+                                <values>
+                                    <value lang="DE">Arbeiten an Geh-/Radwegen</value>
+                                </values>
+                            </comment>
+                            <commentExtension>
+                                <commentExtended>
+                                    <commentType2>roadworksType</commentType2>
+                                </commentExtended>
+                            </commentExtension>
+                        </generalPublicComment>
+                        <generalPublicComment>
+                            <comment>
+                                <values>
+                                    <value lang="DE">Holzmaden, Friedhofstraße 6 Arbeiten an Geh- oder Radwegen, Teilsperrung des Gehwegs </value>
+                                </values>
+                            </comment>
+                            <commentExtension>
+                                <commentExtended>
+                                    <commentType2>roadworksName</commentType2>
+                                </commentExtended>
+                            </commentExtension>
+                        </generalPublicComment>
+                        <groupOfLocations xsi:type="Linear">
+                            <locationForDisplay>
+                                <latitude>48.63469</latitude>
+                                <longitude>9.51625</longitude>
+                            </locationForDisplay>
+                            <linearExtension>
+                                <linearExtended>
+                                    <gmlLineString>
+                                        <srsName>WGS84 EPSG 4326</srsName>
+                                        <posList>48.634690 9.516249 48.634630 9.516290 48.634590 9.516280 48.634520 9.516411 48.634450 9.516350 48.634450 9.516350 48.634390 9.516299 48.634390 9.516299 48.634330 9.516259 48.634290 9.516230 48.634340 9.516170</posList>
+                                        <roadInformation/>
+                                    </gmlLineString>
+                                </linearExtended>
+                            </linearExtension>
+                        </groupOfLocations>
+                        <actionPlanIdentifier>AA4</actionPlanIdentifier>
+                        <roadworksDuration>longTerm</roadworksDuration>
+                        <roadMaintenanceType>roadsideWork</roadMaintenanceType>
+                    </overallSituation>
+                </situationExtended>
+            </situationExtension>
+        </situation><situation id="85898845" version="5">
+            <overallSeverity>low</overallSeverity>
+            <situationVersionTime>2026-10-13T08:26:35.225+02:00</situationVersionTime>
+            <headerInformation>
+                <confidentiality>noRestriction</confidentiality>
+                <informationStatus>real</informationStatus>
+            </headerInformation>
+            <situationRecord xsi:type="ConstructionWorks" id="85898845-85898847-85898850-85898856" version="5">
+                <situationRecordCreationTime>2026-03-04T07:58:33.299+01:00</situationRecordCreationTime>
+                <situationRecordVersionTime>2026-10-13T08:26:35.225+02:00</situationRecordVersionTime>
+                <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                <validity>
+                    <validityStatus>definedByValidityTimeSpec</validityStatus>
+                    <validityTimeSpecification>
+                        <overallStartTime>2026-02-26T00:00:00.000+01:00</overallStartTime>
+                        <overallEndTime>2026-10-30T23:59:00.000+01:00</overallEndTime>
+                    </validityTimeSpecification>
+                </validity>
+                <impact>
+                    <capacityRemaining>1550.0</capacityRemaining>
+                    <numberOfLanesRestricted>0</numberOfLanesRestricted>
+                    <originalNumberOfLanes>1</originalNumberOfLanes>
+                    <residualRoadWidth>3.0</residualRoadWidth>
+                    <impactExtension>
+                        <impactExtended>
+                            <laneStatusCoded>2o</laneStatusCoded>
+                            <laneRestriction>
+                                <lane>allLanesCompleteCarriageway</lane>
+                            </laneRestriction>
+                        </impactExtended>
+                    </impactExtension>
+                </impact>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Bauphase</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksName</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Umbau einer Anschlussstelle</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksType</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Schloss-Straße - Eutendorfer Straße - Hohbühlstraße - Im Wiesengrund</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>routeRecommendation</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <groupOfLocations xsi:type="Linear">
+                    <locationForDisplay>
+                        <latitude>49.00244</latitude>
+                        <longitude>9.758093</longitude>
+                    </locationForDisplay>
+                    <supplementaryPositionalDescription>
+                        <affectedCarriagewayAndLanes>
+                            <carriageway>mainCarriageway</carriageway>
+                            <lengthAffected>72.62545</lengthAffected>
+                        </affectedCarriagewayAndLanes>
+                    </supplementaryPositionalDescription>
+                    <linearWithinLinearElement>
+                        <directionRelativeOnLinearSection>aligned</directionRelativeOnLinearSection>
+                        <linearElement>
+                            <roadName>
+                                <values>
+                                    <value lang="de">Igersheim-Abtsgmünd</value>
+                                </values>
+                            </roadName>
+                            <roadNumber>B19</roadNumber>
+                        </linearElement>
+                        <fromPoint xsi:type="DistanceFromLinearElementReferent">
+                            <distanceAlong>895.0</distanceAlong>
+                            <fromReferent>
+                                <referentIdentifier>6924007O</referentIdentifier>
+                                <referentType>referenceMarker</referentType>
+                            </fromReferent>
+                            <towardsReferent>
+                                <referentIdentifier>6924010O</referentIdentifier>
+                                <referentType>referenceMarker</referentType>
+                            </towardsReferent>
+                        </fromPoint>
+                        <toPoint xsi:type="DistanceFromLinearElementReferent">
+                            <distanceAlong>822.0</distanceAlong>
+                            <fromReferent>
+                                <referentIdentifier>6924007O</referentIdentifier>
+                                <referentType>referenceMarker</referentType>
+                            </fromReferent>
+                            <towardsReferent>
+                                <referentIdentifier>6924010O</referentIdentifier>
+                                <referentType>referenceMarker</referentType>
+                            </towardsReferent>
+                        </toPoint>
+                    </linearWithinLinearElement>
+                    <linearExtension>
+                        <linearExtended>
+                            <gmlLineString>
+                                <srsName>WGS84 EPSG 4326</srsName>
+                                <posList>49.002440 9.758093 49.002412 9.758153 49.002299 9.758388 49.002223 9.758602 49.002170 9.758815 49.002142 9.758967</posList>
+                                <roadInformation>
+                                    <roadNumber>B19</roadNumber>
+                                </roadInformation>
+                            </gmlLineString>
+                        </linearExtended>
+                    </linearExtension>
+                </groupOfLocations>
+                <situationRecordExtension>
+                    <situationRecordExtended>
+                        <extendedLaneStatusCoded>2o</extendedLaneStatusCoded>
+                    </situationRecordExtended>
+                </situationRecordExtension>
+                <actionPlanIdentifier>AS3</actionPlanIdentifier>
+                <operatorActionStatus>requested</operatorActionStatus>
+                <roadworksDuration>longTerm</roadworksDuration>
+                <mobility>
+                    <mobilityType>stationary</mobilityType>
+                </mobility>
+                <subjects>
+                    <subjectTypeOfWorks>junction</subjectTypeOfWorks>
+                </subjects>
+                <constructionWorkType>roadImprovementOrUpgrading</constructionWorkType>
+            </situationRecord>
+            <situationExtension>
+                <situationExtended>
+                    <overallSituation xsi:type="ConstructionWorks" id="85898845-gesamt" version="5">
+                        <situationRecordCreationTime>2026-03-04T07:58:33.298+01:00</situationRecordCreationTime>
+                        <situationRecordVersionTime>2026-10-13T08:26:35.225+02:00</situationRecordVersionTime>
+                        <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                        <validity>
+                            <validityStatus>definedByValidityTimeSpec</validityStatus>
+                            <validityTimeSpecification>
+                                <overallStartTime>2026-02-26T00:00:00.000+01:00</overallStartTime>
+                                <overallEndTime>2026-10-30T23:59:00.000+01:00</overallEndTime>
+                            </validityTimeSpecification>
+                        </validity>
+                        <generalPublicComment>
+                            <comment>
+                                <values>
+                                    <value lang="DE">Umbau einer Anschlussstelle</value>
+                                </values>
+                            </comment>
+                            <commentExtension>
+                                <commentExtended>
+                                    <commentType2>roadworksType</commentType2>
+                                </commentExtended>
+                            </commentExtension>
+                        </generalPublicComment>
+                        <generalPublicComment>
+                            <comment>
+                                <values>
+                                    <value lang="DE">B19 nach Gaildorf-Großaltdorf Umbau einer Anschlussstelle</value>
+                                </values>
+                            </comment>
+                            <commentExtension>
+                                <commentExtended>
+                                    <commentType2>roadworksName</commentType2>
+                                </commentExtended>
+                            </commentExtension>
+                        </generalPublicComment>
+                        <groupOfLocations xsi:type="Linear">
+                            <locationForDisplay>
+                                <latitude>49.00244</latitude>
+                                <longitude>9.758093</longitude>
+                            </locationForDisplay>
+                            <supplementaryPositionalDescription>
+                                <affectedCarriagewayAndLanes>
+                                    <carriageway>mainCarriageway</carriageway>
+                                    <lengthAffected>72.62545</lengthAffected>
+                                </affectedCarriagewayAndLanes>
+                            </supplementaryPositionalDescription>
+                            <linearWithinLinearElement>
+                                <directionRelativeOnLinearSection>aligned</directionRelativeOnLinearSection>
+                                <linearElement>
+                                    <roadName>
+                                        <values>
+                                            <value lang="de">Igersheim-Abtsgmünd</value>
+                                        </values>
+                                    </roadName>
+                                    <roadNumber>B19</roadNumber>
+                                </linearElement>
+                                <fromPoint xsi:type="DistanceFromLinearElementReferent">
+                                    <distanceAlong>895.0</distanceAlong>
+                                    <fromReferent>
+                                        <referentIdentifier>6924007O</referentIdentifier>
+                                        <referentType>referenceMarker</referentType>
+                                    </fromReferent>
+                                    <towardsReferent>
+                                        <referentIdentifier>6924010O</referentIdentifier>
+                                        <referentType>referenceMarker</referentType>
+                                    </towardsReferent>
+                                </fromPoint>
+                                <toPoint xsi:type="DistanceFromLinearElementReferent">
+                                    <distanceAlong>822.0</distanceAlong>
+                                    <fromReferent>
+                                        <referentIdentifier>6924007O</referentIdentifier>
+                                        <referentType>referenceMarker</referentType>
+                                    </fromReferent>
+                                    <towardsReferent>
+                                        <referentIdentifier>6924010O</referentIdentifier>
+                                        <referentType>referenceMarker</referentType>
+                                    </towardsReferent>
+                                </toPoint>
+                            </linearWithinLinearElement>
+                            <linearExtension>
+                                <linearExtended>
+                                    <gmlLineString>
+                                        <srsName>WGS84 EPSG 4326</srsName>
+                                        <posList>49.002440 9.758093 49.002412 9.758153 49.002299 9.758388 49.002223 9.758602 49.002170 9.758815 49.002142 9.758967</posList>
+                                        <roadInformation>
+                                            <roadNumber>B19</roadNumber>
+                                        </roadInformation>
+                                    </gmlLineString>
+                                </linearExtended>
+                            </linearExtension>
+                        </groupOfLocations>
+                        <actionPlanIdentifier>AS3</actionPlanIdentifier>
+                        <roadworksDuration>longTerm</roadworksDuration>
+                        <constructionWorkType>roadImprovementOrUpgrading</constructionWorkType>
+                    </overallSituation>
+                </situationExtended>
+            </situationExtension>
+        </situation><situation id="150517752" version="12">
+            <overallSeverity>low</overallSeverity>
+            <situationVersionTime>2026-10-05T15:25:25.805+02:00</situationVersionTime>
+            <headerInformation>
+                <confidentiality>noRestriction</confidentiality>
+                <informationStatus>real</informationStatus>
+            </headerInformation>
+            <situationRecord xsi:type="MaintenanceWorks" id="150517752-150517754-150517757-150538356" version="12">
+                <situationRecordCreationTime>2026-10-05T14:08:32.229+02:00</situationRecordCreationTime>
+                <situationRecordVersionTime>2026-10-05T15:25:21.825+02:00</situationRecordVersionTime>
+                <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                <validity>
+                    <validityStatus>definedByValidityTimeSpec</validityStatus>
+                    <validityTimeSpecification>
+                        <overallStartTime>2026-10-05T00:00:00.000+02:00</overallStartTime>
+                        <overallEndTime>2026-10-23T23:59:00.000+02:00</overallEndTime>
+                    </validityTimeSpecification>
+                </validity>
+                <impact>
+                    <capacityRemaining>361.0</capacityRemaining>
+                    <residualRoadWidth>3.5</residualRoadWidth>
+                    <impactExtension>
+                        <impactExtended>
+                            <laneStatusCoded>w2x</laneStatusCoded>
+                            <laneRestriction>
+                                <lane>allLanesCompleteCarriageway</lane>
+                            </laneRestriction>
+                        </impactExtended>
+                    </impactExtension>
+                </impact>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Bauphase</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksName</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Leitungsarbeiten</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksType</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Baltmannsweiler, Escherländer auf Höhe von Hausnummer 24</value>
+                        </values>
+                    </comment>
+                </generalPublicComment>
+                <groupOfLocations xsi:type="Linear">
+                    <locationForDisplay>
+                        <latitude>48.76247</latitude>
+                        <longitude>9.45349</longitude>
+                    </locationForDisplay>
+                    <linearExtension>
+                        <linearExtended>
+                            <gmlLineString>
+                                <srsName>WGS84 EPSG 4326</srsName>
+                                <posList>48.762470 9.453490 48.762480 9.453530 48.762530 9.453750 48.762540 9.453800</posList>
+                                <roadInformation/>
+                            </gmlLineString>
+                        </linearExtended>
+                    </linearExtension>
+                </groupOfLocations>
+                <situationRecordExtension>
+                    <situationRecordExtended>
+                        <extendedLaneStatusCoded>w2x</extendedLaneStatusCoded>
+                    </situationRecordExtended>
+                </situationRecordExtension>
+                <actionPlanIdentifier>AA3</actionPlanIdentifier>
+                <operatorActionStatus>implemented</operatorActionStatus>
+                <roadworksDuration>longTerm</roadworksDuration>
+                <mobility>
+                    <mobilityType>stationary</mobilityType>
+                </mobility>
+                <subjects>
+                    <subjectTypeOfWorks>buriedCables</subjectTypeOfWorks>
+                </subjects>
+                <roadworksExtension>
+                    <roadworksExtended>
+                        <roadworksLayout>B II / 9</roadworksLayout>
+                    </roadworksExtended>
+                </roadworksExtension>
+                <roadMaintenanceType>installationWork</roadMaintenanceType>
+            </situationRecord>
+            <situationRecord xsi:type="MaintenanceWorks" id="150517752-150517754-150517757-150538356-gegen" version="12">
+                <situationRecordCreationTime>2026-10-05T14:08:32.229+02:00</situationRecordCreationTime>
+                <situationRecordVersionTime>2026-10-05T15:25:21.825+02:00</situationRecordVersionTime>
+                <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                <validity>
+                    <validityStatus>definedByValidityTimeSpec</validityStatus>
+                    <validityTimeSpecification>
+                        <overallStartTime>2026-10-05T00:00:00.000+02:00</overallStartTime>
+                        <overallEndTime>2026-10-23T23:59:00.000+02:00</overallEndTime>
+                    </validityTimeSpecification>
+                </validity>
+                <impact>
+                    <capacityRemaining>361.0</capacityRemaining>
+                    <residualRoadWidth>3.5</residualRoadWidth>
+                    <impactExtension>
+                        <impactExtended>
+                            <laneStatusCoded>x2w</laneStatusCoded>
+                            <laneRestriction>
+                                <lane>allLanesCompleteCarriageway</lane>
+                            </laneRestriction>
+                        </impactExtended>
+                    </impactExtension>
+                </impact>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Bauphase</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksName</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Leitungsarbeiten</value>
+                        </values>
+                    </comment>
+                    <commentExtension>
+                        <commentExtended>
+                            <commentType2>roadworksType</commentType2>
+                        </commentExtended>
+                    </commentExtension>
+                </generalPublicComment>
+                <generalPublicComment>
+                    <comment>
+                        <values>
+                            <value lang="DE">Baltmannsweiler, Escherländer auf Höhe von Hausnummer 24</value>
+                        </values>
+                    </comment>
+                </generalPublicComment>
+                <groupOfLocations xsi:type="Linear">
+                    <locationForDisplay>
+                        <latitude>48.76247</latitude>
+                        <longitude>9.45349</longitude>
+                    </locationForDisplay>
+                    <linearExtension>
+                        <linearExtended>
+                            <gmlLineString>
+                                <srsName>WGS84 EPSG 4326</srsName>
+                                <posList>48.762470 9.453490 48.762480 9.453530 48.762530 9.453750 48.762540 9.453800</posList>
+                                <roadInformation/>
+                            </gmlLineString>
+                        </linearExtended>
+                    </linearExtension>
+                </groupOfLocations>
+                <situationRecordExtension>
+                    <situationRecordExtended>
+                        <extendedLaneStatusCoded>x2w</extendedLaneStatusCoded>
+                    </situationRecordExtended>
+                </situationRecordExtension>
+                <actionPlanIdentifier>AA3</actionPlanIdentifier>
+                <operatorActionStatus>implemented</operatorActionStatus>
+                <roadworksDuration>longTerm</roadworksDuration>
+                <mobility>
+                    <mobilityType>stationary</mobilityType>
+                </mobility>
+                <subjects>
+                    <subjectTypeOfWorks>buriedCables</subjectTypeOfWorks>
+                </subjects>
+                <roadworksExtension>
+                    <roadworksExtended>
+                        <roadworksLayout>B II / 9</roadworksLayout>
+                    </roadworksExtended>
+                </roadworksExtension>
+                <roadMaintenanceType>installationWork</roadMaintenanceType>
+            </situationRecord>
+            <situationExtension>
+                <situationExtended>
+                    <overallSituation xsi:type="MaintenanceWorks" id="150517752-gesamt" version="12">
+                        <situationRecordCreationTime>2026-10-05T14:08:32.228+02:00</situationRecordCreationTime>
+                        <situationRecordVersionTime>2026-10-05T15:25:25.805+02:00</situationRecordVersionTime>
+                        <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+                        <validity>
+                            <validityStatus>definedByValidityTimeSpec</validityStatus>
+                            <validityTimeSpecification>
+                                <overallStartTime>2026-10-05T00:00:00.000+02:00</overallStartTime>
+                                <overallEndTime>2026-10-23T23:59:00.000+02:00</overallEndTime>
+                            </validityTimeSpecification>
+                        </validity>
+                        <generalPublicComment>
+                            <comment>
+                                <values>
+                                    <value lang="DE">Leitungsarbeiten</value>
+                                </values>
+                            </comment>
+                            <commentExtension>
+                                <commentExtended>
+                                    <commentType2>roadworksType</commentType2>
+                                </commentExtended>
+                            </commentExtension>
+                        </generalPublicComment>
+                        <generalPublicComment>
+                            <comment>
+                                <values>
+                                    <value lang="DE">Baltmannsweiler, Escherländer auf Höhe von Hausnummer 24, Leitungsarbeiten</value>
+                                </values>
+                            </comment>
+                            <commentExtension>
+                                <commentExtended>
+                                    <commentType2>roadworksName</commentType2>
+                                </commentExtended>
+                            </commentExtension>
+                        </generalPublicComment>
+                        <groupOfLocations xsi:type="NonOrderedLocationGroupByList">
+                            <locationContainedInGroup xsi:type="Linear">
+                                <locationForDisplay>
+                                    <latitude>48.76247</latitude>
+                                    <longitude>9.45349</longitude>
+                                </locationForDisplay>
+                                <linearExtension>
+                                    <linearExtended>
+                                        <gmlLineString>
+                                            <srsName>WGS84 EPSG 4326</srsName>
+                                            <posList>48.762470 9.453490 48.762480 9.453530 48.762530 9.453750 48.762540 9.453800</posList>
+                                            <roadInformation/>
+                                        </gmlLineString>
+                                    </linearExtended>
+                                </linearExtension>
+                            </locationContainedInGroup>
+                            <locationContainedInGroup xsi:type="Linear">
+                                <locationForDisplay>
+                                    <latitude>48.76247</latitude>
+                                    <longitude>9.45349</longitude>
+                                </locationForDisplay>
+                                <linearExtension>
+                                    <linearExtended>
+                                        <gmlLineString>
+                                            <srsName>WGS84 EPSG 4326</srsName>
+                                            <posList>48.762470 9.453490 48.762480 9.453530 48.762530 9.453750 48.762540 9.453800</posList>
+                                            <roadInformation/>
+                                        </gmlLineString>
+                                    </linearExtended>
+                                </linearExtension>
+                            </locationContainedInGroup>
+                        </groupOfLocations>
+                        <actionPlanIdentifier>AA3</actionPlanIdentifier>
+                        <roadworksDuration>longTerm</roadworksDuration>
+                        <roadMaintenanceType>installationWork</roadMaintenanceType>
+                    </overallSituation>
+                </situationExtended>
+            </situationExtension>
+        </situation>
+    </payloadPublication>
+</d2LogicalModel>

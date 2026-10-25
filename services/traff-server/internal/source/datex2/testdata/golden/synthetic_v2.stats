@@ -1,0 +1,12 @@
+messages=12
+records=24
+situations=21
+skipped_alertc_only=1
+skipped_beyond_horizon=1
+skipped_cancelled=1
+skipped_duplicate_id=1
+skipped_ended=2
+skipped_linear_reference_only=1
+skipped_no_id=1
+skipped_no_location=1
+skipped_unsupported_type=2

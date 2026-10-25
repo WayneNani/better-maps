@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthetic DATEX II v2.3 SituationPublication (better-maps test fixture). Element names and
+     structure follow the DATEX II v2 schema and the German MDM profile extensions; content is
+     made up. Reference time of the tests: 2026-10-25T16:00:00Z. -->
+<d2LogicalModel xmlns="http://datex2.eu/schema/2/2_0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" modelBaseVersion="2">
+  <exchange>
+    <supplierIdentification><country>de</country><nationalIdentifier>DE-TEST-V2</nationalIdentifier></supplierIdentification>
+    <subscription><operatingMode>operatingMode3</operatingMode><subscriptionStartTime>2026-10-01T00:00:00Z</subscriptionStartTime><subscriptionState>active</subscriptionState><updateMethod>allElementUpdate</updateMethod><target><address/><protocol/></target></subscription>
+  </exchange>
+  <payloadPublication xsi:type="SituationPublication" lang="de">
+    <publicationTime>2026-10-25T15:58:00+01:00</publicationTime>
+    <publicationCreator><country>de</country><nationalIdentifier>DE-TEST-V2</nationalIdentifier></publicationCreator>
+
+    <!-- Temporary speed limit, polyline from linearByCoordinates, road number from linearElement. -->
+    <situation id="syn-speed" version="3">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus></headerInformation>
+      <situationRecord id="syn-speed.0" version="3" xsi:type="SpeedManagement">
+        <situationRecordCreationTime>2026-10-25T10:00:00Z</situationRecordCreationTime>
+        <situationRecordVersionTime>2026-10-25T12:00:00Z</situationRecordVersionTime>
+        <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+        <validity><validityStatus>active</validityStatus><validityTimeSpecification><overallStartTime>2026-10-25T10:00:00Z</overallStartTime></validityTimeSpecification></validity>
+        <groupOfLocations xsi:type="Linear">
+          <linearWithinLinearElement>
+            <linearElement><roadNumber>A9</roadNumber></linearElement>
+          </linearWithinLinearElement>
+          <linearExtension>
+            <extendedLinear>
+              <linearByCoordinates>
+                <start><latitude>48.3500</latitude><longitude>11.6000</longitude></start>
+                <intermediate index="1"><pointCoordinates><latitude>48.3600</latitude><longitude>11.6050</longitude></pointCoordinates></intermediate>
+                <intermediate index="2"><pointCoordinates><latitude>48.3600</latitude><longitude>11.6050</longitude></pointCoordinates></intermediate>
+                <intermediate index="3"><pointCoordinates><latitude>48.3700</latitude><longitude>11.6100</longitude></pointCoordinates></intermediate>
+                <end><latitude>48.3800</latitude><longitude>11.6150</longitude></end>
+              </linearByCoordinates>
+            </extendedLinear>
+          </linearExtension>
+        </groupOfLocations>
+        <complianceOption>mandatory</complianceOption>
+        <speedManagementType>speedRestrictionInOperation</speedManagementType>
+        <temporarySpeedLimit>60</temporarySpeedLimit>
+      </situationRecord>
+      <!-- Speed management without limit carries no information. -->
+      <situationRecord id="syn-speed.1" version="3" xsi:type="SpeedManagement">
+        <validity><validityStatus>active</validityStatus></validity>
+        <groupOfLocations xsi:type="Point"><locationForDisplay><latitude>48.36</latitude><longitude>11.605</longitude></locationForDisplay></groupOfLocations>
+        <speedManagementType>speedRestrictionInOperation</speedManagementType>
+      </situationRecord>
+    </situation>
+
+    <!-- Point location (pointByCoordinates), extremely urgent. -->
+    <situation id="syn-animals" version="1">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus><urgency>extremelyUrgent</urgency></headerInformation>
+      <situationRecord id="syn-animals.0" version="1" xsi:type="AnimalPresenceObstruction">
+        <probabilityOfOccurrence>certain</probabilityOfOccurrence>
+        <validity><validityStatus>active</validityStatus></validity>
+        <groupOfLocations xsi:type="Point">
+          <pointByCoordinates><pointCoordinates><latitude>52.4000</latitude><longitude>13.0500</longitude></pointCoordinates></pointByCoordinates>
+        </groupOfLocations>
+        <animalPresenceType>largeAnimalsOnTheRoad</animalPresenceType>
+      </situationRecord>
+    </situation>
+
+    <!-- TPEG point location, urgent. -->
+    <situation id="syn-infra" version="1">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus><urgency>urgent</urgency></headerInformation>
+      <situationRecord id="syn-infra.0" version="1" xsi:type="InfrastructureDamageObstruction">
+        <validity><validityStatus>active</validityStatus></validity>
+        <groupOfLocations xsi:type="Point">
+          <tpegPointLocation xsi:type="TpegSimplePoint">
+            <tpegDirection>unknown</tpegDirection>
+            <point xsi:type="TpegNonJunctionPoint"><pointCoordinates><latitude>50.1100</latitude><longitude>8.6800</longitude></pointCoordinates></point>
+          </tpegPointLocation>
+        </groupOfLocations>
+        <infrastructureDamageType>gasLeak</infrastructureDamageType>
+      </situationRecord>
+    </situation>
+
+    <!-- GML 2 coordinates ("lon,lat"), road number with space. -->
+    <situation id="syn-ice" version="1">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus></headerInformation>
+      <situationRecord id="syn-ice.0" version="1" xsi:type="WeatherRelatedRoadConditions">
+        <validity><validityStatus>definedByValidityTimeSpec</validityStatus><validityTimeSpecification><overallStartTime>2026-10-25T05:00:00Z</overallStartTime><overallEndTime>2026-10-26T09:00:00Z</overallEndTime></validityTimeSpecification></validity>
+        <groupOfLocations xsi:type="Linear">
+          <linearWithinLinearElement><linearElement><roadNumber>B 2</roadNumber></linearElement></linearWithinLinearElement>
+          <linearExtension><linearLineStringExtension><gmlLineString><coordinates>11.0100,49.4500 11.0200,49.4600 11.0300,49.4700</coordinates></gmlLineString></linearLineStringExtension></linearExtension>
+        </groupOfLocations>
+        <weatherRelatedRoadConditionType>blackIce</weatherRelatedRoadConditionType>
+      </situationRecord>
+    </situation>
+
+    <!-- Only locationForDisplay. -->
+    <situation id="syn-oil" version="1">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus></headerInformation>
+      <situationRecord id="syn-oil.0" version="1" xsi:type="NonWeatherRelatedRoadConditions">
+        <validity><validityStatus>active</validityStatus></validity>
+        <generalPublicComment><comment><values><value lang="de">K 1234 Musterdorf Richtung Beispielstadt, Ölspur</value></values></comment><commentType>locationDescriptor</commentType></generalPublicComment>
+        <groupOfLocations xsi:type="Linear"><locationForDisplay><latitude>48.7000</latitude><longitude>9.1000</longitude></locationForDisplay></groupOfLocations>
+        <nonWeatherRelatedRoadConditionType>oilOnRoad</nonWeatherRelatedRoadConditionType>
+      </situationRecord>
+    </situation>
+
+    <!-- ALERT-C only: cannot be resolved without location table. -->
+    <situation id="syn-alertc" version="1">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus></headerInformation>
+      <situationRecord id="syn-alertc.0" version="1" xsi:type="Accident">
+        <validity><validityStatus>active</validityStatus></validity>
+        <groupOfLocations xsi:type="Linear">
+          <alertCLinear xsi:type="AlertCMethod4Linear">
+            <alertCLocationCountryCode>D</alertCLocationCountryCode><alertCLocationTableNumber>1</alertCLocationTableNumber><alertCLocationTableVersion>22.0</alertCLocationTableVersion>
+            <alertCDirection><alertCDirectionCoded>positive</alertCDirectionCoded></alertCDirection>
+            <alertCMethod4PrimaryPointLocation><alertCLocation><specificLocation>12345</specificLocation></alertCLocation><offsetDistance><offsetDistance>0</offsetDistance></offsetDistance></alertCMethod4PrimaryPointLocation>
+            <alertCMethod4SecondaryPointLocation><alertCLocation><specificLocation>12346</specificLocation></alertCLocation><offsetDistance><offsetDistance>0</offsetDistance></offsetDistance></alertCMethod4SecondaryPointLocation>
+          </alertCLinear>
+        </groupOfLocations>
+        <accidentType>accident</accidentType>
+      </situationRecord>
+    </situation>
+
+    <!-- Linear referencing on BISSTRA only (as in the BASt roadworks feed). -->
+    <situation id="syn-linref" version="1">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus></headerInformation>
+      <situationRecord id="syn-linref.0" version="1" xsi:type="MaintenanceWorks">
+        <validity><validityStatus>active</validityStatus></validity>
+        <groupOfLocations xsi:type="Linear">
+          <linearWithinLinearElement>
+            <linearElement><roadNumber>A1</roadNumber><linearElementReferenceModel>BISSTRA</linearElementReferenceModel></linearElement>
+            <fromPoint xsi:type="DistanceFromLinearElementReferent"><distanceAlong>63</distanceAlong><fromReferent><referentIdentifier>6407080D</referentIdentifier><referentType>referenceMarker</referentType></fromReferent></fromPoint>
+            <toPoint xsi:type="DistanceFromLinearElementReferent"><distanceAlong>328</distanceAlong><fromReferent><referentIdentifier>6407080D</referentIdentifier><referentType>referenceMarker</referentType></fromReferent></toPoint>
+          </linearWithinLinearElement>
+        </groupOfLocations>
+        <roadMaintenanceType>roadworks</roadMaintenanceType>
+      </situationRecord>
+    </situation>
+
+    <!-- No location at all, and a record without ID. -->
+    <situation id="syn-noloc" version="1">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus></headerInformation>
+      <situationRecord id="syn-noloc.0" version="1" xsi:type="Accident">
+        <validity><validityStatus>active</validityStatus></validity>
+        <accidentType>accident</accidentType>
+      </situationRecord>
+      <situationRecord version="1" xsi:type="Accident">
+        <validity><validityStatus>active</validityStatus></validity>
+        <groupOfLocations xsi:type="Point"><locationForDisplay><latitude>48.1</latitude><longitude>11.5</longitude></locationForDisplay></groupOfLocations>
+      </situationRecord>
+    </situation>
+
+    <!-- Valid periods: the current one is used. OpenLR only, FRC0 gives the road class. -->
+    <situation id="syn-periods" version="2">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus></headerInformation>
+      <situationRecord id="syn-periods.0" version="2" xsi:type="MaintenanceWorks">
+        <validity>
+          <validityStatus>definedByValidityTimeSpec</validityStatus>
+          <validityTimeSpecification>
+            <overallStartTime>2026-10-20T00:00:00+02:00</overallStartTime>
+            <overallEndTime>2026-10-31T23:59:00+01:00</overallEndTime>
+            <validPeriod><startOfPeriod>2026-10-26T08:00:00Z</startOfPeriod><endOfPeriod>2026-10-26T20:00:00Z</endOfPeriod></validPeriod>
+            <validPeriod><startOfPeriod>2026-10-24T08:00:00Z</startOfPeriod><endOfPeriod>2026-10-24T20:00:00Z</endOfPeriod></validPeriod>
+            <validPeriod><startOfPeriod>2026-10-25T08:00:00Z</startOfPeriod><endOfPeriod>2026-10-25T20:00:00Z</endOfPeriod></validPeriod>
+          </validityTimeSpecification>
+        </validity>
+        <groupOfLocations xsi:type="Linear">
+          <linearExtension>
+            <openlrExtendedLinear>
+              <firstDirection>
+                <openlrLocationReferencePoint>
+                  <openlrCoordinate><latitude>51.2000</latitude><longitude>6.8000</longitude></openlrCoordinate>
+                  <openlrLineAttributes><openlrFunctionalRoadClass>FRC0</openlrFunctionalRoadClass><openlrFormOfWay>motorway</openlrFormOfWay><openlrBearing>10</openlrBearing></openlrLineAttributes>
+                  <openlrPathAttributes><openlrLowestFRCToNextLRPoint>FRC0</openlrLowestFRCToNextLRPoint><openlrDistanceToNextLRPoint>1200</openlrDistanceToNextLRPoint></openlrPathAttributes>
+                </openlrLocationReferencePoint>
+                <openlrLastLocationReferencePoint>
+                  <openlrCoordinate><latitude>51.2100</latitude><longitude>6.8050</longitude></openlrCoordinate>
+                  <openlrLineAttributes><openlrFunctionalRoadClass>FRC0</openlrFunctionalRoadClass><openlrFormOfWay>motorway</openlrFormOfWay><openlrBearing>190</openlrBearing></openlrLineAttributes>
+                </openlrLastLocationReferencePoint>
+              </firstDirection>
+            </openlrExtendedLinear>
+          </linearExtension>
+        </groupOfLocations>
+        <roadMaintenanceType>resurfacingWork</roadMaintenanceType>
+      </situationRecord>
+    </situation>
+
+    <!-- All valid periods have ended. -->
+    <situation id="syn-periods-ended" version="1">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus></headerInformation>
+      <situationRecord id="syn-periods-ended.0" version="1" xsi:type="MaintenanceWorks">
+        <validity>
+          <validityStatus>definedByValidityTimeSpec</validityStatus>
+          <validityTimeSpecification>
+            <overallStartTime>2026-10-20T00:00:00Z</overallStartTime>
+            <validPeriod><startOfPeriod>2026-10-24T08:00:00Z</startOfPeriod><endOfPeriod>2026-10-24T20:00:00Z</endOfPeriod></validPeriod>
+          </validityTimeSpecification>
+        </validity>
+        <groupOfLocations xsi:type="Point"><locationForDisplay><latitude>51.3</latitude><longitude>7.1</longitude></locationForDisplay></groupOfLocations>
+        <roadMaintenanceType>repairWork</roadMaintenanceType>
+      </situationRecord>
+    </situation>
+
+    <!-- Starts beyond the horizon (7 days in the tests). -->
+    <situation id="syn-future" version="1">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus></headerInformation>
+      <situationRecord id="syn-future.0" version="1" xsi:type="ConstructionWorks">
+        <validity><validityStatus>definedByValidityTimeSpec</validityStatus><validityTimeSpecification><overallStartTime>2026-11-25T00:00:00Z</overallStartTime><overallEndTime>2026-12-25T00:00:00Z</overallEndTime></validityTimeSpecification></validity>
+        <groupOfLocations xsi:type="Point"><locationForDisplay><latitude>53.5</latitude><longitude>10.0</longitude></locationForDisplay></groupOfLocations>
+        <constructionWorkType>demolitionWork</constructionWorkType>
+      </situationRecord>
+    </situation>
+
+    <!-- Location group: the first member has ALERT-C only, the second TPEG coordinates. Both
+         directions, two lanes closed, 15 minutes delay. -->
+    <situation id="syn-group" version="1">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus></headerInformation>
+      <situationRecord id="syn-group.0" version="1" xsi:type="RoadOrCarriagewayOrLaneManagement">
+        <validity><validityStatus>active</validityStatus></validity>
+        <impact><delays><delayTimeValue>900</delayTimeValue></delays><numberOfLanesRestricted>2</numberOfLanesRestricted></impact>
+        <groupOfLocations xsi:type="NonOrderedLocationGroupByList">
+          <locationContainedInGroup xsi:type="Linear">
+            <alertCLinear xsi:type="AlertCMethod2Linear"><alertCLocationCountryCode>D</alertCLocationCountryCode><alertCLocationTableNumber>1</alertCLocationTableNumber><alertCLocationTableVersion>22.0</alertCLocationTableVersion></alertCLinear>
+          </locationContainedInGroup>
+          <locationContainedInGroup xsi:type="Linear">
+            <networkLocationExtension><networkLocationExtended><bothDirections>true</bothDirections></networkLocationExtended></networkLocationExtension>
+            <linearWithinLinearElement><linearElement><roadNumber>A 3</roadNumber></linearElement></linearWithinLinearElement>
+            <tpegLinearLocation>
+              <tpegDirection>bothWays</tpegDirection>
+              <tpegLinearLocationType>segment</tpegLinearLocationType>
+              <to xsi:type="TpegNonJunctionPoint"><pointCoordinates><latitude>50.0500</latitude><longitude>8.5500</longitude></pointCoordinates></to>
+              <from xsi:type="TpegNonJunctionPoint"><pointCoordinates><latitude>50.0400</latitude><longitude>8.5300</longitude></pointCoordinates></from>
+            </tpegLinearLocation>
+          </locationContainedInGroup>
+        </groupOfLocations>
+        <roadOrCarriagewayOrLaneManagementType>laneClosures</roadOrCarriagewayOrLaneManagementType>
+      </situationRecord>
+    </situation>
+
+    <!-- ETRS89 / UTM zone 32N (EPSG:25832), as used by municipalities. -->
+    <situation id="syn-utm" version="1">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus></headerInformation>
+      <situationRecord id="syn-utm.0" version="1" xsi:type="ConstructionWorks">
+        <validity><validityStatus>active</validityStatus></validity>
+        <groupOfLocations xsi:type="Linear">
+          <linearExtension><linearExtended><gmlLineString><srsName>EPSG 25832</srsName><posList>5718041.98 414728.32 5718040.92 414645.45</posList></gmlLineString></linearExtended></linearExtension>
+        </groupOfLocations>
+        <constructionWorkType>constructionWork</constructionWorkType>
+      </situationRecord>
+    </situation>
+
+    <!-- MDM "ByPoints" linear elements; street name without road number. -->
+    <situation id="syn-bypoints" version="1">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus></headerInformation>
+      <situationRecord id="syn-bypoints.0" version="1" xsi:type="RoadOrCarriagewayOrLaneManagement">
+        <validity><validityStatus>active</validityStatus><validityTimeSpecification><overallStartTime>2026-10-25T10:00:00</overallStartTime></validityTimeSpecification></validity>
+        <groupOfLocations xsi:type="Linear">
+          <linearExtension><extendedLinear><additonalLinearWithinLinearElement><linearWithinLinearElement>
+            <linearElement xsi:type="LinearElementByPoints">
+              <roadName><values><value>Hauptstraße</value></values></roadName>
+              <roadNumber/>
+              <startPointOfLinearElement><referentIdentifier>1S</referentIdentifier><referentType>referenceMarker</referentType><pointCoordinates><latitude>49.9786</latitude><longitude>8.3989</longitude></pointCoordinates></startPointOfLinearElement>
+              <intermediatePointOnLinearElement index="1"><referent><referentIdentifier>11</referentIdentifier><referentType>referenceMarker</referentType><pointCoordinates><latitude>49.9786</latitude><longitude>8.4004</longitude></pointCoordinates></referent></intermediatePointOnLinearElement>
+              <endPointOfLinearElement><referentIdentifier>1E</referentIdentifier><referentType>referenceMarker</referentType><pointCoordinates><latitude>49.9785</latitude><longitude>8.4041</longitude></pointCoordinates></endPointOfLinearElement>
+            </linearElement>
+            <fromPoint xsi:type="DistanceFromLinearElementStart"><distanceAlong>0</distanceAlong></fromPoint>
+            <toPoint xsi:type="DistanceFromLinearElementStart"><distanceAlong>380</distanceAlong></toPoint>
+          </linearWithinLinearElement></additonalLinearWithinLinearElement></extendedLinear></linearExtension>
+        </groupOfLocations>
+        <roadOrCarriagewayOrLaneManagementType>contraflow</roadOrCarriagewayOrLaneManagementType>
+      </situationRecord>
+    </situation>
+
+    <!-- Cancelled via lifeCycleManagement. -->
+    <situation id="syn-cancel" version="4">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus></headerInformation>
+      <situationRecord id="syn-cancel.0" version="4" xsi:type="Accident">
+        <validity><validityStatus>active</validityStatus></validity>
+        <management><lifeCycleManagement><cancel>true</cancel></lifeCycleManagement></management>
+        <groupOfLocations xsi:type="Point"><locationForDisplay><latitude>48.2</latitude><longitude>11.4</longitude></locationForDisplay></groupOfLocations>
+        <accidentType>accident</accidentType>
+      </situationRecord>
+    </situation>
+
+    <!-- Unsupported record type. -->
+    <situation id="syn-unsupported" version="1">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus></headerInformation>
+      <situationRecord id="syn-unsupported.0" version="1" xsi:type="ReroutingManagement">
+        <validity><validityStatus>active</validityStatus></validity>
+        <groupOfLocations xsi:type="Point"><locationForDisplay><latitude>48.2</latitude><longitude>11.4</longitude></locationForDisplay></groupOfLocations>
+        <reroutingManagementType>followDiversionSigns</reroutingManagementType>
+      </situationRecord>
+    </situation>
+
+    <!-- Ended. -->
+    <situation id="syn-ended" version="1">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus></headerInformation>
+      <situationRecord id="syn-ended.0" version="1" xsi:type="MaintenanceWorks">
+        <validity><validityStatus>definedByValidityTimeSpec</validityStatus><validityTimeSpecification><overallStartTime>2026-10-01T00:00:00Z</overallStartTime><overallEndTime>2026-10-25T15:00:00Z</overallEndTime></validityTimeSpecification></validity>
+        <groupOfLocations xsi:type="Point"><locationForDisplay><latitude>48.2</latitude><longitude>11.4</longitude></locationForDisplay></groupOfLocations>
+        <roadMaintenanceType>roadworks</roadMaintenanceType>
+      </situationRecord>
+    </situation>
+
+    <!-- Road, origin and destination from the location descriptor. -->
+    <situation id="syn-wrongway" version="1">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus><urgency>normalUrgency</urgency></headerInformation>
+      <situationRecord id="syn-wrongway.0" version="1" xsi:type="VehicleObstruction">
+        <validity><validityStatus>active</validityStatus></validity>
+        <generalPublicComment><comment><values><value lang="en">A3 Frankfurt towards Cologne</value><value lang="de-DE">A3 Frankfurt Richtung Köln zwischen Limburg-Süd (43) und Limburg-Nord (42)</value></values></comment><commentType>locationDescriptor</commentType></generalPublicComment>
+        <groupOfLocations xsi:type="Linear">
+          <tpegLinearLocation>
+            <tpegDirection>unknown</tpegDirection>
+            <tpegLinearLocationType>segment</tpegLinearLocationType>
+            <to xsi:type="TpegNonJunctionPoint"><pointCoordinates><latitude>50.4100</latitude><longitude>8.0600</longitude></pointCoordinates></to>
+            <from xsi:type="TpegNonJunctionPoint"><pointCoordinates><latitude>50.3700</latitude><longitude>8.0900</longitude></pointCoordinates></from>
+          </tpegLinearLocation>
+        </groupOfLocations>
+        <vehicleObstructionType>vehicleOnWrongCarriageway</vehicleObstructionType>
+      </situationRecord>
+    </situation>
+
+    <!-- Unknown subtype values fall back to the default event of the record type. -->
+    <situation id="syn-defaults" version="1">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus></headerInformation>
+      <situationRecord id="syn-defaults.0" version="1" xsi:type="GeneralObstruction">
+        <validity><validityStatus>active</validityStatus></validity>
+        <groupOfLocations xsi:type="Point"><pointByCoordinates><pointCoordinates><latitude>54.3200</latitude><longitude>10.1300</longitude></pointCoordinates></pointByCoordinates></groupOfLocations>
+        <obstructionType>somethingNew</obstructionType>
+      </situationRecord>
+      <situationRecord id="syn-defaults.1" version="1" xsi:type="AbnormalTraffic">
+        <validity><validityStatus>active</validityStatus></validity>
+        <groupOfLocations xsi:type="Point"><pointByCoordinates><pointCoordinates><latitude>54.3200</latitude><longitude>10.1300</longitude></pointCoordinates></pointByCoordinates></groupOfLocations>
+      </situationRecord>
+    </situation>
+
+    <!-- The same record ID twice: the second occurrence is dropped. -->
+    <situation id="syn-dupid-a" version="1">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus></headerInformation>
+      <situationRecord id="syn-dupid.0" version="1" xsi:type="Accident">
+        <validity><validityStatus>active</validityStatus></validity>
+        <groupOfLocations xsi:type="Point"><pointByCoordinates><pointCoordinates><latitude>53.0700</latitude><longitude>8.8000</longitude></pointCoordinates></pointByCoordinates></groupOfLocations>
+        <accidentType>multivehicleAccident</accidentType>
+      </situationRecord>
+    </situation>
+    <situation id="syn-dupid-b" version="1">
+      <headerInformation><confidentiality>noRestriction</confidentiality><informationStatus>real</informationStatus></headerInformation>
+      <situationRecord id="syn-dupid.0" version="1" xsi:type="Accident">
+        <validity><validityStatus>active</validityStatus></validity>
+        <groupOfLocations xsi:type="Point"><pointByCoordinates><pointCoordinates><latitude>53.1700</latitude><longitude>8.9000</longitude></pointCoordinates></pointByCoordinates></groupOfLocations>
+        <accidentType>accident</accidentType>
+      </situationRecord>
+    </situation>
+  </payloadPublication>
+</d2LogicalModel>

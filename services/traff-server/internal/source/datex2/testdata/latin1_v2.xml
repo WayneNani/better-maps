@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- ISO-8859-1 encoded DATEX II v2 publication without namespace (better-maps test fixture). -->
+<d2LogicalModel modelBaseVersion="2">
+  <payloadPublication xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="SituationPublication" lang="de">
+    <publicationTime>2026-10-25T15:00:00</publicationTime>
+    <publicationCreator><country>de</country><nationalIdentifier>DE-TEST-LATIN1</nationalIdentifier></publicationCreator>
+    <situation id="latin1-1" version="1">
+      <situationRecord id="latin1-1.0" version="1" xsi:type="MaintenanceWorks">
+        <validity><validityStatus>active</validityStatus></validity>
+        <generalPublicComment><comment><values><value lang="de">B10 Ulm Richtung Göppingen zwischen Geislingen-Süd und Gingen, Fahrbahnerneuerung</value></values></comment><commentType>locationDescriptor</commentType></generalPublicComment>
+        <groupOfLocations xsi:type="Linear">
+          <tpegLinearLocation>
+            <tpegDirection>westBound</tpegDirection>
+            <tpegLinearLocationType>segment</tpegLinearLocationType>
+            <from xsi:type="TpegNonJunctionPoint"><pointCoordinates><latitude>48.6200</latitude><longitude>9.8400</longitude></pointCoordinates></from>
+            <to xsi:type="TpegNonJunctionPoint"><pointCoordinates><latitude>48.6600</latitude><longitude>9.7700</longitude></pointCoordinates></to>
+          </tpegLinearLocation>
+        </groupOfLocations>
+        <roadMaintenanceType>resurfacingWork</roadMaintenanceType>
+      </situationRecord>
+    </situation>
+  </payloadPublication>
+</d2LogicalModel>

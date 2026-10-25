@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed>
+  <message id="de.datex2.test:v3-accident_1" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-25T15:40:00Z" cancellation="false" forecast="false" urgency="URGENT">
+    <location country="DE" directionality="ONE_DIRECTION" road_class="MOTORWAY" road_ref="A 7">
+      <at>+50.312000 +9.843000</at>
+    </location>
+    <events>
+      <event class="INCIDENT" type="INCIDENT_SERIOUS_ACCIDENT"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:v3-accident_2" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" cancellation="false" forecast="false" urgency="URGENT">
+    <location country="DE" directionality="ONE_DIRECTION" road_class="MOTORWAY" road_ref="A 7">
+      <from>+50.290000 +9.850000</from>
+      <via>+50.300000 +9.848000</via>
+      <to>+50.311000 +9.844000</to>
+    </location>
+    <events>
+      <event class="CONGESTION" type="CONGESTION_STATIONARY_TRAFFIC"></event>
+      <event class="DELAY" type="DELAY_DELAY" q_duration="00:25"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:v3-closure_1" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-25T19:00:00Z" end_time="2026-10-26T04:00:00Z" cancellation="false" forecast="false">
+    <location country="DE" directionality="ONE_DIRECTION" road_class="PRIMARY" road_ref="B 27">
+      <from>+48.720000 +9.155000</from>
+      <to>+48.730000 +9.160000</to>
+    </location>
+    <events>
+      <event class="RESTRICTION" type="RESTRICTION_CARRIAGEWAY_CLOSED"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:v3-works_1" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-25T18:00:00Z" end_time="2026-10-26T04:00:00Z" cancellation="false" forecast="false">
+    <location country="DE" directionality="ONE_DIRECTION" road_class="MOTORWAY" road_ref="A 8">
+      <from>+48.400000 +9.900000</from>
+      <via>+48.410000 +10.000000</via>
+      <to>+48.415000 +10.050000</to>
+    </location>
+    <events>
+      <event class="CONSTRUCTION" type="CONSTRUCTION_RESURFACING_WORK"></event>
+      <event class="RESTRICTION" type="RESTRICTION_LANE_CLOSED" q_int="1"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:v3-fire_1" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" cancellation="false" forecast="false" urgency="X_URGENT">
+    <location country="DE" directionality="ONE_DIRECTION" road_class="TRUNK">
+      <from>+52.520000 +13.300000</from>
+      <via>+52.521000 +13.310000</via>
+      <to>+52.522000 +13.320000</to>
+    </location>
+    <events>
+      <event class="INCIDENT" type="INCIDENT_VEHICLE_FIRE"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:v3-weather_2" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" start_time="2026-10-25T18:00:00Z" end_time="2026-10-25T23:00:00Z" cancellation="false" forecast="false">
+    <location country="DE" directionality="ONE_DIRECTION">
+      <at>+54.400000 +9.500000</at>
+    </location>
+    <events>
+      <event class="WEATHER" type="WEATHER_GUSTY_WIND"></event>
+    </events>
+  </message>
+  <message id="de.datex2.test:v3-misc_1" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" cancellation="false" forecast="false">
+    <location country="DE" directionality="ONE_DIRECTION" road_class="MOTORWAY" road_ref="A 1">
+      <from>+53.500000 +10.100000</from>
+      <to>+53.520000 +10.150000</to>
+    </location>
+    <events>
+      <event class="RESTRICTION" type="RESTRICTION_SPEED_LIMIT" speed="80"></event>
+      <event class="HAZARD" type="HAZARD_PEOPLE_ON_ROAD"></event>
+    </events>
+  </message>
+</feed>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed>
+  <message id="de.datex2.test:latin1-1.0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:00:00Z" expiration_time="2026-10-25T16:30:00Z" cancellation="false" forecast="false">
+    <location country="DE" destination="Göppingen" directionality="ONE_DIRECTION" origin="Ulm" road_class="PRIMARY" road_ref="B 10">
+      <from>+48.620000 +9.840000</from>
+      <to>+48.660000 +9.770000</to>
+    </location>
+    <events>
+      <event class="CONSTRUCTION" type="CONSTRUCTION_RESURFACING_WORK"></event>
+    </events>
+  </message>
+</feed>
