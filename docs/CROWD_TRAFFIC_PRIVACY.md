@@ -451,3 +451,59 @@ else:      j = Zufallszahl in {0, …, 5}; if j >= bucket: j = j + 1; melde j
 Ablehnungsgründe (`title`): `syntax`, `too_large`, `version`, `empty`, `too_many`, `mixed_windows`,
 `window_misaligned`, `window_late`, `window_future`, `tile`, `side`, `offset`, `same_edge_position`,
 `road_class`, `speed_bucket`, `duplicate_key`, `coverage`, `spread`.
+
+## 14. Umsetzung in der App (AP5b)
+
+**Aufteilung.** Die Regeln des Client-Vertrags liegen plattformunabhängig in C++, Verschlüsselung und Versand
+auf Android-Seite:
+
+| Teil | Ort | Inhalt |
+|---|---|---|
+| Kern-Logik | `libs/crowd_traffic/` | `tiles` (Kachelgitter), `segmenter` (13.2, inkrementell), `client` (Trimmung, Freigabe, Fenster, Stichprobe, Tageslimits, Rauschen), `randomness` (sicherer Zufall, randomisierte Antwort), `daily_limits`, `protocol` (JSON, Binary HTTP mit Padding), `route_follower` |
+| Anbindung an die Navigation | `libs/map/crowd_traffic_recorder.*`, Aufrufe in `RoutingManager` | Fahrtbeginn bei `FollowRoute` (nur Auto), Positionen nach dem Route-Matching, Ende bei Ankunft/Abbruch/`CloseRouting` |
+| JNI | `android/sdk/src/main/cpp/.../crowdtraffic/CrowdTraffic.cpp` | fällige Bündel als fertige Binary-HTTP-Anfragen an Java |
+| OHTTP, Versand, Planung | `android/sdk/.../sdk/crowdtraffic/` | `Ohttp` (RFC 9458), `BinaryHttp`, `CrowdTrafficSender`, `CrowdTrafficScheduler`, `CrowdTrafficSettings`, `CrowdTraffic` |
+| Einstellungen | `TrafficSettingsFragment`, `prefs_traffic.xml` | Opt-in „Anonym zur Stauerkennung beitragen“ (aus), Link auf dieses Dokument, Relay-URL (Experten, leer = aus) |
+
+**Datenquelle.** Map-Matching ist das Route-Matching der Navigation: Die Position wird auf die Routenlinie
+projiziert (`FollowedPolyline`), die seit dem letzten Fix passierten Routenpunkte werden mit nach Strecke
+interpolierter Zeit eingefügt, die Straßenklasse kommt aus `RouteSegment::RoadNameInfo` (`m_highwayClass`,
+`m_isLink` ⇒ nicht meldbar). Restdistanz zum Ziel: `Route::GetCurrentDistanceToEndMeters()`. Nur echte
+GPS-Fixes werden verwendet (keine extrapolierten Positionen). Abseits der Route, beim Neuberechnen oder ohne
+Treffer wird eine Lücke markiert: Die betroffenen Kacheln entfallen (Klasse „gemischt“).
+
+**Kryptographie.** HPKE (RFC 9180) kommt aus **Bouncy Castle 1.81** (`bcprov-jdk18on`, MIT-Lizenz) auf
+Java-Seite; `Ohttp` ist nur die dünne OHTTP-Rahmung (Header, `info`, Antwortschlüssel per Export + HKDF).
+Begründung: Im Projekt ist mit Monocypher zwar X25519 und ChaCha20-Poly1305 vorhanden, aber kein SHA-256/HKDF,
+das der Gateway (HKDF-SHA256) verlangt; eine C++-Lösung hätte eigene Hash-Implementierung oder eine neue
+3party-Bibliothek erfordert. Unterstützt werden AES-128-GCM und ChaCha20-Poly1305 (das erste unterstützte
+Paar der ersten passenden Konfiguration). Geprüft gegen RFC 9458, Anhang A, Vektoren des Go-Gateways
+(`go run ./cmd/crowd-vectors java`) und Ende-zu-Ende gegen Gateway und Relay.
+
+**Abweichungen und Präzisierungen gegenüber Abschnitt 13:**
+
+- *Tageslimits ohne Orte:* Die Zähler pro Schlüssel liegen in 4096 Hash-Fächern (BLAKE2b mit täglich neuem
+  Zufallssalz, Monocypher) in `crowd_traffic_limits.bin` (Fächer, Gesamtzahl, Salz, Tag – keine Schlüssel).
+  Kollisionen machen das Limit nur strenger. „Tag“ ist der lokale Kalendertag des Geräts.
+- *Zwischenziele* werden wie das Ziel behandelt (1000 m Luftlinie), unbekannte Restdistanz gilt als „nahe am
+  Ziel“ (strenger als der Vertrag).
+- *Freigabe nach 3 min* wird während laufender Navigation auch ohne neue Positionen geprüft (Stillstand im
+  Stau); beim Ende der Navigation werden nicht freigegebene Abschnitte verworfen.
+- *Planung* im Speicher (`ScheduledExecutorService`, Takt 5 s während der Navigation und solange Bündel
+  ausstehen) statt WorkManager, damit keine Meldungsdaten auf den Datenträger gelangen. Stirbt der Prozess,
+  gehen ungesendete Bündel verloren. Wiederholung bei 429/503/Netzfehler nach 10–40 s, längstens bis
+  Fensterende + 5 min − 10 s.
+- *User-Agent:* fest `better-maps-crowd-traffic` (statt des Android-Standards mit Gerätemodell und Build).
+- *Relay-URL:* Basis-URL (`http://10.0.2.2:18090` ⇒ `/relay` und `/ohttp-keys`, wie `cmd/ohttp-relay`) oder
+  vollständige URL der Relay-Ressource (Schlüssel daneben unter `ohttp-keys`).
+- `libs/crowd_traffic` wird ohne `-ffast-math` übersetzt, damit Kachelgrenzen und Offsets genau wie im
+  Go-Referenzclient berechnet werden.
+- Nicht umgesetzt (Optionen aus Abschnitt 5 und 11): Memoisierung à la RAPPOR, Attrappen-Bündel, Aufteilen
+  von Bündeln.
+
+**Tests.** `bm.sh cpp-test crowd_traffic_tests` (u. a. byte-genaue Bündel ganzer Fahrten gegen den Go-Client
+mit deterministischem Zufall, Segmentierung, Wire-Format, Verteilung der randomisierten Antwort, Tageslimits);
+`bm.sh android-unit` (`app.organicmaps.sdk.crowdtraffic.*`: OHTTP gegen RFC 9458 und Go, Sender gegen einen
+Test-Gateway, Planung, Einstellungen); `tools/better-maps/crowd-e2e.sh` (C++-Client → Java-Sender → Relay →
+Gateway, Stau auf der A100 im Export). Testvektoren neu erzeugen:
+`cd services/crowd-traffic && go run ./cmd/crowd-vectors cpp -out ../../libs/crowd_traffic/crowd_traffic_tests/go_vectors.hpp`.
