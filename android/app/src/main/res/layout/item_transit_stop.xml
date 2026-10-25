@@ -12,7 +12,8 @@
     android:id="@+id/stop_time"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:minWidth="44dp"
+    android:minWidth="56dp"
+    android:paddingEnd="@dimen/margin_half"
     android:textAppearance="@style/MwmTextAppearance.Body4"
     tools:text="17:36" />
 

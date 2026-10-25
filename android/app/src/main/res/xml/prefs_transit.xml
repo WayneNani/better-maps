@@ -10,12 +10,14 @@
     android:title="@string/transit_pref_online"
     android:summary="@string/transit_pref_online_summary"
     android:widgetLayout="@layout/preference_switch"
+    app:iconSpaceReserved="false"
     app:singleLineTitle="false" />
 
   <Preference
     android:key="transit_attribution"
     android:title="@string/transit_pref_attribution"
     android:summary="transitous.org/sources"
+    app:iconSpaceReserved="false"
     app:singleLineTitle="false" />
 
   <PreferenceCategory

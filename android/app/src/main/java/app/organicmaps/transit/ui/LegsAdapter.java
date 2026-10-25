@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.core.widget.TextViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import app.organicmaps.R;
 import app.organicmaps.transit.LegItem;
@@ -165,6 +166,9 @@ final class LegsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
       {
         mSummary.setCompoundDrawablesRelativeWithIntrinsicBounds(
             0, 0, leg.isExpanded() ? R.drawable.ic_expand_less : R.drawable.ic_expand_more, 0);
+        TextViewCompat.setCompoundDrawableTintList(
+            mSummary,
+            ColorStateList.valueOf(ThemeUtils.getColor(mSummary.getContext(), android.R.attr.textColorSecondary)));
         mSummary.setOnClickListener(v -> presenter.toggleStops(leg.getIndex()));
         mSummary.setClickable(true);
       }
