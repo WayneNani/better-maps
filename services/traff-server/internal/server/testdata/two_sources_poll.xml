@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response status="OK" subscription_id="SUB0001">
+  <feed>
+    <message id="de.datex2.e2e:e2e-b2-roadworks.0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:05:00Z" expiration_time="2026-10-25T17:05:00Z" cancellation="true" forecast="false"></message>
+    <message id="de.datex2.e2e:e2e-hamburg.0" receive_time="2026-10-25T16:00:00Z" update_time="2026-10-25T16:05:00Z" expiration_time="2026-10-25T16:35:00Z" cancellation="false" forecast="false">
+      <location country="DE" destination="Lübeck" directionality="ONE_DIRECTION" origin="Bremen" road_class="MOTORWAY" road_ref="A 1">
+        <from>+53.530000 +10.100000</from>
+        <to>+53.535000 +10.120000</to>
+      </location>
+      <events>
+        <event class="INCIDENT" type="INCIDENT_VEHICLE_FIRE"></event>
+      </events>
+    </message>
+  </feed>
+</response>

@@ -89,6 +89,9 @@ func NewRunner(st *store.Store, interval time.Duration, log *slog.Logger, source
 // maxLoggedDuplicates limits the debug output per fetch.
 const maxLoggedDuplicates = 20
 
+// SetClock replaces the clock (for tests). It must be called before Run.
+func (r *Runner) SetClock(now func() time.Time) { r.now = now }
+
 // SetDeduplicator enables the merge step; nil disables it. It must be called before Run.
 func (r *Runner) SetDeduplicator(d Deduplicator) { r.dedup = d }
 

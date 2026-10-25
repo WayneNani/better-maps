@@ -146,7 +146,7 @@ func TestRunOnceDeduplicates(t *testing.T) {
 	r := NewRunner(st, time.Minute, log, a, b)
 	r.SetDeduplicator(prefixDedup{})
 	now := time.Date(2026, 10, 25, 16, 0, 0, 0, time.UTC)
-	r.now = func() time.Time { return now }
+	r.SetClock(func() time.Time { return now })
 
 	r.RunOnce(context.Background())
 	if st.Get("b:1") != nil || st.Get("b:3") == nil {
