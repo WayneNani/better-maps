@@ -18,6 +18,13 @@
       android:summary="@string/prefs_group_route_summary" />
 
   <PreferenceScreen
+    android:key="pref_screen_transit"
+    android:title="@string/transit_settings_title"
+    app:fragment="app.organicmaps.settings.TransitSettingsFragment"
+    app:icon="@drawable/ic_transit_bus"
+    android:summary="@string/transit_settings_summary" />
+
+  <PreferenceScreen
     android:key="pref_screen_map_appearance"
     android:title="@string/prefs_group_map_appearance"
     app:fragment="app.organicmaps.settings.MapAppearanceSettingsFragment"

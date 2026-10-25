@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: values of the public transport settings, see TransitSettings. -->
+<resources>
+  <string-array name="transit_transfer_time_entries">
+    <item>@string/transit_pref_transfer_normal</item>
+    <item>@string/transit_pref_transfer_more</item>
+    <item>@string/transit_pref_transfer_much_more</item>
+  </string-array>
+  <string-array name="transit_transfer_time_values" translatable="false">
+    <item>NORMAL</item>
+    <item>MORE</item>
+    <item>MUCH_MORE</item>
+  </string-array>
+
+  <string-array name="transit_walking_speed_entries">
+    <item>@string/transit_pref_walking_slow</item>
+    <item>@string/transit_pref_walking_normal</item>
+    <item>@string/transit_pref_walking_fast</item>
+  </string-array>
+  <string-array name="transit_walking_speed_values" translatable="false">
+    <item>SLOW</item>
+    <item>NORMAL</item>
+    <item>FAST</item>
+  </string-array>
+
+  <string-array name="transit_max_walk_values" translatable="false">
+    <item>5</item>
+    <item>10</item>
+    <item>15</item>
+    <item>20</item>
+    <item>30</item>
+  </string-array>
+
+  <string-array name="transit_mode_entries">
+    <item>@string/transit_mode_bus</item>
+    <item>@string/transit_mode_tram</item>
+    <item>@string/transit_mode_subway</item>
+    <item>@string/transit_mode_suburban</item>
+    <item>@string/transit_mode_regional</item>
+    <item>@string/transit_mode_long_distance</item>
+    <item>@string/transit_mode_ferry</item>
+  </string-array>
+  <string-array name="transit_mode_values" translatable="false">
+    <item>BUS</item>
+    <item>TRAM</item>
+    <item>SUBWAY</item>
+    <item>SUBURBAN</item>
+    <item>REGIONAL</item>
+    <item>LONG_DISTANCE</item>
+    <item>FERRY</item>
+  </string-array>
+</resources>

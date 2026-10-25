@@ -421,6 +421,50 @@ public class OnlineTransitServiceTest
     assertEquals("3", stopTimesUrl.queryParameter("n"));
   }
 
+  private static final String NO_STOP_TIMES =
+      "{\"stopTimes\":[],\"place\":{\"name\":\"Alexanderplatz (Tram)\",\"stopId\":\"tram\",\"lat\":52.52,"
+      + "\"lon\":13.41,\"level\":0,\"vertexType\":\"TRANSIT\"},\"previousPageCursor\":\"p\","
+      + "\"nextPageCursor\":\"n\"}";
+
+  @Test
+  public void closestStopWithTimesSkipsStopsWithoutDepartures() throws Exception
+  {
+    enqueueJson(200, Fixtures.read("reverse_geocode_alex.json"));
+    enqueueJson(200, NO_STOP_TIMES);
+    enqueueJson(200, Fixtures.read("stoptimes_alex.json"));
+    final TransitDepartures departures = await(mService.closestStopWithTimes(52.5219, 13.4132, 3));
+    assertFalse(departures.getDepartures().isEmpty());
+    assertEquals("/api/v1/reverse-geocode", takeRequestUrl().encodedPath());
+    assertEquals("de-VBB_de:11000:900100024::1", takeRequestUrl().queryParameter("stopId"));
+    assertEquals("de-VBB_de:11000:900100005::1", takeRequestUrl().queryParameter("stopId"));
+    assertEquals(3, mServer.getRequestCount());
+  }
+
+  @Test
+  public void closestStopWithTimesTriesAtMostThreeStops() throws Exception
+  {
+    enqueueJson(200, Fixtures.read("reverse_geocode_alex.json"));
+    for (int i = 0; i < OnlineTransitService.MAX_STOPS_TO_TRY; ++i)
+      enqueueJson(200, NO_STOP_TIMES);
+    final TransitDepartures departures = await(mService.closestStopWithTimes(52.5219, 13.4132, 3));
+    // The nearest stop is reported, without departures.
+    assertTrue(departures.getDepartures().isEmpty());
+    assertEquals("Alexanderplatz (Tram)", departures.getStop().getName());
+    // 5 stops were found, but only 3 were asked.
+    assertEquals(1 + OnlineTransitService.MAX_STOPS_TO_TRY, mServer.getRequestCount());
+  }
+
+  @Test
+  public void closestStopWithTimesStopsAtFirstError() throws Exception
+  {
+    enqueueJson(200, Fixtures.read("reverse_geocode_alex.json"));
+    enqueueJson(200, NO_STOP_TIMES);
+    enqueueJson(503, "{\"error\":\"busy\"}");
+    final TransitServiceException e = awaitFailure(mService.closestStopWithTimes(52.5219, 13.4132, 3));
+    assertEquals(TransitServiceException.Kind.SERVER_ERROR, e.getKind());
+    assertEquals(3, mServer.getRequestCount());
+  }
+
   @Test
   public void closestStopWithTimesWithoutStops() throws Exception
   {

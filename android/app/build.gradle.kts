@@ -92,6 +92,7 @@ android {
         targetSdk = providers.gradleProperty("propTargetSdkVersion").get().toInt()
         base.archivesName = "${appName.replace(" ", "")}-${defaultConfig.versionCode!!}"
         ndk.debugSymbolLevel = "full"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "REVIEW_URL", "\"\"")
         buildConfigField("String", "SUPPORT_MAIL", "\"android@comaps.app\"") // Customized in flavors.
         println("Version: ${versionName!!}")
@@ -145,6 +146,11 @@ android {
         reset()
         include("x86", "armeabi-v7a", "arm64-v8a", "x86_64")
         isUniversalApk = true
+    }
+
+    // Recorded MOTIS responses of the SDK unit tests, served by a local mock server in instrumented tests.
+    sourceSets.getByName("androidTest") {
+        assets.srcDir("../sdk/src/test/resources")
     }
 
     // Only bundle wrap.sh when arm64-v8a is actually compiled.
@@ -394,6 +400,12 @@ dependencies {
 
     // Test Dependencies
     androidTestImplementation(libs.androidx.test.junit)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.espresso.core)
+    androidTestImplementation(libs.androidx.fragment.testing)
+    androidTestImplementation(libs.okhttp.mockwebserver)
+    // Host activity of FragmentScenario; only in debug builds.
+    debugImplementation(libs.androidx.fragment.testing.manifest)
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
 }

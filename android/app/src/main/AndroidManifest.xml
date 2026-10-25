@@ -490,6 +490,10 @@
       android:name="app.organicmaps.settings.RoutingOptionsActivity"
       android:label="@string/routing_options_title"/>
     <activity
+      android:name="app.organicmaps.settings.TransitSettingsActivity"
+      android:label="@string/transit_settings_title"
+      android:parentActivityName="app.organicmaps.MwmActivity"/>
+    <activity
         android:name="app.organicmaps.MapPlaceholderActivity"/>
     <activity
         android:name="app.organicmaps.car.screens.permissions.RequestPermissionsActivity"/>

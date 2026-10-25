@@ -10,7 +10,8 @@ import app.organicmaps.sdk.transit.TransitItinerary;
 import app.organicmaps.sdk.transit.TransitLeg;
 import app.organicmaps.sdk.transit.TransitLocation;
 import app.organicmaps.sdk.transit.TransitPlan;
-import app.organicmaps.sdk.transit.TransitRoutingOptions;
+import app.organicmaps.sdk.transit.provider.ProviderResult;
+import app.organicmaps.sdk.transit.provider.TransitPlanRequest;
 import app.organicmaps.sdk.util.log.Logger;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.time.Instant;
@@ -18,8 +19,8 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Developer helpers for the online public transport service until the real UI exists (AP3b).
- * Not localized on purpose.
+ * Developer helpers for the online public transport service (hidden search command "?transit-plan", debug
+ * builds only). Not localized on purpose.
  */
 public final class TransitDebug
 {
@@ -36,8 +37,18 @@ public final class TransitDebug
   public static void planBerlinHbfToAlexanderplatz(@NonNull Context context)
   {
     Logger.i(TAG, "Requesting plan " + BERLIN_HBF + " -> " + ALEXANDERPLATZ);
-    TransitServices.get(context)
-        .plan(BERLIN_HBF, ALEXANDERPLATZ, null, false, null, TransitRoutingOptions.defaults())
+    // Goes through the provider registry, so it needs the user's consent like every online request.
+    final TransitServices services = TransitServices.get(context);
+    if (!services.getConsent().isGranted())
+    {
+      show(context, "Transit plan", "Online public transport is not allowed: enable it in the settings.",
+           "Online public transport is not allowed");
+      return;
+    }
+    services.getRegistry()
+        .plan(new TransitPlanRequest(BERLIN_HBF, ALEXANDERPLATZ, null, false, null,
+                                     services.getSettings().toRoutingOptions()))
+        .thenApply(ProviderResult::getValue)
         .onSuccess(plan -> {
           final String text = formatPlan(plan);
           Logger.i(TAG, "Plan result:\n" + text);

@@ -66,6 +66,23 @@ public class RoutingController
     default void onStartRouteBuilding() {}
   }
 
+  /**
+   * Computes routes of some router types outside of the core, e.g. public transport with an online service.
+   * The core route is removed while an external router is in charge; the external router reports back with
+   * {@link #onExternalRouteReady()} or hands over to the built-in router with {@link #buildWithBuiltInRouter()}.
+   */
+  public interface ExternalRouter
+  {
+    /** @return true if this router computes routes of the given type now (e.g. depends on user settings). */
+    boolean handles(@NonNull Router router);
+
+    /** Starts computing a route between the points. Called on the main thread. */
+    void build(@NonNull MapObject start, @NonNull MapObject end);
+
+    /** Route planning was closed or another router type was selected: stop and forget the route. */
+    void cancel();
+  }
+
   private static final RoutingController sInstance = new RoutingController();
 
   @Nullable
@@ -92,6 +109,11 @@ public class RoutingController
 
   @NonNull
   private final List<RouteChangedListener> mRouteChangedListeners = new CopyOnWriteArrayList<>();
+
+  @Nullable
+  private ExternalRouter mExternalRouter;
+  // True while the current route is computed and shown by mExternalRouter.
+  private boolean mExternalRouteActive;
 
   private int mInvalidRoutePointsTransactionId;
   private int mRemovingIntermediatePointsTransactionId;
@@ -337,7 +359,65 @@ public class RoutingController
 
     updatePlan();
 
+    final MapObject start = getStartPoint();
+    final MapObject end = getEndPoint();
+    if (mExternalRouter != null && start != null && end != null && mExternalRouter.handles(mLastRouterType))
+    {
+      mExternalRouteActive = true;
+      mCachedRoutingInfo = null;
+      mCachedTransitRouteInfo = null;
+      mExternalRouter.build(start, end);
+      return;
+    }
+    stopExternalRouter();
+
     Framework.nativeBuildRoute();
+  }
+
+  public void setExternalRouter(@Nullable ExternalRouter router)
+  {
+    if (mExternalRouter != null && mExternalRouter != router)
+      stopExternalRouter();
+    mExternalRouter = router;
+  }
+
+  /** True if the current route is computed and shown by the external router (no core route exists). */
+  public boolean isExternalRoute()
+  {
+    return mExternalRouteActive;
+  }
+
+  /** The external router finished (successfully or with an error that it shows itself). */
+  public void onExternalRouteReady()
+  {
+    if (!mExternalRouteActive || !isBuilding())
+      return;
+    Logger.d(TAG, "onExternalRouteReady");
+    mLastBuildProgress = 100;
+    setBuildState(BuildState.BUILT);
+    if (mContainer != null)
+      mContainer.onBuiltRoute();
+    updateProgress();
+  }
+
+  /** The external router declines the current request (e.g. the user did not agree to go online). */
+  public void buildWithBuiltInRouter()
+  {
+    if (!mExternalRouteActive)
+      return;
+    Logger.d(TAG, "buildWithBuiltInRouter");
+    mExternalRouteActive = false;
+    if (isBuilding())
+      Framework.nativeBuildRoute();
+  }
+
+  private void stopExternalRouter()
+  {
+    if (!mExternalRouteActive)
+      return;
+    mExternalRouteActive = false;
+    if (mExternalRouter != null)
+      mExternalRouter.cancel();
   }
 
   public void restoreRoute()
@@ -499,6 +579,7 @@ public class RoutingController
 
     applyRemovingIntermediatePointsTransaction();
     Framework.nativeDeleteSavedRoutePoints();
+    stopExternalRouter();
     Framework.nativeCloseRouting();
 
     mRouteGeometry = RouteGeometry.empty(mRouteGeometry.mRevision + 1);
@@ -871,6 +952,8 @@ public class RoutingController
 
     if (getStartPoint() != null && getEndPoint() != null)
       build();
+    else
+      stopExternalRouter();
   }
 
   public Router getLastRouterType()

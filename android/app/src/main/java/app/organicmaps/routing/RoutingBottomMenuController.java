@@ -38,6 +38,7 @@ import app.organicmaps.sdk.routing.RoutingInfo;
 import app.organicmaps.sdk.routing.TransitRouteInfo;
 import app.organicmaps.sdk.routing.TransitStepInfo;
 import app.organicmaps.sdk.util.Distance;
+import app.organicmaps.transit.ui.OnlineTransitPanel;
 import app.organicmaps.util.Graphics;
 import app.organicmaps.util.ThemeUtils;
 import app.organicmaps.util.UiUtils;
@@ -87,6 +88,8 @@ final class RoutingBottomMenuController implements View.OnClickListener
   private final ShapeableImageView mActionIcon;
   @NonNull
   private final DotDividerItemDecoration mTransitViewDecorator;
+  @NonNull
+  private final OnlineTransitPanel mOnlineTransitPanel;
 
   @Nullable
   private final RoutingBottomMenuListener mListener;
@@ -161,11 +164,35 @@ final class RoutingBottomMenuController implements View.OnClickListener
 
     MaterialButton saveButton = altitudeChartFrame.findViewById(R.id.btn__save);
     saveButton.setOnClickListener(this);
+
+    // Included next to the transit panel in both the phone and the tablet layout.
+    mOnlineTransitPanel =
+        new OnlineTransitPanel(context, ((View) transitFrame.getParent()).findViewById(R.id.online_transit_panel));
+  }
+
+  /** Shows the connections of the online public transport planner. */
+  void showOnlineTransit()
+  {
+    UiUtils.hide(mError, mAltitudeChartFrame, mActionFrame, mTransitFrame);
+    showStartButton(false);
+    mOnlineTransitPanel.show();
+  }
+
+  void hideOnlineTransit()
+  {
+    mOnlineTransitPanel.hide();
+  }
+
+  /** @return true if the back press was consumed (detail view of a connection closed). */
+  boolean onBackPressed()
+  {
+    return mOnlineTransitPanel.onBackPressed();
   }
 
   void showAltitudeChartAndRoutingDetails()
   {
     UiUtils.hide(mError, mActionFrame, mAltitudeChart, mTimeElevationLine, mTransitFrame);
+    hideOnlineTransit();
 
     if (!RoutingController.get().isVehicleRouterType() && !RoutingController.get().isRulerRouterType())
       showRouteAltitudeChart();
@@ -180,12 +207,14 @@ final class RoutingBottomMenuController implements View.OnClickListener
   void hideAltitudeChartAndRoutingDetails()
   {
     UiUtils.hide(mAltitudeChartFrame, mTransitFrame);
+    hideOnlineTransit();
   }
 
   @SuppressLint("SetTextI18n")
   void showTransitInfo(@NonNull TransitRouteInfo info)
   {
     UiUtils.hide(mError, mAltitudeChartFrame, mActionFrame);
+    hideOnlineTransit();
     showStartButton(false);
     UiUtils.show(mTransitFrame);
     RecyclerView rv = mTransitFrame.findViewById(R.id.transit_recycler_view);
@@ -212,6 +241,7 @@ final class RoutingBottomMenuController implements View.OnClickListener
   void showRulerInfo(@NonNull RouteMarkData[] points, Distance totalLength)
   {
     UiUtils.hide(mError, mAltitudeChartFrame, mActionFrame, mAltitudeChartFrame);
+    hideOnlineTransit();
     showStartButton(false);
     UiUtils.show(mTransitFrame);
     final RecyclerView rv = mTransitFrame.findViewById(R.id.transit_recycler_view);
@@ -262,6 +292,7 @@ final class RoutingBottomMenuController implements View.OnClickListener
   void showAddStartFrame()
   {
     UiUtils.hide(mError, mTransitFrame);
+    hideOnlineTransit();
     UiUtils.show(mActionFrame);
     mActionMessage.setText(R.string.routing_add_start_point);
     mActionMessage.setTag(RouteMarkType.Start);
@@ -282,6 +313,7 @@ final class RoutingBottomMenuController implements View.OnClickListener
   void showAddFinishFrame()
   {
     UiUtils.hide(mError, mTransitFrame);
+    hideOnlineTransit();
     UiUtils.show(mActionFrame);
     mActionMessage.setText(R.string.routing_add_finish_point);
     mActionMessage.setTag(RouteMarkType.Finish);
@@ -313,6 +345,7 @@ final class RoutingBottomMenuController implements View.OnClickListener
   private void showError(@NonNull String message)
   {
     UiUtils.hide(mAltitudeChartFrame, mActionFrame, mTransitFrame);
+    hideOnlineTransit();
     mError.setText(message);
     mError.setVisibility(View.VISIBLE);
     showStartButton(false);

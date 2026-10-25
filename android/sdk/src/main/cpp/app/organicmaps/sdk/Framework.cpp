@@ -1311,6 +1311,50 @@ JNIEXPORT void JNICALL Java_app_organicmaps_sdk_Framework_nativeRemoveRoute(JNIE
   frm()->GetRoutingManager().RemoveRoute(false /* deactivateFollowing */);
 }
 
+JNIEXPORT jboolean JNICALL Java_app_organicmaps_sdk_Framework_nativeShowExternalTransitRoute(
+    JNIEnv * env, jclass, jintArray types, jintArray colors, jobjectArray polylines, jobjectArray fromNames,
+    jobjectArray toNames)
+{
+  jsize const count = env->GetArrayLength(types);
+  if (env->GetArrayLength(colors) != count || env->GetArrayLength(polylines) != count ||
+      env->GetArrayLength(fromNames) != count || env->GetArrayLength(toNames) != count)
+  {
+    LOG(LERROR, ("Inconsistent leg arrays"));
+    return JNI_FALSE;
+  }
+
+  std::vector<jint> typeValues(count);
+  std::vector<jint> colorValues(count);
+  env->GetIntArrayRegion(types, 0, count, typeValues.data());
+  env->GetIntArrayRegion(colors, 0, count, colorValues.data());
+
+  std::vector<ExternalTransitLeg> legs(count);
+  for (jsize i = 0; i < count; ++i)
+  {
+    auto & leg = legs[i];
+    leg.m_type = static_cast<TransitType>(typeValues[i]);
+    // A negative value means that the line has no color.
+    leg.m_hasColor = colorValues[i] >= 0;
+    leg.m_colorRgb = static_cast<uint32_t>(colorValues[i]) & 0xFFFFFF;
+
+    jni::TScopedLocalRef from(env, env->GetObjectArrayElement(fromNames, i));
+    jni::TScopedLocalRef to(env, env->GetObjectArrayElement(toNames, i));
+    leg.m_fromName = jni::ToNativeString(env, static_cast<jstring>(from.get()));
+    leg.m_toName = jni::ToNativeString(env, static_cast<jstring>(to.get()));
+
+    jni::TScopedLocalRef polyline(env, env->GetObjectArrayElement(polylines, i));
+    auto const coords = static_cast<jdoubleArray>(polyline.get());
+    jsize const size = coords == nullptr ? 0 : env->GetArrayLength(coords);
+    std::vector<jdouble> latLons(size);
+    if (size > 0)
+      env->GetDoubleArrayRegion(coords, 0, size, latLons.data());
+    leg.m_points.reserve(size / 2);
+    for (jsize p = 0; p + 1 < size; p += 2)
+      leg.m_points.push_back(mercator::FromLatLon(latLons[p], latLons[p + 1]));
+  }
+  return static_cast<jboolean>(frm()->GetRoutingManager().ShowExternalTransitRoute(legs));
+}
+
 JNIEXPORT void JNICALL Java_app_organicmaps_sdk_Framework_nativeFollowRoute(JNIEnv * env, jclass)
 {
   frm()->GetRoutingManager().FollowRoute();

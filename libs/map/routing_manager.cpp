@@ -602,6 +602,45 @@ void RoutingManager::RemoveRoute(bool deactivateFollowing)
   }
 }
 
+bool RoutingManager::ShowExternalTransitRoute(vector<ExternalTransitLeg> const & legs)
+{
+  if (!m_drapeEngine)
+    return false;
+
+  RemoveRoute(false /* deactivateFollowing */);
+
+  // External legs reference no mwm data, so the mwm lookup is never used.
+  auto const getMwmId = [](routing::NumMwmId) { return MwmSet::MwmId(); };
+  auto transitRouteDisplay = make_shared<TransitRouteDisplay>(
+      *m_transitReadManager, getMwmId, m_callbacks.m_stringsBundleGetter, m_bmManager, m_transitSymbolSizes);
+
+  auto subroute = make_unique_dp<df::Subroute>();
+  subroute->m_routeType = df::RouteType::Transit;
+  subroute->m_baseDistance = 0.0;
+  subroute->m_baseDepthIndex = 0.0;
+  // The same as for routes of the built-in transit router, see CreateDrapeSubroute().
+  subroute->m_headFakeDistance = -1.0;
+  subroute->m_tailFakeDistance = 1.0;
+  if (!transitRouteDisplay->ProcessExternalLegs(legs, *subroute))
+    return false;
+
+  m2::RectD routeRect = subroute->m_polyline.GetLimitRect();
+  auto const subrouteId =
+      m_drapeEngine.SafeCallWithResult(&df::DrapeEngine::AddSubroute, df::SubrouteConstPtr(subroute.release()));
+  {
+    lock_guard<mutex> lock(m_drapeSubroutesMutex);
+    m_drapeSubroutes.push_back(subrouteId);
+  }
+
+  GetPlatform().RunTask(Platform::Thread::Gui, [transitRouteDisplay = std::move(transitRouteDisplay)]()
+  { transitRouteDisplay->CreateTransitMarks(); });
+
+  routeRect.Scale(kRouteScaleMultiplier);
+  m_drapeEngine.SafeCall(&df::DrapeEngine::SetModelViewRect, routeRect, true /* applyRotation */, -1 /* zoom */,
+                         true /* isAnim */, true /* useVisibleViewport */);
+  return true;
+}
+
 void RoutingManager::CollectFeaturesAlongRoute(vector<RouteSegment> const & segments, m2::PointD const & startPt,
                                                uint32_t featureType,
                                                vector<std::pair<m2::PointD, FeatureID>> & outFeatures)
