@@ -73,6 +73,21 @@
       <action android:name="android.intent.action.PICK" />
       <data android:mimeType="vnd.android.cursor.dir/postal-address_v2" />
     </intent>
+    <intent>
+      <action android:name="org.traffxml.traff.GET_CAPABILITIES"/>
+    </intent>
+    <intent>
+      <action android:name="org.traffxml.traff.POLL"/>
+    </intent>
+    <intent>
+      <action android:name="org.traffxml.traff.SUBSCRIBE"/>
+    </intent>
+    <intent>
+      <action android:name="org.traffxml.traff.SUBSCRIPTION_CHANGE"/>
+    </intent>
+    <intent>
+      <action android:name="org.traffxml.traff.UNSUBSCRIBE"/>
+    </intent>
   </queries>
 
   <!-- "android:resizeableActivity" allows free-form and split-screen modes -->

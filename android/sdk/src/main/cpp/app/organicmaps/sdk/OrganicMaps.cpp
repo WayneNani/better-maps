@@ -1,6 +1,7 @@
 #include "app/organicmaps/sdk/Framework.hpp"
 
 #include "app/organicmaps/sdk/platform/AndroidPlatform.hpp"
+#include "app/organicmaps/sdk/traffxml/AndroidTraffSource.hpp"
 
 #include "app/organicmaps/sdk/core/jni_helper.hpp"
 
@@ -34,6 +35,26 @@ JNIEXPORT void JNICALL Java_app_organicmaps_sdk_OrganicMaps_nativeInitFramework(
       JNIEnv * env = jni::GetEnv();
       jmethodID const methodId = jni::GetMethodID(env, *onComplete, "run", "()V");
       env->CallVoidMethod(*onComplete, methodId);
+
+      ASSERT(g_framework, ("g_framework must be non-null"));
+
+      /*
+       * Add traffic sources for Android.
+       */
+      jclass configClass = env->FindClass("app/organicmaps/sdk/util/Config");
+      jmethodID const getTrafficLegacyEnabledId = jni::GetStaticMethodID(env, configClass,
+                                                                         "getTrafficLegacyEnabled", "()Z");
+      jmethodID const applyTrafficLegacyEnabledId = jni::GetStaticMethodID(env, configClass,
+                                                                           "applyTrafficLegacyEnabled", "(Z)V");
+      jmethodID const getTrafficAppsId = jni::GetStaticMethodID(env, configClass,
+                                                                "getTrafficApps", "()[Ljava/lang/String;");
+      jmethodID const applyTrafficAppsId = jni::GetStaticMethodID(env, configClass,
+                                                                  "applyTrafficApps", "([Ljava/lang/String;)V");
+
+      env->CallStaticVoidMethod(configClass, applyTrafficLegacyEnabledId,
+                                env->CallStaticBooleanMethod(configClass, getTrafficLegacyEnabledId));
+      env->CallStaticVoidMethod(configClass, applyTrafficAppsId,
+                                (jobjectArray)env->CallStaticObjectMethod(configClass, getTrafficAppsId));
     });
   }
 }

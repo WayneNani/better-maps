@@ -40,7 +40,7 @@ optional<Score> GetFrcScore(Graph::Edge const & e, FunctionalRoadClass functiona
   Score constexpr kMaxScoreForFrc = 25;
 
   if (functionalRoadClass == FunctionalRoadClass::NotAValue)
-    return nullopt;
+    return optional<Score>(0);
 
   auto const hwClass = infoGetter.Get(e.GetFeatureId()).m_hwClass;
 
@@ -174,7 +174,8 @@ bool PassesRestrictionV3(Graph::Edge const & e, FunctionalRoadClass functionalRo
 
   score = *frcScore;
   Score constexpr kScoreForFormOfWay = 25;
-  if (formOfWay == FormOfWay::Roundabout && infoGetter.Get(e.GetFeatureId()).m_isRoundabout)
+  if ((formOfWay == FormOfWay::Roundabout && infoGetter.Get(e.GetFeatureId()).m_isRoundabout)
+      || (formOfWay == FormOfWay::Sliproad && infoGetter.Get(e.GetFeatureId()).m_link))
     score += kScoreForFormOfWay;
 
   return true;

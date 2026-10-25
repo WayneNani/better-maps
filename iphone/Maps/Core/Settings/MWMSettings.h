@@ -1,6 +1,18 @@
 NS_SWIFT_NAME(SettingsBridge)
 @interface MWMSettings : NSObject
 
+<<<<<<< HEAD
++ (BOOL)liveTrafficEnabled;
++ (void)setLiveTrafficEnabled:(BOOL)liveTrafficEnabled;
+
++ (NSURL *)liveTrafficUrl;
++ (void)setLiveTrafficUrl:(NSURL *)liveTrafficUrl;
+
++ (BOOL)buildings3dViewEnabled;
++ (void)setBuildings3dViewEnabled:(BOOL)buildings3dViewEnabled;
+
+=======
+>>>>>>> d348cc62c0ece77a80cb6296b5d563808858f63f
 + (BOOL)perspectiveViewEnabled;
 + (void)setPerspectiveViewEnabled:(BOOL)perspectiveViewEnabled;
 

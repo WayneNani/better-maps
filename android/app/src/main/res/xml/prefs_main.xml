@@ -39,6 +39,13 @@
       android:summary="@string/prefs_group_data_management_summary" />
 
   <PreferenceScreen
+      android:key="pref_screen_traffic"
+      android:title="@string/prefs_group_traffic"
+      app:fragment="app.organicmaps.settings.TrafficSettingsFragment"
+      app:icon="@drawable/ic_traffic"
+      android:summary="@string/prefs_group_traffic_summary" />
+
+  <PreferenceScreen
     android:key="pref_screen_power"
     android:title="@string/power_management"
     app:fragment="app.organicmaps.settings.PowerSettingsFragment"

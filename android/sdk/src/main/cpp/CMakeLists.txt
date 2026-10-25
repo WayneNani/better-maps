@@ -17,6 +17,7 @@ set(SRC
   app/organicmaps/sdk/opengl/gl3stub.h
   app/organicmaps/sdk/platform/GuiThread.hpp
   app/organicmaps/sdk/platform/AndroidPlatform.hpp
+  app/organicmaps/sdk/traffxml/AndroidTraffSource.hpp
   app/organicmaps/sdk/util/Distance.hpp
   app/organicmaps/sdk/util/FeatureIdBuilder.hpp
   app/organicmaps/sdk/vulkan/android_vulkan_context_factory.hpp
@@ -86,6 +87,8 @@ set(SRC
   app/organicmaps/sdk/platform/PThreadImpl.cpp
   app/organicmaps/sdk/platform/SecureStorage.cpp
   app/organicmaps/sdk/platform/SocketImpl.cpp
+  app/organicmaps/sdk/traffxml/AndroidTraffSource.cpp
+  app/organicmaps/sdk/traffxml/SourceImpl.cpp
   app/organicmaps/sdk/util/Config.cpp
   app/organicmaps/sdk/util/GeoUtils.cpp
   app/organicmaps/sdk/util/HttpClient.cpp
@@ -137,6 +140,7 @@ target_link_libraries(${PROJECT_NAME}
   # icu
   # agg
   # vulkan_wrapper
+  traffxml
 
   # Android libs
   log

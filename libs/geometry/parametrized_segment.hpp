@@ -1,5 +1,6 @@
 #pragma once
 
+#include "geometry/mercator.hpp"
 #include "geometry/point2d.hpp"
 
 #include "base/math.hpp"
@@ -9,17 +10,20 @@
 
 namespace m2
 {
-// This class holds a parametrization of the
-// line segment between two points p0 and p1.
-// The parametrization is of the form
-//   p(t) = p0 + t * dir.
-// Other conditions:
-//   dir is the normalized (p1 - p0) vector.
-//   length(dir) = 1.
-//   p(0) = p0.
-//   p(T) = p1 with T = length(p1 - p0).
-//
-// The points with t in [0, T] are the points of the segment.
+/**
+ * @brief This class holds a parametrization of the line segment between two points `p0` and `p1`.
+ *
+ * The parametrization is of the form
+ *   `p(t) = p0 + t * dir`.
+ *
+ * Other conditions:
+ * * `dir` is the normalized `(p1 - p0)` vector.
+ * * `length(dir) = 1`.
+ * * `p(0) = p0`.
+ * * `p(T) = p1` with `T = length(p1 - p0)`.
+ *
+ * The points with `t` in `[0, T]` are the points of the segment.
+ */
 template <typename Point>
 class ParametrizedSegment
 {
@@ -36,7 +40,9 @@ public:
       m_d = m_d / m_length;
   }
 
-  // Returns the squared (euclidean) distance from the segment to |p|.
+  /**
+   * @brief Returns the squared (euclidean) distance from the segment to `p`.
+   */
   double SquaredDistanceToPoint(Point const & p) const
   {
     m2::PointD const diff(p - m_p0);
@@ -52,9 +58,22 @@ public:
     return math::Pow2(CrossProduct(diff, m_d));
   }
 
-  // Returns the point of the segment that is closest to |p|.
-  m2::PointD ClosestPointTo(Point const & p) const
+  /**
+   * @brief Returns the point of the segment that is closest to `p`.
+   *
+   * @param p The checkpoint
+   * @param snapToEnds If true, the result is the endpoint of the segment which is closest to `p`
+   */
+  m2::PointD ClosestPointTo(Point const & p, bool snapToEnds = false) const
   {
+    if (snapToEnds)
+    {
+      if (mercator::DistanceOnEarth(p, m_p0) < mercator::DistanceOnEarth(p, m_p1))
+        return m_p0;
+      else
+        return m_p1;
+    }
+
     m2::PointD const diff(p - m_p0);
     double const t = DotProduct(m_d, diff);
 

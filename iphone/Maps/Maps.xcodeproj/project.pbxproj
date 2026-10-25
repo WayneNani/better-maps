@@ -55,6 +55,7 @@
 		27362BE62F434C9900BCB1FB /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27362BE52F434C9200BCB1FB /* MapView.swift */; };
 		27362BE82F434CA400BCB1FB /* MapOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27362BE72F434C9E00BCB1FB /* MapOverlayView.swift */; };
 		2744A9912F23D86D00E7D02C /* AlternativeMapLanguageHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2744A98E2F23D86B00E7D02C /* AlternativeMapLanguageHandling.swift */; };
+		2747205A2E439FBA00C516DF /* libtraffxml.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 274720592E439FBA00C516DF /* libtraffxml.a */; };
 		2752B6CA2E31197500887CC4 /* MapLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2752B6C92E31197000887CC4 /* MapLanguage.swift */; };
 		2752B6CE2E3121D900887CC4 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2752B6CD2E3121D800887CC4 /* Language.swift */; };
 		2754F5A12F6168010011B076 /* MapTrackRecordingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2754F59E2F6167F80011B076 /* MapTrackRecordingIndicator.swift */; };
@@ -827,6 +828,7 @@
 		27362BE52F434C9200BCB1FB /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		27362BE72F434C9E00BCB1FB /* MapOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapOverlayView.swift; sourceTree = "<group>"; };
 		2744A98E2F23D86B00E7D02C /* AlternativeMapLanguageHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlternativeMapLanguageHandling.swift; sourceTree = "<group>"; };
+		274720592E439FBA00C516DF /* libtraffxml.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libtraffxml.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		2752B6C92E31197000887CC4 /* MapLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapLanguage.swift; sourceTree = "<group>"; };
 		2752B6CD2E3121D800887CC4 /* Language.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
 		2754F59E2F6167F80011B076 /* MapTrackRecordingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapTrackRecordingIndicator.swift; sourceTree = "<group>"; };
@@ -1837,6 +1839,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2747205A2E439FBA00C516DF /* libtraffxml.a in Frameworks */,
 				FAF9DDA32A86DC54000D7037 /* libharfbuzz.a in Frameworks */,
 				FA456C3C26BDC6AD00B83C20 /* Chart.framework in Frameworks */,
 				FA853BF326BC5DE50026D455 /* libshaders.a in Frameworks */,
@@ -2155,6 +2158,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				274720592E439FBA00C516DF /* libtraffxml.a */,
 				CE8597432FC10A4500D250DC /* libi18n.a */,
 				FAF9DDA22A86DC54000D7037 /* libharfbuzz.a */,
 				FA456C3B26BDC6AD00B83C20 /* Chart.framework */,

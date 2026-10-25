@@ -441,12 +441,13 @@ RouteWeight IndexGraph::GetPenalties(EdgeEstimator::Purpose purpose, Segment con
   auto const & toPenaltyData = GetRoadPenaltyData(v);
   // Route crosses border of pass-through/non-pass-through area if |u| and |v| have different
   // pass through restrictions.
-  int8_t const passThroughPenalty = fromPenaltyData.m_passThroughAllowed == toPenaltyData.m_passThroughAllowed ? 0 : 1;
+  int8_t const passThroughPenalty = m_estimator->IsAccessIgnored() ? 0
+      : fromPenaltyData.m_passThroughAllowed == toPenaltyData.m_passThroughAllowed ? 0 : 1;
 
   int8_t accessPenalty = 0;
   int8_t accessConditionalPenalties = 0;
 
-  if (u.GetFeatureId() != v.GetFeatureId())
+  if ((u.GetFeatureId() != v.GetFeatureId()) && !m_estimator->IsAccessIgnored())
   {
     // We do not distinguish between RoadAccess::Type::Private and RoadAccess::Type::Destination for
     // now.
@@ -472,27 +473,33 @@ RouteWeight IndexGraph::GetPenalties(EdgeEstimator::Purpose purpose, Segment con
 
   // RoadPoint between u and v is front of u.
   auto const rp = u.GetRoadPoint(true /* front */);
-  auto const [rpAccessType, rpConfidence] =
-      prevWeight ? m_roadAccess.GetAccess(rp, *prevWeight) : m_roadAccess.GetAccessWithoutConditional(rp);
-  // Get penalty from new penalty system if MWM supports it
-  auto penalty = m_roadPenalty.GetPenalty(rp);
   uint16_t penaltyTime = 0;
-  if (penalty)
-    penaltyTime = penalty->m_timeSeconds;
+  // Get penalty from new penalty system if MWM supports it
+  if (m_estimator->GetMode() == EdgeEstimator::Mode::Navigation)
+  {
+    auto penalty = m_roadPenalty.GetPenalty(rp);
+    if (penalty)
+      penaltyTime = penalty->m_timeSeconds;
+  }
 
-  switch (rpConfidence)
+  if (!m_estimator->IsAccessIgnored())
   {
-  case RoadAccess::Confidence::Sure:
-  {
-    if (rpAccessType != RoadAccess::Type::Yes)
-      accessPenalty = 1;
-    break;
-  }
-  case RoadAccess::Confidence::Maybe:
-  {
-    accessConditionalPenalties = 1;
-    break;
-  }
+    auto const [rpAccessType, rpConfidence] =
+        prevWeight ? m_roadAccess.GetAccess(rp, *prevWeight) : m_roadAccess.GetAccessWithoutConditional(rp);
+    switch (rpConfidence)
+    {
+      case RoadAccess::Confidence::Sure:
+      {
+        if (rpAccessType != RoadAccess::Type::Yes)
+          accessPenalty = 1;
+        break;
+      }
+      case RoadAccess::Confidence::Maybe:
+      {
+        accessConditionalPenalties = 1;
+        break;
+      }
+    }
   }
 
   double weightPenalty = 0.0;
@@ -543,10 +550,31 @@ RouteWeight IndexGraph::CalculateEdgeWeight(EdgeEstimator::Purpose purpose, bool
   auto const & to_segment = isOutgoing ? to : from;
   auto const & from_segment = isOutgoing ? from : to;
   auto const & to_road = GetRoadGeometry(to_segment.GetFeatureId());
-  auto const weight = RouteWeight(m_estimator->CalcSegmentWeight(to_segment, to_road, purpose));
+  /*
+   * FIXME `prevWeight->GetWeight()` is weight (for least-cost routing), not ETA, but is passed as ETA
+   * to both `CalcSegmentWeight()` (for conditional traffic) and `GetPenalties()` (for conditional
+   * access restrictions). Weight and ETA may differ, especially when fake segments are present: these
+   * add a large weight, but zero ETA, resulting in potentially incorrect traffic and access information.
+   * The clean solution would be to rewrite parts of the routing engine, calculating weight and ETA
+   * together and passing them in the same structure, so we can pass true ETA to the two functions.
+   *
+   * Note this function gets called multiple times on the same segment in different phases of route
+   * calculation, we are seeing different weights:
+   * - zero at first, called (indirectly?) by DoCalculateRoute
+   * - weight from A* (called by ReconstructJointSegment() <- DoCalculateRoute())
+   *   – the weight returned from these calls is used to determine the cheapest path
+   * - nullopt, called by RedressRoute(), purpose=ETA (unlike the others)
+   * - zero, called by RedressRoute()
+   */
+  std::optional<double> weightToSegment = prevWeight ? std::optional<double>{prevWeight->GetWeight()} : std::nullopt;
+  auto const weight = RouteWeight(m_estimator->CalcSegmentWeight(to_segment, to_road, purpose, weightToSegment));
   auto const penalties = GetPenalties(purpose, isOutgoing ? from : to, isOutgoing ? to : from, prevWeight);
   auto const turn_penalty = getTurnPenalty(purpose, from_segment, to_segment);
-  return weight + penalties + turn_penalty;
+  auto const transition_penalty = RouteWeight(m_estimator->GetTransitionPenalty(purpose,
+                                                                                (isOutgoing ? from : to),
+                                                                                (isOutgoing ? to : from),
+                                                                                weight.GetWeight()));
+  return weight + penalties + turn_penalty + transition_penalty;
 }
 
 RouteWeight IndexGraph::getTurnPenalty(EdgeEstimator::Purpose purpose, Segment const & from, Segment const & to) const

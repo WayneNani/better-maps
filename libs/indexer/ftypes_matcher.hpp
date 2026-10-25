@@ -723,6 +723,14 @@ public:
   feature::InterpolType GetInterpolType(FeatureType & ft) const { return GetInterpolType(feature::TypesHolder(ft)); }
 };
 
+class IsMotorVehicleAccessRestrictedChecker : public BaseChecker
+{
+  IsMotorVehicleAccessRestrictedChecker();
+
+public:
+  DECLARE_CHECKER_INSTANCE(IsMotorVehicleAccessRestrictedChecker);
+};
+
 /// @name Get city radius and population.
 /// @param r Radius in meters.
 //@{
@@ -733,24 +741,46 @@ double GetRadiusByPopulationForRouting(uint64_t p, LocalityType localityType);
 uint64_t GetPopulationByRadius(double r);
 //@}
 
-// Highway class. The order is important.
-// The enum values follow from the biggest roads (Trunk) to the smallest ones (Service).
+/**
+ * @brief Highway class.
+ *
+ * The order is important. The enum values follow from the biggest roads (Trunk) to the smallest ones (Service).
+ */
 enum class HighwayClass
 {
-  Undefined = 0,  // There has not been any attempt of calculating HighwayClass.
+  /**
+   * Used when there has not been any attempt of calculating HighwayClass.
+   */
+  Undefined = 0,
   Motorway,
   Trunk,
   Primary,
   Secondary,
   Tertiary,
+  /**
+   * Unclassified, residential, living street and `highway=road`.
+   */
   LivingStreet,
+  /**
+   * Service, track, busway and `man_made=pier`.
+   */
   Service,
   // OSM highway=service type is widely used even for _significant_ roads.
   // Adding a new type to distinguish mapped driveway or parking_aisle.
   ServiceMinor,
+  /**
+   * Anything not intended for motorized traffic: pedestrian, footway, bridleway, steps, cycleway,
+   * path and also `highway=construction`.
+   */
   Pedestrian,
-  Transported,  // Vehicles are transported by train or ferry.
-  Count         // This value is used for internals only.
+  /**
+   * Vehicles are transported by train or ferry.
+   */
+  Transported,
+  /**
+   * This value is used for internals only.
+   */
+  Count
 };
 
 std::string DebugPrint(HighwayClass const cls);

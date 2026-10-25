@@ -42,6 +42,24 @@ class WorldGraph;
 class IndexRouter : public IRouter
 {
 public:
+  /**
+   * @brief Indicates the mode in which the router is operating.
+   *
+   * The mode controls some aspects of router behavior, such as asking for additional maps or how
+   * checkpoints are matched to nearby segments.
+   */
+  enum Mode
+  {
+    /**
+     * Router mode for navigation, i.e. user-initiated route guidance.
+     */
+    Navigation,
+    /**
+     * Router mode for location decoding.
+     */
+    Decoding
+  };
+
   class BestEdgeComparator final
   {
   public:
@@ -66,6 +84,24 @@ public:
     m2::PointD const m_direction;
   };
 
+  /**
+   * @brief Creates a new `IndexRouter` instance.
+   *
+   * This is the constructor intended for normal routing. It requires a `TrafficCache` argument,
+   * from which it may create a traffic stash so the traffic situation can be considered for the
+   * route, depending on the vehicle type.
+   *
+   * @param vehicleType The vehichle type
+   * @param loadAltitudes Whether to load altitudes
+   * @param countryParentNameGetterFn Function which converts a country name into the name of its parent country)
+   * @param countryFileFn Function which converts a pointer to its country name
+   * @param countryRectFn Function which returns the rect for a country
+   * @param numMwmIds MWMs to use for route calculation (this should include all MWMs, whether or
+   * not we have the file locally, but not World or WorldCoasts)
+   * @param numMwmTree
+   * @param trafficCache The traffic cache (used only if `vehicleType` is `VehicleType::Car`)
+   * @param dataSource The MWM data source
+   */
   IndexRouter(VehicleType vehicleType, bool loadAltitudes, CountryParentNameGetterFn const & countryParentNameGetterFn,
               TCountryFileFn const & countryFileFn, CountryRectFn const & countryRectFn,
               std::shared_ptr<NumMwmIds> numMwmIds, std::unique_ptr<m4::Tree<NumMwmId>> numMwmTree,
@@ -94,6 +130,76 @@ public:
   {
     m_currentTimeGetter = std::forward<T>(getter);
   }
+
+protected:
+  /**
+   * @brief Creates a new `IndexRouter` instance.
+   *
+   * This constructor is intended for use by the TraFF decoder, not for normal routing. It differs
+   * from the general-purpose constructor in two ways.
+   *
+   * It takes an explicit `EdgeEstimator` argument, instance, which gives the caller fine-grained
+   * control over the cost calculations used for routing by supplying an `EdgeEstimator` of their
+   * choice.
+   *
+   * It also lacks the `TrafficCache` argument and never creates a traffic stash. This creates a
+   * router instance which ignores the traffic situation, regardless of the vehicle type.
+   *
+   * @param vehicleType The vehichle type
+   * @param loadAltitudes Whether to load altitudes
+   * @param countryParentNameGetterFn Function which converts a country name into the name of its parent country)
+   * @param countryFileFn Function which converts a pointer to its country name
+   * @param countryRectFn Function which returns the rect for a country
+   * @param numMwmIds
+   * @param numMwmTree
+   * @param estimator An edge estimator
+   * @param dataSource The MWM data source
+   */
+  IndexRouter(VehicleType vehicleType, bool loadAltitudes,
+              CountryParentNameGetterFn const & countryParentNameGetterFn,
+              TCountryFileFn const & countryFileFn, CountryRectFn const & countryRectFn,
+              std::shared_ptr<NumMwmIds> numMwmIds, std::unique_ptr<m4::Tree<NumMwmId>> numMwmTree,
+              std::shared_ptr<EdgeEstimator> estimator, DataSource & dataSource);
+
+
+  /**
+   * @brief Returns the mode in which the router is operating.
+   *
+   * The `IndexRouter` always returns `Mode::Navigation`; subclasses may override this method and
+   * return different values.
+   *
+   * In navigation mode, the router may exit with `RouterResultCode::NeedMoreMaps` if it determines
+   * that a better route can be calculated with additional maps. When snapping endpoints to edges,
+   * it will consider only edges which are not “fenced off” by other edges, i.e. which can be
+   * reached from the endpoint without crossing other edges. This decreases the number of fake
+   * endings and thus speeds up routing, without any undesirable side effects for that use case.
+   *
+   * In decoding mode, the router will never exit with `RouterResultCode::NeedMoreMaps`: it will try
+   * to find a route with the existing maps, or exit without finding a route. When snapping
+   * endpoints to edges, it considers all edges within the given radius, fenced off or not.
+   */
+  virtual Mode GetMode() { return Mode::Navigation; }
+
+  /**
+   * @brief Returns current routing options.
+   *
+   * In this class, the routing options are the one set in the GUI. Subclasses may override this
+   * method to provide different routing options.
+   */
+  virtual RoutingOptions GetRoutingOptions();
+
+  /**
+   * @brief Whether to constrain point projections to segment endpoints.
+   *
+   * If `false`, retrieving the closest point on a segment can return any point on the segment.
+   * If `true`, this indicates the closest point on a segment can only be one of its endpoints, not
+   * a point in between. This prevents partial segments in the route (segments will be added to the
+   * route completely, or not at all).
+   *
+   * The `IndexRouter` always returns `false`, subclasses can override this method and return
+   * `true` at their discretion.
+   */
+  virtual bool IsSnapToEndsActive() { return false; }
 
 private:
   RouterResultCode CalculateSubrouteJointsMode(IndexGraphStarter & starter, RouterDelegate const & delegate,
@@ -159,8 +265,8 @@ private:
     static bool IsFencedOff(m2::PointD const & point, EdgeProjectionT const & edgeProjection,
                             std::vector<RoadInfoT> const & fences);
 
-    static void RoadsToNearestEdges(m2::PointD const & point, std::vector<RoadInfoT> const & roads,
-                                    IsEdgeProjGood const & isGood, std::vector<EdgeProjectionT> & edgeProj);
+    void RoadsToNearestEdges(m2::PointD const & point, std::vector<RoadInfoT> const & roads,
+                             IsEdgeProjGood const & isGood, std::vector<EdgeProjectionT> & edgeProj);
 
     Segment GetSegmentByEdge(Edge const & edge) const;
 

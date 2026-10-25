@@ -30,6 +30,7 @@ target_link_libraries(${PROJECT_NAME}
     indexer
     openlr
     qt_common
+    traffxml
   PRIVATE
     drape_frontend
     map

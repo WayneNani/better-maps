@@ -129,4 +129,74 @@ JNIEXPORT void JNICALL Java_app_organicmaps_sdk_util_Config_nativeSetTranslitera
   frm()->SaveTransliteration(value);
   frm()->AllowTransliteration(value);
 }
+
+JNIEXPORT jboolean JNICALL
+Java_app_organicmaps_sdk_util_Config_nativeGetTrafficHttpEnabled(JNIEnv * env, jclass thiz)
+{
+  return frm()->LoadTrafficHttpEnabled();
+}
+
+JNIEXPORT void JNICALL
+Java_app_organicmaps_sdk_util_Config_nativeSetTrafficHttpEnabled(JNIEnv * env, jclass thiz,
+                                                                 jboolean value)
+{
+  frm()->SaveTrafficHttpEnabled(value);
+  frm()->SetTrafficHttpEnabled(value);
+}
+
+JNIEXPORT jstring JNICALL
+Java_app_organicmaps_sdk_util_Config_nativeGetTrafficHttpUrl(JNIEnv * env, jclass thiz)
+{
+  std::string value = frm()->LoadTrafficHttpUrl();
+  return jni::ToJavaString(env, value);
+}
+
+JNIEXPORT void JNICALL
+Java_app_organicmaps_sdk_util_Config_nativeSetTrafficHttpUrl(JNIEnv * env, jclass thiz,
+                                                             jstring value)
+{
+  frm()->SaveTrafficHttpUrl(jni::ToNativeString(env, value));
+  frm()->SetTrafficHttpUrl(jni::ToNativeString(env, value));
+}
+
+JNIEXPORT void JNICALL
+Java_app_organicmaps_sdk_util_Config_applyTrafficLegacyEnabled(JNIEnv * env, jclass thiz,
+                                                               jboolean value)
+{
+  TrafficManager & tm = g_framework->GetTrafficManager();
+  tm.RemoveTraffSourceIf([](traffxml::TraffSource* source) {
+    if (traffxml::AndroidTraffSourceV0_7* traffSource = dynamic_cast<traffxml::AndroidTraffSourceV0_7*>(source))
+    {
+      traffSource->Close();
+      return true;
+    }
+    else
+      return false;
+  });
+  if (value)
+    traffxml::AndroidTraffSourceV0_7::Create(tm);
+}
+
+JNIEXPORT void JNICALL
+Java_app_organicmaps_sdk_util_Config_applyTrafficApps(JNIEnv * env, jclass thiz, jobjectArray value)
+{
+  jsize valueLen = env->GetArrayLength(value);
+  TrafficManager & tm = g_framework->GetTrafficManager();
+  tm.RemoveTraffSourceIf([](traffxml::TraffSource* source) {
+    if (traffxml::AndroidTraffSourceV0_8* traffSource = dynamic_cast<traffxml::AndroidTraffSourceV0_8*>(source))
+    {
+      traffSource->Close();
+      return true;
+    }
+    else
+      return false;
+  });
+  for (jsize i = 0; i < valueLen; i++)
+  {
+    jstring jAppId = (jstring)env->GetObjectArrayElement(value, i);
+    std::string appId = jni::ToNativeString(env, jAppId);
+    traffxml::AndroidTraffSourceV0_8::Create(tm, appId);
+    env->DeleteLocalRef(jAppId);
+  }
+}
 }  // extern "C"

@@ -355,14 +355,18 @@ SMOKE_DATEX2= scripts/smoke.sh                    # ohne DATEX-II-Quelle
 - Der Client kennt bisher nur Ereignistypen der Klassen `CONGESTION`, `DELAY` und (teilweise) `RESTRICTION`.
   Unbekannte Ereignisse überspringt er; eine Meldung ganz ohne bekanntes Ereignis verwirft er. Baustellen ohne
   Tempolimit oder Sperrung (nur `CONSTRUCTION_ROADWORKS`, `RESTRICTION_LANE_CLOSED`, …) kommen daher derzeit in der
-  App nicht an – sie hätten im Client ohnehin keine Auswirkung auf Routing und Einfärbung.
+  App nicht an – sie hätten im Client ohnehin keine Auswirkung auf Routing und Einfärbung. Gemessen am
+  25.10.2026 für Berlin (A10, A100, A111, A113, A114, A115): 90 Meldungen im Feed, davon 53 vom Client übernommen.
+  Erweiterung der Ereignistypen ist ein Upstream-Thema (`libs/traffxml/traff_model.cpp`, `kEventSpeedGroupMap`).
 - Der Client braucht mindestens zwei der Punkte `from`/`to`/`at`; Meldungen mit nur einem Punkt (`at`) ignoriert er.
   Das betrifft DATEX-II-Punktmeldungen (z. B. Unfall an einer Stelle).
 - DATEX-II-Meldungen, die nur `INCIDENT_*`, `HAZARD_*`, `WEATHER_*`, `CONSTRUCTION_*` oder `AUTHORITY_*` enthalten
   (Unfall ohne Stau oder Sperrung, Gefahr, Wetter), sind gültiges TraFF, werden aber vom aktuellen Client verworfen.
   Sie sind trotzdem im Feed, damit spätere Client-Versionen sie anzeigen können.
-- Der Client wertet `timeout` noch nicht aus. Auf `SUBSCRIPTION_UNKNOWN` (z. B. nach einem Server-Neustart oder
-  abgelaufenem Abo) löscht er die ID, abonniert aber erst neu, wenn sich die aktiven MWMs ändern
-  (`TrafficManager::SubscribeOrChangeSubscription()` ist sonst ein No-op). Das sollte in AP4a behoben werden.
-- Der Client pollt höchstens einmal pro Minute; nach einem leeren Feed setzt `HttpTraffSource` den nächsten
-  Poll-Zeitpunkt nicht hoch, pollt also im Minutentakt. Die Abo-TTL von 1 h ist dafür großzügig bemessen.
+- Seit AP4a (Branch `bm/traffic`) abonniert der Client nach `SUBSCRIPTION_UNKNOWN` (z. B. nach einem
+  Server-Neustart oder abgelaufenem Abo) sofort neu, und ein gescheitertes Abonnement wird beim nächsten
+  Poll-Zeitpunkt wiederholt.
+- Der Client pollt alle 5 Minuten, auch nach leeren Feeds; meldet der Server ein `timeout`, pollt er
+  spätestens nach der Hälfte davon (Raster des Traffic-Managers: 1 Minute). Die Abo-TTL von 1 h ist
+  dafür großzügig bemessen.
+- Ende-zu-Ende-Test Server + App-Client ohne Emulator: `tools/better-maps/traffic-e2e.sh`.

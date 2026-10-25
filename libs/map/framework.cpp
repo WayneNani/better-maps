@@ -14,7 +14,9 @@
 #include "ge0/url_generator.hpp"
 
 #include "platform/location.hpp"
+#include "routing/index_router.hpp"
 #include "routing/route.hpp"
+#include "routing/routing_helpers.hpp"
 #include "routing/router.hpp"
 #include "routing/speed_camera_prohibition.hpp"
 
@@ -28,8 +30,11 @@
 #include "storage/country.hpp"
 #include "storage/country_decl.hpp"
 #include "storage/country_info_getter.hpp"
+#include "storage/routing_helpers.hpp"
 #include "storage/storage.hpp"
 #include "storage/storage_helpers.hpp"
+
+#include "traffxml/traff_source.hpp"
 
 #include "drape_frontend/color_constants.hpp"
 #include "drape_frontend/frontend_renderer.hpp"
@@ -40,6 +45,8 @@
 #include "drape_frontend/visual_params.hpp"
 
 #include "drape/viewport.hpp"
+
+#include "editor/editable_data_source.hpp"
 
 #include "descriptions/loader.hpp"
 
@@ -64,6 +71,7 @@
 #include "platform/country_file.hpp"
 #include "platform/distance.hpp"
 #include "platform/local_country_file.hpp"
+#include "platform/local_country_file_utils.hpp"
 #include "platform/localization.hpp"
 #include "platform/measurement_utils.hpp"
 #include "platform/platform.hpp"
@@ -91,6 +99,7 @@
 #include "base/logging.hpp"
 #include "base/math.hpp"
 #include "base/shared_buffer_manager.hpp"
+#include "base/stl_helpers.hpp"
 #include "base/string_utils.hpp"
 #include "base/thread.hpp"
 #include "base/thread_checker.hpp"
@@ -98,6 +107,7 @@
 #include "std/target_os.hpp"
 
 #include "defines.hpp"
+#include "private.h"
 
 #include <algorithm>
 
@@ -129,6 +139,8 @@ std::string_view constexpr kMapModeDrivingTrafficKey = "DrivingModeHasTraffic";
 std::string_view constexpr kMapModePublicTransportTransitLinesKey = "PublicTransportModeHasTransitLines";
 std::string_view constexpr kContourLinesKey = "HasContourLinesLayer";
 std::string_view constexpr kOutdoorKey = "HasOutdoorLayer";
+std::string_view constexpr kTrafficHttpEnabledKey = "TrafficHttpEnabled";
+std::string_view constexpr kTrafficHttpUrlKey = "TrafficHttpUrl";
 std::string_view constexpr kTrafficSimplifiedColorsKey = "TrafficSimplifiedColors";
 std::string_view constexpr kLargeFontsSize = "LargeFontsSize";
 std::string_view constexpr kFontScaleFactor = "FontScaleFactor";
@@ -332,8 +344,11 @@ Framework::Framework(FrameworkParams const & params, bool loadMaps)
                                                [this]() -> StringsBundle const &
 { return m_stringsBundle; }, [this]() -> power_management::PowerManager const & { return m_powerManager; }),
                      static_cast<RoutingManager::Delegate &>(*this))
-  , m_trafficManager(bind(&Framework::GetMwmsByRect, this, _1, false /* rough */), kMaxTrafficCacheSizeBytes,
-                     m_routingManager.RoutingSession())
+  , m_trafficManager(m_featuresFetcher.GetDataSource(),
+                     [this]() -> storage::CountryInfoGetter const & { return GetCountryInfoGetter(); },
+                     [this](string const & id) -> string { return m_storage.GetParentIdFor(id); },
+                     bind(&Framework::GetMwmsByRect, this, _1, false /* rough */),
+                     kMaxTrafficCacheSizeBytes, m_routingManager.RoutingSession())
   , m_lastReportedCountry(kInvalidCountryId)
   , m_popularityLoader(m_featuresFetcher.GetDataSource(), POPULARITY_RANKS_FILE_TAG)
   , m_reviewsLoader(std::make_unique<reviews::Loader>(m_featuresFetcher.GetDataSource()))
@@ -408,10 +423,10 @@ Framework::Framework(FrameworkParams const & params, bool loadMaps)
   editor.SetDelegate(make_unique<search::EditorDelegate>(m_featuresFetcher.GetDataSource()));
   editor.SetInvalidateFn([this]() { InvalidateRect(GetCurrentViewport()); });
 
-  /// @todo Uncomment when we will integrate a traffic provider.
-  // m_trafficManager.SetCurrentDataVersion(m_storage.GetCurrentDataVersion());
-  // m_trafficManager.SetSimplifiedColorScheme(LoadTrafficSimplifiedColors());
-  // m_trafficManager.SetEnabled(MapModeHasTraffic());
+  if (params.m_trafficTestMode)
+    m_trafficManager.SetTestMode();
+  m_trafficManager.SetCurrentDataVersion(m_storage.GetCurrentDataVersion());
+  m_trafficManager.SetSimplifiedColorScheme(LoadTrafficSimplifiedColors());
 
   m_isolinesManager.SetEnabled(HasContourLinesLayer());
 
@@ -443,6 +458,19 @@ Framework::~Framework()
   m_featuresFetcher.SetOnMapDeregisteredCallback(nullptr);
 }
 
+void Framework::InitializeTraffic()
+{
+  m_trafficManager.SetEnabled(CurrentMapModeHasTraffic());
+  if (!m_trafficManager.IsTestMode() && LoadTrafficHttpEnabled())
+    // TODO handle invalid URLs
+    traffxml::HttpTraffSource::Create(m_trafficManager, LoadTrafficHttpUrl());
+
+  /*
+   * MockTraffSource for debugging purposes.
+   */
+  //traffxml::MockTraffSource::Create(m_trafficManager);
+}
+
 void Framework::ShowNode(storage::CountryId const & countryId)
 {
   StopLocationFollow();
@@ -458,14 +486,14 @@ void Framework::OnCountryFileDownloaded(storage::CountryId const &, storage::Loc
   m2::RectD rect = mercator::Bounds::FullRect();
 
   if (localFile && localFile->OnDisk(MapFileType::Map))
-  {
-    auto const res = RegisterMap(*localFile);
-    MwmSet::MwmId const & id = res.first;
-    if (id.IsAlive())
-      rect = id.GetInfo()->m_bordersRect;
-  }
+    m_trafficManager.RunSynchronized([this, localFile, &rect](){
+      auto const res = RegisterMap(*localFile);
+      MwmSet::MwmId const & id = res.first;
+      if (id.IsAlive())
+        rect = id.GetInfo()->m_bordersRect;
+      m_trafficManager.Invalidate(id);
+    });
 
-  m_trafficManager.Invalidate();
   m_transitManager.Invalidate();
   m_isolinesManager.Invalidate();
 
@@ -547,6 +575,8 @@ void Framework::LoadMapsSync()
   LOG(LDEBUG, ("Editor initialized"));
 
   GetStorage().RestoreDownloadQueue();
+
+  InitializeTraffic();
 }
 
 // Small copy-paste with LoadMapsSync, but I don't have a better solution.
@@ -568,6 +598,8 @@ void Framework::LoadMapsAsync(std::function<void()> && callback)
       LOG(LDEBUG, ("Editor initialized"));
 
       GetStorage().RestoreDownloadQueue();
+
+      InitializeTraffic();
 
       callback();
     });
@@ -2580,6 +2612,42 @@ void Framework::SetFontScaleFactor(double scaleFactor)
   InvalidateRect(GetCurrentViewport());
 }
 
+void Framework::SetTrafficHttpEnabled(bool enabled)
+{
+  m_trafficManager.SetHttpTraffSource(enabled, LoadTrafficHttpUrl());
+}
+
+bool Framework::LoadTrafficHttpEnabled()
+{
+  bool enabled;
+  if (!settings::Get(kTrafficHttpEnabledKey, enabled))
+    enabled = false;
+  return enabled;
+}
+
+void Framework::SaveTrafficHttpEnabled(bool trafficHttpEnabled)
+{
+  settings::Set(kTrafficHttpEnabledKey, trafficHttpEnabled);
+}
+
+void Framework::SetTrafficHttpUrl(std::string url)
+{
+  m_trafficManager.SetHttpTraffSource(LoadTrafficHttpEnabled(), url);
+}
+
+std::string Framework::LoadTrafficHttpUrl()
+{
+  std::string url;
+  if (!settings::Get(kTrafficHttpUrlKey, url))
+    url = TRAFFIC_HTTP_URL_DEFAULT;
+  return url;
+}
+
+void Framework::SaveTrafficHttpUrl(std::string trafficHttpUrl)
+{
+  settings::Set(kTrafficHttpUrlKey, trafficHttpUrl);
+}
+
 bool Framework::LoadTrafficSimplifiedColors()
 {
   bool simplified;
@@ -2761,7 +2829,23 @@ MapMode Framework::CurrentMapMode()
 
 bool Framework::CurrentMapModeHasTraffic()
 {
+  /*
+   * Workaround:
+   * Android never seems to enter driving mode.
+   * On Qt, when switching between modes, Traffic response was kind of flaky
+   * (start up in pedestrian mode, switch to car and enabled traffic, no updates until the app
+   * is restarted)
+   */
+#if defined(OMIM_OS_ANDROID)
+  /*
+   * Workaround: modes are not yet implemented on Android, the app doesn’t ever seem to enter driving
+   * mode, so checking for that would prevent traffic from working.
+   * Remove this when modes are implemented on Android (and verify traffic still works as intended).
+   */
+  return DrivingMapModeHasTraffic();
+#else
   return CurrentMapMode() == MapMode::Driving && DrivingMapModeHasTraffic();
+#endif
 }
 
 bool Framework::CurrentMapModeHasTransitLines()
@@ -3550,6 +3634,17 @@ bool Framework::ParseSearchQueryCommand(search::SearchParams const & params)
     m_storage.RunCountriesCheckAsyncSaveOnly();
     return true;
   }
+
+  if (params.m_query == "?clear-traffic")
+  {
+    GetTrafficManager().Clear();
+  }
+
+  /*
+   * `?wiki` is not parsed here as it is implemented in the search engine itself.
+   * Upon encountering `?wiki`, this function will return false, causing the caller to pass it to
+   * the search engine as a regular search term.
+   */
 
   return false;
 }

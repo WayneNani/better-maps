@@ -22,11 +22,15 @@ namespace routing
 {
 class AbsentRegionsFinder;
 
-/// Dispatches a route calculation on a worker thread
+/**
+ * @brief The AsyncRouter class is a wrapper class to run routing routines in a different thread.
+ *
+ * It encapsulates an `IRouter` (or subclass) instance, set with `SetRouter()`, and runs it in a
+ * separate worker thread to calculate the route.
+ */
 class AsyncRouter final
 {
 public:
-  /// AsyncRouter is a wrapper class to run routing routines in the different thread
   AsyncRouter(PointCheckCallback const & pointCheckCallback);
   ~AsyncRouter();
 
@@ -57,6 +61,15 @@ public:
 
   bool FindClosestProjectionToRoad(m2::PointD const & point, m2::PointD const & direction, double radius,
                                    EdgeProj & proj);
+
+  /**
+   * @brief Retrieves the MWMs needed to build the route.
+   *
+   * Waits for the routing thread to finish and returns the list of MWM names from it.
+   *
+   * @param countries Receives the list of MWM names.
+   */
+  void GetAllRegions(std::set<std::string> & countries);
 
 private:
   /// Worker thread function

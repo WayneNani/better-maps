@@ -1,3 +1,12 @@
+/*
+ * TODO The whole pytraffic construct appears to be obsolete.
+ * It appears to have been used to serialize/deserialize (unconditional) traffic coloring into two
+ * files per MWM, one holding keys, another holding speed groups.
+ * This is no longer needed with the TraFF backend, and most of this code does not even work any more
+ * after the changes made there, and has therefore been commented out.
+ * Unless there is still something useful to be salvaged from this code, it can be removed.
+ */
+
 #include "traffic/speed_groups.hpp"
 #include "traffic/traffic_info.hpp"
 
@@ -52,10 +61,10 @@ std::string SegmentSpeedsRepr(SegmentSpeeds const & v)
   return ss.str();
 }
 
-traffic::TrafficInfo::Coloring TransformToSpeedGroups(SegmentMapping const & segmentMapping)
+traffic::TrafficInfo::SimpleColoring TransformToSpeedGroups(SegmentMapping const & segmentMapping)
 {
   double const kEps = 1e-9;
-  traffic::TrafficInfo::Coloring result;
+  traffic::TrafficInfo::SimpleColoring result;
   for (auto const & kv : segmentMapping)
   {
     double const ws = kv.second.m_weightedSpeed;
@@ -96,6 +105,14 @@ std::string RoadSegmentIdRepr(traffic::TrafficInfo::RoadSegmentId const & v)
   return ss.str();
 }
 
+#if 0
+/*
+ * TODO Obsolete and no longer needed.
+ * Also, coloring logic has been amended to support conditional coloring (what was previously `Coloring`
+ * is now `SimpleColoring`, and `Coloring` is now a struct with one member of type  `SimpleColoring`
+ * and one of type `std::map<Condition, SimpleColoring>` aka `ConditionalColoring`, which
+ * breaks most of the existing logic (resulting in compilation errors or incorrect behavior).
+ */
 boost::python::list GenerateTrafficKeys(std::string const & mwmPath)
 {
   std::vector<traffic::TrafficInfo::RoadSegmentId> result;
@@ -103,6 +120,11 @@ boost::python::list GenerateTrafficKeys(std::string const & mwmPath)
   return pyhelpers::StdVectorToPythonList(result);
 }
 
+/*
+ * TODO Inherited from MWM/OM, no longer works with TraFF logic (API logic changed).
+ * We no longer separate keys (segments IDs) from values (their speed groups).
+ * See if we can refactor this into something meaningful and useful, else remove.
+ */
 std::vector<uint8_t> GenerateTrafficValues(std::vector<traffic::TrafficInfo::RoadSegmentId> const & keys,
                                            boost::python::dict const & segmentMappingDict, uint8_t useTempBlock)
 {
@@ -139,6 +161,13 @@ std::vector<uint8_t> GenerateTrafficValues(std::vector<traffic::TrafficInfo::Roa
   return buf;
 }
 
+/*
+ * TODO Inherited from MWM/OM, no longer works with TraFF logic (API logic changed).
+ * We no longer separate keys (segments IDs) from values (their speed groups), nor do we store
+ * either in binary files: Segment/speed group pairs are generated from TraFF data and cached in
+ * XML format (using a custom extension to TraFF).
+ * See if we can refactor this into something meaningful and useful, else remove.
+ */
 std::vector<uint8_t> GenerateTrafficValuesFromList(boost::python::list const & keys,
                                                    boost::python::dict const & segmentMappingDict)
 {
@@ -148,6 +177,13 @@ std::vector<uint8_t> GenerateTrafficValuesFromList(boost::python::list const & k
   return GenerateTrafficValues(keysVec, segmentMappingDict, 1 /* useTempBlock */);
 }
 
+/*
+ * TODO Inherited from MWM/OM, no longer works with TraFF logic (API logic changed).
+ * We no longer separate keys (segments IDs) from values (their speed groups), nor do we store
+ * either in binary files: Segment/speed group pairs are generated from TraFF data and cached in
+ * XML format (using a custom extension to TraFF).
+ * See if we can refactor this into something meaningful and useful, else remove.
+ */
 std::vector<uint8_t> GenerateTrafficValuesFromBinary(std::vector<uint8_t> const & keysBlob,
                                                      boost::python::dict const & segmentMappingDict,
                                                      uint8_t useTempBlock = 1)
@@ -157,6 +193,7 @@ std::vector<uint8_t> GenerateTrafficValuesFromBinary(std::vector<uint8_t> const 
 
   return GenerateTrafficValues(keys, segmentMappingDict, useTempBlock);
 }
+#endif
 
 void LoadClassificator(std::string const & classifPath)
 {
@@ -200,8 +237,13 @@ BOOST_PYTHON_MODULE(pytraffic)
       .value("Unknown", traffic::SpeedGroup::Unknown);
 
   def("load_classificator", LoadClassificator);
+#if 0
+  // TODO obsolete
   def("generate_traffic_keys", GenerateTrafficKeys);
+  // TODO obsolete, see function definition
   def("generate_traffic_values_from_list", GenerateTrafficValuesFromList);
+  // TODO obsolete, see function definition
   def("generate_traffic_values_from_binary", GenerateTrafficValuesFromBinary,
       (arg("keysBlob"), arg("segmentMappingDict"), arg("useTempBlock") = 1));
+#endif
 }

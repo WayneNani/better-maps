@@ -204,6 +204,8 @@ public:
   void Set3dMode(bool allow3d, bool allow3dBuildings);
   void Get3dMode(bool & allow3d, bool & allow3dBuildings);
 
+  TrafficManager & GetTrafficManager() { return m_work.GetTrafficManager(); }
+
   void SetMapLanguageCode(std::string const & languageCode);
   std::string GetMapLanguageCode();
 

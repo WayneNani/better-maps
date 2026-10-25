@@ -84,7 +84,6 @@ struct TrafficSegmentGeometry
 using TrafficSegmentsGeometryValue =
     std::vector<std::pair<traffic::TrafficInfo::RoadSegmentId, TrafficSegmentGeometry>>;
 using TrafficSegmentsGeometry = std::map<MwmSet::MwmId, TrafficSegmentsGeometryValue>;
-using TrafficSegmentsColoring = std::map<MwmSet::MwmId, traffic::TrafficInfo::Coloring>;
 
 struct TrafficRenderData
 {
@@ -174,7 +173,7 @@ public:
 
   void FlushSegmentsGeometry(ref_ptr<dp::GraphicsContext> context, TileKey const & tileKey,
                              TrafficSegmentsGeometry const & geom, ref_ptr<dp::TextureManager> textures);
-  void UpdateColoring(TrafficSegmentsColoring const & coloring);
+  void UpdateColoring(traffic::TrafficInfo::GlobalColoring const & coloring);
 
   void ClearCache();
   void ClearCache(MwmSet::MwmId const & mwmId);
@@ -224,12 +223,27 @@ private:
 
   void FlushGeometry(TrafficBatcherKey const & key, dp::RenderState const & state,
                      drape_ptr<dp::RenderBucket> && buffer);
+
+  /**
+   * @brief Determines the current speed group for a given segment.
+   *
+   * This function examines both unconditional coloring and any conditional coloring entries that apply
+   * at the current point in time and returns the most restrictive speed group that applies. If `coloring`
+   * has no currently applicable information on that segment, `SpeedGroup::Unknown` is returned.
+   *
+   * @param coloring The coloring from which to retrieve the speed group.
+   * @param seg The segment for which to retrieve the speed group.
+   * @return The most restrictive speed group that applies at the moment, or `SpeedGroup::Unknown`.
+   */
+  traffic::SpeedGroup GetSpeedGroup(traffic::TrafficInfo::Coloring const & coloring,
+                                    traffic::TrafficInfo::RoadSegmentId const & seg);
+
   void GenerateSegmentsGeometry(ref_ptr<dp::GraphicsContext> context, MwmSet::MwmId const & mwmId,
                                 TileKey const & tileKey, TrafficSegmentsGeometryValue const & geometry,
                                 traffic::TrafficInfo::Coloring const & coloring,
                                 ref_ptr<dp::TextureManager> texturesMgr);
 
-  TrafficSegmentsColoring m_coloring;
+  traffic::TrafficInfo::GlobalColoring m_coloring;
 
   std::array<dp::TextureManager::ColorRegion, static_cast<size_t>(traffic::SpeedGroup::Count)> m_colorsCache;
   bool m_colorsCacheValid = false;

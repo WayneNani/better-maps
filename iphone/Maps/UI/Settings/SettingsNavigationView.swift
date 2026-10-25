@@ -60,6 +60,14 @@ struct SettingsNavigationView: View {
     @State var forceRefreshDate: Date = Date.now
     
     
+    /// If live traffic data should be used
+    @State var hasLiveTraffic: Bool = false
+    
+    
+    /// The url of the live traffic data server
+    @State var liveTrafficServerUrlString: String = ""
+    
+    
     /// The actual view
     var body: some View {
         List {
@@ -222,6 +230,24 @@ struct SettingsNavigationView: View {
                     Text("driving_options_title")
                 }
             }
+            
+            Section {
+                Toggle(isOn: $hasLiveTraffic) {
+                    VStack(alignment: .leading) {
+                        Text("traffic_http_enabled")
+                        
+                        Text("traffic_http_enabled_description")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .tint(.accent)
+                
+                TextField("traffic_http_url", text: $liveTrafficServerUrlString, prompt: Text("traffic_http_url_not_set"))
+                    .tint(.accent)
+            } header: {
+                Text("traffic_http")
+            }
         }
         .accentColor(.accent)
         .navigationViewStyle(StackNavigationViewStyle())
@@ -239,6 +265,8 @@ struct SettingsNavigationView: View {
             shouldAvoidFerriesWhileRouting = Settings.shouldAvoidFerriesWhileRouting
             shouldAvoidMotorwaysWhileRouting = Settings.shouldAvoidMotorwaysWhileRouting
             shouldAvoidStepsWhileRouting = Settings.shouldAvoidStepsWhileRouting
+            hasLiveTraffic = Settings.hasLiveTraffic
+            liveTrafficServerUrlString = Settings.liveTrafficServerUrl?.absoluteString ?? ""
         }
         .onChange(of: scenePhase) { _ in
             forceRefreshDate = Date.now
@@ -286,6 +314,15 @@ struct SettingsNavigationView: View {
         }
         .onChange(of: shouldAvoidStepsWhileRouting) { changedShouldAvoidStepsWhileRouting in
             Settings.shouldAvoidStepsWhileRouting = changedShouldAvoidStepsWhileRouting
+        .onChange(of: hasLiveTraffic) { changedHasLiveTraffic in
+            Settings.hasLiveTraffic = changedHasLiveTraffic
+        }
+        .onChange(of: liveTrafficServerUrlString) { changedLiveTrafficServerUrlString in
+            if !changedLiveTrafficServerUrlString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, let changedLiveTrafficServerUrl = URL(string: changedLiveTrafficServerUrlString.trimmingCharacters(in: .whitespacesAndNewlines)) {
+                Settings.liveTrafficServerUrl = changedLiveTrafficServerUrl
+            } else {
+                Settings.liveTrafficServerUrl = nil
+            }
         }
     }
 }

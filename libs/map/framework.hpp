@@ -113,10 +113,21 @@ class Loader;
 /// build version for screenshots.
 // #define FIXED_LOCATION
 
+/**
+ * @brief Initialization parameters for the framework.
+ *
+ * `FrameworkParams` is intended for parameters which are hardcoded rather than read from a
+ * configuration. It allows test cases to run on a tailored configuration.
+ */
 struct FrameworkParams
 {
   bool m_enableDiffs = true;
   size_t m_numSearchAPIThreads = 1;
+
+  /**
+   * @brief Whether the traffic manager should start in test mode.
+   */
+  bool m_trafficTestMode = false;
 
   FrameworkParams() = default;
   FrameworkParams(bool enableDiffs) : m_enableDiffs(enableDiffs) {}
@@ -320,7 +331,34 @@ public:
   /// \note It works for group and leaf node.
   bool HasUnsavedEdits(storage::CountryId const & countryId);
 
+  /**
+   * @brief Loads maps synchronously.
+   *
+   * Maps are loaded on the calling thread.
+   *
+   * This function also performs certain initialization operations which depend on map data being
+   * available, such as search, traffic and the download queue.
+   *
+   * @note This function is not suitable for use on platforms which enforce restrictions on
+   * time-consuming or potentially blocking operations on the UI thread (as Android does). On such
+   * platforms, `LoadMapsAsync()` should be used instead.
+   */
   void LoadMapsSync();
+
+  /**
+   * @brief Loads maps asynchronously.
+   *
+   * Maps are loaded on a new thread. Some operations are executed as part of a separate task which
+   * is posted to the GUI thread.
+   *
+   * This function also performs certain initialization operations which depend on map data being
+   * available, such as search, traffic and the download queue.
+   *
+   * After finishing initialization, the caller-supplied callback function is called. This function
+   * also runs on the GUI thread and should therefore not perform any time-consuming operations.
+   *
+   * @param callback A callback function to run at the end of initialization.
+   */
   void LoadMapsAsync(std::function<void()> && callback);
 
   /// Registers all local map files in internal indexes.
@@ -399,6 +437,18 @@ public:
   void ClearViewportSearchResults() override;
   // PositionProvider, SearchApi::Delegate and TipsApi::Delegate override.
   std::optional<m2::PointD> GetCurrentPosition() const override;
+
+  /**
+   * @brief Parses a debug command passed to the search interface.
+   *
+   * This is called before passing search input to the actual search function. If a debug command
+   * is recognized, this function will trigger the appropriate action and return `true`. In this case
+   * the caller should not forward the input to the search engine. If no debug command is recognized,
+   * this function will return `false` and the caller should forward the input to the search engine.
+   *
+   * @param params
+   * @return true if search input is a recognized debug command, false if not
+   */
   bool ParseSearchQueryCommand(search::SearchParams const & params) override;
   m2::PointD GetMinDistanceBetweenResults() const override;
 
@@ -472,6 +522,16 @@ private:
 
 private:
   std::vector<m2::TriangleD> GetSelectedFeatureTriangles() const;
+
+  /**
+   * @brief Initializes the traffic manager.
+   *
+   * This enables the traffic manager if defined in settings. If the traffic manager is not in test
+   * mode, all cunfigured sources are also added here.
+   *
+   * Maps must be loaded prior to calling this method.
+   */
+  void InitializeTraffic();
 
 public:
   /// @name GPS location updates routine.
@@ -581,11 +641,18 @@ private:
   std::unique_ptr<descriptions::Loader> m_descriptionsLoader;
 
 public:
-  // Moves viewport to the search result and taps on it.
+  /**
+   * @brief Moves viewport to the search result and taps on it.
+   * @param res
+   * @param animation
+   */
   void SelectSearchResult(search::Result const & res, bool animation);
 
-  // Cancels all searches, stops location follow and then selects
-  // search result.
+  /**
+   * @brief Cancels all searches, stops location follow and then selects search result.
+   * @param res
+   * @param animation
+   */
   void ShowSearchResult(search::Result const & res, bool animation = true);
 
   void UpdateViewport(search::Results const & results);
@@ -818,6 +885,14 @@ public:
   TransitReadManager & GetTransitManager();
   IsolinesManager & GetIsolinesManager();
   IsolinesManager const & GetIsolinesManager() const;
+
+  void SetTrafficHttpEnabled(bool enabled);
+  bool LoadTrafficHttpEnabled();
+  void SaveTrafficHttpEnabled(bool trafficHttpEnabled);
+
+  void SetTrafficHttpUrl(std::string url);
+  std::string LoadTrafficHttpUrl();
+  void SaveTrafficHttpUrl(std::string trafficHttpUrl);
 
   bool LoadTrafficSimplifiedColors();
   void SaveTrafficSimplifiedColors(bool simplified);

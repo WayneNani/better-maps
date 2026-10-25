@@ -28,6 +28,7 @@ data/categories.txt
 
 data/bm.json
 data/edits.xml
+data/traffic.xml
 data/World.mwm
 data/WorldCoasts.mwm
 data/world_mwm/*

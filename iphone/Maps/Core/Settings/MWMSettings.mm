@@ -29,6 +29,64 @@ NSString * const kUDFileLoggingEnabledKey = @"FileLoggingEnabledKey";
 
 @implementation MWMSettings
 
+<<<<<<< HEAD
++ (BOOL)liveTrafficEnabled;
+{
+  return GetFramework().LoadTrafficHttpEnabled();
+}
+
++ (void)setLiveTrafficEnabled:(BOOL)liveTrafficEnabled;
+{
+  auto &f = GetFramework();
+  f.SaveTrafficHttpEnabled(liveTrafficEnabled);
+  f.SetTrafficHttpEnabled(liveTrafficEnabled);
+}
+
++ (NSURL *)liveTrafficUrl;
+{
+  NSString * link = @(GetFramework().LoadTrafficHttpUrl().c_str());
+  if ([link length] == 0) {
+    return nil;
+  } else {
+    return [NSURL URLWithString:link];
+  }
+}
+
++ (void)setLiveTrafficUrl:(NSURL *)liveTrafficUrl;
+{
+  auto &f = GetFramework();
+  if (liveTrafficUrl == nil) {
+    f.SaveTrafficHttpUrl(@"".UTF8String);
+    f.SetTrafficHttpUrl(@"".UTF8String);
+  } else {
+    f.SaveTrafficHttpUrl(liveTrafficUrl.absoluteString.UTF8String);
+    f.SetTrafficHttpUrl(liveTrafficUrl.absoluteString.UTF8String);
+  }
+}
+
++ (BOOL)buildings3dViewEnabled;
+{
+  bool _ = true, on = true;
+  GetFramework().Load3dMode(_, on);
+  if (GetFramework().GetPowerManager().GetScheme() == power_management::Scheme::EconomyMaximum) {
+    return false;
+  } else {
+    return on;
+  }
+}
+
++ (void)setBuildings3dViewEnabled:(BOOL)buildings3dViewEnabled;
+{
+  auto &f = GetFramework();
+  bool _ = true, is3dBuildings = true;
+  f.Load3dMode(_, is3dBuildings);
+  is3dBuildings = static_cast<bool>(buildings3dViewEnabled);
+  f.Save3dMode(_, is3dBuildings);
+  f.Allow3dMode(_, is3dBuildings);
+}
+
+=======
+>>>>>>> d348cc62c0ece77a80cb6296b5d563808858f63f
 + (BOOL)perspectiveViewEnabled;
 {
   bool _ = true, on = true;

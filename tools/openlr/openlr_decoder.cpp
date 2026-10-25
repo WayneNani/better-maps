@@ -234,6 +234,7 @@ public:
     m_graph.ResetFakes();
 
     path.m_segmentId.Set(segment.m_segmentId);
+    path.m_messageId = segment.m_messageId;
 
     auto const & points = segment.GetLRPs();
     CHECK_GREATER(points.size(), 1, ("A segment cannot consist of less than two points"));
@@ -322,6 +323,7 @@ public:
     uint32_t constexpr kMaxProjectionCandidates = 5;
 
     path.m_segmentId.Set(segment.m_segmentId);
+    path.m_messageId = segment.m_messageId;
 
     auto const & points = segment.GetLRPs();
     CHECK_GREATER(points.size(), 1, ("A segment cannot consist of less than two points"));
@@ -432,9 +434,9 @@ bool OpenLRDecoder::SegmentsFilter::Matches(LinearSegment const & segment) const
 }
 
 // OpenLRDecoder -----------------------------------------------------------------------------
-OpenLRDecoder::OpenLRDecoder(vector<FrozenDataSource> & dataSources,
+OpenLRDecoder::OpenLRDecoder(DataSource & dataSource,
                              CountryParentNameGetter const & countryParentNameGetter)
-  : m_dataSources(dataSources)
+  : m_dataSource(dataSource)
   , m_countryParentNameGetter(countryParentNameGetter)
 {}
 
@@ -483,9 +485,9 @@ void OpenLRDecoder::Decode(vector<LinearSegment> const & segments, uint32_t cons
   vector<Stats> stats(numThreads);
   vector<thread> workers;
   for (size_t i = 1; i < numThreads; ++i)
-    workers.emplace_back(worker, i, ref(m_dataSources[i]), ref(stats[i]));
+    workers.emplace_back(worker, i, ref(m_dataSource), ref(stats[i]));
 
-  worker(0 /* threadNum */, m_dataSources[0], stats[0]);
+  worker(0 /* threadNum */, m_dataSource, stats[0]);
   for (auto & worker : workers)
     worker.join();
 

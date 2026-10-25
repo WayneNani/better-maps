@@ -110,8 +110,6 @@ auto constexpr TMP_OFFSETS_EXT = OFFSET_EXT EXTENSION_TMP;
 #define CROSS_MWM_OSM_WAYS_DIR "cross_mwm_osm_ways"
 #define TEMP_ADDR_EXTENSION ".tempaddr"
 
-#define TRAFFIC_FILE_EXTENSION ".traffic"
-
 #define SKIPPED_ELEMENTS_FILE "skipped_elements.json"
 
 #define MAPCSS_MAPPING_FILE "mapcss-mapping.csv"

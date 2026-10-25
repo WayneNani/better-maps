@@ -217,6 +217,8 @@
     <string name="prefs_group_information">Information</string>
     <string name="prefs_group_route">Navigation</string>
     <string name="prefs_group_route_summary">Units, voice instructions, routing options</string>
+    <string name="prefs_group_traffic">Traffic</string>
+    <string name="prefs_group_traffic_summary">Live traffic information</string>
     <string name="pref_zoom_title">Zoom buttons</string>
     <string name="pref_zoom_summary">Display on the map</string>
     <!-- Settings advanced group in settings screen -->
@@ -840,6 +842,24 @@
     <string name="change_map_locale">Map language</string>
     <!-- Current language of the app -->
     <string name="change_app_locale">App language</string>
+    <!-- Enable live traffic data via HTTP (title) -->
+    <string name="traffic_http_enabled">Enable live traffic data</string>
+    <!-- Enable live traffic data via HTTP (description) -->
+    <string name="traffic_http_enabled_description">When enabled, the app will periodically retrieve traffic information from the configured URL.</string>
+    <!-- URL for live traffic data -->
+    <string name="traffic_http_url">Traffic service URL</string>
+    <!-- Status message indicating that user did not set a traffic URL yet. -->
+    <string name="traffic_http_url_not_set">Not set</string>
+    <!-- TraFF 0.8 apps from which to receive data (title) -->
+    <string name="traffic_apps">Use data from TraFF applications</string>
+    <!-- Status message indicating that no TraFF 0.8 apps are installed -->
+    <string name="traffic_apps_not_available">No apps installed</string>
+    <!-- Status message indicating that no TraFF 0.8 apps are currently selected -->
+    <string name="traffic_apps_none_selected">No apps selected</string>
+    <!-- Enable traffic data from TraFF 0.7 apps (title) -->
+    <string name="traffic_legacy_enabled">Use data from legacy TraFF applications</string>
+    <!-- Enable traffic data from TraFF 0.7 apps (description) -->
+    <string name="traffic_legacy_enabled_description">When enabled, the app will receive and process traffic data from legacy TraFF applications.</string>
     <!-- Local language -->
     <string name="pref_maplanguage_local">Local Language</string>
     <!-- OpenStreetMap text on splash screen -->

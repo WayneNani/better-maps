@@ -83,6 +83,7 @@ target_link_libraries(${PROJECT_NAME}
     routing
     search
     storage
+    traffxml
   PRIVATE
     coding
     editor

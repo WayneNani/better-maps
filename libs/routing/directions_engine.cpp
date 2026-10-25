@@ -100,6 +100,7 @@ void DirectionsEngine::LoadPathAttributes(FeatureID const & featureId, LoadedPat
 
   pathSegment.m_roadNameInfo.m_mwmId = ft->GetID();
   pathSegment.m_roadNameInfo.m_isLink = pathSegment.m_isLink;
+  pathSegment.m_roadNameInfo.m_onRoundabout = pathSegment.m_onRoundabout;
   pathSegment.m_roadNameInfo.m_highwayClass = pathSegment.m_highwayClass;
   pathSegment.m_roadNameInfo.m_junction_ref = ft->GetMetadata(feature::Metadata::FMD_JUNCTION_REF);
   pathSegment.m_roadNameInfo.m_destination_ref = ft->GetMetadata(feature::Metadata::FMD_DESTINATION_REF);

@@ -147,10 +147,10 @@ unique_ptr<DirectionsEngine> CreateDirectionsEngine(VehicleType vehicleType, sha
   UNREACHABLE();
 }
 
-shared_ptr<TrafficStash> CreateTrafficStash(VehicleType, shared_ptr<NumMwmIds>, traffic::TrafficCache const &)
+shared_ptr<TrafficStash> CreateTrafficStash(VehicleType vehicleType, shared_ptr<NumMwmIds> numMwmIds,
+                                            traffic::TrafficCache const & trafficCache)
 {
-  return nullptr;
-  // return (vehicleType == VehicleType::Car ? make_shared<TrafficStash>(trafficCache, numMwmIds) : nullptr);
+  return (vehicleType == VehicleType::Car ? make_shared<TrafficStash>(trafficCache, numMwmIds) : nullptr);
 }
 
 void PushPassedSubroutes(Checkpoints const & checkpoints, vector<Route::SubrouteAttrs> & subroutes)
@@ -286,6 +286,37 @@ IndexRouter::IndexRouter(VehicleType vehicleType, bool loadAltitudes,
   CHECK(m_directionsEngine, ());
 }
 
+IndexRouter::IndexRouter(VehicleType vehicleType, bool loadAltitudes,
+                         CountryParentNameGetterFn const & countryParentNameGetterFn,
+                         TCountryFileFn const & countryFileFn, CountryRectFn const & countryRectFn,
+                         shared_ptr<NumMwmIds> numMwmIds, unique_ptr<m4::Tree<NumMwmId>> numMwmTree,
+                         std::shared_ptr<EdgeEstimator> estimator, DataSource & dataSource)
+  : m_vehicleType(vehicleType)
+  , m_loadAltitudes(loadAltitudes)
+  , m_name("astar-bidirectional-" + ToString(m_vehicleType))
+  , m_dataSource(dataSource, numMwmIds)
+  , m_vehicleModelFactory(CreateVehicleModelFactory(m_vehicleType, countryParentNameGetterFn))
+  , m_countryFileFn(countryFileFn)
+  , m_countryRectFn(countryRectFn)
+  , m_numMwmIds(std::move(numMwmIds))
+  , m_numMwmTree(std::move(numMwmTree))
+  , m_trafficStash(nullptr)
+  , m_roadGraph(m_dataSource,
+                vehicleType == VehicleType::Pedestrian || vehicleType == VehicleType::Transit
+                    ? IRoadGraph::Mode::IgnoreOnewayTag
+                    : IRoadGraph::Mode::ObeyOnewayTag,
+                m_vehicleModelFactory)
+  , m_estimator(estimator)
+  , m_directionsEngine(CreateDirectionsEngine(m_vehicleType, m_numMwmIds, m_dataSource))
+  , m_countryParentNameGetterFn(countryParentNameGetterFn)
+{
+  CHECK(!m_name.empty(), ());
+  CHECK(m_numMwmIds, ());
+  CHECK(m_numMwmTree, ());
+  CHECK(m_estimator, ());
+  CHECK(m_directionsEngine, ());
+}
+
 IndexRouter::~IndexRouter() = default;
 
 unique_ptr<WorldGraph> IndexRouter::MakeSingleMwmWorldGraph()
@@ -308,8 +339,9 @@ bool IndexRouter::FindClosestProjectionToRoad(m2::PointD const & point, m2::Poin
   auto const rect = mercator::RectByCenterXYAndSizeInMeters(point, radius);
   std::vector<EdgeProjectionT> candidates;
 
+  // TODO should we increase the count in decoding mode?
   uint32_t const count = direction.IsAlmostZero() ? 1 : 4;
-  m_roadGraph.FindClosestEdges(rect, count, candidates);
+  m_roadGraph.FindClosestEdges(rect, count, candidates, IsSnapToEndsActive());
 
   if (candidates.empty())
     return false;
@@ -542,7 +574,7 @@ RouterResultCode IndexRouter::DoCalculateRoute(Checkpoints const & checkpoints, 
       guidesMwmId = m_numMwmIds->GetId(country);
   }
 
-  if (!route.GetAbsentCountries().empty())
+  if ((GetMode() == Mode::Navigation) && !route.GetAbsentCountries().empty())
     return RouterResultCode::NeedMoreMaps;
 
   TrafficStash::Guard guard(m_trafficStash);
@@ -1086,10 +1118,15 @@ RouterResultCode IndexRouter::AdjustRoute(Checkpoints const & checkpoints, m2::P
   return RouterResultCode::NoError;
 }
 
+RoutingOptions IndexRouter::GetRoutingOptions()
+{
+  return RoutingOptions::LoadOptionsFromSettings(m_vehicleType);
+}
+
 unique_ptr<WorldGraph> IndexRouter::MakeWorldGraph()
 {
   // Use saved routing options for all types (car, bicycle, pedestrian).
-  RoutingOptions const routingOptions = RoutingOptions::LoadOptionsFromSettings(m_vehicleType);
+  RoutingOptions const routingOptions = GetRoutingOptions();
   /// @DebugNote
   // Add avoid roads here for debug purpose.
   // routingOptions.Add(RoutingOptions::Option::Motorway);
@@ -1136,10 +1173,10 @@ int IndexRouter::PointsOnEdgesSnapping::Snap(m2::PointD const & start, m2::Point
 
   // One of startEnding or finishEnding will be empty here.
   if (startEnding.m_projections.empty())
-    startEnding = MakeFakeEnding(m_startSegments, start, m_graph);
+    startEnding = MakeFakeEnding(m_startSegments, start, m_graph, m_router.IsSnapToEndsActive());
 
   if (finishEnding.m_projections.empty())
-    finishEnding = MakeFakeEnding(finishSegments, finish, m_graph);
+    finishEnding = MakeFakeEnding(finishSegments, finish, m_graph, m_router.IsSnapToEndsActive());
 
   return 0;
 }
@@ -1221,12 +1258,11 @@ bool IndexRouter::PointsOnEdgesSnapping::IsFencedOff(m2::PointD const & point, E
   return false;
 }
 
-// static
 void IndexRouter::PointsOnEdgesSnapping::RoadsToNearestEdges(m2::PointD const & point, vector<RoadInfoT> const & roads,
                                                              IsEdgeProjGood const & isGood,
                                                              vector<EdgeProjectionT> & edgeProj)
 {
-  NearestEdgeFinder finder(point, isGood);
+  NearestEdgeFinder finder(point, isGood, m_router.IsSnapToEndsActive());
   for (auto const & road : roads)
     finder.AddInformationSource(road);
 
@@ -1350,7 +1386,7 @@ bool IndexRouter::PointsOnEdgesSnapping::FindBestEdges(m2::PointD const & checkp
     }
 
     // Removing all candidates which are fenced off by the road graph (|closestRoads|) from |checkpoint|.
-    return !IsFencedOff(checkpoint, edgeProj, closestRoads);
+    return (m_router.GetMode() == Mode::Decoding) || !IsFencedOff(checkpoint, edgeProj, closestRoads);
   };
 
   // Getting closest edges from |closestRoads| if they are correct according to isGood() function.
@@ -1715,7 +1751,7 @@ RouterResultCode IndexRouter::RedressRoute(vector<Segment> const & segments, bas
           routeSegment.SetSpeedCameraInfo(worldGraph.GetSpeedCamInfo(segment));
 
         if (m_trafficStash)
-          routeSegment.SetTraffic(m_trafficStash->GetSpeedGroup(segment));
+          routeSegment.SetTraffic(m_trafficStash->GetSpeedGroup(segment, routeSegment.GetTimeFromBeginningSec()));
 
         routeSegment.SetSpeedLimit(worldGraph.GetSpeedLimit(segment));
       }

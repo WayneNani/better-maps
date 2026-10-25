@@ -21,6 +21,9 @@ AbsentRegionsFinder::AbsentRegionsFinder(CountryFileGetterFn const & countryFile
 
 void AbsentRegionsFinder::GenerateAbsentRegions(Checkpoints const & checkpoints, RouterDelegate const & delegate)
 {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_regions.clear();
+
   if (m_routerThread)
   {
     m_routerThread->Cancel();
@@ -52,18 +55,22 @@ void AbsentRegionsFinder::GetAbsentRegions(std::set<std::string> & regions)
 
 void AbsentRegionsFinder::GetAllRegions(std::set<std::string> & countries)
 {
-  countries.clear();
+  std::lock_guard<std::mutex> lock(m_mutex);
+  // Note: if called from `RoutingSession` callback, m_state will still have its pre-update value.
+  if (m_routerThread)
+  {
+    m_routerThread->Join();
 
-  if (!m_routerThread)
-    return;
+    for (auto const & mwmName : m_routerThread->GetRoutineAs<RegionsRouter>()->GetMwmNames())
+    {
+      if (!mwmName.empty())
+        m_regions.emplace(mwmName);
+    }
 
-  m_routerThread->Join();
+    m_routerThread.reset();
+  }
 
-  for (auto const & mwmName : m_routerThread->GetRoutineAs<RegionsRouter>()->GetMwmNames())
-    if (!mwmName.empty())
-      countries.emplace(mwmName);
-
-  m_routerThread.reset();
+  countries = m_regions;
 }
 
 bool AbsentRegionsFinder::AreCheckpointsInSameMwm(Checkpoints const & checkpoints) const
