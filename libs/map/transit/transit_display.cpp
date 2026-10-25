@@ -5,6 +5,7 @@
 #include "map/transit/transit_reader.hpp"
 #include "map/user_mark.hpp"
 
+#include "drape_frontend/apply_feature_functors.hpp"
 #include "drape_frontend/route_renderer.hpp"
 #include "drape_frontend/shape_view_params.hpp"
 #include "drape_frontend/user_marks_provider.hpp"
@@ -20,13 +21,16 @@
 #include "routing/routing_session.hpp"
 #include "routing/segment.hpp"
 
+#include "geometry/mercator.hpp"
 #include "geometry/point_with_altitude.hpp"
 
 #include "base/assert.hpp"
 #include "base/logging.hpp"
 #include "base/strings_bundle.hpp"
 
+#include <limits>
 #include <memory>
+#include <tuple>
 
 using namespace std;
 
@@ -51,6 +55,8 @@ float constexpr kTransferMarkerScale = 4.0f;
 float constexpr kGateBgScale = 1.2f;
 
 int constexpr kSmallIconZoom = 1;
+// Mercator distance below which two points of consecutive legs are considered the same.
+double constexpr kSamePointEps = 1e-7;
 int constexpr kMediumIconZoom = 10;
 
 int constexpr kMinStopTitleZoom = 13;
@@ -229,6 +235,36 @@ void AddTransitShapes(::transit::ShapeLink shapeLink, TransitShapesInfoPT const 
 
   style.m_endIndex = subroute.m_polyline.GetSize() - 1;
   subroute.AddStyle(style);
+}
+
+df::ColorConstant GetNearestTransitColorName(uint32_t rgb)
+{
+  auto const toRgb = [](dp::Color const & c)
+  { return std::tuple<double, double, double>(c.GetRed(), c.GetGreen(), c.GetBlue()); };
+  // The top byte of a Drape color value is the inverted alpha.
+  auto const [r1, g1, b1] = toRgb(df::ToDrapeColor(rgb & 0xFFFFFF));
+
+  df::ColorConstant nearest = df::GetTransitColorName("default");
+  double minDist = std::numeric_limits<double>::max();
+  for (auto const & [name, color] : df::GetTransitClearColors())
+  {
+    // Only line colors, not text colors.
+    if (name.find(df::kTransitTextPrefix) != std::string::npos)
+      continue;
+    auto const [r2, g2, b2] = toRgb(color);
+    // "Redmean" color distance, see https://en.wikipedia.org/wiki/Color_difference.
+    double const redMean = (r1 + r2) / 2.0;
+    double const dr = r1 - r2;
+    double const dg = g1 - g2;
+    double const db = b1 - b2;
+    double const dist = (2.0 + redMean / 256.0) * dr * dr + 4.0 * dg * dg + (2.0 + (255.0 - redMean) / 256.0) * db * db;
+    if (dist < minDist)
+    {
+      minDist = dist;
+      nearest = name;
+    }
+  }
+  return nearest;
 }
 
 TransitRouteDisplay::TransitRouteDisplay(TransitReadManager & transitReadManager, GetMwmIdFn const & getMwmIdFn,
@@ -675,6 +711,110 @@ bool TransitRouteDisplay::ProcessSubroute(vector<routing::RouteSegment> const & 
     LOG(LWARNING, ("Invalid subroute. Points number =", subroute.m_polyline.GetSize()));
 
   return isValidSubroute;
+}
+
+bool TransitRouteDisplay::ProcessExternalLegs(vector<ExternalTransitLeg> const & legs, df::Subroute & subroute)
+{
+  subroute.m_maxPixelWidth = m_maxSubrouteWidth;
+  subroute.m_styleType = df::SubrouteStyleType::Multiple;
+  subroute.m_style.clear();
+  subroute.m_polyline = m2::PolylineD();
+
+  double distance = 0.0;
+  auto const addPoint = [&subroute, &distance](m2::PointD const & pt)
+  {
+    if (subroute.m_polyline.GetSize() > 0)
+      distance += mercator::DistanceOnEarth(subroute.m_polyline.Back(), pt);
+    subroute.m_polyline.Add(pt);
+  };
+
+  for (size_t i = 0; i < legs.size(); ++i)
+  {
+    auto const & leg = legs[i];
+    if (leg.m_points.empty())
+      continue;
+
+    if (subroute.m_polyline.GetSize() == 0)
+      addPoint(leg.m_points.front());
+    else if (!subroute.m_polyline.Back().EqualDxDy(leg.m_points.front(), kSamePointEps))
+    {
+      // Close gaps between legs (e.g. a stop position and the start of the next shape) with a short walk.
+      df::SubrouteStyle style(df::kRoutePedestrian, df::RoutePattern(4.0, 2.0));
+      style.m_startIndex = subroute.m_polyline.GetSize() - 1;
+      addPoint(leg.m_points.front());
+      style.m_endIndex = subroute.m_polyline.GetSize() - 1;
+      subroute.AddStyle(style);
+    }
+
+    bool const isWalk = leg.m_type == TransitType::Pedestrian;
+    df::ColorConstant const color = isWalk         ? df::ColorConstant(df::kRoutePedestrian)
+                                  : leg.m_hasColor ? GetNearestTransitColorName(leg.m_colorRgb)
+                                                   : df::GetTransitColorName("default");
+
+    if (!isWalk)
+    {
+      df::SubrouteMarker marker;
+      marker.m_position = leg.m_points.front();
+      marker.m_distance = distance;
+      marker.m_scale = kStopMarkerScale;
+      marker.m_innerColor = color;
+      marker.m_colors.push_back(color);
+      subroute.m_markers.push_back(marker);
+
+      TransitMarkInfo markInfo;
+      markInfo.m_type = TransitMarkInfo::Type::KeyStop;
+      markInfo.m_point = leg.m_points.front();
+      auto const symbolIt = kTransitSymbols.find(leg.m_type);
+      markInfo.m_symbolName =
+          symbolIt != kTransitSymbols.end() ? symbolIt->second : kTransitSymbols.at(TransitType::Bus);
+      markInfo.m_color = color;
+      if (!leg.m_fromName.empty())
+        markInfo.m_titles.emplace_back(leg.m_fromName, df::GetTransitTextColorName("default"));
+      m_transitMarks.push_back(std::move(markInfo));
+    }
+
+    df::SubrouteStyle style =
+        isWalk ? df::SubrouteStyle(df::kRoutePedestrian, df::RoutePattern(4.0, 2.0)) : df::SubrouteStyle(color);
+    style.m_startIndex = subroute.m_polyline.GetSize() - 1;
+    for (size_t p = 1; p < leg.m_points.size(); ++p)
+      addPoint(leg.m_points[p]);
+    // A leg needs at least one segment to be drawn.
+    if (subroute.m_polyline.GetSize() - 1 > style.m_startIndex)
+    {
+      style.m_endIndex = subroute.m_polyline.GetSize() - 1;
+      subroute.AddStyle(style);
+    }
+
+    if (!isWalk)
+    {
+      df::SubrouteMarker marker;
+      marker.m_position = leg.m_points.back();
+      marker.m_distance = distance;
+      marker.m_scale = kStopMarkerScale;
+      marker.m_innerColor = color;
+      marker.m_colors.push_back(color);
+      subroute.m_markers.push_back(marker);
+
+      // The next vehicle's stop mark shows the transfer, so only the final stop gets a mark here.
+      bool hasLaterTransit = false;
+      for (size_t j = i + 1; j < legs.size() && !hasLaterTransit; ++j)
+        hasLaterTransit = legs[j].m_type != TransitType::Pedestrian && !legs[j].m_points.empty();
+      if (!hasLaterTransit)
+      {
+        TransitMarkInfo markInfo;
+        markInfo.m_type = TransitMarkInfo::Type::Stop;
+        markInfo.m_point = leg.m_points.back();
+        if (!leg.m_toName.empty())
+          markInfo.m_titles.emplace_back(leg.m_toName, df::GetTransitTextColorName("default"));
+        m_transitMarks.push_back(std::move(markInfo));
+      }
+    }
+  }
+
+  bool const isValid = subroute.m_polyline.GetSize() > 1 && !subroute.m_style.empty();
+  if (!isValid)
+    LOG(LWARNING, ("Invalid external transit route. Points number =", subroute.m_polyline.GetSize()));
+  return isValid;
 }
 
 template <class T>

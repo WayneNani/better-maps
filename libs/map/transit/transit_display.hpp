@@ -121,6 +121,23 @@ struct TransitMarkInfo
   FeatureID m_featureId;
 };
 
+// A leg of a public transport itinerary computed outside of the app's own router, e.g. by an online service.
+struct ExternalTransitLeg
+{
+  // TransitType::Pedestrian for walking, otherwise the vehicle type.
+  TransitType m_type = TransitType::Pedestrian;
+  // Geometry in Mercator.
+  std::vector<m2::PointD> m_points;
+  // Line color as 0xRRGGBB; m_hasColor is false if the operator publishes none.
+  uint32_t m_colorRgb = 0;
+  bool m_hasColor = false;
+  std::string m_fromName;
+  std::string m_toName;
+};
+
+// Name of the transit palette color nearest to |rgb| (0xRRGGBB), for lines with arbitrary colors.
+df::ColorConstant GetNearestTransitColorName(uint32_t rgb);
+
 struct SubrouteParams
 {
   df::ColorConstant m_lastColor;
@@ -155,6 +172,8 @@ public:
                       std::map<std::string, m2::PointF> const & transitSymbolSizes);
 
   bool ProcessSubroute(std::vector<routing::RouteSegment> const & segments, df::Subroute & subroute);
+  // Fills |subroute| (line colors, dashed walks, stop markers) and the stop marks from external legs.
+  bool ProcessExternalLegs(std::vector<ExternalTransitLeg> const & legs, df::Subroute & subroute);
   void CreateTransitMarks();
 
   TransitRouteInfo const & GetRouteInfo();

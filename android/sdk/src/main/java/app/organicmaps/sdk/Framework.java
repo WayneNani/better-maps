@@ -211,6 +211,20 @@ public class Framework
 
   public static native void nativeRemoveRoute();
 
+  /**
+   * Draws a public transport itinerary computed outside of the built-in router (e.g. online) like a transit
+   * route. All arrays have one entry per leg. Removed by {@link #nativeRemoveRoute()}.
+   *
+   * @param types {@code TransitType} values of the core (1 = walking, 2 = subway, 3 = train, ..., see
+   *        {@code libs/map/transit/transit_display.hpp}).
+   * @param colors line colors as 0xRRGGBB, -1 for none.
+   * @param polylines per leg the interleaved coordinates {lat0, lon0, lat1, lon1, ...}.
+   * @return false if nothing could be drawn.
+   */
+  public static native boolean nativeShowExternalTransitRoute(@NonNull int[] types, @NonNull int[] colors,
+                                                              @NonNull double[][] polylines,
+                                                              @NonNull String[] fromNames, @NonNull String[] toNames);
+
   public static native void nativeFollowRoute();
 
   public static native void nativeDisableFollowing();

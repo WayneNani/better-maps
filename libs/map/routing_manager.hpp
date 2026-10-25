@@ -254,6 +254,12 @@ public:
   void SetRouterImpl(routing::RouterType type);
   void RemoveRoute(bool deactivateFollowing);
 
+  /// Draws a public transport itinerary computed outside of the routing session (e.g. by an online service)
+  /// like a transit route: lines in their colors, dashed walks and stop marks. Replaces the current route
+  /// drawing; RemoveRoute() removes it. The routing session is not changed, so it cannot be followed.
+  /// @return false if the legs have no geometry.
+  bool ShowExternalTransitRoute(std::vector<ExternalTransitLeg> const & legs);
+
   void CheckLocationForRouting(location::GpsInfo const & info);
   void CallRouteBuilded(routing::RouterResultCode code, storage::CountriesSet const & absentCountries);
   void OnBuildRouteReady(routing::Route const & route, routing::RouterResultCode code);
