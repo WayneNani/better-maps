@@ -232,6 +232,35 @@ Der Projektinhaber hat die Koordination delegiert. Getroffene Entscheidungen:
 5. **Welle 3 automatisch:** AP5b und AP2c werden umgesetzt; AP3d (eigener MOTIS-Server) nur als
    Compose-Datei mit kleinem Testausschnitt; AP4d braucht Hardware und bleibt manuell.
 
+## Umsetzungsstand (2026-10-25)
+
+Alle Pakete außer AP3c (DB-Anbieter, zurückgestellt) und AP4d (TMC-Hardwaretest, manuell) sind auf `main`.
+Zusätzlich entstand AP5c: eine Quelle `crowd` im `traff-server`, die die Crowd-Aggregate abholt und benachbarte
+Stau-Kacheln zu einer Meldung zusammenfasst.
+
+| AP | Inhalt | Stand |
+|---|---|---|
+| AP0 | Einrichtung, `bm.sh`, Emulator, `docs/BETTER_MAPS_BUILD.md` | erledigt |
+| AP1 | Filter „Jetzt geöffnet“ (Kern, JNI, Chips) | gemergt |
+| AP2a | ~130 deutsche Such-Synonyme + Test | gemergt („Hauptbahnhof“ in AP2b wieder entfernt) |
+| AP2b | Ranking für Kategorien, Filter aus der Anfrage, Bewertungs-Set Berlin | gemergt |
+| AP2c | Online-Suche (Photon) als Ergänzung, Opt-in | gemergt |
+| AP3a | `transit` auf main, MOTIS v2.11.4 `/api/v6` mit `plan()` | gemergt |
+| AP3b | ÖPNV im Routenplaner, Anbieter-Schicht, Opt-in, Abfahrten in der Ortsansicht | gemergt |
+| AP3c | DB-Anbieter | zurückgestellt |
+| AP3d | Eigener MOTIS-Server (Podman, Profile Berlin/Brandenburg, Echtzeit) | gemergt |
+| AP4a | Upstream-Branch `traffic` + Client-Fixes + E2E-Test | gemergt |
+| AP4b | `traff-server` (Go) mit Autobahn-API | gemergt |
+| AP4c | DATEX-II-Quelle + Dublettenunterdrückung | gemergt |
+| AP4d | TMC über Qz testen | offen (Hardware) |
+| AP5a | Privacy-Design + `crowd-traffic`-Server (OHTTP, RR ε=3, k=10) | gemergt |
+| AP5b | Melde-Client in der App (C++-Kern, Java-OHTTP) | gemergt |
+| AP5c | Crowd-Quelle im `traff-server` | gemergt |
+
+Testlage auf `main` nach dem letzten Merge: 390 JVM-Tests und 4 instrumentierte Tests grün; C++-Tests für
+`crowd_traffic`, `routing`, `traffic`, `traffxml`, `indexer` grün; Such-Tests bis auf 8 bekannte Upstream-Altfehler
+grün; alle Go-Pakete grün; `traffic-e2e.sh` und `crowd-e2e.sh` grün.
+
 ## Nicht im Plan, aber interessant
 
 Vorhandene Branches, die sich später übernehmen lassen: `LMBishop/preview-route-step` (Routenvorschau,
