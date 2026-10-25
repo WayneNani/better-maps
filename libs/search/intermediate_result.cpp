@@ -1,5 +1,7 @@
 #include "search/intermediate_result.hpp"
 
+#include "search/opening_hours_filter.hpp"
+
 #include "storage/country_info_getter.hpp"
 
 #include "indexer/classificator.hpp"
@@ -24,7 +26,6 @@
 
 #include <algorithm>
 
-#include "3party/opening_hours/opening_hours.hpp"
 #include "indexer/reviews_model.hpp"
 
 namespace search
@@ -154,7 +155,8 @@ std::string DebugPrint(PreRankerResult const & r)
 }
 
 // RankerResult ------------------------------------------------------------------------------------
-RankerResult::RankerResult(FeatureType & ft, m2::PointD const & center, string displayName, string const & fileName)
+RankerResult::RankerResult(FeatureType & ft, m2::PointD const & center, string displayName, string const & fileName,
+                           time_t openingHoursTime)
   : m_types(ft)
   , m_str(std::move(displayName))
   , m_id(ft.GetID())
@@ -168,12 +170,12 @@ RankerResult::RankerResult(FeatureType & ft, m2::PointD const & center, string d
 
   m_region.SetParams(fileName, center);
 
-  FillDetails(ft, m_str, m_details);
+  FillDetails(ft, m_str, openingHoursTime, m_details);
 }
 
 RankerResult::RankerResult(FeatureType & ft, std::string const & fileName)
   : RankerResult(ft, feature::GetCenter(ft, FeatureType::WORST_GEOMETRY),
-                 ft.GetTranslatedName().m_primary.value_or(std::string()), fileName)
+                 ft.GetTranslatedName().m_primary.value_or(std::string()), fileName, time(nullptr))
 {}
 
 RankerResult::RankerResult(double lat, double lon)
@@ -249,7 +251,7 @@ bool RankerResult::RegionInfo::GetCountryId(storage::CountryInfoGetter const & i
 }
 
 // Functions ---------------------------------------------------------------------------------------
-void FillDetails(FeatureType & ft, std::string const & name, Result::Details & details)
+void FillDetails(FeatureType & ft, std::string const & name, time_t openingHoursTime, Result::Details & details)
 {
   if (details.m_isInitialized)
     return;
@@ -266,25 +268,14 @@ void FillDetails(FeatureType & ft, std::string const & name, Result::Details & d
   }
 
   /// @todo Avoid temporary string when OpeningHours (boost::spirit) will allow string_view.
-  std::string const openHours(ft.GetMetadata(feature::Metadata::FMD_OPEN_HOURS));
-  if (!openHours.empty())
+  auto const openingHours =
+      GetOpeningHoursStatus(std::string(ft.GetMetadata(feature::Metadata::FMD_OPEN_HOURS)), openingHoursTime);
+  if (openingHours.m_isOpen != osm::Unknown)
   {
-    using namespace osmoh;
-    OpeningHours const oh((std::string(openHours)));
-    if (oh.IsValid())
-    {
-      /// @todo We should check closed/open time for specific feature's timezone.
-      time_t const now = time(nullptr);
-      auto const info = oh.GetInfo(now);
-      if (info.state != RuleState::Unknown)
-      {
-        // In else case value is osm::Unknown, it's set in preview's constructor.
-        details.m_isOpenNow = (info.state == RuleState::Open) ? osm::Yes : osm::No;
-
-        details.m_minutesUntilOpen = (info.nextTimeOpen - now) / 60;
-        details.m_minutesUntilClosed = (info.nextTimeClosed - now) / 60;
-      }
-    }
+    // In else case value is osm::Unknown, it's set in Details' constructor.
+    details.m_isOpenNow = openingHours.m_isOpen;
+    details.m_minutesUntilOpen = static_cast<uint16_t>(openingHours.m_minutesUntilOpen);
+    details.m_minutesUntilClosed = static_cast<uint16_t>(openingHours.m_minutesUntilClosed);
   }
 
   feature::TypesHolder typesHolder(ft);

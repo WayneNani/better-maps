@@ -13,6 +13,7 @@
 #include "geometry/point2d.hpp"
 #include "geometry/rect2d.hpp"
 
+#include <ctime>
 #include <string>
 #include <vector>
 
@@ -111,7 +112,10 @@ public:
   };
 
   /// For Type::Feature and Type::Building.
-  RankerResult(FeatureType & ft, m2::PointD const & center, std::string displayName, std::string const & fileName);
+  /// @param[in] openingHoursTime Moment to evaluate opening hours at, see Result::IsOpenNow().
+  RankerResult(FeatureType & ft, m2::PointD const & center, std::string displayName, std::string const & fileName,
+               time_t openingHoursTime);
+  /// Evaluates opening hours at the current time.
   RankerResult(FeatureType & ft, std::string const & fileName);
 
   /// For Type::LatLon.
@@ -192,5 +196,5 @@ private:
 #endif
 };
 
-void FillDetails(FeatureType & ft, std::string const & name, Result::Details & details);
+void FillDetails(FeatureType & ft, std::string const & name, time_t openingHoursTime, Result::Details & details);
 }  // namespace search

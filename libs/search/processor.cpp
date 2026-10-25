@@ -553,6 +553,10 @@ void Processor::Search(SearchParams params)
 
   m_emitter.Init(std::move(params.m_onResults));
 
+  // Use the same moment for all opening hours checks during this search.
+  if (!params.m_openingHoursTime)
+    params.m_openingHoursTime = time(nullptr);
+
   bool const viewportSearch = params.m_mode == Mode::Viewport;
 
   auto const & viewport = params.m_viewport;
@@ -892,6 +896,9 @@ void Processor::InitPreRanker(Geocoder::Params const & geocoderParams, SearchPar
   params.m_viewportSearch = viewportSearch;
   params.m_categorialRequest = geocoderParams.IsCategorialRequest();
   params.m_numQueryTokens = geocoderParams.GetNumTokens();
+  params.m_openingHoursFilter = searchParams.m_openingHoursFilter;
+  ASSERT(searchParams.m_openingHoursTime, ());
+  params.m_openingHoursTime = *searchParams.m_openingHoursTime;
 
   m_preRanker.Init(params);
 }
@@ -940,6 +947,8 @@ void Processor::InitRanker(Geocoder::Params const & geocoderParams, SearchParams
   params.m_viewportSearch = viewportSearch;
   params.m_viewport = GetViewport();
   params.m_categorialRequest = geocoderParams.IsCategorialRequest();
+  ASSERT(searchParams.m_openingHoursTime, ());
+  params.m_openingHoursTime = *searchParams.m_openingHoursTime;
 
   m_ranker.Init(params, geocoderParams);
 }

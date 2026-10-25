@@ -2,6 +2,7 @@
 
 #include "search/intermediate_result.hpp"
 #include "search/nested_rects_cache.hpp"
+#include "search/opening_hours_filter.hpp"
 #include "search/pre_ranking_info.hpp"
 #include "search/ranker.hpp"
 
@@ -13,6 +14,7 @@
 
 #include "base/macros.hpp"
 
+#include <ctime>
 #include <limits>
 #include <optional>
 #include <set>
@@ -61,6 +63,10 @@ public:
     bool m_categorialRequest = false;
 
     size_t m_numQueryTokens = 0;
+
+    // POIs which don't pass this filter at |m_openingHoursTime| are dropped.
+    OpeningHoursFilter m_openingHoursFilter = OpeningHoursFilter::Off;
+    time_t m_openingHoursTime = 0;
   };
 
   PreRanker(DataSource const & dataSource, Ranker & ranker);
@@ -143,6 +149,7 @@ private:
   void DbgFindAndLog(std::set<uint32_t> const & ids) const;
 
   void FilterForViewportSearch();
+  void FilterByOpeningHours();
   void Filter();
   void FilterRelaxedResults(bool lastUpdate);
 
