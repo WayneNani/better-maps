@@ -7,6 +7,7 @@ set(SRC
   go_vectors.hpp
   protocol_tests.cpp
   randomness_tests.cpp
+  route_follower_tests.cpp
   segmenter_tests.cpp
   test_support.cpp
   test_support.hpp

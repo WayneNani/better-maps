@@ -9,6 +9,8 @@ set(SRC
   protocol.hpp
   randomness.cpp
   randomness.hpp
+  route_follower.cpp
+  route_follower.hpp
   segmenter.cpp
   segmenter.hpp
   tiles.cpp
