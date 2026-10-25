@@ -168,7 +168,7 @@ string Sanitize(string s)
 }
 
 // Writes |top| results of the query as TSV lines:
-// query, position, name, type, address, distance to the user position (m), opening state.
+// query, position, name, type, address, distance to the user position (m), opening state, ranking details.
 void WriteTsv(ostream & os, string const & query, vector<Result> const & results, size_t top,
               optional<m2::PointD> const & position)
 {
@@ -187,7 +187,14 @@ void WriteTsv(ostream & os, string const & query, vector<Result> const & results
 
     os << Sanitize(query) << '\t' << i + 1 << '\t' << Sanitize(r.GetString()) << '\t' << type << '\t'
        << Sanitize(r.GetAddress()) << '\t' << distance << '\t'
-       << (r.GetResultType() == Result::Type::Feature ? OpenStateString(r.IsOpenNow()) : "") << '\n';
+       << (r.GetResultType() == Result::Type::Feature ? OpenStateString(r.IsOpenNow()) : "") << '\t';
+    if (r.GetResultType() == Result::Type::Feature)
+    {
+      auto const & info = r.GetRankingInfo();
+      os << "rank " << info.GetLinearModelRank() << ", popularity " << static_cast<int>(info.m_popularity)
+         << ", pureCats " << info.m_pureCats;
+    }
+    os << '\n';
   }
 }
 
@@ -369,7 +376,7 @@ void RunRequests(TestSearchEngine & engine, m2::RectD const & viewport, string q
   {
     tsv.open(FLAGS_tsv_out);
     CHECK(tsv.is_open(), ("Can't open", FLAGS_tsv_out));
-    tsv << "query\tpos\tname\ttype\taddress\tdistance_m\topen\n";
+    tsv << "query\tpos\tname\ttype\taddress\tdistance_m\topen\tranking\n";
   }
 
   ofstream csv;
