@@ -143,6 +143,7 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.jakarta.annotation.api)
     implementation(libs.google.guava)
+    implementation(libs.bouncycastle.bcprov)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.okhttp.mockwebserver)

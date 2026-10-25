@@ -429,6 +429,31 @@ public final class Config
     nativeSetTrafficHttpUrl(value);
   }
   
+  /**
+   * Settings of the anonymous congestion reports, see app.organicmaps.sdk.crowdtraffic.CrowdTrafficSettings
+   * (stored in the native settings, where the native client reads them).
+   */
+  public static boolean getCrowdTrafficBoolean(@NonNull String key, boolean def)
+  {
+    return getBool(key, def);
+  }
+
+  public static void setCrowdTrafficBoolean(@NonNull String key, boolean value)
+  {
+    setBool(key, value);
+  }
+
+  @NonNull
+  public static String getCrowdTrafficString(@NonNull String key, @NonNull String def)
+  {
+    return getString(key, def);
+  }
+
+  public static void setCrowdTrafficString(@NonNull String key, @NonNull String value)
+  {
+    setString(key, value);
+  }
+
   public static String[] getTrafficApps()
   {
     String appString = getString(KEY_TRAFFIC_APPS, "");

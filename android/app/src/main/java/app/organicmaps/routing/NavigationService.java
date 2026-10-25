@@ -33,6 +33,7 @@ import app.organicmaps.MwmActivity;
 import app.organicmaps.MwmApplication;
 import app.organicmaps.R;
 import app.organicmaps.provider.NavigationContract;
+import app.organicmaps.sdk.crowdtraffic.CrowdTraffic;
 import app.organicmaps.sdk.Framework;
 import app.organicmaps.sdk.location.LocationHelper;
 import app.organicmaps.sdk.location.LocationListener;
@@ -180,6 +181,7 @@ public class NavigationService extends Service implements LocationListener
 
     mNotificationBuilder = null;
     mCarNotificationExtender = null;
+    CrowdTraffic.onNavigationStopped();
     MwmApplication.from(this).getLocationHelper().removeListener(this);
     TtsPlayer.INSTANCE.stop();
 
@@ -255,6 +257,9 @@ public class NavigationService extends Service implements LocationListener
 
     // Restart the location with more frequent refresh interval for navigation.
     locationHelper.restartWithNewMode();
+
+    // Anonymous congestion reports (only if the user opted in).
+    CrowdTraffic.onNavigationStarted();
 
     // Please make this service START_STICKY after fixing the issues at the beginning of the function.
     return START_NOT_STICKY;

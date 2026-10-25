@@ -33,3 +33,7 @@
 -keep class app.organicmaps.sdk.traffxml.SourceImplV0_7 { *; }
 -keep class app.organicmaps.sdk.traffxml.SourceImplV0_8 { *; }
 
+
+# Bouncy Castle (HPKE for the anonymous congestion reports) references JNDI classes that are not
+# available on Android and not used by the lightweight API.
+-dontwarn javax.naming.**
