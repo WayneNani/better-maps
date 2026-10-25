@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import app.organicmaps.sdk.search.OpeningHoursFilter;
+import app.organicmaps.sdk.search.QueryFilter;
 import org.junit.Test;
 
 public class OpeningHoursFilterStateTest
@@ -55,5 +56,28 @@ public class OpeningHoursFilterStateTest
 
     state.setOpenNow(true);
     assertEquals(OpeningHoursFilter.OPEN_NOW_OR_UNKNOWN, state.getFilter());
+  }
+  @Test
+  public void queryFilterTurnsTheChipOn()
+  {
+    final OpeningHoursFilterState state = new OpeningHoursFilterState();
+    final QueryFilter cafeOpen = new QueryFilter(OpeningHoursFilter.OPEN_NOW.toNative(), 0, "Café ");
+    assertFalse(state.isOpenNowChipChecked(null));
+    assertTrue(state.isOpenNowChipChecked(cafeOpen));
+    assertEquals(OpeningHoursFilter.OFF, state.getFilter(null));
+    assertEquals(OpeningHoursFilter.OPEN_NOW, state.getFilter(cafeOpen));
+    // The chip state itself is not changed.
+    assertFalse(state.isOpenNow());
+  }
+
+  @Test
+  public void includeUnknownWorksWithQueryFilter()
+  {
+    final OpeningHoursFilterState state = new OpeningHoursFilterState();
+    final QueryFilter pharmacySunday =
+        new QueryFilter(OpeningHoursFilter.OPEN_NOW.toNative(), 1792929600L, "Apotheke ");
+    state.setIncludeUnknown(true);
+    assertEquals(OpeningHoursFilter.OPEN_NOW_OR_UNKNOWN, state.getFilter(pharmacySunday));
+    assertEquals(OpeningHoursFilter.OFF, state.getFilter(null));
   }
 }

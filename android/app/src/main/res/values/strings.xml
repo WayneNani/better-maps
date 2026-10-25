@@ -983,6 +983,8 @@
     <string name="closed_now">Closed now</string>
     <!-- Search results filter chip, shown when the "Open now" filter is enabled: also show places without known opening hours. -->
     <string name="search_filter_include_unknown_opening_hours">Also without opening hours</string>
+    <!-- Search results filter chip for a day/time from the query, e.g. "Apotheke Sonntag". %s is a weekday and time, e.g. "Sun 12:00". -->
+    <string name="search_filter_open_at">Open %s</string>
     <!-- Used in navigation panel. -->
     <string name="destination">Destination</string>
     <!-- Used in navigation panel. "Stop" as in "Intermediate Stop" -->
