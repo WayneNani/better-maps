@@ -3,7 +3,6 @@ package app.organicmaps.search.online.ui;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
-import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +13,7 @@ import androidx.annotation.StringRes;
 import androidx.recyclerview.widget.RecyclerView;
 import app.organicmaps.R;
 import app.organicmaps.sdk.search.online.OnlineSearchResult;
+import app.organicmaps.sdk.util.StringUtils;
 import app.organicmaps.search.online.OnlineSearchItem;
 import app.organicmaps.search.online.OnlineSearchRows;
 import app.organicmaps.search.online.OnlineSearchState;
@@ -252,7 +252,7 @@ public class OnlineSearchAdapter extends RecyclerView.Adapter<OnlineSearchAdapte
       {
         mDownload.setText(region.getSizeBytes() > 0
                               ? context.getString(R.string.online_search_download, region.getName(),
-                                                  Formatter.formatShortFileSize(context, region.getSizeBytes()))
+                                                  StringUtils.getFileSizeString(context, region.getSizeBytes()))
                               : context.getString(R.string.online_search_download_no_size, region.getName()));
         UiUtils.show(mDownload);
       }
