@@ -19,3 +19,5 @@ target_link_libraries(${PROJECT_NAME}
   pugixml
   coding
 )
+
+omim_add_test_subdirectory(traffxml_tests)
