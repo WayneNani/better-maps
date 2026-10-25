@@ -222,7 +222,12 @@ DecoderModel::DecoderModel(VehicleModel::LimitsInitList const & roadLimits)
 
 SpeedKMpH DecoderModel::GetSpeed(FeatureTypes const & types, SpeedParams const & speedParams) const
 {
-  return GetTypeSpeedImpl(types, speedParams, true /* isCar */);
+  /*
+   * Decoder weights are distance-based, so we always use the (uniform) speeds of this model.
+   * With `isCar == true`, maxspeed tags and MWM default speeds would be used instead, which exceed
+   * `m_maxModelSpeed` and trigger an assertion in debug builds.
+   */
+  return GetTypeSpeedImpl(types, speedParams, false /* isCar */);
 }
 
 SpeedKMpH const & DecoderModel::GetOffroadSpeed() const
