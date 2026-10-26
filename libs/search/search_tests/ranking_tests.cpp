@@ -114,11 +114,11 @@ namespace
 {
 ErrorsMade GetErrorsMade(QueryParams::Token const & token, strings::UniString const & text)
 {
-  return search::impl::GetErrorsMade(token, text, search::BuildLevenshteinDFA(text));
+  return search::impl::GetErrorsMade(token, text, search::BuildLevenshteinMatcher(text));
 }
 ErrorsMade GetPrefixErrorsMade(QueryParams::Token const & token, strings::UniString const & text)
 {
-  return search::impl::GetPrefixErrorsMade(token, text, search::BuildLevenshteinDFA(text));
+  return search::impl::GetPrefixErrorsMade(token, text, search::BuildLevenshteinMatcher(text));
 }
 }  // namespace
 

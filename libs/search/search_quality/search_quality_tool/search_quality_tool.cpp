@@ -42,6 +42,7 @@
 #include <optional>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include <gflags/gflags.h>
@@ -68,6 +69,10 @@ DEFINE_bool(prefix_free, true, "Append a space to every query, so the last token
 DEFINE_bool(detect_query_filters, false, "Recognize filter words in queries like the app does (\"Café offen\")");
 DEFINE_string(tsv_out, "", "File the top results are written to as TSV (query, position, name, type, ...)");
 DEFINE_int32(max_results, 0, "Maximum number of results of a query (the app's default when 0)");
+DEFINE_double(timeout, 0, "Search timeout in seconds (the app's default when 0)");
+DEFINE_int32(typing_interval_ms, 0,
+             "Type every query like in the app: search for each prefix after this interval, cancelling the search for "
+             "the previous prefix. The times are then measured from the last keystroke.");
 DEFINE_bool(tsv_debug, false, "Write the full ranking info (parse, name score, distance to pivot) to the TSV output");
 
 string const kDefaultQueriesPathSuffix = "/../search/search_quality/search_quality_tool/queries.txt";
@@ -250,11 +255,13 @@ void WriteTsv(ostream & os, DataSource const & dataSource, string const & query,
 // If n == 1, prints the query and the top result separated by a tab.
 // Otherwise, prints the query on a separate line
 // and then prints n top results on n lines starting with tabs.
-void PrintTopResults(string const & query, vector<Result> const & results, size_t n, double elapsedSeconds)
+void PrintTopResults(string const & query, vector<Result> const & results, size_t n, double elapsedSeconds,
+                     double firstResultsSeconds, double cpuSeconds)
 {
   cout << query;
   char timeBuf[100];
-  snprintf(timeBuf, sizeof(timeBuf), "\t[%.3fs]", elapsedSeconds);
+  snprintf(timeBuf, sizeof(timeBuf), "\t[%.3fs, first results %.3fs, cpu %.3fs]", elapsedSeconds, firstResultsSeconds,
+           cpuSeconds);
   if (n > 1)
     cout << timeBuf;
   for (size_t i = 0; i < n; ++i)
@@ -418,6 +425,8 @@ void RunRequests(DataSource const & dataSource, TestSearchEngine & engine, m2::R
     if (FLAGS_max_results > 0)
       params.m_maxNumResults = static_cast<size_t>(FLAGS_max_results);
     params.m_detectQueryFilters = FLAGS_detect_query_filters;
+    if (FLAGS_timeout > 0)
+      params.m_timeout = duration_cast<SearchParams::TimeDurationT>(duration<double>(FLAGS_timeout));
     if (FLAGS_opening_hours_time != 0)
       params.m_openingHoursTime = static_cast<time_t>(FLAGS_opening_hours_time);
     requests.emplace_back(make_unique<TestSearchRequest>(engine, params));
@@ -449,12 +458,44 @@ void RunRequests(DataSource const & dataSource, TestSearchEngine & engine, m2::R
   }
 
   vector<double> responseTimes(queries.size());
+  vector<double> firstResultsTimes(queries.size());
+  vector<double> cpuTimes(queries.size());
   for (size_t i = 0; i < queries.size(); ++i)
   {
-    requests[i]->Run();
-    auto rt = duration_cast<milliseconds>(requests[i]->ResponseTime()).count();
+    TestSearchRequest::TimeDurationT queueTime{};
+    if (FLAGS_typing_interval_ms > 0)
+    {
+      // Like the app: a search for every keystroke, which cancels the search for the previous one.
+      auto const query = strings::MakeUniString(queries[i]);
+      vector<unique_ptr<TestSearchRequest>> prefixRequests;
+      for (size_t length = 1; length < query.size(); ++length)
+      {
+        SearchParams params = requests[i]->Params();
+        params.m_query = MakePrefixFree(strings::ToUtf8(strings::UniString(query.begin(), query.begin() + length)));
+        if (!prefixRequests.empty())
+          prefixRequests.back()->Cancel();
+        prefixRequests.push_back(make_unique<TestSearchRequest>(engine, params));
+        prefixRequests.back()->Start();
+        this_thread::sleep_for(milliseconds(FLAGS_typing_interval_ms));
+      }
+      if (!prefixRequests.empty())
+        prefixRequests.back()->Cancel();
+      requests[i]->Run();
+      for (auto & request : prefixRequests)
+        request->Wait();
+      queueTime = requests[i]->QueueTime();
+    }
+    else
+    {
+      requests[i]->Run();
+    }
+    auto rt = duration_cast<milliseconds>(queueTime + requests[i]->ResponseTime()).count();
     responseTimes[i] = static_cast<double>(rt) / 1000;
-    PrintTopResults(MakePrefixFree(queries[i]), requests[i]->Results(), top, responseTimes[i]);
+    auto const ft = duration_cast<milliseconds>(queueTime + requests[i]->FirstResultsTime()).count();
+    firstResultsTimes[i] = static_cast<double>(ft) / 1000;
+    cpuTimes[i] = static_cast<double>(duration_cast<milliseconds>(requests[i]->CpuTime()).count()) / 1000;
+    PrintTopResults(MakePrefixFree(queries[i]), requests[i]->Results(), top, responseTimes[i], firstResultsTimes[i],
+                    cpuTimes[i]);
     if (tsv.is_open())
       WriteTsv(tsv, dataSource, queries[i], requests[i]->Results(), top, ParsePosition(FLAGS_position));
 
@@ -479,6 +520,9 @@ void RunRequests(DataSource const & dataSource, TestSearchEngine & engine, m2::R
   cout << "Maximum response time: " << maxTime << "s" << endl;
   cout << "Average response time: " << averageTime << "s"
        << " (std. dev. " << stdDevTime << "s)" << endl;
+  cout << "Total response time: " << accumulate(responseTimes.begin(), responseTimes.end(), 0.0)
+       << "s, until first results: " << accumulate(firstResultsTimes.begin(), firstResultsTimes.end(), 0.0)
+       << "s, cpu: " << accumulate(cpuTimes.begin(), cpuTimes.end(), 0.0) << "s" << endl;
 }
 
 int main(int argc, char * argv[])

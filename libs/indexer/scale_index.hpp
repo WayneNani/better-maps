@@ -47,6 +47,21 @@ public:
         m_IndexForScale[i]->ForEach(fn, beg, end);
   }
 
+  // ForEachInIntervalAndScale() reads the buckets [0, GetNumBuckets(scale)), one after the other.
+  size_t GetNumBuckets(int scale) const
+  {
+    auto const scaleBucket = BucketByScale(scale);
+    return scaleBucket < m_IndexForScale.size() ? scaleBucket + 1 : 0;
+  }
+
+  // Calls |fn(key, value)| for the keys in the sorted, not overlapping |intervals| ([beg, end) pairs) in |bucket|, in
+  // the order of keys.
+  template <class Intervals, class FnT>
+  void ForEachInIntervalsAndBucket(Intervals const & intervals, size_t bucket, FnT && fn) const
+  {
+    m_IndexForScale[bucket]->ForEachInIntervals(fn, intervals);
+  }
+
 private:
   using IndexT = IntervalIndex<Reader, uint32_t>;
   std::vector<std::unique_ptr<IndexT>> m_IndexForScale;

@@ -71,12 +71,13 @@ string DebugPrint(ErrorsMade const & errorsMade)
 
 namespace impl
 {
-ErrorsMade GetErrorsMade(QueryParams::Token const & token, strings::UniString const & text, LevenshteinDFA const & dfa)
+ErrorsMade GetErrorsMade(QueryParams::Token const & token, strings::UniString const & text,
+                         LevenshteinMatcher const & matcher)
 {
   if (token.AnyOfSynonyms([&text](strings::UniString const & s) { return text == s; }))
     return ErrorsMade(0);
 
-  auto it = dfa.Begin();
+  auto it = matcher.Begin();
   strings::DFAMove(it, token.GetOriginal().begin(), token.GetOriginal().end());
   if (it.Accepts())
     return ErrorsMade(it.ErrorsMade());
@@ -85,12 +86,12 @@ ErrorsMade GetErrorsMade(QueryParams::Token const & token, strings::UniString co
 }
 
 ErrorsMade GetPrefixErrorsMade(QueryParams::Token const & token, strings::UniString const & text,
-                               LevenshteinDFA const & dfa)
+                               LevenshteinMatcher const & matcher)
 {
   if (token.AnyOfSynonyms([&text](strings::UniString const & s) { return StartsWith(text, s); }))
     return ErrorsMade(0);
 
-  auto it = dfa.Begin();
+  auto it = matcher.Begin();
   strings::DFAMove(it, token.GetOriginal().begin(), token.GetOriginal().end());
   if (!it.Rejects())
     return ErrorsMade(it.PrefixErrorsMade());

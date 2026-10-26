@@ -22,7 +22,7 @@
 #ifdef OMIM_OS_WINDOWS
 #include <io.h>
 #else
-#include <unistd.h>  // ftruncate
+#include <unistd.h>  // ftruncate, pread
 #endif
 
 namespace base
@@ -111,6 +111,26 @@ uint64_t FileData::Size() const
 
 void FileData::Read(uint64_t pos, void * p, size_t size)
 {
+#ifndef OMIM_OS_WINDOWS
+  // Reading files is random access, mostly by pages of 1 KB (see ReaderCache): one pread() instead of fseek() and
+  // fread() saves a system call and copying through the FILE's buffer. The file position is not used by reading.
+  if (m_Op == Op::READ)
+  {
+    auto * dst = static_cast<char *>(p);
+    size_t bytesRead = 0;
+    while (bytesRead < size)
+    {
+      ssize_t const n = pread(fileno(m_File), dst + bytesRead, size - bytesRead, static_cast<off_t>(pos + bytesRead));
+      if (n < 0 && errno == EINTR)
+        continue;
+      if (n <= 0)
+        MYTHROW(Reader::ReadException, (GetErrorProlog(), bytesRead, pos, size));
+      bytesRead += static_cast<size_t>(n);
+    }
+    return;
+  }
+#endif
+
   if (fseek64(m_File, static_cast<off_t>(pos), SEEK_SET))
     MYTHROW(Reader::ReadException, (GetErrorProlog(), pos));
 

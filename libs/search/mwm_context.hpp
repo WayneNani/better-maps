@@ -78,6 +78,37 @@ public:
     });
   }
 
+  // Lower level access to the scale index: ForEachIndex(intervals, scale, fn) reads each interval in the buckets
+  // [0, GetNumIndexBuckets(scale)) and skips duplicate and deleted indices.
+  size_t GetNumIndexBuckets(uint32_t scale) const { return m_index.GetNumBuckets(scale); }
+
+  // Calls |fn(key, index)| for each feature index with a key in the sorted, not overlapping |intervals| in |bucket|,
+  // in the order of keys.
+  template <typename Fn>
+  void ForEachIndexInBucket(covering::Intervals const & intervals, size_t bucket, Fn && fn) const
+  {
+    m_index.ForEachInIntervalsAndBucket(intervals, bucket, fn);
+  }
+
+  // Calls |fn| for the same indices as ForEachIndex(), but not in the same order, and faster: the intervals (sorted
+  // and not overlapping, like a covering) are read together for each bucket of the scale index.
+  template <typename Fn>
+  void ForEachIndexUnordered(covering::Intervals const & intervals, uint32_t scale, Fn && fn) const
+  {
+    CheckUniqueIndexes checkUnique;
+    size_t const numBuckets = GetNumIndexBuckets(scale);
+    for (size_t bucket = 0; bucket < numBuckets; ++bucket)
+    {
+      ForEachIndexInBucket(intervals, bucket, [&](uint64_t /* key */, uint32_t index)
+      {
+        if (checkUnique(index) && GetEditedStatus(index) != FeatureStatus::Deleted)
+          fn(index);
+      });
+    }
+  }
+
+  bool IsDeleted(uint32_t index) const { return GetEditedStatus(index) == FeatureStatus::Deleted; }
+
   template <typename Fn>
   void ForEachIndex(m2::RectD const & rect, Fn && fn) const
   {

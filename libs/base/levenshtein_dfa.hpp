@@ -2,6 +2,7 @@
 
 #include "base/string_utils.hpp"
 
+#include <array>
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -146,6 +147,49 @@ private:
   std::vector<bool> m_accepting;
   std::vector<size_t> m_errorsMade;
   std::vector<size_t> m_prefixErrorsMade;
+};
+
+// Recognizes the same language as LevenshteinDFA(s, prefixSize, prefixMisprints, maxErrors), and its iterator gives
+// the same results as the DFA's iterator, but the states are computed while moving instead of building all of them in
+// advance. Building a DFA takes much longer than moving through it, so this is faster when only a few short strings are
+// matched with |s|, e.g. the tokens of a query with the tokens of a feature's name.
+//
+// *NOTE* |prefixMisprints| must outlive the matcher.
+class LevenshteinMatcher
+{
+public:
+  class Iterator
+  {
+  public:
+    Iterator & Move(UniChar c);
+
+    bool Accepts() const;
+    bool Rejects() const { return m_state.m_positions.empty(); }
+
+    size_t ErrorsMade() const;
+    size_t PrefixErrorsMade() const;
+
+  private:
+    friend class LevenshteinMatcher;
+
+    explicit Iterator(LevenshteinMatcher const & matcher);
+
+    LevenshteinDFA::State m_state;
+    // Buffer for the next state, to avoid allocations.
+    LevenshteinDFA::State m_next;
+    LevenshteinMatcher const * m_matcher;
+  };
+
+  LevenshteinMatcher(UniString const & s, size_t prefixSize, std::array<UniString, 11> const & prefixMisprints,
+                     size_t maxErrors);
+
+  Iterator Begin() const { return Iterator(*this); }
+
+private:
+  UniString m_s;
+  size_t m_prefixSize;
+  std::array<UniString, 11> const * m_prefixMisprints;
+  size_t m_maxErrors;
 };
 
 std::string DebugPrint(LevenshteinDFA::Position const & p);

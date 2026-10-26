@@ -361,6 +361,7 @@ private:
     //      return res.first->second;
     //    };
 
+    m_loader.LoadStreets(streets, m_cancellable);
     for (uint32_t streetId : streets)
     {
       BailIfCancelled();

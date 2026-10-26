@@ -36,6 +36,9 @@ public:
     return std::pair<Value &, bool>(r.first->second, r.second);
   }
 
+  // Unlike Get(), doesn't count as an access.
+  bool Has(Key const & key) const { return m_map.find(key) != m_map.end(); }
+
   void Clear()
   {
     m_map.clear();

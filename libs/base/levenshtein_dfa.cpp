@@ -7,6 +7,7 @@
 #include <iterator>
 #include <queue>
 #include <sstream>
+#include <utility>
 #include <vector>
 
 namespace strings
@@ -108,9 +109,45 @@ private:
 
   UniString const & m_s;
   size_t const m_size;
-  std::array<UniString, 11> const m_prefixMisprints;
+  std::array<UniString, 11> const & m_prefixMisprints;
   size_t const m_prefixSize;
 };
+
+bool IsAccepting(LevenshteinDFA::Position const & p, size_t size)
+{
+  return p.IsStandard() && size - p.m_offset <= p.m_errorsLeft;
+}
+
+bool IsAccepting(LevenshteinDFA::State const & s, size_t size)
+{
+  for (auto const & p : s.m_positions)
+    if (IsAccepting(p, size))
+      return true;
+  return false;
+}
+
+// Returns minimum number of made errors among accepting positions in |s|.
+size_t ErrorsMade(LevenshteinDFA::State const & s, size_t size, size_t maxErrors)
+{
+  size_t errorsMade = maxErrors;
+  for (auto const & p : s.m_positions)
+  {
+    if (!IsAccepting(p, size))
+      continue;
+    auto const errorsLeft = p.m_errorsLeft - (size - p.m_offset);
+    errorsMade = std::min(errorsMade, maxErrors - errorsLeft);
+  }
+  return errorsMade;
+}
+
+// Returns minimum number of errors already made. This number cannot decrease.
+size_t PrefixErrorsMade(LevenshteinDFA::State const & s, size_t maxErrors)
+{
+  size_t errorsMade = maxErrors;
+  for (auto const & p : s.m_positions)
+    errorsMade = std::min(errorsMade, maxErrors - p.m_errorsLeft);
+  return errorsMade;
+}
 }  // namespace
 
 // LevenshteinDFA ----------------------------------------------------------------------------------
@@ -312,36 +349,22 @@ bool LevenshteinDFA::IsValid(State const & s) const
 
 bool LevenshteinDFA::IsAccepting(Position const & p) const
 {
-  return p.IsStandard() && m_size - p.m_offset <= p.m_errorsLeft;
+  return ::strings::IsAccepting(p, m_size);
 }
 
 bool LevenshteinDFA::IsAccepting(State const & s) const
 {
-  for (auto const & p : s.m_positions)
-    if (IsAccepting(p))
-      return true;
-  return false;
+  return ::strings::IsAccepting(s, m_size);
 }
 
 size_t LevenshteinDFA::ErrorsMade(State const & s) const
 {
-  size_t errorsMade = m_maxErrors;
-  for (auto const & p : s.m_positions)
-  {
-    if (!IsAccepting(p))
-      continue;
-    auto const errorsLeft = p.m_errorsLeft - (m_size - p.m_offset);
-    errorsMade = std::min(errorsMade, m_maxErrors - errorsLeft);
-  }
-  return errorsMade;
+  return ::strings::ErrorsMade(s, m_size, m_maxErrors);
 }
 
 size_t LevenshteinDFA::PrefixErrorsMade(State const & s) const
 {
-  size_t errorsMade = m_maxErrors;
-  for (auto const & p : s.m_positions)
-    errorsMade = std::min(errorsMade, m_maxErrors - p.m_errorsLeft);
-  return errorsMade;
+  return ::strings::PrefixErrorsMade(s, m_maxErrors);
 }
 
 size_t LevenshteinDFA::Move(size_t s, UniChar c) const
@@ -357,6 +380,52 @@ size_t LevenshteinDFA::Move(size_t s, UniChar c) const
     i = distance(m_alphabet.begin(), it);
 
   return m_transitions[s][i];
+}
+
+// LevenshteinMatcher ------------------------------------------------------------------------------
+LevenshteinMatcher::LevenshteinMatcher(UniString const & s, size_t prefixSize,
+                                       std::array<UniString, 11> const & prefixMisprints, size_t maxErrors)
+  : m_s(s)
+  , m_prefixSize(prefixSize)
+  , m_prefixMisprints(&prefixMisprints)
+  , m_maxErrors(maxErrors)
+{
+  CHECK_LESS_OR_EQUAL(prefixSize, s.size(), ());
+}
+
+LevenshteinMatcher::Iterator::Iterator(LevenshteinMatcher const & matcher) : m_matcher(&matcher)
+{
+  // The same as LevenshteinDFA::MakeStart().
+  m_state.m_positions.emplace_back(0 /* offset */, matcher.m_maxErrors /* errorsLeft */, false /* transposed */);
+}
+
+LevenshteinMatcher::Iterator & LevenshteinMatcher::Iterator::Move(UniChar c)
+{
+  // The DFA moves by a character which is not in its alphabet like by any other such character. The transitions
+  // depend on a character only by comparing it with the characters of the string and of its prefix misprints, which
+  // are all in the alphabet, so moving by |c| itself gives the same state.
+  if (Rejects())
+    return *this;
+
+  TransitionTable table(m_matcher->m_s, *m_matcher->m_prefixMisprints, m_matcher->m_prefixSize);
+  table.Move(m_state, c, m_next);
+  std::swap(m_state, m_next);
+  return *this;
+}
+
+bool LevenshteinMatcher::Iterator::Accepts() const
+{
+  return IsAccepting(m_state, m_matcher->m_s.size());
+}
+
+size_t LevenshteinMatcher::Iterator::ErrorsMade() const
+{
+  return ::strings::ErrorsMade(m_state, m_matcher->m_s.size(), m_matcher->m_maxErrors);
+}
+
+size_t LevenshteinMatcher::Iterator::PrefixErrorsMade() const
+{
+  return ::strings::PrefixErrorsMade(m_state, m_matcher->m_maxErrors);
 }
 
 std::string DebugPrint(LevenshteinDFA::Position const & p)

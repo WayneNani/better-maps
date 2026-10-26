@@ -3,6 +3,9 @@
 #include "base/dfa_helpers.hpp"
 #include "base/levenshtein_dfa.hpp"
 
+#include <algorithm>
+#include <array>
+#include <random>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -286,6 +289,54 @@ UNIT_TEST(LevenshteinDFA_PrefixDFASmoke)
         auto it = dfa.Begin();
         for (auto const c : query)
           DFAMove(it, std::string({c}));
+      }
+    }
+  }
+}
+// LevenshteinMatcher must give the same results as the iterator of the corresponding LevenshteinDFA.
+UNIT_TEST(LevenshteinMatcher_SameAsDFA)
+{
+  std::array<UniString, 11> const kMisprints = {MakeUniString("ao"), MakeUniString("bp"), MakeUniString("äa"),
+                                                MakeUniString("sz"), MakeUniString("ck"), MakeUniString("ie"),
+                                                MakeUniString("yi"), MakeUniString("uv"), MakeUniString("mn"),
+                                                MakeUniString("fv"), MakeUniString("dt")};
+  // Includes characters with and without misprints, and characters which are in no source.
+  UniString const kAlphabet = MakeUniString("abcäosziexq");
+
+  std::mt19937 rng(12345);
+  auto const randomString = [&](size_t maxSize)
+  {
+    UniString s;
+    size_t const size = 1 + rng() % maxSize;
+    for (size_t i = 0; i < size; ++i)
+      s.push_back(kAlphabet[rng() % kAlphabet.size()]);
+    return s;
+  };
+
+  for (size_t iSource = 0; iSource < 300; ++iSource)
+  {
+    UniString const source = randomString(9);
+    for (size_t maxErrors = 0; maxErrors <= 2; ++maxErrors)
+    {
+      for (size_t prefixSize = 0; prefixSize <= std::min<size_t>(2, source.size()); ++prefixSize)
+      {
+        LevenshteinDFA const dfa(source, prefixSize, kMisprints, maxErrors);
+        LevenshteinMatcher const matcher(source, prefixSize, kMisprints, maxErrors);
+        for (size_t iQuery = 0; iQuery < 30; ++iQuery)
+        {
+          UniString const query = iQuery == 0 ? source : randomString(11);
+          auto dfaIt = dfa.Begin();
+          auto matcherIt = matcher.Begin();
+          for (auto const c : query)
+          {
+            dfaIt.Move(c);
+            matcherIt.Move(c);
+            TEST_EQUAL(dfaIt.Rejects(), matcherIt.Rejects(), (source, query, maxErrors, prefixSize));
+            TEST_EQUAL(dfaIt.Accepts(), matcherIt.Accepts(), (source, query, maxErrors, prefixSize));
+            TEST_EQUAL(dfaIt.ErrorsMade(), matcherIt.ErrorsMade(), (source, query, maxErrors, prefixSize));
+            TEST_EQUAL(dfaIt.PrefixErrorsMade(), matcherIt.PrefixErrorsMade(), (source, query, maxErrors, prefixSize));
+          }
+        }
       }
     }
   }

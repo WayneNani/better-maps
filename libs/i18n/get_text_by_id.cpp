@@ -15,6 +15,10 @@
 #include "base/logging.hpp"
 
 #include <algorithm>
+#include <map>
+#include <mutex>
+#include <optional>
+#include <utility>
 
 namespace platform
 {
@@ -66,21 +70,42 @@ TGetTextByIdPtr GetTextById::Create(string const & jsonBuffer, string const & lo
   return result;
 }
 
-TGetTextByIdPtr GetTextByIdFactoryForRegion(TextSource textSource, string const regionId)
+namespace
 {
-  string jsonBuffer;
+// Returns the strings of |localeName| or nullptr if they are invalid, std::nullopt if there is no json file.
+// The parsed files are kept: the names of regions are translated for every search result, and reading and parsing
+// a json file (from the apk on Android) for every name was slower than the whole search ranking.
+std::optional<std::shared_ptr<GetTextById const>> GetCachedTextById(TextSource textSource, string const & localeName)
+{
+  static std::mutex mutex;
+  static std::map<std::pair<TextSource, string>, std::optional<std::shared_ptr<GetTextById const>>> cache;
+
+  std::lock_guard lock(mutex);
+  auto const [it, inserted] = cache.try_emplace({textSource, localeName});
+  if (inserted)
+  {
+    string jsonBuffer;
+    if (GetJsonBuffer(textSource, localeName, jsonBuffer))
+      it->second = GetTextById::Create(jsonBuffer, localeName);
+  }
+  return it->second;
+}
+}  // namespace
+
+std::shared_ptr<GetTextById const> GetTextByIdFactoryForRegion(TextSource textSource, string const regionId)
+{
   for (LanguageIndex const languageIndex : PrioritizedMapLanguageIndexes(CountryLanguage::Instance().GetLocalLanguageIndexes(regionId)))
   {
     LanguageCode const languageCode = ConvertLanguageIndexToLanguageCode(languageIndex);
     if (languageIndex == kDefaultNameIndex)
     {
       for (auto const & localLanguageCode : CountryLanguage::Instance().GetLocalLanguageCodes(regionId))
-        if (GetJsonBuffer(textSource, localLanguageCode, jsonBuffer))
-          return GetTextById::Create(jsonBuffer, localLanguageCode);
+        if (auto textById = GetCachedTextById(textSource, localLanguageCode))
+          return *textById;
     }
-    else if (GetJsonBuffer(textSource, languageCode, jsonBuffer))
+    else if (auto textById = GetCachedTextById(textSource, languageCode))
     {
-      return GetTextById::Create(jsonBuffer, languageCode);
+      return *textById;
     }
   }
 
