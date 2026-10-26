@@ -56,7 +56,7 @@ DEFINE_string(mwm_list_path, "", "Path to a file containing the names of availab
 DEFINE_string(mwm_path, "", "Path to mwm files (writable dir)");
 DEFINE_string(queries_path, "", "Path to the file with queries");
 DEFINE_int32(top, 1, "Number of top results to show for every query");
-DEFINE_string(viewport, "", "Viewport to use when searching (default, moscow, london, zurich)");
+DEFINE_string(viewport, "", "Viewport to use when searching (default, moscow, london, zurich, berlin, nuremberg)");
 DEFINE_string(check_completeness, "", "Path to the file with completeness data");
 DEFINE_string(ranking_csv_file, "", "File ranking info will be exported to");
 DEFINE_string(position, "", "User position as \"lat,lon\" (none by default)");

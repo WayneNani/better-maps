@@ -114,7 +114,8 @@ void InitViewport(string viewportName, m2::RectD & viewport)
       {"moscow", mercator::RectByCenterLatLonAndSizeInMeters(55.7, 37.7, 5000)},
       {"london", mercator::RectByCenterLatLonAndSizeInMeters(51.5, 0.0, 5000)},
       {"zurich", mercator::RectByCenterLatLonAndSizeInMeters(47.4, 8.5, 5000)},
-      {"berlin", mercator::RectByCenterLatLonAndSizeInMeters(52.52, 13.405, 5000)}};
+      {"berlin", mercator::RectByCenterLatLonAndSizeInMeters(52.52, 13.405, 5000)},
+      {"nuremberg", mercator::RectByCenterLatLonAndSizeInMeters(49.4521, 11.0767, 5000)}};
 
   auto it = kViewports.find(viewportName);
   if (it == kViewports.end())
