@@ -105,6 +105,9 @@ private:
   void MatchForSuggestions(strings::UniString const & token, int8_t locale, std::string const & prolog);
   void ProcessSuggestions(std::vector<RankerResult> const & vec) const;
 
+  // Merges the features of one railway station into one result, see StationPart.
+  static void MergeStationParts(std::vector<RankerResult> & results);
+
   std::string GetLocalizedRegionInfoForResult(RankerResult const & result) const;
 
   Params m_params;

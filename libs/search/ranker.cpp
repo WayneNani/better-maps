@@ -1022,6 +1022,7 @@ void Ranker::UpdateResults(bool lastUpdate)
       return r1.GetLinearModelRank() > r2.GetLinearModelRank();
     }, base::EqualsBy(&RankerResult::GetID));
 
+    MergeStationParts(m_tentativeResults);
     ProcessSuggestions(m_tentativeResults);
   }
 
@@ -1081,6 +1082,80 @@ void Ranker::UpdateResults(bool lastUpdate)
     BailIfCancelled();
     m_emitter.Emit();
   }
+}
+
+// static
+void Ranker::MergeStationParts(vector<RankerResult> & results)
+{
+  // Big stations like Leipzig Hbf are about 300 m long, their entrances may be a bit farther from the station point.
+  double constexpr kMaxDistanceM = 400.0;
+
+  struct Station
+  {
+    size_t m_index;
+    StationPart m_part;
+  };
+
+  vector<Station> stations;
+  for (size_t i = 0; i < results.size(); ++i)
+  {
+    auto const & r = results[i];
+    auto const type = r.GetResultType();
+    if ((type != RankerResult::Type::Feature && type != RankerResult::Type::Building) || r.GetName().empty())
+      continue;
+    auto const part = GetStationPart(r.GetTypes());
+    if (part != StationPart::None)
+      stations.push_back({i, part});
+  }
+  if (stations.size() < 2)
+    return;
+
+  // The biggest feature of a station represents it, e.g. railway=station rather than its subway station or building.
+  sort(stations.begin(), stations.end(), [&results](Station const & lhs, Station const & rhs)
+  {
+    if (lhs.m_part != rhs.m_part)
+      return lhs.m_part > rhs.m_part;
+    return results[lhs.m_index].GetLinearModelRank() > results[rhs.m_index].GetLinearModelRank();
+  });
+
+  vector<bool> merged(results.size(), false);
+  bool anyMerged = false;
+  for (size_t i = 0; i < stations.size(); ++i)
+  {
+    if (merged[stations[i].m_index])
+      continue;
+    auto & station = results[stations[i].m_index];
+    for (size_t j = i + 1; j < stations.size(); ++j)
+    {
+      size_t const index = stations[j].m_index;
+      if (merged[index])
+        continue;
+      auto const & part = results[index];
+      if (PointDistance(station.GetCenter(), part.GetCenter()) > kMaxDistanceM ||
+          !AreSimilarStationNames(station.GetName(), part.GetName()))
+      {
+        continue;
+      }
+
+      // The station takes the place of its best ranked part.
+      station.m_finalRank = max(station.m_finalRank, part.m_finalRank);
+      merged[index] = true;
+      anyMerged = true;
+    }
+  }
+
+  if (!anyMerged)
+    return;
+
+  vector<RankerResult> kept;
+  kept.reserve(results.size());
+  for (size_t i = 0; i < results.size(); ++i)
+    if (!merged[i])
+      kept.push_back(std::move(results[i]));
+  results.swap(kept);
+
+  stable_sort(results.begin(), results.end(), [](RankerResult const & lhs, RankerResult const & rhs)
+  { return lhs.GetLinearModelRank() > rhs.GetLinearModelRank(); });
 }
 
 void Ranker::ClearCaches()

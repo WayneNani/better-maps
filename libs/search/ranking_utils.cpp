@@ -5,12 +5,16 @@
 
 #include "base/dfa_helpers.hpp"
 
+#include "indexer/classificator.hpp"
 #include "indexer/feature_data.hpp"
+#include "indexer/search_string_utils.hpp"
 
 #include "base/assert.hpp"
 
 #include <algorithm>
+#include <array>
 #include <sstream>
+#include <string_view>
 
 namespace search
 {
@@ -125,5 +129,87 @@ string DebugPrint(NameScores const & scores)
      << ", m_errorsMade: " << DebugPrint(scores.m_errorsMade) << ", m_isAltOrOldName: "
      << " }";
   return os.str();
+}
+string DebugPrint(StationPart part)
+{
+  switch (part)
+  {
+  case StationPart::None: return "None";
+  case StationPart::Part: return "Part";
+  case StationPart::Building: return "Building";
+  case StationPart::Subway: return "Subway";
+  case StationPart::LightRail: return "LightRail";
+  case StationPart::Halt: return "Halt";
+  case StationPart::Station: return "Station";
+  }
+  UNREACHABLE();
+}
+
+StationPart GetStationPart(feature::TypesHolder const & types)
+{
+  // public_transport=platform is not here: it is mostly a bus or a tram platform, not a part of a station.
+  static auto const kTypes = []()
+  {
+    Classificator const & c = classif();
+    return std::array<std::pair<uint32_t, StationPart>, 9>{{
+        {c.GetTypeByPath({"railway", "subway_entrance"}), StationPart::Part},
+        {c.GetTypeByPath({"railway", "platform"}), StationPart::Part},
+        {c.GetTypeByPath({"building", "train_station"}), StationPart::Building},
+        {c.GetTypeByPath({"railway", "station", "subway"}), StationPart::Subway},
+        {c.GetTypeByPath({"railway", "station", "funicular"}), StationPart::Subway},
+        {c.GetTypeByPath({"railway", "station", "monorail"}), StationPart::Subway},
+        {c.GetTypeByPath({"railway", "station", "light_rail"}), StationPart::LightRail},
+        {c.GetTypeByPath({"railway", "halt"}), StationPart::Halt},
+        {c.GetTypeByPath({"railway", "station"}), StationPart::Station},
+    }};
+  }();
+
+  auto result = StationPart::None;
+  for (uint32_t type : types)
+  {
+    // The most specific matching type: railway-station-subway-berlin is a subway station, not a railway station.
+    for (uint8_t level = std::min<uint8_t>(ftype::GetLevel(type), 3); level >= 2; --level)
+    {
+      uint32_t const truncated = ftype::Trunc(type, level);
+      auto const it =
+          std::find_if(kTypes.begin(), kTypes.end(), [truncated](auto const & p) { return p.first == truncated; });
+      if (it != kTypes.end())
+      {
+        result = std::max(result, it->second);
+        break;
+      }
+    }
+  }
+  return result;
+}
+
+bool AreSimilarStationNames(std::string_view lhs, std::string_view rhs)
+{
+  auto const tokenize = [](std::string_view name)
+  {
+    static UniString const kHbf = MakeUniString("hbf");
+    static UniString const kHauptbahnhof = MakeUniString("hauptbahnhof");
+    static UniString const kBf = MakeUniString("bf");
+    static UniString const kBhf = MakeUniString("bhf");
+    static UniString const kBahnhof = MakeUniString("bahnhof");
+
+    auto tokens = NormalizeAndTokenizeString(name);
+    for (auto & t : tokens)
+    {
+      if (t == kHbf)
+        t = kHauptbahnhof;
+      else if (t == kBf || t == kBhf)
+        t = kBahnhof;
+    }
+    std::sort(tokens.begin(), tokens.end());
+    tokens.erase(std::unique(tokens.begin(), tokens.end()), tokens.end());
+    return tokens;
+  };
+
+  auto const l = tokenize(lhs);
+  auto const r = tokenize(rhs);
+  if (l.empty() || r.empty())
+    return false;
+  return std::includes(l.begin(), l.end(), r.begin(), r.end()) || std::includes(r.begin(), r.end(), l.begin(), l.end());
 }
 }  // namespace search
