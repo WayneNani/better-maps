@@ -31,6 +31,7 @@ import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -124,6 +125,8 @@ import app.organicmaps.transit.OnlineTransitRouter;
 import app.organicmaps.transit.SavedConnection;
 import app.organicmaps.transit.TransitServices;
 import app.organicmaps.transit.ui.OnlineTransitPanel;
+import app.organicmaps.transit.ui.SavedConnectionCard;
+import app.organicmaps.transit.ui.SavedConnectionsActivity;
 import app.organicmaps.transit.ui.TransitConsentDialog;
 import app.organicmaps.util.SharingUtils;
 import app.organicmaps.util.ThemeSwitcher;
@@ -194,6 +197,10 @@ public class MwmActivity extends BaseMwmFragmentActivity
   private PanelAnimator mPanelAnimator;
   @Nullable
   private OnmapDownloader mOnmapDownloader;
+  @Nullable
+  private SavedConnectionCard mSavedConnectionCard;
+  // Last result of canShowSavedConnection(), to update the card only when it changes.
+  private boolean mSavedConnectionCardRoom;
   private boolean mIsTabletLayout;
   @SuppressWarnings("NotNullFieldNotInitialized")
   @NonNull
@@ -643,6 +650,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
 
     initMainMenu();
     initOnmapDownloader();
+    initSavedConnectionCard();
     initPositionChooser();
   }
 
@@ -1251,6 +1259,8 @@ public class MwmActivity extends BaseMwmFragmentActivity
     LocationState.nativeSetListener(this);
     MwmApplication.from(this).getLocationHelper().addListener(this);
     mSearchController.attach(this);
+    if (mSavedConnectionCard != null)
+      mSavedConnectionCard.start();
     Utils.keepScreenOn(Config.isKeepScreenOnEnabled() || RoutingController.get().isNavigating(), getWindow());
   }
 
@@ -1269,6 +1279,8 @@ public class MwmActivity extends BaseMwmFragmentActivity
     }
     MwmApplication.from(getApplicationContext()).getIsolinesManager().detach();
     mSearchController.detach();
+    if (mSavedConnectionCard != null)
+      mSavedConnectionCard.stop();
     Utils.keepScreenOn(false, getWindow());
 
     final String backUrl = Framework.nativeGetParsedBackUrl();
@@ -1296,6 +1308,83 @@ public class MwmActivity extends BaseMwmFragmentActivity
     mPowerSaveSettings = null;
     if (mRemoveDisplayListener && !isChangingConfigurations())
       mDisplayManager.removeListener(DisplayType.Device);
+  }
+
+  /** The card with the next saved public transport connection on the map. */
+  private void initSavedConnectionCard()
+  {
+    final View card = findViewById(R.id.transit_saved_card);
+    mSavedConnectionCard = new SavedConnectionCard(this, card, new SavedConnectionCard.Host() {
+      @Override
+      public boolean canShowSavedConnection()
+      {
+        return canShowSavedConnectionCard();
+      }
+
+      @Override
+      public void openSavedConnection(@NonNull SavedConnection saved)
+      {
+        if (!Map.isEngineCreated())
+          return;
+        closeFloatingPanels();
+        TransitServices.get(MwmActivity.this).getRouter().showSaved(saved, false);
+      }
+
+      @Override
+      public void onSavedConnectionCardChanged()
+      {
+        updateBottomWidgetsOffset();
+      }
+    });
+    // Above the bottom buttons; not wider than needed on large screens.
+    mMapButtonsViewModel.getBottomButtonsHeight().observe(this, height -> placeSavedConnectionCard(card));
+    card.getRootView().addOnLayoutChangeListener((v, l, t, r, b, oldL, oldT, oldR, oldB) -> {
+      if (r - l != oldR - oldL || b - t != oldB - oldT)
+        placeSavedConnectionCard(card);
+    });
+    // Other UI takes the room: route planning, navigation, place page, search, full screen.
+    mMapButtonsViewModel.getLayoutMode().observe(this, mode -> refreshSavedConnectionCard());
+    mMapButtonsViewModel.getButtonsHidden().observe(this, hidden -> refreshSavedConnectionCard());
+    mPlacePageViewModel.getMapObject().observe(this, object -> refreshSavedConnectionCard());
+    card.getViewTreeObserver().addOnGlobalLayoutListener(this::refreshSavedConnectionCard);
+  }
+
+  private boolean canShowSavedConnectionCard()
+  {
+    final RoutingController routing = RoutingController.get();
+    final Float bottomButtons = mMapButtonsViewModel.getBottomButtonsHeight().getValue();
+    return !routing.isPlanning() && !routing.isNavigating() && !isFullscreen()
+ && mMapButtonsViewModel.getLayoutMode().getValue() == MapButtonsController.LayoutMode.regular
+ && mPlacePageViewModel.getMapObject().getValue() == null && !UiUtils.isVisible(mSearchController.getToolbar())
+ && ChoosePositionMode.get() == ChoosePositionMode.None && bottomButtons != null && bottomButtons > 0;
+  }
+
+  private void refreshSavedConnectionCard()
+  {
+    final boolean room = canShowSavedConnectionCard();
+    if (mSavedConnectionCard == null || room == mSavedConnectionCardRoom)
+      return;
+    mSavedConnectionCardRoom = room;
+    mSavedConnectionCard.update();
+  }
+
+  private void placeSavedConnectionCard(@NonNull View card)
+  {
+    final Float bottomButtons = mMapButtonsViewModel.getBottomButtonsHeight().getValue();
+    final ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) card.getLayoutParams();
+    final int bottom = (bottomButtons != null ? bottomButtons.intValue() : 0) + mNavBarHeight
+                     + getResources().getDimensionPixelSize(R.dimen.margin_half);
+    final int parentWidth = ((View) card.getParent()).getWidth();
+    final int maxWidth = getResources().getDimensionPixelSize(R.dimen.transit_card_max_width);
+    final int width = parentWidth - params.getMarginStart() - params.getMarginEnd() > maxWidth
+                        ? maxWidth
+                        : ViewGroup.LayoutParams.MATCH_PARENT;
+    if (params.bottomMargin == bottom && params.width == width)
+      return;
+    params.bottomMargin = bottom;
+    params.width = width;
+    card.setLayoutParams(params);
+    refreshSavedConnectionCard();
   }
 
   /** Back from the detail view of an online public transport connection to the list. */
@@ -1520,6 +1609,10 @@ public class MwmActivity extends BaseMwmFragmentActivity
       offsetY = Math.max(offsetY, bottomButtonHeight.intValue() + mNavBarHeight);
     if (mMainMenu != null)
       offsetY = Math.max(offsetY, mMainMenu.getMenuHeight());
+    // The scale and the copyright stay above the card with the next saved connection.
+    final View savedCard = findViewById(R.id.transit_saved_card);
+    if (mSavedConnectionCard != null && mSavedConnectionCard.isShown() && savedCard.getHeight() > 0)
+      offsetY = Math.max(offsetY, ((View) savedCard.getParent()).getHeight() - savedCard.getTop());
 
     final View navBottomSheetLineFrame = findViewById(R.id.line_frame);
     final View navBottomSheetNavBar = findViewById(R.id.nav_bottom_sheet_nav_bar);
@@ -2607,6 +2700,10 @@ public class MwmActivity extends BaseMwmFragmentActivity
 
       items.add(new MenuBottomSheetItem(R.string.share_my_location, R.drawable.ic_share,
                                         this::onShareLocationOptionSelected));
+
+      if (TransitServices.get(this).getSavedConnections().size() > 0)
+        items.add(new MenuBottomSheetItem(R.string.transit_saved_title, R.drawable.ic_transit_saved,
+                                          () -> SavedConnectionsActivity.start(this)));
 
       if (!BUTTON_HELP_CODE.equals(activeLeftButton))
         items.add(new MenuBottomSheetItem(R.string.about_help, R.drawable.ic_logo_monochrome, this::showHelp));

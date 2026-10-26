@@ -68,4 +68,16 @@ public interface TransitTexts
   /** E.g. "My position", for a search from or to the own position. */
   @NonNull
   String myPosition();
+
+  /** E.g. "in 25 min" for a departure. */
+  @NonNull
+  String inTime(@NonNull String duration);
+
+  /** E.g. "now" for a departure within the current minute. */
+  @NonNull
+  String departingNow();
+
+  /** E.g. "on the way", for a connection that has departed and not arrived yet. */
+  @NonNull
+  String onTheWay();
 }

@@ -137,4 +137,13 @@
   <string name="transit_change_start">Start: %1$s. Tap to change.</string>
   <string name="transit_change_destination">Destination: %1$s. Tap to change.</string>
   <string name="transit_swap">Swap start and destination</string>
+  <!-- Card with the next saved connection on the map. -->
+  <string name="transit_in_time">in %1$s</string>
+  <string name="transit_departing_now">now</string>
+  <string name="transit_on_the_way">on the way</string>
+  <string name="transit_card_open">Open the saved connection %1$s</string>
+  <string name="transit_card_all">All saved connections (%1$d)</string>
+  <string name="transit_card_hide">Hide this connection on the map</string>
+  <string name="transit_pref_show_on_map">Show on the map</string>
+  <string name="transit_pref_show_on_map_summary">The next saved connection appears on the map until it arrives</string>
 </resources>

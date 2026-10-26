@@ -138,4 +138,25 @@ public final class AndroidTransitTexts implements TransitTexts
   {
     return mResources.getString(R.string.transit_my_position);
   }
+
+  @NonNull
+  @Override
+  public String inTime(@NonNull String duration)
+  {
+    return mResources.getString(R.string.transit_in_time, duration);
+  }
+
+  @NonNull
+  @Override
+  public String departingNow()
+  {
+    return mResources.getString(R.string.transit_departing_now);
+  }
+
+  @NonNull
+  @Override
+  public String onTheWay()
+  {
+    return mResources.getString(R.string.transit_on_the_way);
+  }
 }

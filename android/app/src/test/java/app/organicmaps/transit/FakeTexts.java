@@ -117,4 +117,25 @@ class FakeTexts implements TransitTexts
   {
     return "My position";
   }
+
+  @NonNull
+  @Override
+  public String inTime(@NonNull String duration)
+  {
+    return "in " + duration;
+  }
+
+  @NonNull
+  @Override
+  public String departingNow()
+  {
+    return "now";
+  }
+
+  @NonNull
+  @Override
+  public String onTheWay()
+  {
+    return "on the way";
+  }
 }

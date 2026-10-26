@@ -136,4 +136,13 @@
   <string name="transit_change_start">Start: %1$s. Zum Ändern tippen.</string>
   <string name="transit_change_destination">Ziel: %1$s. Zum Ändern tippen.</string>
   <string name="transit_swap">Start und Ziel tauschen</string>
+  <!-- Karte mit der nächsten gespeicherten Verbindung auf der Karte. -->
+  <string name="transit_in_time">in %1$s</string>
+  <string name="transit_departing_now">jetzt</string>
+  <string name="transit_on_the_way">unterwegs</string>
+  <string name="transit_card_open">Gespeicherte Verbindung %1$s öffnen</string>
+  <string name="transit_card_all">Alle gespeicherten Verbindungen (%1$d)</string>
+  <string name="transit_card_hide">Diese Verbindung auf der Karte ausblenden</string>
+  <string name="transit_pref_show_on_map">Auf der Karte anzeigen</string>
+  <string name="transit_pref_show_on_map_summary">Die nächste gespeicherte Verbindung erscheint auf der Karte, bis sie ankommt</string>
 </resources>

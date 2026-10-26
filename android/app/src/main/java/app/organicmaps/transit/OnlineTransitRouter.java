@@ -29,6 +29,8 @@ public final class OnlineTransitRouter implements RoutingController.ExternalRout
   // Shown instead of a search by the next build().
   @Nullable
   private SavedConnection mPendingSaved;
+  // The shown saved connection was opened from the list of saved connections (back returns there).
+  private boolean mSavedFromList;
 
   public OnlineTransitRouter(@NonNull TransitServices services)
   {
@@ -47,12 +49,26 @@ public final class OnlineTransitRouter implements RoutingController.ExternalRout
   @MainThread
   public void showSaved(@NonNull SavedConnection saved)
   {
+    showSaved(saved, true);
+  }
+
+  /** @param fromList true if opened from the list of saved connections, false e.g. from the card on the map. */
+  @MainThread
+  public void showSaved(@NonNull SavedConnection saved, boolean fromList)
+  {
     mPendingSaved = saved;
+    mSavedFromList = fromList;
     final MapObject start = MapObject.createMapObject(FeatureId.EMPTY, MapObject.API_POINT, saved.getFromName(), "",
                                                       saved.getFrom().getLat(), saved.getFrom().getLon());
     final MapObject end = MapObject.createMapObject(FeatureId.EMPTY, MapObject.API_POINT, saved.getToName(), "",
                                                     saved.getTo().getLat(), saved.getTo().getLon());
     RoutingController.get().prepare(start, end, Router.Transit);
+  }
+
+  /** True if back from the shown saved connection should return to the list of saved connections. */
+  public boolean isSavedFromList()
+  {
+    return mSavedFromList;
   }
 
   @Override

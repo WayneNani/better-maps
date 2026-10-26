@@ -267,8 +267,8 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
   }
 
   /**
-   * Back from the detail view to the list or time grid. A saved connection was opened from the saved connections:
-   * the route planner closes and that list opens again.
+   * Back from the detail view to the list or time grid. A saved connection closes the route planner; if it was
+   * opened from the list of saved connections, that list opens again.
    *
    * @return false if there was no detail view.
    */
@@ -280,7 +280,8 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
     final RoutingController controller = RoutingController.get();
     if (controller.isPlanning())
       controller.cancel();
-    SavedConnectionsActivity.start(activity);
+    if (TransitServices.get(activity).getRouter().isSavedFromList())
+      SavedConnectionsActivity.start(activity);
     return true;
   }
 
