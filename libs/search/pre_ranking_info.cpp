@@ -1,9 +1,26 @@
 #include "search/pre_ranking_info.hpp"
 
+#include <algorithm>
 #include <sstream>
 
 namespace search
 {
+std::optional<TokenRange> PreRankingInfo::GetCityAndPoiTokenRange() const
+{
+  if (!Model::IsPoi(m_type) || !m_cityId.IsValid())
+    return {};
+
+  auto const & poiRange = InnermostTokenRange();
+  auto const & cityRange =
+      m_tokenRanges[Model::TYPE_CITY].Empty() ? m_tokenRanges[Model::TYPE_VILLAGE] : m_tokenRanges[Model::TYPE_CITY];
+  if (cityRange.Empty() || poiRange.Empty())
+    return {};
+  if (cityRange.End() != poiRange.Begin() && poiRange.End() != cityRange.Begin())
+    return {};
+
+  return TokenRange(std::min(cityRange.Begin(), poiRange.Begin()), std::max(cityRange.End(), poiRange.End()));
+}
+
 std::string DebugPrint(PreRankingInfo const & info)
 {
   std::ostringstream os;

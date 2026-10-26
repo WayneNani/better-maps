@@ -7,6 +7,9 @@
 #include "search/token_range.hpp"
 #include "search/token_slice.hpp"
 
+#include "indexer/classificator.hpp"
+#include "indexer/classificator_loader.hpp"
+#include "indexer/feature_data.hpp"
 #include "indexer/search_delimiters.hpp"
 #include "indexer/search_string_utils.hpp"
 
@@ -409,5 +412,58 @@ UNIT_TEST(RankingInfo_LocalPoi_OnlyForCategoryQueries)
   auto closed = MakeCafeInfo(100, osm::No);
   open.m_categoryQuery = closed.m_categoryQuery = false;
   TEST_ALMOST_EQUAL_ABS(open.GetLinearModelRank(), closed.GetLinearModelRank(), 1e-9, ());
+}
+
+UNIT_TEST(StationPart_Types)
+{
+  classificator::Load();
+  Classificator const & c = classif();
+  auto const part = [&c](std::initializer_list<base::StringIL> paths)
+  {
+    feature::TypesHolder types;
+    for (auto const & path : paths)
+      types.Add(c.GetTypeByPath(path));
+    return GetStationPart(types);
+  };
+
+  TEST_EQUAL(part({{"railway", "station"}}), StationPart::Station, ());
+  TEST_EQUAL(part({{"railway", "halt"}}), StationPart::Halt, ());
+  TEST_EQUAL(part({{"railway", "station", "light_rail", "berlin"}}), StationPart::LightRail, ());
+  TEST_EQUAL(part({{"railway", "station", "subway"}}), StationPart::Subway, ());
+  TEST_EQUAL(part({{"railway", "station", "subway", "berlin"}}), StationPart::Subway, ());
+  TEST_EQUAL(part({{"building", "train_station"}}), StationPart::Building, ());
+  TEST_EQUAL(part({{"railway", "subway_entrance"}}), StationPart::Part, ());
+  TEST_EQUAL(part({{"railway", "subway_entrance", "berlin"}}), StationPart::Part, ());
+  TEST_EQUAL(part({{"railway", "platform"}}), StationPart::Part, ());
+
+  // The biggest part wins: a station mapped together with its building.
+  TEST_EQUAL(part({{"building", "train_station"}, {"railway", "station"}}), StationPart::Station, ());
+
+  // Stops and other things are not parts of a station.
+  TEST_EQUAL(part({{"highway", "bus_stop"}}), StationPart::None, ());
+  TEST_EQUAL(part({{"public_transport", "platform"}}), StationPart::None, ());
+  TEST_EQUAL(part({{"railway", "tram_stop"}}), StationPart::None, ());
+  TEST_EQUAL(part({{"amenity", "taxi"}}), StationPart::None, ());
+  TEST_EQUAL(part({{"railway", "rail"}}), StationPart::None, ());
+  TEST_EQUAL(part({{"building"}}), StationPart::None, ());
+}
+
+UNIT_TEST(StationPart_SimilarNames)
+{
+  TEST(AreSimilarStationNames("Nürnberg Hauptbahnhof", "Hauptbahnhof"), ());
+  TEST(AreSimilarStationNames("Hauptbahnhof", "Nürnberg Hauptbahnhof"), ());
+  TEST(AreSimilarStationNames("Fürth (Bayern) Hauptbahnhof", "Fürth Hauptbahnhof"), ());
+  TEST(AreSimilarStationNames("Fürth Hauptbahnhof", "Hauptbahnhof Fürth"), ());
+  TEST(AreSimilarStationNames("Fürth Hbf", "Fürth Hauptbahnhof"), ());
+  TEST(AreSimilarStationNames("Erlangen", "Bahnhof Erlangen"), ());
+  TEST(AreSimilarStationNames("Erlangen Bf", "Bahnhof Erlangen"), ());
+  TEST(AreSimilarStationNames("S+U Alexanderplatz", "Alexanderplatz"), ());
+  TEST(AreSimilarStationNames("U Potsdamer Platz", "potsdamer platz"), ());
+
+  TEST(!AreSimilarStationNames("Hauptbahnhof Nord", "Hauptbahnhof Süd"), ());
+  TEST(!AreSimilarStationNames("Hamburg Hauptbahnhof", "Hauptbahnhof Süd"), ());
+  TEST(!AreSimilarStationNames("Nürnberg-Steinbühl", "Nürnberg Hauptbahnhof"), ());
+  TEST(!AreSimilarStationNames("", "Hauptbahnhof"), ());
+  TEST(!AreSimilarStationNames("", ""), ());
 }
 }  // namespace ranking_tests

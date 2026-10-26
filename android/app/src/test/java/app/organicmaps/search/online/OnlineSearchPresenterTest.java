@@ -279,7 +279,9 @@ public class OnlineSearchPresenterTest
     debounce();
     assertTrue(mProvider.mRequests.isEmpty());
 
-    mPresenter.onOfflineResults(Collections.singletonList(new OfflinePlace("München", 48.137, 11.575)));
+    // The city "München" matches only a part of the query.
+    mPresenter.onOfflineResults(
+        Collections.singletonList(new OfflinePlace("München", 48.137, 11.575, null, OfflinePlace.Match.PARTIAL)));
     mPresenter.onOfflineSearchFinished();
     assertEquals(OnlineSearchPolicy.Decision.FEW_OFFLINE_RESULTS, mPresenter.getDecision());
     assertEquals(OnlineSearchState.Status.LOADING, status());
@@ -319,6 +321,24 @@ public class OnlineSearchPresenterTest
     mPresenter.onOfflineResults(Arrays.asList(new OfflinePlace("Alexanderplatz", 52.5219, 13.4132),
                                               new OfflinePlace("Alexanderplatz", 52.5215, 13.4110),
                                               new OfflinePlace("Alexanderplatz Bhf", 52.5213, 13.4105)));
+    mPresenter.onOfflineSearchFinished();
+    assertEquals(OnlineSearchPolicy.Decision.ENOUGH_OFFLINE_RESULTS, mPresenter.getDecision());
+    debounce();
+    assertEquals(OnlineSearchState.Status.HIDDEN, status());
+    assertTrue(mProvider.mRequests.isEmpty());
+  }
+
+  @Test
+  public void bestOfflineAnswerStaysOffline()
+  {
+    // "Nürnberg Hbf" searched in Berlin: the station matches the whole query ("Hauptbahnhof" is highlighted for
+    // "Hbf"), the other stations of Nürnberg only "Nürnberg".
+    mConsent.grant(1);
+    type("Nürnberg Hbf", BERLIN);
+    mPresenter.onOfflineResults(
+        Arrays.asList(new OfflinePlace("Nürnberg Hauptbahnhof", 49.446, 11.082, null, OfflinePlace.Match.FULL),
+                      new OfflinePlace("Nürnberg-Steinbühl", 49.443, 11.064, null, OfflinePlace.Match.PARTIAL),
+                      new OfflinePlace("Nürnberg-Dürrenhof", 49.447, 11.099, null, OfflinePlace.Match.PARTIAL)));
     mPresenter.onOfflineSearchFinished();
     assertEquals(OnlineSearchPolicy.Decision.ENOUGH_OFFLINE_RESULTS, mPresenter.getDecision());
     debounce();

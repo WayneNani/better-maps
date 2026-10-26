@@ -13,6 +13,7 @@ set(SRC
   ranker_test.cpp
   search_edited_features_test.cpp
   smoke_test.cpp
+  station_ranking_test.cpp
   tracer_tests.cpp
   utils_test.cpp
 )

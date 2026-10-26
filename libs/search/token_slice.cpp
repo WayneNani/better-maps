@@ -50,6 +50,15 @@ TokenSliceNoCategories::TokenSliceNoCategories(QueryParams const & params, Token
       m_indexes.push_back(i);
 }
 
+// TokenSliceOfIndexes -----------------------------------------------------------------------------
+TokenSliceOfIndexes::TokenSliceOfIndexes(QueryParams const & params, vector<size_t> indexes, bool skipCategories)
+  : m_params(params)
+  , m_indexes(std::move(indexes))
+{
+  if (skipCategories)
+    std::erase_if(m_indexes, [&params](size_t i) { return params.IsCategorySynonym(i); });
+}
+
 string DebugPrint(TokenSlice const & slice)
 {
   return SliceToString("TokenSlice", slice);
@@ -58,5 +67,10 @@ string DebugPrint(TokenSlice const & slice)
 string DebugPrint(TokenSliceNoCategories const & slice)
 {
   return SliceToString("TokenSliceNoCategories", slice);
+}
+
+string DebugPrint(TokenSliceOfIndexes const & slice)
+{
+  return SliceToString("TokenSliceOfIndexes", slice);
 }
 }  // namespace search

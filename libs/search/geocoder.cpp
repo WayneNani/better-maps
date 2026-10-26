@@ -462,7 +462,7 @@ Geocoder::ExtendedMwmInfos Geocoder::OrderCountries(bool inViewport, vector<MwmI
   {
     for (auto const & p : m_cities)
       for (auto const & city : p.second)
-        mwmsWithCities.insert(m_infoGetter.GetRegionCountryId(city.m_rect.Center()));
+        mwmsWithCities.insert(m_infoGetter.GetRegionCountryId(city.m_center));
     for (auto const & p : m_regions[Region::TYPE_STATE])
       for (auto const & state : p.second)
         mwmsWithStates.insert(m_infoGetter.GetRegionCountryId(state.m_center));
@@ -787,6 +787,7 @@ void Geocoder::FillLocalitiesTable(BaseContext const & ctx)
       City city(std::move(l), Model::TYPE_CITY);
 
       auto const center = ft->GetCenter();
+      city.m_center = center;
 
       CitiesBoundariesTable::Boundaries boundaries;
       bool haveBoundary = false;
@@ -853,6 +854,7 @@ void Geocoder::FillVillageLocalities(BaseContext const & ctx)
     */
 
     City village(std::move(l), Model::TYPE_VILLAGE);
+    village.m_center = center;
 
     auto const population = ftypes::GetPopulation(*ft);
     auto const radius = ftypes::GetRadiusByPopulation(population);
@@ -1023,7 +1025,7 @@ void Geocoder::MatchCities(BaseContext & ctx)
     {
       BailIfCancelled();
 
-      if (!ctx.m_regions.empty() && !m_infoGetter.BelongsToAnyRegion(city.m_rect.Center(), ctx.m_regions.back()->m_ids))
+      if (!ctx.m_regions.empty() && !m_infoGetter.BelongsToAnyRegion(city.m_center, ctx.m_regions.back()->m_ids))
         continue;
 
       ScopedMarkTokens mark(ctx.m_tokens, BaseContext::FromModelType(city.m_type), tokenRange);
@@ -1051,7 +1053,7 @@ void Geocoder::MatchCities(BaseContext & ctx)
       size_t const numEmitted = ctx.m_numEmitted;
 
       CentersFilter centers;
-      centers.Add(city.m_rect.Center());
+      centers.Add(city.m_center);
       LimitedSearch(ctx, filter, centers);
 
       /// @todo A bit controversial here. We don't emit relaxed city if it was matched with some address.

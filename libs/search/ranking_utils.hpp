@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <limits>
 #include <string>
+#include <string_view>
 #include <vector>
 
 class CategoriesHolder;
@@ -182,6 +183,29 @@ struct NameScores
 
 std::string DebugPrint(NameScore const & score);
 std::string DebugPrint(NameScores const & scores);
+
+// Features of a railway station, from the smallest to the biggest. Search results of one station (a station, its
+// building, platforms and entrances, an S-Bahn and a subway station of the same name) are merged into one result,
+// shown as the biggest feature.
+enum class StationPart : uint8_t
+{
+  None,       // Not a part of a station.
+  Part,       // Subway entrance, railway platform.
+  Building,   // building=train_station.
+  Subway,     // railway=station + station=subway, funicular, monorail.
+  Halt,       // railway=halt.
+  LightRail,  // railway=station + station=light_rail (S-Bahn).
+  Station,    // railway=station.
+};
+
+std::string DebugPrint(StationPart part);
+
+StationPart GetStationPart(feature::TypesHolder const & types);
+
+// Returns true if the names of two features of a station are similar: all tokens of one name are in the other one,
+// e.g. "Hauptbahnhof" and "Nürnberg Hauptbahnhof", "Fürth Hauptbahnhof" and "Fürth (Bayern) Hauptbahnhof",
+// "S+U Alexanderplatz" and "Alexanderplatz". "Hbf" is the same as "Hauptbahnhof". Empty names are never similar.
+bool AreSimilarStationNames(std::string_view lhs, std::string_view rhs);
 
 class TokensVector
 {

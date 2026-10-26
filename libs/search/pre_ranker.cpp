@@ -80,6 +80,32 @@ void SweepNearbyResults(m2::PointD const & eps, ankerl::unordered_dense::set<Fea
 }
 }  // namespace
 
+// static
+PreRanker::PreResultsContainerT::iterator PreRanker::SelectInterpretation(PreResultsContainerT::iterator begin,
+                                                                           PreResultsContainerT::iterator end)
+{
+  ASSERT(begin != end, ());
+
+  // |begin| matches the most tokens in the feature itself. A feature whose name contains the name of its city
+  // (the station "Nürnberg Hauptbahnhof" for "Nürnberg Hbf") is also matched as a POI in that city. Both
+  // interpretations use the same tokens, but the one with the city tells that the feature is in the city, so the
+  // Ranker measures its distance from the city and not from the user, who may be far away.
+  auto const & best = begin->GetInfo();
+  if (best.m_cityId.IsValid() || !Model::IsPoi(best.m_type))
+    return begin;
+
+  for (auto it = std::next(begin); it != end; ++it)
+  {
+    auto const & info = it->GetInfo();
+    if (info.m_allTokensUsed != best.m_allTokensUsed || info.m_isCommonMatchOnly != best.m_isCommonMatchOnly)
+      continue;
+    auto const cityAndPoiRange = info.GetCityAndPoiTokenRange();
+    if (cityAndPoiRange && *cityAndPoiRange == best.InnermostTokenRange())
+      return it;
+  }
+  return begin;
+}
+
 PreRanker::PreRanker(DataSource const & dataSource, Ranker & ranker)
   : m_dataSource(dataSource)
   , m_ranker(ranker)
@@ -205,7 +231,19 @@ void PreRanker::Filter()
   /// @DebugNote
   /// Use DbgFindAndLog to check needed ids before and after filtering
 
-  base::SortUnique(m_results, lessForUnique, base::EqualsBy(&PreRankerResult::GetId));
+  std::sort(m_results.begin(), m_results.end(), lessForUnique);
+  {
+    PreResultsContainerT unique;
+    unique.reserve(m_results.size());
+    for (auto i = m_results.begin(); i != m_results.end();)
+    {
+      auto const groupEnd =
+          std::find_if(i, m_results.end(), [&i](PreRankerResult const & r) { return r.GetId() != i->GetId(); });
+      unique.push_back(std::move(*SelectInterpretation(i, groupEnd)));
+      i = groupEnd;
+    }
+    m_results.swap(unique);
+  }
 
   if (m_params.m_viewportSearch)
     FilterForViewportSearch();

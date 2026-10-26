@@ -218,7 +218,7 @@ public final class OnlineSearchPresenter
   private void evaluate()
   {
     mDecision = OnlineSearchPolicy.decide(mQuery, mIsCategory, mCenterRegion, OfflinePlace.countAnswers(mOffline),
-                                          mOfflineFinished);
+                                          OfflinePlace.bestIsAnswer(mOffline), mOfflineFinished);
     if (!mDecision.isOnline())
     {
       if (!mRequested)

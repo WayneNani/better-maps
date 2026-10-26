@@ -98,6 +98,17 @@ public final class OfflinePlace
     return full + (full == 0 && partial == 0 ? unhighlighted : 0);
   }
 
+  /**
+   * True if the best offline result (the first one) answers the whole query: "Nürnberg Hbf" finds the station
+   * "Nürnberg Hauptbahnhof" first and then other stations of Nürnberg, which match only a part of the query.
+   */
+  public static boolean bestIsAnswer(@NonNull Iterable<OfflinePlace> places)
+  {
+    for (OfflinePlace place : places)
+      return place.getMatch() == Match.FULL;
+    return false;
+  }
+
   private static int highlightedLength(@Nullable int[] ranges)
   {
     if (ranges == null)

@@ -6,6 +6,8 @@
 - Gleiche Bedingungen: `Germany_Berlin.mwm` (261018), Position/Viewport Berlin-Mitte (52.5200, 13.4050),
   Öffnungszeiten ausgewertet am Mi, 21.10.2026, 20:30 (Europe/Berlin), Anfragen ohne Leerzeichen am Ende.
 - Erzeugt mit `run_eval.sh` und `evaluate.py queries.tsv results_before.tsv results_after.tsv`.
+- Bahnhofs-Fernsuchen (Branch `bm/search-stations`): eigenes Set `stations.tsv` und Vergleich in
+  `stations_comparison.md`; das Berlin-Set danach in `results_after_stations.tsv` (keine Verschlechterung).
 
 Lesart: Bei Kategorie-/Filter-Anfragen zählt P@5 (Anteil der Top 5 mit passendem Typ), die mittlere Entfernung
 der Top 5 und der Öffnungszustand der passenden Treffer. Bei Orten, Adressen, Straßen, Tippfehlern und

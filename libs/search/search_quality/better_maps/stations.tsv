@@ -1,0 +1,34 @@
+# better-maps search evaluation set: railway stations searched from another city (AP stations).
+# Columns (tab separated): id, kind, query, expectation, as in queries.tsv.
+# The query starts with the viewport and user position it is searched from ("berlin: ", "nuremberg: "), see
+# run_stations.sh. kind: station -> the station (its biggest feature), counter -> other things that must not change.
+# The expectation is a regex for the expected result ("name | address | type").
+s01	station	berlin: Nürnberg Hbf	^Nürnberg Hauptbahnhof \|.*\| railway-station
+s02	station	berlin: Nürnberg Hauptbahnhof	^Nürnberg Hauptbahnhof \|.*\| railway-station
+s03	station	berlin: Nürnberg Bahnhof	^Nürnberg Hauptbahnhof \|.*\| railway-station
+s04	station	berlin: Hbf Nürnberg	^Nürnberg Hauptbahnhof \|.*\| railway-station
+s05	station	berlin: Fürth Hbf	^Fürth (\(Bayern\) )?Hauptbahnhof \|.*\| railway-station
+s06	station	berlin: Fürth Hauptbahnhof	^Fürth (\(Bayern\) )?Hauptbahnhof \|.*\| railway-station
+s07	station	berlin: Erlangen Bahnhof	^(Bahnhof )?Erlangen \|.*\| (railway-station|building-train_station)
+s08	station	berlin: Erlangen Hbf	^(Bahnhof )?Erlangen \|.*\| (railway-station|building-train_station)
+s09	station	berlin: Nürnberg Frankenstadion	^Nürnberg Frankenstadion \|.*\| railway-station
+s10	station	berlin: Fürth Rathaus	^Fürth Rathaus \|.*\| railway-station
+s11	station	nuremberg: Berlin Hbf	^Berlin Hauptbahnhof \|.*\| railway-station
+s12	station	nuremberg: Berlin Hauptbahnhof	^Berlin Hauptbahnhof \|.*\| railway-station
+s13	station	nuremberg: Hbf Berlin	^Berlin Hauptbahnhof \|.*\| railway-station
+s14	station	nuremberg: Nürnberg Hbf	^Nürnberg Hauptbahnhof \|.*\| railway-station
+s15	station	nuremberg: Hauptbahnhof	^Nürnberg Hauptbahnhof \|.*\| railway-station
+s16	station	nuremberg: Fürth Hbf	^Fürth (\(Bayern\) )?Hauptbahnhof \|.*\| railway-station
+s17	station	nuremberg: Erlangen Hbf	^(Bahnhof )?Erlangen \|.*\| (railway-station|building-train_station)
+s18	station	bonn: Nürnberg Hbf	^Nürnberg Hauptbahnhof \|.*\| railway-station
+s19	station	bonn: Fürth Hbf	^Fürth (\(Bayern\) )?Hauptbahnhof \|.*\| railway-station
+s20	station	bonn: Berlin Hbf	^Berlin Hauptbahnhof \|.*\| railway-station
+c01	counter	berlin: Bahnhofstraße	^Bahnhofstraße \|.*\| highway-
+c02	counter	nuremberg: Bahnhofstraße	^Bahnhofstraße \|.*\| highway-
+c03	counter	berlin: Hotel Nürnberg Hauptbahnhof	^ibis Hotel Nürnberg Hauptbahnhof \|
+c04	counter	nuremberg: ibis Nürnberg Hauptbahnhof	^ibis Hotel Nürnberg Hauptbahnhof \|
+c05	counter	berlin: Hotel am Hauptbahnhof	^(City Apartment|Hotel) am Hauptbahnhof \|
+c06	counter	nuremberg: Hotel am Hauptbahnhof	^(City Apartment|Hotel) am Hauptbahnhof \|
+c07	counter	nuremberg: Nürnberg Bahnhofsplatz	^Bahnhofsplatz \|.*\| highway-
+c08	counter	nuremberg: Nürnberg Hauptbahnhof Apotheke	\| amenity-pharmacy
+c09	counter	berlin: Nürnberg Gostenhof	^Gostenhof \|.*\| place-suburb

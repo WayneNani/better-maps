@@ -13,6 +13,7 @@
 #include "indexer/feature.hpp"
 #include "indexer/feature_data.hpp"
 #include "indexer/mwm_set.hpp"
+#include "indexer/search_delimiters.hpp"
 
 #include "platform/country_file.hpp"
 #include "platform/helpers.hpp"
@@ -58,7 +59,7 @@ DEFINE_string(mwm_list_path, "", "Path to a file containing the names of availab
 DEFINE_string(mwm_path, "", "Path to mwm files (writable dir)");
 DEFINE_string(queries_path, "", "Path to the file with queries");
 DEFINE_int32(top, 1, "Number of top results to show for every query");
-DEFINE_string(viewport, "", "Viewport to use when searching (default, moscow, london, zurich)");
+DEFINE_string(viewport, "", "Viewport to use when searching (default, moscow, london, zurich, berlin, nuremberg, bonn)");
 DEFINE_string(check_completeness, "", "Path to the file with completeness data");
 DEFINE_string(ranking_csv_file, "", "File ranking info will be exported to");
 DEFINE_string(position, "", "User position as \"lat,lon\" (none by default)");
@@ -66,6 +67,8 @@ DEFINE_int64(opening_hours_time, 0, "Unix time to evaluate opening hours at (cur
 DEFINE_bool(prefix_free, true, "Append a space to every query, so the last token is not treated as a prefix");
 DEFINE_bool(detect_query_filters, false, "Recognize filter words in queries like the app does (\"Café offen\")");
 DEFINE_string(tsv_out, "", "File the top results are written to as TSV (query, position, name, type, ...)");
+DEFINE_int32(max_results, 0, "Maximum number of results of a query (the app's default when 0)");
+DEFINE_bool(tsv_debug, false, "Write the full ranking info (parse, name score, distance to pivot) to the TSV output");
 
 string const kDefaultQueriesPathSuffix = "/../search/search_quality/search_quality_tool/queries.txt";
 string const kEmptyResult = "<empty>";
@@ -190,8 +193,29 @@ string GetAllTypes(DataSource const & dataSource, Result const & r)
   return res;
 }
 
+// How well a result answers the query, judged by the highlighted parts like the Android app does to decide whether
+// to search online (see OfflinePlace.match() there): "full" if at least 75% of the query's letters and digits are
+// highlighted in the name and the address, "partial" if less, "none" if nothing.
+string HighlightMatch(string const & query, Result const & r)
+{
+  size_t highlighted = 0;
+  for (size_t i = 0; i < r.GetHighlightRangesCount(); ++i)
+    highlighted += r.GetHighlightRange(i).second;
+  for (size_t i = 0; i < r.GetDescHighlightRangesCount(); ++i)
+    highlighted += r.GetDescHighlightRange(i).second;
+  if (highlighted == 0)
+    return "none";
+
+  search::Delimiters const delimiters;
+  size_t queryLength = 0;
+  for (auto const c : strings::MakeUniString(query))
+    if (!delimiters(c))
+      ++queryLength;
+  return highlighted >= 0.75 * queryLength ? "full" : "partial";
+}
+
 // Writes |top| results of the query as TSV lines: query, position, name, type, all types of the feature, address,
-// distance to the user position (m), opening state, ranking details.
+// distance to the user position (m), opening state, ranking details, highlight match (see HighlightMatch()).
 void WriteTsv(ostream & os, DataSource const & dataSource, string const & query, vector<Result> const & results,
               size_t top, optional<m2::PointD> const & position)
 {
@@ -216,8 +240,10 @@ void WriteTsv(ostream & os, DataSource const & dataSource, string const & query,
       auto const & info = r.GetRankingInfo();
       os << "rank " << info.GetLinearModelRank() << ", popularity " << static_cast<int>(info.m_popularity)
          << ", pureCats " << info.m_pureCats;
+      if (FLAGS_tsv_debug)
+        os << ", " << DebugPrint(info);
     }
-    os << '\n';
+    os << '\t' << HighlightMatch(query, r) << '\n';
   }
 }
 
@@ -388,6 +414,9 @@ void RunRequests(DataSource const & dataSource, TestSearchEngine & engine, m2::R
     params.m_mode = Mode::Everywhere;
     params.m_position = ParsePosition(FLAGS_position);
     params.m_needAddress = true;
+    params.m_needHighlighting = true;
+    if (FLAGS_max_results > 0)
+      params.m_maxNumResults = static_cast<size_t>(FLAGS_max_results);
     params.m_detectQueryFilters = FLAGS_detect_query_filters;
     if (FLAGS_opening_hours_time != 0)
       params.m_openingHoursTime = static_cast<time_t>(FLAGS_opening_hours_time);
@@ -399,7 +428,7 @@ void RunRequests(DataSource const & dataSource, TestSearchEngine & engine, m2::R
   {
     tsv.open(FLAGS_tsv_out);
     CHECK(tsv.is_open(), ("Can't open", FLAGS_tsv_out));
-    tsv << "query\tpos\tname\ttype\ttypes\taddress\tdistance_m\topen\tranking\n";
+    tsv << "query\tpos\tname\ttype\ttypes\taddress\tdistance_m\topen\tranking\thighlight\n";
   }
 
   ofstream csv;

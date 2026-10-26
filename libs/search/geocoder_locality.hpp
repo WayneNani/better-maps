@@ -63,6 +63,9 @@ struct City : public Locality
 {
   City(Locality && locality, Model::Type type) : Locality(std::move(locality)), m_type(type) {}
 
+  // The locality point. It is not always the center of |m_rect|: e.g. the boundary of Hamburg includes
+  // the far away island Neuwerk.
+  m2::PointD m_center;
   m2::RectD m_rect;
   Model::Type m_type;
 };

@@ -60,6 +60,29 @@ private:
   std::vector<size_t> m_indexes;
 };
 
+// Query tokens at the given positions in the given order, e.g. the tokens of "Hbf Nürnberg" in the order of the
+// name "Nürnberg Hauptbahnhof".
+class TokenSliceOfIndexes
+{
+public:
+  TokenSliceOfIndexes(QueryParams const & params, std::vector<size_t> indexes, bool skipCategories);
+
+  inline QueryParams::Token const & Get(size_t i) const
+  {
+    ASSERT_LESS(i, Size(), ());
+    return m_params.GetToken(m_indexes[i]);
+  }
+
+  inline size_t Size() const { return m_indexes.size(); }
+
+  inline bool Empty() const { return Size() == 0; }
+  inline bool IsPrefix(size_t i) const { return m_params.IsPrefixToken(m_indexes[i]); }
+
+private:
+  QueryParams const & m_params;
+  std::vector<size_t> m_indexes;
+};
+
 class QuerySlice : public StringSliceBase
 {
 public:
@@ -98,4 +121,5 @@ private:
 std::string DebugPrint(TokenSlice const & slice);
 
 std::string DebugPrint(TokenSliceNoCategories const & slice);
+std::string DebugPrint(TokenSliceOfIndexes const & slice);
 }  // namespace search
