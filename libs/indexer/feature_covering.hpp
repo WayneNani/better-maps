@@ -17,6 +17,8 @@
 #include <utility>
 #include <vector>
 
+#include "3party/ankerl/unordered_dense.h"
+
 class FeatureType;
 
 namespace indexer
@@ -75,14 +77,27 @@ void CoverViewportAndAppendLowerLevels(m2::RectD const & r, int cellDepth, Inter
   ids.reserve(SPLIT_RECT_CELLS_COUNT);
   CoverRect<mercator::Bounds, m2::CellId<DEPTH_LEVELS>>(r, SPLIT_RECT_CELLS_COUNT, cellDepth - 1, ids);
 
+  // Same as AppendLowerLevels() for every cell, but neighbouring cells share most of their ancestors: append every
+  // ancestor only once (the merged result is the same), which makes the sorting much faster.
   Intervals intervals;
-  for (auto const & id : ids)
+  intervals.reserve(2 * ids.size());
+  ankerl::unordered_dense::set<int64_t> ancestors;
+  for (auto id : ids)
   {
-    AppendLowerLevels<DEPTH_LEVELS>(id, cellDepth,
-                                    [&intervals](Interval const & interval) { intervals.push_back(interval); });
+    int64_t const idInt64 = id.ToInt64(cellDepth);
+    intervals.emplace_back(idInt64, idInt64 + id.SubTreeSize(cellDepth));
+    while (id.Level() > 0)
+    {
+      id = id.Parent();
+      int64_t const parentInt64 = id.ToInt64(cellDepth);
+      // All the ancestors of an appended ancestor are appended too.
+      if (!ancestors.insert(parentInt64).second)
+        break;
+      intervals.emplace_back(parentInt64, parentInt64 + 1);
+    }
   }
 
-  SortAndMergeIntervals(intervals, res);
+  SortAndMergeIntervals(std::move(intervals), res);
 }
 
 enum CoveringMode

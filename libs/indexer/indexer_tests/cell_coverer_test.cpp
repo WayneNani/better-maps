@@ -3,9 +3,13 @@
 #include "geometry/covering_utils.hpp"
 
 #include "indexer/cell_coverer.hpp"
+#include "indexer/feature_covering.hpp"
 #include "indexer/indexer_tests/bounds.hpp"
 
 #include "coding/hex.hpp"
+
+#include "geometry/latlon.hpp"
+#include "geometry/mercator.hpp"
 
 #include "base/logging.hpp"
 
@@ -62,5 +66,37 @@ UNIT_TEST(MaxDepthCoverSpiral)
 
     TEST_EQUAL(cells.size(), 1, ());
     TEST_EQUAL(cells[0].Level(), levelMax, ());
+  }
+}
+
+UNIT_TEST(CoverViewportAndAppendLowerLevels_SameAsAllLowerLevels)
+{
+  // The reference: lower levels of every cell, as in AppendLowerLevels().
+  auto const reference = [](m2::RectD const & r, int cellDepth)
+  {
+    std::vector<RectId> ids;
+    CoverRect<mercator::Bounds, RectId>(r, SPLIT_RECT_CELLS_COUNT, cellDepth - 1, ids);
+    covering::Intervals intervals;
+    for (auto const & id : ids)
+      covering::AppendLowerLevels<RectId::DEPTH_LEVELS>(id, cellDepth, [&](covering::Interval const & i)
+      { intervals.push_back(i); });
+    return covering::SortAndMergeIntervals(intervals);
+  };
+
+  for (double const sizeM : {10.0, 500.0, 1000.0, 3000.0, 50000.0})
+  {
+    for (auto const & ll : {ms::LatLon(50.7374, 7.0982), ms::LatLon(52.52, 13.405), ms::LatLon(-33.86, 151.2),
+                            ms::LatLon(0.0, 0.0)})
+    {
+      auto const rect = mercator::RectByCenterXYAndSizeInMeters(mercator::FromLatLon(ll), sizeM);
+      for (int const scale : {10, 14, 17})
+      {
+        int const cellDepth = covering::GetCodingDepth<RectId::DEPTH_LEVELS>(scale);
+        covering::Intervals res;
+        covering::CoverViewportAndAppendLowerLevels<RectId::DEPTH_LEVELS>(rect, cellDepth, res);
+        TEST(!res.empty(), ());
+        TEST_EQUAL(res, reference(rect, cellDepth), (sizeM, ll, scale));
+      }
+    }
   }
 }
