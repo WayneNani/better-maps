@@ -67,8 +67,7 @@ public:
     SetViewport(m2::RectD(-0.1, -0.1, 0.1, 0.1));
   }
 
-  vector<Result> Search(string const & query, OpeningHoursFilter filter, Mode mode = Mode::Everywhere,
-                        bool categorial = true, int hour = 12)
+  SearchParams MakeParams(string const & query, OpeningHoursFilter filter, Mode mode, bool categorial, int hour) const
   {
     SearchParams params = GetDefaultSearchParams(query);
     params.m_mode = mode;
@@ -77,7 +76,20 @@ public:
     params.m_openingHoursTime = MakeLocalTime(hour);
     if (mode == Mode::Viewport)
       params.m_maxNumResults = SearchParams::kDefaultNumResultsInViewport;
-    return MakeRequest(params)->Results();
+    return params;
+  }
+
+  vector<Result> Search(string const & query, OpeningHoursFilter filter, Mode mode = Mode::Everywhere,
+                        bool categorial = true, int hour = 12)
+  {
+    return MakeRequest(MakeParams(query, filter, mode, categorial, hour))->Results();
+  }
+
+  // See Results::GetHiddenWithoutOpeningHoursCount().
+  size_t CountHiddenWithoutOpeningHours(string const & query, OpeningHoursFilter filter, Mode mode = Mode::Everywhere,
+                                        bool categorial = true, int hour = 12)
+  {
+    return MakeRequest(MakeParams(query, filter, mode, categorial, hour))->HiddenWithoutOpeningHoursCount();
   }
 
   Rule Match(TestFeature const & feature) const { return ExactMatch(m_mwmId, feature); }
@@ -183,6 +195,40 @@ UNIT_CLASS_TEST(OpeningHoursFilterTest, ResultsOpenStatusUsesSearchTime)
   }
 }
 
+UNIT_CLASS_TEST(OpeningHoursFilterTest, CountsHiddenWithoutOpeningHours)
+{
+  for (auto const mode : {Mode::Everywhere, Mode::Viewport})
+  {
+    // |m_unknownCafe| has no opening hours, |m_invalidCafe| has unparsable ones. |m_closedCafe| is hidden
+    // because it's closed, it is not counted: "Also without opening hours" doesn't show it.
+    TEST_EQUAL(CountHiddenWithoutOpeningHours("cafe ", OpeningHoursFilter::OpenNow, mode), 2, (mode));
+    TEST_EQUAL(CountHiddenWithoutOpeningHours("cafe", OpeningHoursFilter::OpenNow, mode, false /* categorial */), 2,
+               (mode));
+
+    // Nothing is hidden because of unknown opening hours.
+    TEST_EQUAL(CountHiddenWithoutOpeningHours("cafe ", OpeningHoursFilter::Off, mode), 0, (mode));
+    TEST_EQUAL(CountHiddenWithoutOpeningHours("cafe ", OpeningHoursFilter::OpenNowOrUnknown, mode), 0, (mode));
+  }
+
+  // Only POIs matching the query are counted.
+  TEST_EQUAL(CountHiddenWithoutOpeningHours("mystery cafe", OpeningHoursFilter::OpenNow, Mode::Everywhere,
+                                            false /* categorial */),
+             1, ());
+}
+
+UNIT_CLASS_TEST(OpeningHoursFilterTest, QueryFilterCountsHiddenWithoutOpeningHours)
+{
+  // "open now" in the query turns the filter on ("Café offen"), the count is the same as with the chip.
+  SearchParams params =
+      MakeParams("cafe open now", OpeningHoursFilter::Off, Mode::Everywhere, false /* categorial */, 12);
+  params.m_detectQueryFilters = true;
+  auto const request = MakeRequest(params);
+  // The street and the building are not POIs, they are never filtered.
+  Rules const rules = {Match(m_openCafe), Match(m_street), Match(m_building)};
+  TEST(ResultsMatch(request->Results(), rules), ());
+  TEST_EQUAL(request->HiddenWithoutOpeningHoursCount(), 2, ());
+}
+
 // More POIs than PreRanker's everywhere batch size (1000), so the batch selection is involved.
 UNIT_CLASS_TEST(SearchTest, OpeningHoursFilter_ManyPois)
 {
@@ -227,6 +273,47 @@ UNIT_CLASS_TEST(SearchTest, OpeningHoursFilter_ManyPois)
   TEST_EQUAL(results.size(), params.m_maxNumResults, ());
   for (auto const & r : results)
     TEST_EQUAL(r.IsOpenNow(), osm::Yes, (r));
+}
+
+// The count of hidden POIs is not limited by the number of results and each POI is counted once,
+// also when several batches are sent to the ranker.
+UNIT_CLASS_TEST(SearchTest, OpeningHoursFilter_CountsManyHiddenWithoutOpeningHours)
+{
+  size_t constexpr kSide = 40;
+  vector<TestCafe> cafes;
+  cafes.reserve(kSide * kSide);
+  size_t withoutOpeningHours = 0;
+  for (size_t i = 0; i < kSide; ++i)
+  {
+    for (size_t j = 0; j < kSide; ++j)
+    {
+      cafes.emplace_back(m2::PointD(i * 0.0001, j * 0.0001), "Cafe", "en");
+      if ((i + j) % 4 == 0)
+        cafes.back().GetMetadata().Set(feature::Metadata::FMD_OPEN_HOURS, "Mo-Su 08:00-20:00");
+      else
+        ++withoutOpeningHours;
+    }
+  }
+
+  BuildCountry("Wonderland", [&](TestMwmBuilder & builder)
+  {
+    for (auto const & cafe : cafes)
+      builder.Add(cafe);
+  });
+  SetViewport(m2::RectD(-0.1, -0.1, 0.1, 0.1));
+
+  SearchParams params = GetDefaultSearchParams("cafe ");
+  params.m_categorialRequest = true;
+  params.m_openingHoursTime = MakeLocalTime(12);
+  params.m_openingHoursFilter = OpeningHoursFilter::OpenNow;
+  auto const request = MakeRequest(params);
+  for (auto const & r : request->Results())
+    TEST_EQUAL(r.IsOpenNow(), osm::Yes, (r));
+
+  // PreRanker takes 1000 POIs of 1600 in one batch, the hidden ones are counted among them.
+  size_t const hidden = request->HiddenWithoutOpeningHoursCount();
+  TEST_GREATER(hidden, params.m_maxNumResults, ());
+  TEST_LESS_OR_EQUAL(hidden, withoutOpeningHours, ());
 }
 
 UNIT_CLASS_TEST(OpeningHoursFilterTest, ViewportFilterBeforeSweeping)

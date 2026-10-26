@@ -57,6 +57,8 @@ public:
   // Time from Start() until the search started (waiting for other searches of the engine).
   TimeDurationT QueueTime() const;
   std::vector<search::Result> const & Results() const;
+  // See search::Results::GetHiddenWithoutOpeningHoursCount().
+  size_t HiddenWithoutOpeningHoursCount() const;
 
   SearchParams const & Params() const { return m_params; }
 
@@ -78,6 +80,7 @@ protected:
   mutable std::mutex m_mu;
 
   std::vector<search::Result> m_results;
+  size_t m_hiddenWithoutOpeningHours = 0;
   bool m_done = false;
 
   base::Timer m_timer;

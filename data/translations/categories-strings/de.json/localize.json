@@ -525,13 +525,13 @@
         "defaultMessage": "4Batterien-Recycling|6Abgabe von Batterien|4Altbatterien-Annahmestelle|4Recycling von Batterien|4Batterie-Recycling|4Batterien|4Annahme von Altbatterien|4Altbatterien|6Abgabe von Altbatterien|4Batterien-Abgabestelle"
     },
     "recycling-clothes|@category_recycling": {
-        "defaultMessage": "3Altkleider|3Alte Kleidung|3Kleiderspende|3Altkleidercontainer"
+        "defaultMessage": "3Altkleider|3Alte Kleidung|3Kleiderspende|3Altkleidercontainer|4Kleidercontainer"
     },
     "recycling-glass_bottles|@category_recycling": {
-        "defaultMessage": "4Glas-Container|3Glasflaschen|3Altglas"
+        "defaultMessage": "4Glas-Container|3Glasflaschen|3Altglas|4Glascontainer|4Altglascontainer"
     },
     "recycling-paper|@category_recycling": {
-        "defaultMessage": "4Altpapier|3Papier|3Papier-Recycling|4Altpapier-Recycling"
+        "defaultMessage": "4Altpapier|3Papier|3Papier-Recycling|4Altpapier-Recycling|4Papiercontainer|4Altpapiercontainer"
     },
     "recycling-plastic|@category_recycling": {
         "defaultMessage": "3Kunststoff|3Plastik|3Plastikmüll|3Plaste|3Plast"
@@ -1530,7 +1530,7 @@
         "defaultMessage": "4Recycling von Dosen|4Dosenrecycling|4Aluminiumdosen-Recycling|3Blechdosen"
     },
     "recycling-shoes|@category_recycling": {
-        "defaultMessage": "4Recycling von Schuhen|4Schuh-Recycling|4Schuhe spenden|4Altschuhe"
+        "defaultMessage": "4Recycling von Schuhen|4Schuh-Recycling|4Schuhe spenden|4Altschuhe|4Schuhcontainer"
     },
     "recycling-green_waste|@category_recycling": {
         "defaultMessage": "3Recycling von Gartenabfällen|4Organisches Müll Recycling|5Gartenabfälle|3Biomüll|3Kompost|5Grünschnitt"

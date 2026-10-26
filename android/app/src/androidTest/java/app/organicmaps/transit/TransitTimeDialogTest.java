@@ -2,12 +2,14 @@ package app.organicmaps.transit;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.espresso.matcher.ViewMatchers.isChecked;
 import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
@@ -15,12 +17,17 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import android.content.Context;
+import android.os.SystemClock;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TimePicker;
 import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.testing.FragmentScenario;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
@@ -105,7 +112,13 @@ public class TransitTimeDialogTest
   public void tearDown() throws Exception
   {
     if (mScenario != null)
+    {
+      closeDialogs();
+      // Closing the activity also removes the time dialog (an AlertDialog, not a fragment).
       mScenario.close();
+      mScenario = null;
+    }
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync();
     onMain(() -> {
       mServices.getConnectionsPresenter().clear();
       mServices.getConnectionsPresenter().setTime(null, false);
@@ -142,7 +155,7 @@ public class TransitTimeDialogTest
     onView(withId(R.id.transit_time)).perform(click());
     onView(withId(R.id.transit_day_other)).inRoot(isDialog()).perform(click());
     typeDateInCalendar(date);
-    onView(withId(com.google.android.material.R.id.confirm_button)).inRoot(isDialog()).perform(click());
+    clickCalendarButton(com.google.android.material.R.id.confirm_button);
 
     // Back in the time dialog: the chip shows the chosen date.
     final TransitFormatter formatter = formatter();
@@ -194,7 +207,7 @@ public class TransitTimeDialogTest
     onView(withId(com.google.android.material.R.id.confirm_button)).inRoot(isDialog()).check(matches(not(isEnabled())));
     replaceDate(today.plusDays(TransitDateRange.MAX_DAYS_AHEAD));
     onView(withId(com.google.android.material.R.id.confirm_button)).inRoot(isDialog()).check(matches(isEnabled()));
-    onView(withId(com.google.android.material.R.id.cancel_button)).inRoot(isDialog()).perform(click());
+    clickCalendarButton(com.google.android.material.R.id.cancel_button);
 
     // Cancelled: the time dialog still shows today.
     onView(withId(R.id.transit_day_0)).inRoot(isDialog()).check(matches(isChecked()));
@@ -209,12 +222,62 @@ public class TransitTimeDialogTest
     replaceDate(date);
   }
 
+  /**
+   * Types the date into the text input of the calendar. The calendar shows the soft keyboard for its text input
+   * asynchronously (not tracked by Espresso); while it slides in, the dialog is panned and a click on its buttons may
+   * miss them. So the keyboard is closed again: Espresso waits until it is hidden.
+   */
   private void replaceDate(@NonNull LocalDate date) throws Exception
   {
     onView(allOf(isDescendantOfA(withId(com.google.android.material.R.id.mtrl_picker_text_input_date)),
                  isAssignableFrom(EditText.class)))
         .inRoot(isDialog())
-        .perform(replaceText(dateText(date)));
+        .perform(replaceText(dateText(date)), closeSoftKeyboard());
+  }
+
+  /**
+   * Clicks the confirm or cancel button of the calendar and waits until the calendar is closed, so that the next
+   * check sees the time dialog below it (and not the closing calendar, which is a dialog too).
+   */
+  private void clickCalendarButton(int buttonId) throws Exception
+  {
+    onView(withId(buttonId)).inRoot(isDialog()).check(matches(isDisplayed())).perform(click());
+    final long deadline = SystemClock.uptimeMillis() + TIMEOUT_MS;
+    while (isDatePickerShown())
+    {
+      if (SystemClock.uptimeMillis() > deadline)
+        fail("The calendar is still shown after the click on its button");
+      InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+      SystemClock.sleep(50);
+    }
+  }
+
+  private boolean isDatePickerShown() throws Exception
+  {
+    final AtomicReference<Boolean> shown = new AtomicReference<>(false);
+    mScenario.onFragment(fragment -> {
+      final Fragment picker =
+          fragment.requireActivity().getSupportFragmentManager().findFragmentByTag(TransitTimeDialog.DATE_PICKER_TAG);
+      shown.set(picker instanceof DialogFragment && ((DialogFragment) picker).getDialog() != null
+                && ((DialogFragment) picker).getDialog().isShowing());
+    });
+    return shown.get();
+  }
+
+  /** Closes what a failed test may have left open: the calendar, the time dialog and the soft keyboard. */
+  private void closeDialogs()
+  {
+    if (mScenario == null)
+      return;
+    mScenario.onFragment(fragment -> {
+      for (Fragment f : fragment.requireActivity().getSupportFragmentManager().getFragments())
+        if (f instanceof DialogFragment)
+          ((DialogFragment) f).dismissAllowingStateLoss();
+      final InputMethodManager imm = fragment.requireContext().getSystemService(InputMethodManager.class);
+      final View focus = fragment.requireActivity().getWindow().getDecorView();
+      imm.hideSoftInputFromWindow(focus.getWindowToken(), 0);
+    });
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync();
   }
 
   /** The date as the calendar's text input expects it (see {@link TransitTimeDialog#textInputPattern}). */

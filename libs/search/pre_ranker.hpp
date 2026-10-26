@@ -183,6 +183,10 @@ private:
   ankerl::unordered_dense::set<FeatureID> m_prevEmit;
   /// @}
 
+  // POIs removed by OpeningHoursFilter::OpenNow because of unknown opening hours, see
+  // Results::GetHiddenWithoutOpeningHoursCount().
+  ankerl::unordered_dense::set<FeatureID> m_hiddenWithoutOpeningHours;
+
   unsigned m_rndSeed;
 
   DISALLOW_COPY_AND_MOVE(PreRanker);

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: "Open now" filter of the search results, see OpeningHoursFilterController. -->
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:orientation="vertical">
+  <HorizontalScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:scrollbars="none">
+    <com.google.android.material.chip.ChipGroup
+      android:id="@+id/opening_hours_filter"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:paddingStart="@dimen/margin_base"
+      android:paddingEnd="@dimen/margin_base"
+      app:singleLine="true">
+      <com.google.android.material.chip.Chip
+        android:id="@+id/filter_open_now"
+        style="@style/Widget.Material3.Chip.Filter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/open_now"/>
+      <com.google.android.material.chip.Chip
+        android:id="@+id/filter_include_unknown_opening_hours"
+        style="@style/Widget.Material3.Chip.Filter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/search_filter_include_unknown_opening_hours"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+    </com.google.android.material.chip.ChipGroup>
+  </HorizontalScrollView>
+
+  <!-- better-maps: "Open now" has hidden places without opening hours; a tap shows them too. -->
+  <LinearLayout
+    android:id="@+id/opening_hours_filter_hint"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:minHeight="@dimen/margin_double_and_half"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/margin_base"
+    android:paddingTop="@dimen/margin_quarter"
+    android:paddingEnd="@dimen/margin_base"
+    android:paddingBottom="@dimen/margin_quarter"
+    android:visibility="gone"
+    tools:visibility="visible">
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/opening_hours_filter_hint_text"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:importantForAccessibility="no"
+      android:textAlignment="viewStart"
+      android:textAppearance="@style/MwmTextAppearance.Body3"
+      tools:text="12 places without opening hours hidden" />
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/opening_hours_filter_hint_action"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="@dimen/margin_half"
+      android:importantForAccessibility="no"
+      android:text="@string/search_filter_show_hidden"
+      android:textAppearance="@style/MwmTextAppearance.Body3"
+      android:textColor="?colorSecondary"
+      android:textStyle="bold" />
+  </LinearLayout>
+</LinearLayout>

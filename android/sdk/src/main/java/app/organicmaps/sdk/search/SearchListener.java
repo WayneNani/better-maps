@@ -21,9 +21,21 @@ public interface SearchListener
   /**
    * @param timestamp Timestamp of search request.
    */
+  default void onResultsEnd(long timestamp) {}
+
+  /**
+   * The search has ended.
+   *
+   * @param timestamp                 Timestamp of search request.
+   * @param hiddenWithoutOpeningHours The number of places which match the query, but are hidden by
+   *                                  {@link OpeningHoursFilter#OPEN_NOW} because their opening hours are unknown.
+   *                                  {@link OpeningHoursFilter#OPEN_NOW_OR_UNKNOWN} shows them.
+   */
   // Called by JNI.
   @Keep
   @SuppressWarnings("unused")
-  default void onResultsEnd(long timestamp)
-  {}
+  default void onResultsEnd(long timestamp, int hiddenWithoutOpeningHours)
+  {
+    onResultsEnd(timestamp);
+  }
 }

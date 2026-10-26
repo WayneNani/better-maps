@@ -107,6 +107,13 @@ vector<search::Result> const & TestSearchRequest::Results() const
   return m_results;
 }
 
+size_t TestSearchRequest::HiddenWithoutOpeningHoursCount() const
+{
+  lock_guard<mutex> lock(m_mu);
+  CHECK(m_done, ("This function may be called only when request is processed."));
+  return m_hiddenWithoutOpeningHours;
+}
+
 void TestSearchRequest::Start()
 {
   {
@@ -165,6 +172,7 @@ void TestSearchRequest::OnResults(search::Results const & results)
 {
   lock_guard<mutex> lock(m_mu);
   m_results.assign(results.begin(), results.end());
+  m_hiddenWithoutOpeningHours = results.GetHiddenWithoutOpeningHoursCount();
   if (!m_firstResultsTime && results.GetCount() != 0)
     m_firstResultsTime = m_timer.TimeElapsed();
   if (results.IsEndMarker())

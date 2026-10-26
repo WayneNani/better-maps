@@ -318,6 +318,10 @@ void FillDetails(FeatureType & ft, std::string const & name, time_t openingHours
   append(brand);
   append(elevation);
   append(subtypes);
+  // better-maps: recycling containers have no names; the operator tells apart e.g. charity and commercial
+  // clothes containers ("Clothes • Shoes • REMONDIS").
+  if (ftypes::IsRecyclingChecker::Instance()(typesHolder))
+    append(ft.GetMetadata(feature::Metadata::FMD_OPERATOR));
   append(fee);
 
   details.m_description = std::move(description);
