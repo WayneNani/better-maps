@@ -49,4 +49,13 @@
     <item>LONG_DISTANCE</item>
     <item>FERRY</item>
   </string-array>
+
+  <string-array name="transit_default_view_entries">
+    <item>@string/transit_view_list</item>
+    <item>@string/transit_view_grid</item>
+  </string-array>
+  <string-array name="transit_default_view_values" translatable="false">
+    <item>LIST</item>
+    <item>GRID</item>
+  </string-array>
 </resources>

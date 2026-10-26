@@ -95,4 +95,30 @@
   <string name="transit_departures_empty">In nächster Zeit keine Abfahrten.</string>
   <string name="transit_departures_no_stop">Keine Haltestelle mit Abfahrten in der Nähe gefunden.</string>
   <string name="transit_departures_enable">Abfahrten mit Echtzeit anzeigen</string>
+
+  <string name="transit_view_switch">Darstellung der Verbindungen</string>
+  <string name="transit_view_list">Liste</string>
+  <string name="transit_view_grid">Zeitraster</string>
+  <string name="transit_grid_column">%1$s bis %2$s, %3$s, %4$s</string>
+  <string name="transit_save">Verbindung speichern</string>
+  <string name="transit_unsave">Aus den gespeicherten Verbindungen entfernen</string>
+  <string name="transit_saved">Verbindung gespeichert</string>
+  <string name="transit_unsaved">Verbindung aus den gespeicherten Verbindungen entfernt</string>
+  <string name="transit_saved_title">Gespeicherte Verbindungen</string>
+  <string name="transit_saved_empty">Noch keine gespeicherten Verbindungen. Öffne eine Verbindung und tippe auf das Lesezeichen, um sie zu speichern.</string>
+  <string name="transit_saved_on">Gespeicherte Verbindung · %1$s</string>
+  <string name="transit_saved_past">Diese Verbindung liegt in der Vergangenheit (%1$s).</string>
+  <string name="transit_saved_past_label">Vergangen</string>
+  <string name="transit_search_again">Erneut suchen</string>
+  <string name="transit_from_to">%1$s → %2$s</string>
+  <string name="transit_delete">Löschen</string>
+  <string name="transit_deleted">Verbindung gelöscht</string>
+  <string name="transit_undo">Rückgängig</string>
+  <string name="transit_more">Mehr</string>
+  <plurals name="transit_saved_count">
+    <item quantity="one">%d Verbindung</item>
+    <item quantity="other">%d Verbindungen</item>
+  </plurals>
+  <string name="transit_pref_category_display">Anzeige</string>
+  <string name="transit_pref_default_view">Standardansicht</string>
 </resources>
