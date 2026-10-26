@@ -13,7 +13,6 @@ import app.organicmaps.transit.LineBadge;
 import app.organicmaps.transit.TransitConnectionsPresenter;
 import app.organicmaps.util.UiUtils;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.chip.ChipGroup;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -124,7 +123,8 @@ final class ConnectionsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private final TextView mArrival;
     private final TextView mArrivalDelay;
     private final TextView mDuration;
-    private final ChipGroup mBadges;
+    private final JourneyBarView mBar;
+    private final TextView mFirstBadge;
     private final TextView mDetails;
     private final View mCancelled;
 
@@ -136,7 +136,8 @@ final class ConnectionsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       mArrival = view.findViewById(R.id.arrival);
       mArrivalDelay = view.findViewById(R.id.arrival_delay);
       mDuration = view.findViewById(R.id.duration);
-      mBadges = view.findViewById(R.id.badges);
+      mBar = view.findViewById(R.id.bar);
+      mFirstBadge = view.findViewById(R.id.first_badge);
       mDetails = view.findViewById(R.id.details);
       mCancelled = view.findViewById(R.id.cancelled);
     }
@@ -148,31 +149,22 @@ final class ConnectionsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       final String arrival =
           item.getArrivalDayOffset() > 0 ? item.getArrival() + " +" + item.getArrivalDayOffset() : item.getArrival();
       TransitViews.bindTime(mArrival, mArrivalDelay, arrival, item.getArrivalDelay(), item.isCancelled());
-      mDuration.setText(item.getDuration());
+      mDuration.setText(item.isWalkOnly() ? item.getDuration() : item.getDuration() + " · " + item.getTransfers());
+      mBar.setTimeline(item.getTimeline());
 
-      mBadges.removeAllViews();
-      final LayoutInflater inflater = LayoutInflater.from(mBadges.getContext());
-      if (item.isWalkOnly())
-      {
-        UiUtils.hide(mBadges);
-      }
+      // First vehicle with its stop and track below the bar.
+      final List<LineBadge> badges = item.getBadges();
+      if (item.isWalkOnly() || badges.isEmpty())
+        UiUtils.hide(mFirstBadge);
       else
       {
-        UiUtils.show(mBadges);
-        for (LineBadge badge : item.getBadges())
-        {
-          final TextView view = (TextView) inflater.inflate(R.layout.item_transit_badge, mBadges, false);
-          TransitViews.bindBadge(view, badge);
-          mBadges.addView(view);
-        }
+        UiUtils.show(mFirstBadge);
+        TransitViews.bindBadge(mFirstBadge, badges.get(0));
       }
-
-      final StringBuilder details = new StringBuilder();
-      if (item.getBoarding() != null)
-        details.append(item.getBoarding()).append(" · ");
-      details.append(item.isWalkOnly() ? mDetails.getContext().getString(R.string.transit_walk, item.getDuration())
-                                       : item.getTransfers());
-      mDetails.setText(details);
+      if (item.isWalkOnly())
+        mDetails.setText(mDetails.getContext().getString(R.string.transit_walk, item.getDuration()));
+      else
+        UiUtils.setTextAndHideIfEmpty(mDetails, item.getBoarding());
       UiUtils.showIf(item.isCancelled(), mCancelled);
     }
   }

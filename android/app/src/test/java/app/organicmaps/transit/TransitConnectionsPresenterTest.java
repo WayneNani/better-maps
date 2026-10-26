@@ -16,12 +16,15 @@ import app.organicmaps.sdk.transit.TransitServiceException;
 import app.organicmaps.sdk.transit.TransitTestData;
 import app.organicmaps.sdk.transit.provider.TransitProviderRegistry;
 import app.organicmaps.sdk.util.concurrency.Debouncer;
+import java.io.File;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class TransitConnectionsPresenterTest
 {
@@ -36,12 +39,18 @@ public class TransitConnectionsPresenterTest
   private final List<Boolean> mFinished = new ArrayList<>();
   private boolean mOnline = true;
   private TransitRoutingOptions mOptions = TransitRoutingOptions.defaults();
+  private ConnectionsState.ViewMode mDefaultView = ConnectionsState.ViewMode.LIST;
   private TransitProviderRegistry mRegistry;
+  private SavedConnectionsStore mSaved;
   private TransitConnectionsPresenter mPresenter;
+
+  @Rule
+  public final TemporaryFolder mFolder = new TemporaryFolder();
 
   @Before
   public void setUp()
   {
+    mSaved = new SavedConnectionsStore(new File(mFolder.getRoot(), "saved.json"), Runnable::run, () -> NOW);
     mRegistry = new TransitProviderRegistry(Runnable::run, () -> 0L, () -> mOnline);
     mRegistry.register(mProvider, TransitProviderRegistry.PRIORITY_DEFAULT);
     mPresenter = new TransitConnectionsPresenter(mRegistry,
@@ -61,7 +70,7 @@ public class TransitConnectionsPresenterTest
                                                    {
                                                      mDisplay.add("clear");
                                                    }
-                                                 });
+                                                 }, () -> mDefaultView, mSaved);
     mPresenter.attach(mRendered::add);
     mPresenter.setListener(mFinished::add);
   }
@@ -481,5 +490,302 @@ public class TransitConnectionsPresenterTest
     mPresenter.detach(view);
     searchAndWait();
     assertEquals(1, other.size());
+  }
+
+  // View switching.
+
+  @Test
+  public void startsInDefaultView()
+  {
+    assertEquals(ConnectionsState.ViewMode.LIST, state().getViewMode());
+    mDefaultView = ConnectionsState.ViewMode.GRID;
+    searchAndWait();
+    assertEquals(ConnectionsState.ViewMode.GRID, state().getViewMode());
+    assertEquals(ConnectionsState.ViewMode.GRID, mPresenter.getViewMode());
+  }
+
+  @Test
+  public void switchingViewNeedsNoRequest()
+  {
+    searchAndWait();
+    mProvider.lastPlan().complete(plan(null, null, Fixtures.s5("a", 29), Fixtures.busAndSubway("b")));
+    mPresenter.setViewMode(ConnectionsState.ViewMode.GRID);
+    assertEquals(ConnectionsState.ViewMode.GRID, state().getViewMode());
+    assertEquals(ConnectionsState.Screen.LIST, state().getScreen());
+    assertEquals(2, state().getItems().size());
+    mPresenter.setViewMode(ConnectionsState.ViewMode.LIST);
+    assertEquals(ConnectionsState.ViewMode.LIST, state().getViewMode());
+    assertEquals(1, mProvider.mPlanRequests.size());
+  }
+
+  @Test
+  public void settingTheSameViewTwiceRendersOnce()
+  {
+    mPresenter.setViewMode(ConnectionsState.ViewMode.GRID);
+    final int rendered = mRendered.size();
+    mPresenter.setViewMode(ConnectionsState.ViewMode.GRID);
+    assertEquals(rendered, mRendered.size());
+  }
+
+  @Test
+  public void backFromDetailReturnsToLastUsedView()
+  {
+    searchAndWait();
+    mProvider.lastPlan().complete(plan(null, null, Fixtures.s5("a", 29), Fixtures.busAndSubway("b")));
+    mPresenter.setViewMode(ConnectionsState.ViewMode.GRID);
+    mPresenter.select(1);
+    assertEquals(ConnectionsState.Screen.DETAIL, state().getScreen());
+    assertEquals("b", state().getSelected().getKey());
+    assertTrue(mPresenter.back());
+    assertEquals(ConnectionsState.Screen.LIST, state().getScreen());
+    assertEquals(ConnectionsState.ViewMode.GRID, state().getViewMode());
+
+    mPresenter.setViewMode(ConnectionsState.ViewMode.LIST);
+    mPresenter.select(0);
+    assertTrue(mPresenter.back());
+    assertEquals(ConnectionsState.ViewMode.LIST, state().getViewMode());
+  }
+
+  @Test
+  public void viewIsKeptForTheRunningSearch()
+  {
+    searchAndWait();
+    mProvider.lastPlan().complete(plan(null, "next", Fixtures.s5("a", 29)));
+    mPresenter.setViewMode(ConnectionsState.ViewMode.GRID);
+
+    mPresenter.loadLater();
+    mProvider.lastPlan().complete(plan(null, null, Fixtures.s5("b", 39)));
+    assertEquals(ConnectionsState.ViewMode.GRID, state().getViewMode());
+
+    mPresenter.setTime(t("2026-10-25T17:00:00Z"), false);
+    assertEquals(ConnectionsState.ViewMode.GRID, state().getViewMode());
+    mPresenter.onOptionsChanged();
+    assertEquals(ConnectionsState.ViewMode.GRID, state().getViewMode());
+    // The same places again (e.g. the route is rebuilt).
+    mPresenter.search(HBF, ALEX);
+    assertEquals(ConnectionsState.ViewMode.GRID, state().getViewMode());
+  }
+
+  @Test
+  public void newPlacesStartInDefaultView()
+  {
+    searchAndWait();
+    mPresenter.setViewMode(ConnectionsState.ViewMode.GRID);
+    mPresenter.search(ALEX, HBF);
+    assertEquals(ConnectionsState.ViewMode.LIST, state().getViewMode());
+
+    mPresenter.setViewMode(ConnectionsState.ViewMode.GRID);
+    mPresenter.clear();
+    assertEquals(ConnectionsState.ViewMode.LIST, state().getViewMode());
+  }
+
+  @Test
+  public void changedDefaultAppliesUnlessSwitched()
+  {
+    searchAndWait();
+    mDefaultView = ConnectionsState.ViewMode.GRID;
+    mPresenter.onOptionsChanged();
+    assertEquals(ConnectionsState.ViewMode.GRID, state().getViewMode());
+    mPresenter.setViewMode(ConnectionsState.ViewMode.LIST);
+    mDefaultView = ConnectionsState.ViewMode.GRID;
+    mPresenter.onOptionsChanged();
+    assertEquals(ConnectionsState.ViewMode.LIST, state().getViewMode());
+  }
+
+  @Test
+  public void stateCarriesTheClock()
+  {
+    assertEquals(NOW, state().getNow());
+  }
+
+  // Saved connections.
+
+  private void searchWithNamesAndSelect(@NonNull TransitItinerary itinerary)
+  {
+    mPresenter.search(HBF, ALEX, "Hauptbahnhof", "Alexanderplatz");
+    mScheduler.advance(TransitConnectionsPresenter.DEBOUNCE_MS);
+    mProvider.lastPlan().complete(plan(null, null, itinerary));
+    mPresenter.select(0);
+  }
+
+  @Test
+  public void saveAndRemoveTheSelectedConnection()
+  {
+    searchWithNamesAndSelect(Fixtures.s5("a", 29));
+    assertFalse(state().isSelectedSaved());
+    assertFalse(state().isSavedView());
+
+    mPresenter.toggleSaved();
+    assertTrue(state().isSelectedSaved());
+    final SavedConnection saved = mSaved.get("a");
+    assertEquals("Hauptbahnhof", saved.getFromName());
+    assertEquals("Alexanderplatz", saved.getToName());
+    assertEquals(HBF, saved.getFrom());
+    assertEquals(ALEX, saved.getTo());
+    assertEquals(NOW, saved.getSavedAt());
+
+    mPresenter.toggleSaved();
+    assertFalse(state().isSelectedSaved());
+    assertFalse(mSaved.contains("a"));
+    // Nothing went online.
+    assertEquals(1, mProvider.mPlanRequests.size());
+  }
+
+  @Test
+  public void savingWithoutNamesUsesTheStops()
+  {
+    searchAndWait();
+    mProvider.lastPlan().complete(plan(null, null, Fixtures.s5("a", 29)));
+    mPresenter.select(0);
+    mPresenter.toggleSaved();
+    assertEquals("S+U Berlin Hauptbahnhof", mSaved.get("a").getFromName());
+    assertEquals("S+U Alexanderplatz", mSaved.get("a").getToName());
+  }
+
+  @Test
+  public void savingInTheListDoesNothing()
+  {
+    searchAndWait();
+    mProvider.lastPlan().complete(plan(null, null, Fixtures.s5("a", 29)));
+    mPresenter.toggleSaved();
+    assertEquals(0, mSaved.size());
+  }
+
+  @Test
+  public void removalElsewhereIsRendered()
+  {
+    searchWithNamesAndSelect(Fixtures.s5("a", 29));
+    mPresenter.toggleSaved();
+    assertTrue(state().isSelectedSaved());
+    // E.g. deleted in the list of saved connections.
+    mSaved.remove("a");
+    assertFalse(state().isSelectedSaved());
+  }
+
+  @NonNull
+  private SavedConnection saved(@NonNull TransitItinerary itinerary)
+  {
+    return mSaved.save(itinerary, "Hauptbahnhof", "Alexanderplatz", HBF, ALEX);
+  }
+
+  @Test
+  public void showSavedWithoutRequest()
+  {
+    mPresenter.showSaved(saved(Fixtures.s5("a", 29)));
+    final ConnectionsState state = state();
+    assertEquals(ConnectionsState.Screen.DETAIL, state.getScreen());
+    assertTrue(state.isSavedView());
+    assertTrue(state.isSelectedSaved());
+    assertFalse(state.isPast());
+    assertFalse(state.isLoading());
+    assertTrue(state.getItems().isEmpty());
+    // No "no connections found" for a saved connection.
+    assertFalse(state.isEmpty());
+    assertEquals("a", state.getSelected().getKey());
+    assertEquals("17:29", state.getSelected().getDeparture());
+    assertEquals(3, state.getLegs().size());
+    assertEquals("So., 25.10.2026", state.getSelectedDate());
+    assertTrue(mPresenter.isShowingSaved());
+    assertEquals(List.of("show a"), mDisplay);
+    // The route planner learns that the route is ready.
+    assertEquals(List.of(true), mFinished);
+    assertTrue(mProvider.mPlanRequests.isEmpty());
+    mScheduler.advance(TransitConnectionsPresenter.DEBOUNCE_MS);
+    assertTrue(mProvider.mPlanRequests.isEmpty());
+  }
+
+  @Test
+  public void pastSavedConnection()
+  {
+    // Arrives at 16:00 - 2 h + 17 min.
+    mPresenter.showSaved(saved(Fixtures.s5("old", -120)));
+    assertTrue(state().isPast());
+  }
+
+  @Test
+  public void showSavedReplacesARunningSearch()
+  {
+    searchAndWait();
+    mPresenter.showSaved(saved(Fixtures.s5("a", 29)));
+    // The late result of the search is ignored.
+    mProvider.lastPlan().complete(plan(null, null, Fixtures.busAndSubway("b")));
+    assertTrue(state().isSavedView());
+    assertEquals("a", state().getSelected().getKey());
+    assertTrue(state().getItems().isEmpty());
+  }
+
+  @Test
+  public void backFromSavedClosesIt()
+  {
+    mPresenter.showSaved(saved(Fixtures.s5("a", 29)));
+    assertTrue(mPresenter.back());
+    assertEquals(ConnectionsState.Screen.NONE, state().getScreen());
+    assertFalse(mPresenter.hasQuery());
+    assertFalse(mPresenter.isShowingSaved());
+    assertEquals(List.of("show a", "clear"), mDisplay);
+    // Still saved.
+    assertTrue(mSaved.contains("a"));
+  }
+
+  @Test
+  public void searchAgainFromSaved()
+  {
+    mPresenter.showSaved(saved(Fixtures.s5("old", -120)));
+    mPresenter.searchAgain();
+    // An explicit action: sent at once, departing now, between the saved places.
+    assertEquals(1, mProvider.mPlanRequests.size());
+    assertEquals(HBF, mProvider.lastRequest().getFrom());
+    assertEquals(ALEX, mProvider.lastRequest().getTo());
+    assertNull(mProvider.lastRequest().getTime());
+    assertEquals(ConnectionsState.Screen.LIST, state().getScreen());
+    assertFalse(state().isSavedView());
+    assertEquals(List.of("show old", "clear"), mDisplay);
+
+    mProvider.lastPlan().complete(plan(null, null, Fixtures.s5("a", 29)));
+    assertEquals(1, state().getItems().size());
+    mPresenter.select(0);
+    mPresenter.toggleSaved();
+    // The names of the saved connection are kept for the new search.
+    assertEquals("Hauptbahnhof", mSaved.get("a").getFromName());
+  }
+
+  @Test
+  public void savedViewIgnoresListActions()
+  {
+    mPresenter.showSaved(saved(Fixtures.s5("a", 29)));
+    mPresenter.select(0);
+    mPresenter.loadLater();
+    mPresenter.loadEarlier();
+    mPresenter.retry();
+    mPresenter.onOptionsChanged();
+    mScheduler.advance(TransitConnectionsPresenter.DEBOUNCE_MS);
+    assertTrue(mProvider.mPlanRequests.isEmpty());
+    assertTrue(state().isSavedView());
+    // Stops can be expanded as in any detail view.
+    mPresenter.toggleStops(1);
+    assertTrue(state().getLegs().get(1).isExpanded());
+  }
+
+  @Test
+  public void unsaveInSavedViewKeepsShowingIt()
+  {
+    mPresenter.showSaved(saved(Fixtures.s5("a", 29)));
+    mPresenter.toggleSaved();
+    assertFalse(mSaved.contains("a"));
+    assertTrue(state().isSavedView());
+    assertFalse(state().isSelectedSaved());
+    mPresenter.toggleSaved();
+    assertTrue(mSaved.contains("a"));
+    assertEquals("Hauptbahnhof", mSaved.get("a").getFromName());
+  }
+
+  @Test
+  public void newSearchLeavesSavedView()
+  {
+    mPresenter.showSaved(saved(Fixtures.s5("a", 29)));
+    mPresenter.search(ALEX, HBF);
+    assertFalse(state().isSavedView());
+    assertEquals(ConnectionsState.Screen.LIST, state().getScreen());
+    assertEquals(List.of("show a", "clear"), mDisplay);
   }
 }

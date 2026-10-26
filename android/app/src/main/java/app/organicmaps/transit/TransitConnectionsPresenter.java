@@ -3,7 +3,9 @@ package app.organicmaps.transit;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import app.organicmaps.sdk.transit.TransitItinerary;
+import app.organicmaps.sdk.transit.TransitLeg;
 import app.organicmaps.sdk.transit.TransitLocation;
+import app.organicmaps.sdk.transit.TransitPlace;
 import app.organicmaps.sdk.transit.TransitPlan;
 import app.organicmaps.sdk.transit.TransitRoutingOptions;
 import app.organicmaps.sdk.transit.provider.ProviderResult;
@@ -27,6 +29,12 @@ import java.util.Set;
  * New queries are debounced, so that quick changes of start, destination or time cause one request only. Paging
  * ("earlier"/"later") and "try again" are explicit user actions and run immediately. Results of outdated queries are
  * ignored. Nothing is retried automatically.
+ * <p>
+ * The connections are shown as a list or as a time grid. Each search starts in the default view from the settings;
+ * the user can switch for the running search, and returns to that view from the detail view.
+ * <p>
+ * The detail view can also show a saved connection ({@link #showSaved}) without any query; the connection in the
+ * detail view can be saved or removed from the saved connections ({@link #toggleSaved}).
  */
 public final class TransitConnectionsPresenter
 {
@@ -64,6 +72,12 @@ public final class TransitConnectionsPresenter
     Instant now();
   }
 
+  public interface DefaultViewSource
+  {
+    @NonNull
+    ConnectionsState.ViewMode getDefaultViewMode();
+  }
+
   @NonNull
   private final TransitProviderRegistry mRegistry;
   @NonNull
@@ -76,6 +90,10 @@ public final class TransitConnectionsPresenter
   private final Clock mClock;
   @NonNull
   private final RouteDisplay mRouteDisplay;
+  @NonNull
+  private final DefaultViewSource mDefaultView;
+  @NonNull
+  private final SavedConnectionsStore mSavedStore;
 
   @Nullable
   private View mView;
@@ -86,6 +104,10 @@ public final class TransitConnectionsPresenter
   private TransitLocation mFrom;
   @Nullable
   private TransitLocation mTo;
+  @NonNull
+  private String mFromName = "";
+  @NonNull
+  private String mToName = "";
   @Nullable
   private Instant mTime;
   private boolean mArriveBy;
@@ -119,10 +141,17 @@ public final class TransitConnectionsPresenter
   private int mSelected = -1;
   @NonNull
   private final Set<Integer> mExpandedLegs = new HashSet<>();
+  // The saved connection in the detail view, null for searched connections.
+  @Nullable
+  private SavedConnection mSaved;
+  // View chosen by the user for the running search; null for the default from the settings.
+  @Nullable
+  private ConnectionsState.ViewMode mViewMode;
 
   public TransitConnectionsPresenter(@NonNull TransitProviderRegistry registry, @NonNull OptionsSource options,
                                      @NonNull TransitItemFactory items, @NonNull Debouncer debouncer,
-                                     @NonNull Clock clock, @NonNull RouteDisplay routeDisplay)
+                                     @NonNull Clock clock, @NonNull RouteDisplay routeDisplay,
+                                     @NonNull DefaultViewSource defaultView, @NonNull SavedConnectionsStore savedStore)
   {
     mRegistry = registry;
     mOptions = options;
@@ -130,6 +159,10 @@ public final class TransitConnectionsPresenter
     mDebouncer = debouncer;
     mClock = clock;
     mRouteDisplay = routeDisplay;
+    mDefaultView = defaultView;
+    mSavedStore = savedStore;
+    // E.g. a connection was removed in the list of saved connections.
+    mSavedStore.addListener(this::render);
   }
 
   public void attach(@NonNull View view)
@@ -152,9 +185,100 @@ public final class TransitConnectionsPresenter
   /** Starts a new query between two places (debounced). The selected time is kept. */
   public void search(@NonNull TransitLocation from, @NonNull TransitLocation to)
   {
+    search(from, to, "", "");
+  }
+
+  /**
+   * @param fromName name of the start for saved connections, e.g. "Hauptbahnhof"; empty if unknown (e.g. the own
+   *     position), then the first stop is used.
+   */
+  public void search(@NonNull TransitLocation from, @NonNull TransitLocation to, @NonNull String fromName,
+                     @NonNull String toName)
+  {
+    // Another start or destination is a new search: back to the default view.
+    if (!from.equals(mFrom) || !to.equals(mTo))
+      mViewMode = null;
     mFrom = from;
     mTo = to;
+    mFromName = fromName;
+    mToName = toName;
     startQuery(true);
+  }
+
+  @NonNull
+  public ConnectionsState.ViewMode getViewMode()
+  {
+    return mViewMode != null ? mViewMode : mDefaultView.getDefaultViewMode();
+  }
+
+  /** Switches between list and time grid for the running search. */
+  public void setViewMode(@NonNull ConnectionsState.ViewMode mode)
+  {
+    if (getViewMode() == mode && mViewMode != null)
+      return;
+    mViewMode = mode;
+    render();
+  }
+
+  /**
+   * Shows a saved connection in the detail view and on the map, without a query. {@link #back()} closes it,
+   * {@link #searchAgain()} searches between the same places now.
+   */
+  public void showSaved(@NonNull SavedConnection saved)
+  {
+    mDebouncer.cancel();
+    ++mGeneration;
+    resetResults();
+    mRequest = null;
+    mLoading = false;
+    mError = null;
+    mFrom = saved.getFrom();
+    mTo = saved.getTo();
+    mFromName = saved.getFromName();
+    mToName = saved.getToName();
+    mTime = null;
+    mArriveBy = false;
+    mViewMode = null;
+    mSaved = saved;
+    mRouteDisplay.show(saved.getItinerary());
+    render();
+    if (mListener != null)
+      mListener.onQueryFinished(true);
+  }
+
+  /** True if the detail view shows a saved connection. */
+  public boolean isShowingSaved()
+  {
+    return mSaved != null;
+  }
+
+  /** Searches connections between the places of the shown saved connection, departing now. */
+  public void searchAgain()
+  {
+    if (mSaved == null)
+      return;
+    mTime = null;
+    mArriveBy = false;
+    startQuery(false);
+  }
+
+  /** Saves the connection in the detail view, or removes it if it is saved already. */
+  public void toggleSaved()
+  {
+    final TransitItinerary itinerary = getSelectedItinerary();
+    if (itinerary == null)
+      return;
+    final String key = TransitItemFactory.key(itinerary);
+    if (mSavedStore.contains(key))
+    {
+      mSavedStore.remove(key);
+      return;
+    }
+    final TransitLocation from = coordinates(mFrom, firstPlace(itinerary));
+    final TransitLocation to = coordinates(mTo, lastPlace(itinerary));
+    if (from == null || to == null)
+      return;
+    mSavedStore.save(itinerary, placeName(mFromName, itinerary, true), placeName(mToName, itinerary, false), from, to);
   }
 
   /**
@@ -162,7 +286,7 @@ public final class TransitConnectionsPresenter
    */
   public void setTime(@Nullable Instant time, boolean arriveBy)
   {
-    if (Objects.equals(mTime, time) && mArriveBy == arriveBy)
+    if (Objects.equals(mTime, time) && mArriveBy == arriveBy && mSaved == null)
       return;
     mTime = time;
     mArriveBy = arriveBy;
@@ -186,14 +310,14 @@ public final class TransitConnectionsPresenter
   /** Settings changed: query again if a query is shown. */
   public void onOptionsChanged()
   {
-    if (hasQuery())
+    if (hasQuery() && mSaved == null)
       startQuery(true);
   }
 
   /** Explicit retry after an error: repeats the failed query or page. */
   public void retry()
   {
-    if (!hasQuery())
+    if (!hasQuery() || mSaved != null)
       return;
     if (mError != null || mRequest == null)
     {
@@ -274,7 +398,7 @@ public final class TransitConnectionsPresenter
   public void select(int index)
   {
     final List<TransitItinerary> all = getAllItineraries();
-    if (index < 0 || index >= all.size())
+    if (mSaved != null || index < 0 || index >= all.size())
       return;
     mSelected = index;
     mExpandedLegs.clear();
@@ -282,9 +406,18 @@ public final class TransitConnectionsPresenter
     render();
   }
 
-  /** Back from the detail view to the list. @return false if the list was shown already. */
+  /**
+   * Back from the detail view to the list or time grid. A saved connection is closed completely (there is no list).
+   *
+   * @return false if the list was shown already.
+   */
   public boolean back()
   {
+    if (mSaved != null)
+    {
+      clear();
+      return true;
+    }
     if (mSelected < 0)
       return false;
     mSelected = -1;
@@ -297,7 +430,7 @@ public final class TransitConnectionsPresenter
   /** Shows or hides the intermediate stops of a leg in the detail view. */
   public void toggleStops(int legIndex)
   {
-    if (mSelected < 0)
+    if (getSelectedItinerary() == null)
       return;
     if (!mExpandedLegs.remove(legIndex))
       mExpandedLegs.add(legIndex);
@@ -309,9 +442,13 @@ public final class TransitConnectionsPresenter
   {
     mDebouncer.cancel();
     ++mGeneration;
-    final boolean hadSelection = mSelected >= 0;
+    final boolean hadSelection = mSelected >= 0 || mSaved != null;
+    mSaved = null;
+    mViewMode = null;
     mFrom = null;
     mTo = null;
+    mFromName = "";
+    mToName = "";
     mRequest = null;
     resetResults();
     mLoading = false;
@@ -325,6 +462,8 @@ public final class TransitConnectionsPresenter
   @Nullable
   public TransitItinerary getSelectedItinerary()
   {
+    if (mSaved != null)
+      return mSaved.getItinerary();
     final List<TransitItinerary> all = getAllItineraries();
     return mSelected >= 0 && mSelected < all.size() ? all.get(mSelected) : null;
   }
@@ -339,10 +478,11 @@ public final class TransitConnectionsPresenter
   {
     final Instant now = mClock.now();
     final String timeLabel = mItems.getFormatter().formatQueryTime(mTime, mArriveBy, now);
+    final ConnectionsState.ViewMode viewMode = getViewMode();
     if (!hasQuery())
       return new ConnectionsState(ConnectionsState.Screen.NONE, timeLabel, mArriveBy, false, false, false, null, null,
                                   Collections.emptyList(), false, false, null, Collections.emptyList(), providerName(),
-                                  attributionUrl());
+                                  attributionUrl(), viewMode, false, false, false, null, now);
 
     final List<TransitItinerary> all = getAllItineraries();
     final List<ItineraryItem> items = new ArrayList<>(all.size());
@@ -351,18 +491,26 @@ public final class TransitConnectionsPresenter
 
     final TransitItinerary selected = getSelectedItinerary();
     final boolean detail = selected != null;
+    ItineraryItem selectedItem = null;
+    if (mSaved != null)
+      selectedItem = mItems.itinerary(mSaved.getItinerary());
+    else if (detail)
+      selectedItem = items.get(mSelected);
     return new ConnectionsState(
         detail ? ConnectionsState.Screen.DETAIL : ConnectionsState.Screen.LIST, timeLabel, mArriveBy, mLoading,
         mLoadingEarlier, mLoadingLater, mError, mPagingError, items,
         !mLoading && mError == null && mPreviousCursor != null, !mLoading && mError == null && mNextCursor != null,
-        detail ? items.get(mSelected) : null, detail ? mItems.legs(selected, mExpandedLegs) : Collections.emptyList(),
-        providerName(), attributionUrl());
+        selectedItem, detail ? mItems.legs(selected, mExpandedLegs) : Collections.emptyList(), providerName(),
+        attributionUrl(), viewMode, mSaved != null, detail && mSavedStore.contains(TransitItemFactory.key(selected)),
+        mSaved != null && mSaved.isPast(now),
+        detail ? mItems.getFormatter().formatDate(selected.getStartTime(), zoneOf(selected)) : null, now);
   }
 
   private void startQuery(boolean debounce)
   {
     final int generation = ++mGeneration;
-    final boolean hadSelection = mSelected >= 0;
+    final boolean hadSelection = mSelected >= 0 || mSaved != null;
+    mSaved = null;
     resetResults();
     mLoading = true;
     mError = null;
@@ -453,6 +601,53 @@ public final class TransitConnectionsPresenter
       if (known.add(TransitItemFactory.key(itinerary)))
         result.add(itinerary);
     return result;
+  }
+
+  @Nullable
+  private static String zoneOf(@NonNull TransitItinerary itinerary)
+  {
+    return itinerary.getLegs().isEmpty() ? null : itinerary.getLegs().get(0).getFrom().getTimeZone();
+  }
+
+  @Nullable
+  private static TransitPlace firstPlace(@NonNull TransitItinerary itinerary)
+  {
+    return itinerary.getLegs().isEmpty() ? null : itinerary.getLegs().get(0).getFrom();
+  }
+
+  @Nullable
+  private static TransitPlace lastPlace(@NonNull TransitItinerary itinerary)
+  {
+    final List<TransitLeg> legs = itinerary.getLegs();
+    return legs.isEmpty() ? null : legs.get(legs.size() - 1).getTo();
+  }
+
+  /** The query location if it has coordinates, otherwise the coordinates of the place in the result. */
+  @Nullable
+  private static TransitLocation coordinates(@Nullable TransitLocation query, @Nullable TransitPlace place)
+  {
+    if (query != null && !query.isStop())
+      return query;
+    if (place != null && isValidCoordinate(place.getLat(), place.getLon()))
+      return TransitLocation.fromCoordinates(place.getLat(), place.getLon());
+    return null;
+  }
+
+  private static boolean isValidCoordinate(double lat, double lon)
+  {
+    return !Double.isNaN(lat) && !Double.isNaN(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180;
+  }
+
+  /** The given name, or the first (last) stop with public transport, or "Start" ("Destination"). */
+  @NonNull
+  private String placeName(@NonNull String name, @NonNull TransitItinerary itinerary, boolean start)
+  {
+    if (!name.trim().isEmpty())
+      return name.trim();
+    final TransitLeg leg = start ? itinerary.getFirstTransitLeg() : itinerary.getLastTransitLeg();
+    if (leg != null)
+      return mItems.getFormatter().placeName(start ? leg.getFrom() : leg.getTo());
+    return start ? mItems.getFormatter().getTexts().start() : mItems.getFormatter().getTexts().destination();
   }
 
   @Nullable

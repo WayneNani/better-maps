@@ -392,6 +392,8 @@ dependencies {
     // https://github.com/organicmaps/organicmaps/issues/6106
     implementation(libs.google.guava)
     implementation(libs.appdevnext.androidchart)
+    // Saved public transport connections (JSON file); the SDK uses it already.
+    implementation(libs.gson)
 
     // Test Dependencies
     androidTestImplementation(libs.androidx.test.junit)

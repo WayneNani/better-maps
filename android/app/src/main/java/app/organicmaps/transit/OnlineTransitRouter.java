@@ -4,6 +4,7 @@ import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import app.organicmaps.sdk.Router;
+import app.organicmaps.sdk.bookmarks.data.FeatureId;
 import app.organicmaps.sdk.bookmarks.data.MapObject;
 import app.organicmaps.sdk.routing.RoutingController;
 import app.organicmaps.sdk.transit.TransitLocation;
@@ -25,6 +26,9 @@ public final class OnlineTransitRouter implements RoutingController.ExternalRout
   private final TransitServices mServices;
   @Nullable
   private ConsentPrompter mPrompter;
+  // Shown instead of a search by the next build().
+  @Nullable
+  private SavedConnection mPendingSaved;
 
   public OnlineTransitRouter(@NonNull TransitServices services)
   {
@@ -36,16 +40,43 @@ public final class OnlineTransitRouter implements RoutingController.ExternalRout
     mPrompter = prompter;
   }
 
+  /**
+   * Opens the route planner with the start and destination of a saved connection and shows the connection in the
+   * detail view and on the map, without any request.
+   */
+  @MainThread
+  public void showSaved(@NonNull SavedConnection saved)
+  {
+    mPendingSaved = saved;
+    final MapObject start = MapObject.createMapObject(FeatureId.EMPTY, MapObject.API_POINT, saved.getFromName(), "",
+                                                      saved.getFrom().getLat(), saved.getFrom().getLon());
+    final MapObject end = MapObject.createMapObject(FeatureId.EMPTY, MapObject.API_POINT, saved.getToName(), "",
+                                                    saved.getTo().getLat(), saved.getTo().getLon());
+    RoutingController.get().prepare(start, end, Router.Transit);
+  }
+
   @Override
   public boolean handles(@NonNull Router router)
   {
-    return router == Router.Transit && mServices.getConsent().getState() != TransitConsent.State.DECLINED;
+    if (router != Router.Transit)
+      return false;
+    // A saved connection is shown without going online.
+    return mPendingSaved != null || mServices.getConsent().getState() != TransitConsent.State.DECLINED;
   }
 
   @MainThread
   @Override
   public void build(@NonNull MapObject start, @NonNull MapObject end)
   {
+    final SavedConnection saved = mPendingSaved;
+    if (saved != null)
+    {
+      mPendingSaved = null;
+      final TransitConnectionsPresenter presenter = mServices.getConnectionsPresenter();
+      presenter.setListener(this);
+      presenter.showSaved(saved);
+      return;
+    }
     final TransitConsent consent = mServices.getConsent();
     if (consent.isGranted())
     {
@@ -89,6 +120,13 @@ public final class OnlineTransitRouter implements RoutingController.ExternalRout
     final TransitConnectionsPresenter presenter = mServices.getConnectionsPresenter();
     presenter.setListener(this);
     presenter.search(TransitLocation.fromCoordinates(start.getLat(), start.getLon()),
-                     TransitLocation.fromCoordinates(end.getLat(), end.getLon()));
+                     TransitLocation.fromCoordinates(end.getLat(), end.getLon()), name(start), name(end));
+  }
+
+  /** Name for saved connections; empty for the own position, which means nothing later. */
+  @NonNull
+  private static String name(@NonNull MapObject point)
+  {
+    return point.isMyPosition() ? "" : point.getTitle();
   }
 }

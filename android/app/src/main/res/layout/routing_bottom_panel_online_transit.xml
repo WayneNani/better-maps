@@ -52,6 +52,64 @@
       android:visibility="gone"
       tools:text="17:29 – 17:46 · 17 min" />
 
+    <!-- List or time grid, for the running search. -->
+    <com.google.android.material.button.MaterialButtonToggleGroup
+      android:id="@+id/transit_view_toggle"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:contentDescription="@string/transit_view_switch"
+      app:selectionRequired="true"
+      app:singleSelection="true">
+
+      <com.google.android.material.button.MaterialButton
+        android:id="@+id/transit_view_list"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="44dp"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/transit_view_list"
+        android:minWidth="0dp"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
+        app:icon="@drawable/ic_transit_view_list"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconTint="?iconTint" />
+
+      <com.google.android.material.button.MaterialButton
+        android:id="@+id/transit_view_grid"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="44dp"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/transit_view_grid"
+        android:minWidth="0dp"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
+        app:icon="@drawable/ic_transit_view_grid"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconTint="?iconTint" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/transit_saved_list"
+      style="@style/Widget.Material3.Button.IconButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:contentDescription="@string/transit_saved_title"
+      app:icon="@drawable/ic_transit_saved"
+      app:iconTint="?iconTint" />
+
+    <!-- Save the connection in the detail view; filled when saved. -->
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/transit_save"
+      style="@style/Widget.Material3.Button.IconButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:contentDescription="@string/transit_save"
+      android:visibility="gone"
+      app:icon="@drawable/ic_transit_bookmark"
+      tools:visibility="visible" />
+
     <com.google.android.material.button.MaterialButton
       android:id="@+id/transit_settings"
       style="@style/Widget.Material3.Button.IconButton"
@@ -95,6 +153,50 @@
       android:layout_height="wrap_content"
       android:text="@string/transit_retry" />
   </LinearLayout>
+
+  <!-- Shown for a saved connection: its date or that it is over, and searching again. -->
+  <LinearLayout
+    android:id="@+id/transit_saved_info"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/margin_base"
+    android:paddingEnd="@dimen/margin_half"
+    android:visibility="gone"
+    tools:visibility="visible">
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/transit_saved_text"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:textAppearance="@style/MwmTextAppearance.Body3"
+      tools:text="This connection is in the past (Sun, Oct 25, 2026)." />
+
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/transit_search_again"
+      style="@style/Widget.Material3.Button.TextButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/transit_search_again"
+      android:textAllCaps="false" />
+  </LinearLayout>
+
+  <!-- Time grid: the axis stays, the columns scroll sideways. The height is set in code. -->
+  <HorizontalScrollView
+    android:id="@+id/transit_grid_scroll"
+    android:layout_width="match_parent"
+    android:layout_height="320dp"
+    android:fillViewport="true"
+    android:scrollbars="none"
+    android:visibility="gone">
+
+    <app.organicmaps.transit.ui.TimeGridView
+      android:id="@+id/transit_grid"
+      android:layout_width="wrap_content"
+      android:layout_height="match_parent" />
+  </HorizontalScrollView>
 
   <app.organicmaps.transit.ui.MaxHeightRecyclerView
     android:id="@+id/transit_list"

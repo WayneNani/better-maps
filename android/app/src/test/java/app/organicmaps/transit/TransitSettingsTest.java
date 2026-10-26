@@ -155,4 +155,19 @@ public class TransitSettingsTest
     assertFalse(TransitSettings.isValidServerUrl("https:///path"));
     assertFalse(TransitSettings.isValidServerUrl("https://exa mple.org"));
   }
+
+  @Test
+  public void defaultViewIsListUnlessGridIsChosen()
+  {
+    assertEquals(ConnectionsState.ViewMode.LIST, new TransitSettings(new MapStore()).getDefaultViewMode());
+    assertEquals(
+        ConnectionsState.ViewMode.GRID,
+        new TransitSettings(new MapStore().with(TransitSettings.KEY_DEFAULT_VIEW, "GRID")).getDefaultViewMode());
+    assertEquals(
+        ConnectionsState.ViewMode.GRID,
+        new TransitSettings(new MapStore().with(TransitSettings.KEY_DEFAULT_VIEW, "grid")).getDefaultViewMode());
+    assertEquals(
+        ConnectionsState.ViewMode.LIST,
+        new TransitSettings(new MapStore().with(TransitSettings.KEY_DEFAULT_VIEW, "CAROUSEL")).getDefaultViewMode());
+  }
 }

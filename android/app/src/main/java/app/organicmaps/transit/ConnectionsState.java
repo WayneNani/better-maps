@@ -2,6 +2,7 @@ package app.organicmaps.transit;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,6 +15,15 @@ public final class ConnectionsState
     NONE,
     LIST,
     DETAIL
+  }
+
+  /** How the connections are shown. */
+  public enum ViewMode
+  {
+    /** One row per connection with a bar over its duration. */
+    LIST,
+    /** One column per connection on a common vertical time axis. */
+    GRID
   }
 
   @NonNull
@@ -40,12 +50,23 @@ public final class ConnectionsState
   final String mProviderName;
   @Nullable
   final String mAttributionUrl;
+  @NonNull
+  final ViewMode mViewMode;
+  final boolean mSavedView;
+  final boolean mSelectedSaved;
+  final boolean mPast;
+  @Nullable
+  final String mSelectedDate;
+  @NonNull
+  final Instant mNow;
 
   ConnectionsState(@NonNull Screen screen, @NonNull String timeLabel, boolean arriveBy, boolean loading,
                    boolean loadingEarlier, boolean loadingLater, @Nullable TransitError error,
                    @Nullable TransitError pagingError, @NonNull List<ItineraryItem> items, boolean canLoadEarlier,
                    boolean canLoadLater, @Nullable ItineraryItem selected, @NonNull List<LegItem> legs,
-                   @Nullable String providerName, @Nullable String attributionUrl)
+                   @Nullable String providerName, @Nullable String attributionUrl, @NonNull ViewMode viewMode,
+                   boolean savedView, boolean selectedSaved, boolean past, @Nullable String selectedDate,
+                   @NonNull Instant now)
   {
     mScreen = screen;
     mTimeLabel = timeLabel;
@@ -62,6 +83,12 @@ public final class ConnectionsState
     mLegs = Collections.unmodifiableList(legs);
     mProviderName = providerName;
     mAttributionUrl = attributionUrl;
+    mViewMode = viewMode;
+    mSavedView = savedView;
+    mSelectedSaved = selectedSaved;
+    mPast = past;
+    mSelectedDate = selectedDate;
+    mNow = now;
   }
 
   @NonNull
@@ -118,10 +145,10 @@ public final class ConnectionsState
     return mItems;
   }
 
-  /** True if the query succeeded without any connection. */
+  /** True if the query succeeded without any connection. A saved connection is shown without a query. */
   public boolean isEmpty()
   {
-    return !mLoading && mError == null && mItems.isEmpty();
+    return !mSavedView && !mLoading && mError == null && mItems.isEmpty();
   }
 
   public boolean canLoadEarlier()
@@ -158,5 +185,44 @@ public final class ConnectionsState
   public String getAttributionUrl()
   {
     return mAttributionUrl;
+  }
+
+  /** List or time grid; kept while a connection is open, so that "back" returns to it. */
+  @NonNull
+  public ViewMode getViewMode()
+  {
+    return mViewMode;
+  }
+
+  /** True if the detail view shows a saved connection (opened from the saved connections, not from a search). */
+  public boolean isSavedView()
+  {
+    return mSavedView;
+  }
+
+  /** True if the connection in the detail view is saved. */
+  public boolean isSelectedSaved()
+  {
+    return mSelectedSaved;
+  }
+
+  /** True if the saved connection in the detail view is over. */
+  public boolean isPast()
+  {
+    return mPast;
+  }
+
+  /** Date of the connection in the detail view, e.g. "Sun, 25 Oct 2026". */
+  @Nullable
+  public String getSelectedDate()
+  {
+    return mSelectedDate;
+  }
+
+  /** Time of this state, e.g. for the "now" line of the time grid. */
+  @NonNull
+  public Instant getNow()
+  {
+    return mNow;
   }
 }

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: one saved public transport connection. -->
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:background="?selectableItemBackground"
+  android:gravity="center_vertical"
+  android:orientation="horizontal"
+  android:paddingStart="@dimen/margin_base"
+  android:paddingTop="@dimen/margin_half"
+  android:paddingBottom="@dimen/margin_half">
+
+  <LinearLayout
+    android:id="@+id/saved_content"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:orientation="vertical">
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal">
+
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/saved_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/MwmTextAppearance.Body4"
+        tools:text="Sun, Oct 25, 2026" />
+
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/saved_past"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_half"
+        android:text="@string/transit_saved_past_label"
+        android:textAppearance="@style/MwmTextAppearance.Body4"
+        android:textStyle="bold"
+        android:visibility="gone"
+        tools:visibility="visible" />
+    </LinearLayout>
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/saved_route"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="2dp"
+      android:ellipsize="end"
+      android:maxLines="2"
+      android:textAppearance="@style/MwmTextAppearance.Body2"
+      android:textStyle="bold"
+      tools:text="Hauptbahnhof → Tempelhof" />
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="2dp"
+      android:baselineAligned="true"
+      android:orientation="horizontal">
+
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/departure"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/MwmTextAppearance.Body2"
+        tools:text="17:29" />
+
+      <com.google.android.material.textview.MaterialTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/margin_quarter"
+        android:paddingEnd="@dimen/margin_quarter"
+        android:text="–"
+        android:textAppearance="@style/MwmTextAppearance.Body2"
+        tools:ignore="HardcodedText" />
+
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/arrival"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/MwmTextAppearance.Body2"
+        tools:text="17:46" />
+
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_half"
+        android:textAppearance="@style/MwmTextAppearance.Body3"
+        tools:text="17 min" />
+    </LinearLayout>
+
+    <com.google.android.material.chip.ChipGroup
+      android:id="@+id/badges"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/margin_quarter"
+      app:chipSpacingHorizontal="4dp"
+      app:chipSpacingVertical="4dp" />
+  </LinearLayout>
+
+  <com.google.android.material.button.MaterialButton
+    android:id="@+id/saved_more"
+    style="@style/Widget.Material3.Button.IconButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:contentDescription="@string/transit_more"
+    app:icon="@drawable/ic_more"
+    app:iconTint="?iconTint" />
+</LinearLayout>

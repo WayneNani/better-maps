@@ -16,10 +16,12 @@ import app.organicmaps.sdk.transit.provider.TransitProvider;
 import app.organicmaps.sdk.transit.provider.TransitProviderRegistry;
 import app.organicmaps.sdk.transit.provider.TransitousProvider;
 import app.organicmaps.sdk.util.concurrency.Debouncer;
+import java.io.File;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Locale;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * Application-wide access to online public transport: settings, consent, the provider registry (Transitous by
@@ -46,6 +48,8 @@ public final class TransitServices
   @NonNull
   private final TransitProviderRegistry mRegistry;
   @NonNull
+  private final SavedConnectionsStore mSavedConnections;
+  @NonNull
   private String mServerUrl = "";
   private TransitConnectionsPresenter mConnections;
   private OnlineTransitRouter mRouter;
@@ -62,6 +66,9 @@ public final class TransitServices
     mConsent = new TransitConsent(store);
     mRegistry = new TransitProviderRegistry(mMainExecutor, System::currentTimeMillis, mConsent::isGranted);
     registerDefaultProvider();
+    mSavedConnections =
+        new SavedConnectionsStore(new File(new File(mContext.getFilesDir(), "transit"), "saved_connections.json"),
+                                  Executors.newSingleThreadExecutor(), Instant::now);
   }
 
   @NonNull
@@ -88,6 +95,14 @@ public final class TransitServices
   public TransitProviderRegistry getRegistry()
   {
     return mRegistry;
+  }
+
+  /** Connections saved by the user (on the device only). */
+  @MainThread
+  @NonNull
+  public SavedConnectionsStore getSavedConnections()
+  {
+    return mSavedConnections;
   }
 
   /** Call after a setting changed: applies a new server and queries the shown connections again. */
@@ -126,8 +141,8 @@ public final class TransitServices
     {
       mConnections =
           new TransitConnectionsPresenter(mRegistry, mSettings::toRoutingOptions, createItemFactory(mContext),
-                                          Debouncer.onMainThread(TransitConnectionsPresenter.DEBOUNCE_MS), Instant::now,
-                                          new TransitConnectionsPresenter.RouteDisplay() {
+                                          Debouncer.onMainThread(TransitConnectionsPresenter.DEBOUNCE_MS),
+                                          Instant::now, new TransitConnectionsPresenter.RouteDisplay() {
                                             @Override
                                             public void show(@NonNull TransitItinerary itinerary)
                                             {
@@ -139,7 +154,7 @@ public final class TransitServices
                                             {
                                               mRouteDisplay.clear();
                                             }
-                                          });
+                                          }, mSettings::getDefaultViewMode, mSavedConnections);
     }
     return mConnections;
   }

@@ -16,6 +16,7 @@ import app.organicmaps.sdk.transit.TransitServiceConfig;
 import app.organicmaps.sdk.transit.provider.TransitousProvider;
 import app.organicmaps.transit.TransitServices;
 import app.organicmaps.transit.TransitSettings;
+import app.organicmaps.transit.ui.SavedConnectionsActivity;
 import app.organicmaps.transit.ui.TransitConsentDialog;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,8 @@ import java.util.Set;
 @Keep
 public class TransitSettingsFragment extends BaseXmlSettingsFragment
 {
+  private static final String KEY_SAVED = "transit_saved";
+
   @Override
   protected int getXmlResources()
   {
@@ -41,6 +44,7 @@ public class TransitSettingsFragment extends BaseXmlSettingsFragment
     initMaxWalk();
     initExcludedModes();
     initServer();
+    initSaved();
     for (String key : new String[] {TransitSettings.KEY_TRANSFER_TIME, TransitSettings.KEY_WALKING_SPEED,
                                     TransitSettings.KEY_WHEELCHAIR, TransitSettings.KEY_BIKE})
     {
@@ -88,6 +92,27 @@ public class TransitSettingsFragment extends BaseXmlSettingsFragment
     final Preference route = findPreference("transit_category_route");
     if (route != null)
       route.setEnabled(granted);
+  }
+
+  @Override
+  public void onResume()
+  {
+    super.onResume();
+    // The number may have changed in the list of saved connections.
+    final Preference saved = findPreference(KEY_SAVED);
+    if (saved != null)
+    {
+      final int count = services().getSavedConnections().size();
+      saved.setSummary(getResources().getQuantityString(R.plurals.transit_saved_count, count, count));
+    }
+  }
+
+  private void initSaved()
+  {
+    getPreference(KEY_SAVED).setOnPreferenceClickListener(p -> {
+      SavedConnectionsActivity.start(requireActivity());
+      return true;
+    });
   }
 
   private void initAttribution()

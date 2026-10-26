@@ -96,4 +96,30 @@
   <string name="transit_departures_empty">No departures in the near future.</string>
   <string name="transit_departures_no_stop">No stop with departures found nearby.</string>
   <string name="transit_departures_enable">Show departures with realtime data</string>
+
+  <string name="transit_view_switch">Display of the connections</string>
+  <string name="transit_view_list">List</string>
+  <string name="transit_view_grid">Time grid</string>
+  <string name="transit_grid_column">%1$s to %2$s, %3$s, %4$s</string>
+  <string name="transit_save">Save connection</string>
+  <string name="transit_unsave">Remove from saved connections</string>
+  <string name="transit_saved">Connection saved</string>
+  <string name="transit_unsaved">Connection removed from saved connections</string>
+  <string name="transit_saved_title">Saved connections</string>
+  <string name="transit_saved_empty">No saved connections yet. Open a connection and tap the bookmark to save it.</string>
+  <string name="transit_saved_on">Saved connection · %1$s</string>
+  <string name="transit_saved_past">This connection is in the past (%1$s).</string>
+  <string name="transit_saved_past_label">Past</string>
+  <string name="transit_search_again">Search again</string>
+  <string name="transit_from_to">%1$s → %2$s</string>
+  <string name="transit_delete">Delete</string>
+  <string name="transit_deleted">Connection deleted</string>
+  <string name="transit_undo">Undo</string>
+  <string name="transit_more">More</string>
+  <plurals name="transit_saved_count">
+    <item quantity="one">%d connection</item>
+    <item quantity="other">%d connections</item>
+  </plurals>
+  <string name="transit_pref_category_display">Display</string>
+  <string name="transit_pref_default_view">Default view</string>
 </resources>

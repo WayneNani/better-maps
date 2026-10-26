@@ -494,6 +494,10 @@
       android:label="@string/transit_settings_title"
       android:parentActivityName="app.organicmaps.MwmActivity"/>
     <activity
+      android:name="app.organicmaps.transit.ui.SavedConnectionsActivity"
+      android:label="@string/transit_saved_title"
+      android:parentActivityName="app.organicmaps.MwmActivity"/>
+    <activity
         android:name="app.organicmaps.MapPlaceholderActivity"/>
     <activity
         android:name="app.organicmaps.car.screens.permissions.RequestPermissionsActivity"/>

@@ -21,6 +21,27 @@
     app:singleLineTitle="false" />
 
   <PreferenceCategory
+    android:key="transit_category_display"
+    android:title="@string/transit_pref_category_display"
+    app:iconSpaceReserved="false">
+
+    <ListPreference
+      android:key="transit_default_view"
+      android:defaultValue="LIST"
+      android:title="@string/transit_pref_default_view"
+      android:entries="@array/transit_default_view_entries"
+      android:entryValues="@array/transit_default_view_values"
+      app:useSimpleSummaryProvider="true"
+      app:iconSpaceReserved="false" />
+
+    <Preference
+      android:key="transit_saved"
+      android:title="@string/transit_saved_title"
+      app:iconSpaceReserved="false"
+      app:singleLineTitle="false" />
+  </PreferenceCategory>
+
+  <PreferenceCategory
     android:key="transit_category_route"
     android:title="@string/transit_pref_category_route"
     app:iconSpaceReserved="false">
