@@ -145,10 +145,10 @@ public final class ConnectionsState
     return mItems;
   }
 
-  /** True if the query succeeded without any connection. */
+  /** True if the query succeeded without any connection. A saved connection is shown without a query. */
   public boolean isEmpty()
   {
-    return !mLoading && mError == null && mItems.isEmpty();
+    return !mSavedView && !mLoading && mError == null && mItems.isEmpty();
   }
 
   public boolean canLoadEarlier()

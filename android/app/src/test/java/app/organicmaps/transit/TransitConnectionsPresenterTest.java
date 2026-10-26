@@ -679,6 +679,8 @@ public class TransitConnectionsPresenterTest
     assertFalse(state.isPast());
     assertFalse(state.isLoading());
     assertTrue(state.getItems().isEmpty());
+    // No "no connections found" for a saved connection.
+    assertFalse(state.isEmpty());
     assertEquals("a", state.getSelected().getKey());
     assertEquals("17:29", state.getSelected().getDeparture());
     assertEquals(3, state.getLegs().size());
