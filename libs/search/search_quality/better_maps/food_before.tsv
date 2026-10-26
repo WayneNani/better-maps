@@ -1,0 +1,516 @@
+query	pos	name	type	types	address	distance_m	open	ranking
+Café	1	Bio Company	amenity-cafe	amenity-cafe shop-supermarket amenity cuisine-vegan cuisine-vegetarian wheelchair-limited organic-only	Berlin, Dircksenstraße, 145-147, Berlin, Germany	356	open	rank 0.530213, popularity 0, pureCats 1
+Café	2	dean&david	amenity-fast_food	amenity-fast_food amenity cuisine-sandwich cuisine-vegan cuisine-vegetarian internet_access-wlan wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 7, Berlin, Germany	90	open	rank 0.530059, popularity 0, pureCats 1
+Café	3	Bandy Brooks	amenity-cafe	amenity-cafe amenity-ice_cream cuisine-ice_cream wheelchair-limited	Berlin, Karl-Liebknecht-Straße, 1, Berlin, Germany	182	open	rank 0.528569, popularity 0, pureCats 1
+Café	4	Eden	amenity-restaurant	amenity-restaurant amenity cuisine-asian cuisine-vegan cuisine-vegetarian internet_access-wlan wheelchair-yes	Berlin, Rosenstraße, 19, Berlin, Germany	215	open	rank 0.528083, popularity 0, pureCats 1
+Café	5	La Siesta	amenity-cafe	amenity-cafe amenity cuisine-coffee_shop	Berlin, Garnisonkirchplatz, 2, Berlin, Germany	308	open	rank 0.52682, popularity 0, pureCats 1
+Frühstück	1	Bio Company	amenity-cafe	amenity-cafe shop-supermarket amenity cuisine-vegan cuisine-vegetarian wheelchair-limited organic-only	Berlin, Dircksenstraße, 145-147, Berlin, Germany	356	open	rank 0.530213, popularity 0, pureCats 1
+Frühstück	2	Bandy Brooks	amenity-cafe	amenity-cafe amenity-ice_cream cuisine-ice_cream wheelchair-limited	Berlin, Karl-Liebknecht-Straße, 1, Berlin, Germany	182	open	rank 0.528569, popularity 0, pureCats 1
+Frühstück	3	Alto	amenity-restaurant	amenity-restaurant amenity cuisine-breakfast internet_access-wlan wheelchair-yes	Berlin, An der Spandauer Brücke, 11, Berlin, Germany	236	open	rank 0.527784, popularity 0, pureCats 1
+Frühstück	4	La Siesta	amenity-cafe	amenity-cafe amenity cuisine-coffee_shop	Berlin, Garnisonkirchplatz, 2, Berlin, Germany	308	open	rank 0.52682, popularity 0, pureCats 1
+Frühstück	5	Maxim	amenity-cafe	amenity-cafe amenity cuisine-vegetarian internet_access-wlan wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 14, Berlin, Germany	309	open	rank 0.526803, popularity 0, pureCats 1
+Kaffee	1	Bio Company	amenity-cafe	amenity-cafe shop-supermarket amenity cuisine-vegan cuisine-vegetarian wheelchair-limited organic-only	Berlin, Dircksenstraße, 145-147, Berlin, Germany	356	open	rank 0.530213, popularity 0, pureCats 1
+Kaffee	2	Bandy Brooks	amenity-cafe	amenity-cafe amenity-ice_cream cuisine-ice_cream wheelchair-limited	Berlin, Karl-Liebknecht-Straße, 1, Berlin, Germany	182	open	rank 0.528569, popularity 0, pureCats 1
+Kaffee	3	La Siesta	amenity-cafe	amenity-cafe amenity cuisine-coffee_shop	Berlin, Garnisonkirchplatz, 2, Berlin, Germany	308	open	rank 0.52682, popularity 0, pureCats 1
+Kaffee	4	Maxim	amenity-cafe	amenity-cafe amenity cuisine-vegetarian internet_access-wlan wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 14, Berlin, Germany	309	open	rank 0.526803, popularity 0, pureCats 1
+Kaffee	5	Tudo	amenity-cafe	amenity-cafe amenity cuisine-bubble_tea wheelchair-yes	Berlin, Germany	350	open	rank 0.526285, popularity 0, pureCats 1
+Apotheke	1	MediosApotheke	amenity-pharmacy	amenity-pharmacy wheelchair-yes	Berlin, Friedrichstrasse, 113A, Berlin, Germany	1362	open	rank 0.517972, popularity 0, pureCats 1
+Apotheke	2	MediosApotheke Hackescher Markt	amenity-pharmacy	amenity-pharmacy wheelchair-no	Berlin, Rosenthaler Straße, 46-47, Berlin, Germany	525	closed	rank 0.514339, popularity 0, pureCats 1
+Apotheke	3	Apotheke Hackesches Quartier	amenity-pharmacy	amenity-pharmacy wheelchair-yes	Berlin, Henriette-Herz-Platz, 3, Berlin, Germany	296	closed	rank 0.512969, popularity 0, pureCats 1
+Apotheke	4	Apotheke im Berliner Hauptbahnhof	amenity-pharmacy	amenity-pharmacy wheelchair-yes	Berlin, Europaplatz, 1, Berlin, Germany	2479	open	rank 0.512742, popularity 0, pureCats 1
+Apotheke	5	Panorama Apotheke	amenity-pharmacy	amenity-pharmacy wheelchair-no	Berlin, Panoramastraße, 1, Berlin, Germany	385	closed	rank 0.511867, popularity 0, pureCats 1
+Tankstelle	1	Total	amenity-fuel	amenity-fuel amenity-compressed_air wheelchair-limited	Berlin, Prenzlauer Allee, 1, Berlin, Germany	1334	open	rank 0.520135, popularity 0, pureCats 1
+Tankstelle	2	Aral	amenity-fuel	amenity-fuel amenity-compressed_air wheelchair-limited	Berlin, Holzmarktstraße, 12/14, Berlin, Germany	1332	open	rank 0.518148, popularity 0, pureCats 1
+Tankstelle	3	Aral	amenity-fuel	amenity-fuel wheelchair-yes	Berlin, Prinzenstraße, 29, Berlin, Germany	2032	open	rank 0.514577, popularity 0, pureCats 1
+Tankstelle	4	Total Station	amenity-fuel	amenity-fuel amenity-compressed_air wheelchair-yes	Berlin, Margarete-Sommer-Straße, 2, Berlin, Germany	2727	open	rank 0.513826, popularity 0, pureCats 1
+Tankstelle	5	Shell	amenity-fuel	amenity-fuel amenity-compressed_air wheelchair-limited	Berlin, Oranienstraße, 138, Berlin, Germany	1788	unknown	rank 0.513709, popularity 0, pureCats 1
+Döner	1	Kebab Kitchen	amenity-fast_food	amenity-fast_food amenity cuisine-kebab cuisine-vegan cuisine-vegetarian wheelchair-no	Berlin, Rosenthaler Straße, 46, Berlin, Germany	514	open	rank 0.524452, popularity 0, pureCats 1
+Döner	2	Ali Baba Bistro	amenity-fast_food	amenity-fast_food amenity cuisine-kebab cuisine-vegan cuisine-vegetarian wheelchair-no	Berlin, Germany	384	open	rank 0.523875, popularity 0, pureCats 1
+Döner	3	Pergamon	amenity-fast_food	amenity-fast_food amenity cuisine-kebab cuisine-pizza wheelchair-yes	Berlin, Germany	475	open	rank 0.523864, popularity 0, pureCats 1
+Döner	4	Döner Inn	amenity-fast_food	amenity-fast_food amenity cuisine-kebab wheelchair-yes	Berlin, Germany	570	open	rank 0.522882, popularity 0, pureCats 1
+Döner	5	mangal DÖNER (Mangal.de, comming soon)	amenity-fast_food	amenity-fast_food	Berlin, Karl-Liebknecht-Straße, 13, Berlin, Germany	285	unknown	rank 0.522121, popularity 0, pureCats 0
+Supermarkt	1	REWE City	shop-supermarket	shop-supermarket internet_access-wlan wheelchair-yes	Berlin, Litfaß-Platz, 4, Berlin, Germany	289	open	rank 0.529063, popularity 0, pureCats 1
+Supermarkt	2	Kaufland	shop-supermarket	shop-supermarket internet_access-wlan wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 13, Berlin, Germany	321	open	rank 0.526652, popularity 0, pureCats 1
+Supermarkt	3	E-Center	shop-supermarket	shop-supermarket internet_access-wlan wheelchair-yes	Berlin, Rosenthaler Straße, 43-45, Berlin, Germany	502	open	rank 0.526574, popularity 0, pureCats 1
+Supermarkt	4	Netto Marken-Discount	shop-supermarket	shop-supermarket wheelchair-yes	Berlin, Rathausstraße, 5, Berlin, Germany	351	open	rank 0.526275, popularity 0, pureCats 1
+Supermarkt	5	Edeka Schaaf	shop-supermarket	shop-supermarket organic-yes wheelchair-yes	Berlin, Schillingstraße, 2, Berlin, Germany	1097	open	rank 0.525628, popularity 0, pureCats 1
+Bäckerei	1	M&M Back	shop-bakery	shop-bakery wheelchair-yes	Berlin, Germany	324	open	rank 0.525612, popularity 0, pureCats 1
+Bäckerei	2	Ditsch	shop-bakery	shop-bakery	Berlin, Germany	471	open	rank 0.5239, popularity 0, pureCats 1
+Bäckerei	3	Cinnamood	amenity-cafe	amenity-cafe amenity cuisine-coffee_shop cuisine-cake cuisine-vegan cuisine-vegetarian wheelchair-no	Berlin, Oranienburger Straße, 8, Berlin, Germany	523	open	rank 0.523354, popularity 0, pureCats 1
+Bäckerei	4	Kamps	shop-bakery	shop-bakery wheelchair-yes	Berlin, Germany	346	unknown	rank 0.523333, popularity 0, pureCats 1
+Bäckerei	5	Steinecke	shop-bakery	shop-bakery internet_access-wlan wheelchair-yes	Berlin, Fischerinsel, 12, Berlin, Germany	708	open	rank 0.52161, popularity 0, pureCats 1
+Restaurant	1	BLOCK HOUSE	amenity-restaurant	amenity-restaurant amenity cuisine-steak_house wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 7, Berlin, Germany	60	open	rank 0.530604, popularity 0, pureCats 1
+Restaurant	2	Zum Nußbaum	amenity-restaurant	amenity-restaurant amenity cuisine-german wheelchair-limited	Berlin, Am Nußbaum, 3, Berlin, Germany	347	open	rank 0.529453, popularity 2, pureCats 1
+Restaurant	3	Kila.	amenity-restaurant	amenity-restaurant amenity cuisine-vietnamese wheelchair-yes	Berlin, Spandauer Straße, 3, Berlin, Germany	90	open	rank 0.529061, popularity 0, pureCats 1
+Restaurant	4	Schlögl's Altberliner Gaststätte	amenity-restaurant	amenity-restaurant amenity cuisine-german cuisine-regional wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 9, Berlin, Germany	163	open	rank 0.528855, popularity 0, pureCats 1
+Restaurant	5	Trattoria Peretti	amenity-restaurant	amenity-restaurant amenity cuisine-italian wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 5, Berlin, Germany	128	open	rank 0.528417, popularity 0, pureCats 1
+Geldautomat	1		amenity-atm	amenity-atm wheelchair-yes	Berlin, Germany	285	open	rank 0.527111, popularity 0, pureCats 1
+Geldautomat	2	Berliner Volksbank	amenity-atm	amenity-atm wheelchair-yes	Berlin, Germany	121	unknown	rank 0.526528, popularity 0, pureCats 1
+Geldautomat	3	Berliner Sparkasse	amenity-atm	amenity-atm	Berlin, Germany	612	open	rank 0.525478, popularity 0, pureCats 1
+Geldautomat	4	Berliner Volksbank	amenity-atm	amenity-atm wheelchair-limited	Berlin, Germany	451	open	rank 0.525119, popularity 0, pureCats 1
+Geldautomat	5	Berliner Sparkasse	amenity-atm	amenity-atm wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 13, Berlin, Germany	290	unknown	rank 0.525043, popularity 0, pureCats 1
+Arzt	1	St. Hedwig-Krankenhaus	amenity-hospital	amenity-hospital wheelchair-yes	Berlin, Große Hamburger Straße, 5-11, Berlin, Germany	873	unknown	rank 0.522252, popularity 0, pureCats 1
+Arzt	2	Dagmar Steinbrück	amenity-doctors	amenity-doctors	Berlin, Münzstraße, 5, Berlin, Germany	515	unknown	rank 0.520433, popularity 0, pureCats 1
+Arzt	3	Hagedorn & Deter Neurologisch-psychiatrische Praxis	amenity-doctors	amenity-doctors	Berlin, Große Hamburger Straße, 5-11, Berlin, Germany	786	unknown	rank 0.519942, popularity 0, pureCats 1
+Arzt	4	Ddrmed Europe	amenity-doctors	amenity-doctors	Berlin, Germany	733	unknown	rank 0.517393, popularity 0, pureCats 1
+Arzt	5	Dr. Bek, Dr. Lozo, Dr. Föhse & Kollegen	amenity-doctors	amenity-doctors wheelchair-yes	Berlin, Friedrichstrasse, 147, Berlin, Germany	1145	unknown	rank 0.517309, popularity 0, pureCats 1
+Kino	1	Babylon	amenity-cinema	amenity-cinema wheelchair-limited	Berlin, Rosa-Luxemburg-Straße, 30, Berlin, Germany	788	open	rank 0.527181, popularity 20, pureCats 1
+Kino	2	Kino Central	amenity-cinema	amenity-cinema wheelchair-limited	Berlin, Rosenthaler Straße, 39, Berlin, Germany	551	unknown	rank 0.525072, popularity 0, pureCats 1
+Kino	3	Zeughauskino	amenity-cinema	amenity-cinema wheelchair-limited	Berlin, Unter den Linden, 2, Berlin, Germany	535	unknown	rank 0.524238, popularity 0, pureCats 1
+Kino	4	Hackesche Höfe Kino	amenity-cinema	amenity-cinema internet_access-wlan wheelchair-no	Berlin, Rosenthaler Straße, 40-41, Berlin, Germany	498	unknown	rank 0.522611, popularity 0, pureCats 1
+Kino	5	Kino International	amenity-cinema	amenity-cinema building toilets-yes internet_access-wlan wheelchair-yes	Berlin, Karl-Marx-Allee, 33, Berlin, Germany	1221	unknown	rank 0.521572, popularity 12, pureCats 1
+Museum	1	Museumsinsel	railway-station-subway-berlin	railway-station-subway-berlin wheelchair-yes	Berlin, Germany	514	unknown	rank 0.539452, popularity 8, pureCats 0
+Museum	2	Märkisches Museum	railway-station-subway-berlin	railway-station-subway-berlin wheelchair-yes	Berlin, Germany	922	unknown	rank 0.535875, popularity 10, pureCats 0
+Museum	3	DDR-Museum	tourism-museum	tourism-museum internet_access-wlan wheelchair-limited fee-yes	Berlin, Karl-Liebknecht-Straße, 1, Berlin, Germany	196	open	rank 0.533106, popularity 12, pureCats 1
+Museum	4	Monsterkabinett	tourism-gallery	tourism-gallery wheelchair-no	Berlin, Rosenthaler Straße, 39, Berlin, Germany	542	open	rank 0.52416, popularity 0, pureCats 1
+Museum	5	Hošek Contemporary	tourism-gallery	tourism-gallery	Berlin, Germany	844	unknown	rank 0.523911, popularity 7, pureCats 1
+Hotel	1	Radisson Collection Hotel Berlin	tourism-hotel	tourism-hotel wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 3, Berlin, Germany	156	unknown	rank 0.531971, popularity 0, pureCats 1
+Hotel	2	Park Inn by Radisson Berlin-Alexanderplatz	tourism-hotel	tourism-hotel building internet_access-wlan wheelchair-no	Berlin, Germany	615	unknown	rank 0.52789, popularity 7, pureCats 1
+Hotel	3	Hotel de Rome	tourism-hotel	tourism-hotel internet_access-wlan wheelchair-yes	Berlin, Behrenstraße, 37, Berlin, Germany	876	open	rank 0.527226, popularity 0, pureCats 1
+Hotel	4	Adina Apartment Hotel Berlin Hackescher Markt	tourism-hotel	tourism-hotel internet_access wheelchair-yes	Berlin, An der Spandauer Brücke, 11, Berlin, Germany	263	unknown	rank 0.526408, popularity 0, pureCats 1
+Hotel	5	Wunderflats	tourism-hostel	tourism-hostel wheelchair-yes	Berlin, Rosenstraße, 16, Berlin, Germany	148	unknown	rank 0.525092, popularity 0, pureCats 1
+Pizza	1	La Focaccia	amenity-fast_food	amenity-fast_food amenity cuisine-pizza cuisine-vegetarian wheelchair-yes	Berlin, Neue Promenade, 9, Berlin, Germany	406	open	rank 0.525624, popularity 0, pureCats 1
+Pizza	2	OLLA Grill & Orient Lounge	amenity-restaurant	amenity-restaurant amenity cuisine-oriental cuisine-pizza cuisine-vegetarian wheelchair-yes	Berlin, Germany	465	open	rank 0.524965, popularity 0, pureCats 1
+Pizza	3	Capvin	amenity-restaurant	amenity-restaurant amenity cuisine-italian cuisine-pizza wheelchair-limited	Berlin, Rosenthaler Straße, 36, Berlin, Germany	558	open	rank 0.523999, popularity 0, pureCats 1
+Pizza	4	Pergamon	amenity-fast_food	amenity-fast_food amenity cuisine-kebab cuisine-pizza wheelchair-yes	Berlin, Germany	475	open	rank 0.523864, popularity 0, pureCats 1
+Pizza	5	Pizza-Scheune	amenity-restaurant	amenity-restaurant amenity cuisine-italian cuisine-pizza cuisine-vegetarian wheelchair-no	Berlin, Rosa-Luxemburg-Straße, 49, Berlin, Germany	957	open	rank 0.520615, popularity 0, pureCats 1
+Spielplatz	1		leisure-playground	leisure-playground	Berlin, Germany	260	unknown	rank 0.522449, popularity 0, pureCats 1
+Spielplatz	2		leisure-playground	leisure-playground	Berlin, Germany	341	unknown	rank 0.521405, popularity 0, pureCats 1
+Spielplatz	3		leisure-playground	leisure-playground	Berlin, Germany	480	unknown	rank 0.519807, popularity 0, pureCats 1
+Spielplatz	4		leisure-playground	leisure-playground	Berlin, Germany	597	unknown	rank 0.518623, popularity 0, pureCats 1
+Spielplatz	5		leisure-playground	leisure-playground wheelchair-no	Berlin, Germany	604	unknown	rank 0.518554, popularity 0, pureCats 1
+Toilette	1		amenity-toilets	amenity-toilets building drinking_water-yes fee-yes wheelchair-yes	Berlin, Germany	341	open	rank 0.5264, popularity 0, pureCats 1
+Toilette	2		amenity-toilets	amenity-toilets building fee-no wheelchair-yes	Berlin, Germany	387	open	rank 0.525844, popularity 0, pureCats 1
+Toilette	3		amenity-toilets	amenity-toilets fee-no wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 13, Berlin, Germany	300	open	rank 0.524923, popularity 0, pureCats 1
+Toilette	4	City WC	amenity-toilets	amenity-toilets fee-yes wheelchair-yes	Berlin, Spandauer Straße, 9, Berlin, Germany	185	unknown	rank 0.524522, popularity 0, pureCats 1
+Toilette	5		amenity-toilets	amenity-toilets amenity-toilets-private	Berlin, Große Präsidentenstraße, 1, Berlin, Germany	468	open	rank 0.523929, popularity 0, pureCats 1
+Eisdiele	1	Waffel oder Becher	amenity-ice_cream	amenity-ice_cream wheelchair-yes	Berlin, Spandauer Straße, 2, Berlin, Germany	142	open	rank 0.529199, popularity 0, pureCats 1
+Eisdiele	2	Softinis	amenity-ice_cream	amenity-ice_cream	Berlin, Germany	422	open	rank 0.523439, popularity 0, pureCats 1
+Eisdiele	3	yoli	amenity-ice_cream	amenity-ice_cream	Berlin, Münzstraße, 11b, Berlin, Germany	526	open	rank 0.523328, popularity 0, pureCats 1
+Eisdiele	4	Cuore Di Vetro	amenity-ice_cream	amenity-ice_cream toilets-yes cuisine-ice_cream cuisine-vegan internet_access-wlan wheelchair-no	Berlin, Max-Beer-Straße, 33, Berlin, Germany	772	open	rank 0.522058, popularity 0, pureCats 1
+Eisdiele	5	Hokey Pokey	amenity-ice_cream	amenity-ice_cream cuisine-vegan wheelchair-no	Berlin, Torstraße, 141, Berlin, Germany	1152	open	rank 0.519268, popularity 0, pureCats 1
+Biergarten	1	Fischer & Lustig	amenity-biergarten	amenity-biergarten wheelchair-yes	Berlin, Poststraße, 26, Berlin, Germany	320	open	rank 0.526662, popularity 0, pureCats 1
+Biergarten	2	Georgbräu	amenity-biergarten	amenity-biergarten wheelchair-no	Berlin, Germany	395	open	rank 0.524751, popularity 0, pureCats 1
+Biergarten	3	republik-berlin	amenity-biergarten	amenity-biergarten wheelchair-no	Berlin, Köpenicker Straße, 74, Berlin, Germany	1316	open	rank 0.517242, popularity 0, pureCats 1
+Biergarten	4	Mauersegler	amenity-biergarten	amenity-biergarten wheelchair-limited	Berlin, Bernauer Straße, 63-64, Berlin, Germany	2298	open	rank 0.513452, popularity 0, pureCats 1
+Biergarten	5		amenity-biergarten	amenity-biergarten	Berlin, Germany	1290	unknown	rank 0.5134, popularity 0, pureCats 1
+Apotheke offen	1	MediosApotheke	amenity-pharmacy	amenity-pharmacy wheelchair-yes	Berlin, Friedrichstrasse, 113A, Berlin, Germany	1362	open	rank 0.517972, popularity 0, pureCats 1
+Apotheke offen	2	Apotheke im Berliner Hauptbahnhof	amenity-pharmacy	amenity-pharmacy wheelchair-yes	Berlin, Europaplatz, 1, Berlin, Germany	2479	open	rank 0.512742, popularity 0, pureCats 1
+Apotheke offen	3	Herz Apotheke	amenity-pharmacy	amenity-pharmacy wheelchair-yes	Berlin, Badstraße, 57, Berlin, Germany	3808	open	rank 0.50842, popularity 0, pureCats 1
+Apotheke offen	4	Sky Apotheke Kreuzberg	amenity-pharmacy	amenity-pharmacy wheelchair-yes	Berlin, Bergmannstraße, 5-7, Berlin, Germany	3564	open	rank 0.508122, popularity 0, pureCats 1
+Apotheke offen	5	Sky Apotheke	amenity-pharmacy	amenity-pharmacy wheelchair-yes	Berlin, Müllerstraße, 142, Berlin, Germany	4682	open	rank 0.50516, popularity 0, pureCats 1
+Café jetzt geöffnet	1	Bio Company	amenity-cafe	amenity-cafe shop-supermarket amenity cuisine-vegan cuisine-vegetarian wheelchair-limited organic-only	Berlin, Dircksenstraße, 145-147, Berlin, Germany	356	open	rank 0.530213, popularity 0, pureCats 1
+Café jetzt geöffnet	2	dean&david	amenity-fast_food	amenity-fast_food amenity cuisine-sandwich cuisine-vegan cuisine-vegetarian internet_access-wlan wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 7, Berlin, Germany	90	open	rank 0.530059, popularity 0, pureCats 1
+Café jetzt geöffnet	3	Bandy Brooks	amenity-cafe	amenity-cafe amenity-ice_cream cuisine-ice_cream wheelchair-limited	Berlin, Karl-Liebknecht-Straße, 1, Berlin, Germany	182	open	rank 0.528569, popularity 0, pureCats 1
+Café jetzt geöffnet	4	Eden	amenity-restaurant	amenity-restaurant amenity cuisine-asian cuisine-vegan cuisine-vegetarian internet_access-wlan wheelchair-yes	Berlin, Rosenstraße, 19, Berlin, Germany	215	open	rank 0.528083, popularity 0, pureCats 1
+Café jetzt geöffnet	5	La Siesta	amenity-cafe	amenity-cafe amenity cuisine-coffee_shop	Berlin, Garnisonkirchplatz, 2, Berlin, Germany	308	open	rank 0.52682, popularity 0, pureCats 1
+Apotheke Sonntag	1	Galenus-Apotheke	amenity-pharmacy	amenity-pharmacy wheelchair-no	Berlin, Germany	1302	open	rank 0.518325, popularity 0, pureCats 1
+Apotheke Sonntag	2	MediosApotheke	amenity-pharmacy	amenity-pharmacy wheelchair-yes	Berlin, Friedrichstrasse, 113A, Berlin, Germany	1362	open	rank 0.517972, popularity 0, pureCats 1
+Apotheke Sonntag	3	Arkona Apotheke	amenity-pharmacy	amenity-pharmacy	Berlin, Kastanienallee, 38, Berlin, Germany	1737	open	rank 0.515959, popularity 0, pureCats 1
+Apotheke Sonntag	4	Apotheke im Regierungsviertel	amenity-pharmacy	amenity-pharmacy wheelchair-yes	Berlin, Wilhelmstraße, 93, Berlin, Germany	1759	open	rank 0.515849, popularity 0, pureCats 1
+Apotheke Sonntag	5	Bahnhof-Apotheke Friedrichshain	amenity-pharmacy	amenity-pharmacy wheelchair-yes	Berlin, Am Ostbahnhof, 5, Berlin, Germany	2246	open	rank 0.513665, popularity 0, pureCats 1
+Supermarkt Sonntag	1	Kaufland	shop-supermarket	shop-supermarket internet_access-wlan wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 13, Berlin, Germany	321	open	rank 0.526652, popularity 0, pureCats 1
+Supermarkt Sonntag	2	Asia-Mekong	shop-supermarket	shop-supermarket cuisine-asian wheelchair-limited	Berlin, Henriette-Herz-Platz, 1, Berlin, Germany	349	open	rank 0.526304, popularity 0, pureCats 1
+Supermarkt Sonntag	3	EDEKA	shop-supermarket	shop-supermarket wheelchair-yes	Berlin, Friedrichstrasse, 142, Berlin, Germany	1218	open	rank 0.520842, popularity 0, pureCats 1
+Supermarkt Sonntag	4	Go Asia	shop-supermarket	shop-supermarket wheelchair-yes	Berlin, Friedrichstrasse, 140, Berlin, Germany	1177	open	rank 0.519103, popularity 0, pureCats 1
+Supermarkt Sonntag	5	Kauf Markt	shop-supermarket	shop-supermarket wheelchair-limited	Berlin, Torstraße, 169-171, Berlin, Germany	1203	open	rank 0.517936, popularity 0, pureCats 1
+Restaurant heute 22 Uhr	1	BLOCK HOUSE	amenity-restaurant	amenity-restaurant amenity cuisine-steak_house wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 7, Berlin, Germany	60	open	rank 0.530604, popularity 0, pureCats 1
+Restaurant heute 22 Uhr	2	Zum Nußbaum	amenity-restaurant	amenity-restaurant amenity cuisine-german wheelchair-limited	Berlin, Am Nußbaum, 3, Berlin, Germany	347	open	rank 0.529453, popularity 2, pureCats 1
+Restaurant heute 22 Uhr	3	Trattoria Peretti	amenity-restaurant	amenity-restaurant amenity cuisine-italian wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 5, Berlin, Germany	128	open	rank 0.528417, popularity 0, pureCats 1
+Restaurant heute 22 Uhr	4	Eden	amenity-restaurant	amenity-restaurant amenity cuisine-asian cuisine-vegan cuisine-vegetarian internet_access-wlan wheelchair-yes	Berlin, Rosenstraße, 19, Berlin, Germany	215	open	rank 0.528083, popularity 0, pureCats 1
+Restaurant heute 22 Uhr	5	Kartoffelhaus	amenity-restaurant	amenity-restaurant amenity cuisine-german wheelchair-no	Berlin, Karl-Liebknecht-Straße, 9, Berlin, Germany	152	open	rank 0.528039, popularity 0, pureCats 1
+cafe open now	1	Bio Company	amenity-cafe	amenity-cafe shop-supermarket amenity cuisine-vegan cuisine-vegetarian wheelchair-limited organic-only	Berlin, Dircksenstraße, 145-147, Berlin, Germany	356	open	rank 0.530213, popularity 0, pureCats 1
+cafe open now	2	dean&david	amenity-fast_food	amenity-fast_food amenity cuisine-sandwich cuisine-vegan cuisine-vegetarian internet_access-wlan wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 7, Berlin, Germany	90	open	rank 0.530059, popularity 0, pureCats 1
+cafe open now	3	Bandy Brooks	amenity-cafe	amenity-cafe amenity-ice_cream cuisine-ice_cream wheelchair-limited	Berlin, Karl-Liebknecht-Straße, 1, Berlin, Germany	182	open	rank 0.528569, popularity 0, pureCats 1
+cafe open now	4	Eden	amenity-restaurant	amenity-restaurant amenity cuisine-asian cuisine-vegan cuisine-vegetarian internet_access-wlan wheelchair-yes	Berlin, Rosenstraße, 19, Berlin, Germany	215	open	rank 0.528083, popularity 0, pureCats 1
+cafe open now	5	La Siesta	amenity-cafe	amenity-cafe amenity cuisine-coffee_shop	Berlin, Garnisonkirchplatz, 2, Berlin, Germany	308	open	rank 0.52682, popularity 0, pureCats 1
+Tankstelle geöffnet	1	Total	amenity-fuel	amenity-fuel amenity-compressed_air wheelchair-limited	Berlin, Prenzlauer Allee, 1, Berlin, Germany	1334	open	rank 0.520135, popularity 0, pureCats 1
+Tankstelle geöffnet	2	Aral	amenity-fuel	amenity-fuel amenity-compressed_air wheelchair-limited	Berlin, Holzmarktstraße, 12/14, Berlin, Germany	1332	open	rank 0.518148, popularity 0, pureCats 1
+Tankstelle geöffnet	3	Aral	amenity-fuel	amenity-fuel wheelchair-yes	Berlin, Prinzenstraße, 29, Berlin, Germany	2032	open	rank 0.514577, popularity 0, pureCats 1
+Tankstelle geöffnet	4	Total Station	amenity-fuel	amenity-fuel amenity-compressed_air wheelchair-yes	Berlin, Margarete-Sommer-Straße, 2, Berlin, Germany	2727	open	rank 0.513826, popularity 0, pureCats 1
+Tankstelle geöffnet	5	TotalEnergies Chausseestraße	amenity-fuel	amenity-fuel amenity-compressed_air landuse-retail wheelchair-limited	Berlin, Chausseestraße, 61, Berlin, Germany	2776	open	rank 0.513651, popularity 0, pureCats 1
+Bäckerei am Sonntag	1	Bäcker Wiedemann	shop-bakery	shop-bakery wheelchair-limited	Berlin, Germany	46	open	rank 0.529849, popularity 0, pureCats 1
+Bäckerei am Sonntag	2	Kamps	shop-bakery	shop-bakery wheelchair-yes	Berlin, An der Spandauer Brücke, 10, Berlin, Germany	296	open	rank 0.526976, popularity 0, pureCats 1
+Bäckerei am Sonntag	3	Forum Café	amenity-cafe	amenity-cafe amenity toilets-yes cuisine-cake cuisine-vegetarian internet_access-wlan wheelchair-yes	Berlin, Schloßplatz, 1, Berlin, Germany	405	open	rank 0.52564, popularity 0, pureCats 1
+Bäckerei am Sonntag	4	M&M Back	shop-bakery	shop-bakery wheelchair-yes	Berlin, Germany	324	open	rank 0.525612, popularity 0, pureCats 1
+Bäckerei am Sonntag	5	Steinecke	shop-bakery	shop-bakery internet_access-wlan wheelchair-limited	Berlin, Dircksenstraße, 52, Berlin, Germany	371	open	rank 0.525034, popularity 0, pureCats 1
+Club	1	b-flat	amenity-nightclub	amenity-nightclub wheelchair-no	Berlin, Dircksenstraße, 40, Berlin, Germany	417	open	rank 0.52962, popularity 2, pureCats 1
+Club	2	Ladycompany - Fitness für Frauen	leisure-fitness_centre	leisure-fitness_centre	Berlin, Spandauer Straße, 4, Berlin, Germany	122	open	rank 0.529527, popularity 0, pureCats 1
+Club	3	Mokka Mitte Bar	amenity-nightclub	amenity-nightclub	Berlin, Germany	517	open	rank 0.524419, popularity 0, pureCats 1
+Club	4	AM to PM	amenity-nightclub	amenity-nightclub internet_access-wlan wheelchair-no	Berlin, Am Zwirngraben, 2, Berlin, Germany	343	unknown	rank 0.524379, popularity 0, pureCats 1
+Club	5	Evo Fitness	leisure-fitness_centre	leisure-fitness_centre wheelchair-no	Berlin, Rosa-Luxemburg-Straße, 14, Berlin, Germany	616	open	rank 0.522441, popularity 0, pureCats 1
+Disco	1	b-flat	amenity-nightclub	amenity-nightclub wheelchair-no	Berlin, Dircksenstraße, 40, Berlin, Germany	417	open	rank 0.52962, popularity 2, pureCats 1
+Disco	2	Clärchens Ballhaus	amenity-nightclub	amenity-nightclub wheelchair-no	Berlin, Auguststraße, 24, Berlin, Germany	905	open	rank 0.525567, popularity 9, pureCats 1
+Disco	3	Mokka Mitte Bar	amenity-nightclub	amenity-nightclub	Berlin, Germany	517	open	rank 0.524419, popularity 0, pureCats 1
+Disco	4	AM to PM	amenity-nightclub	amenity-nightclub internet_access-wlan wheelchair-no	Berlin, Am Zwirngraben, 2, Berlin, Germany	343	unknown	rank 0.524379, popularity 0, pureCats 1
+Disco	5	Tresor Berlin	amenity-nightclub	amenity-nightclub wheelchair-yes	Berlin, Köpenicker Straße, 70, Berlin, Germany	1427	unknown	rank 0.521594, popularity 52, pureCats 1
+Nachtclub	1	b-flat	amenity-nightclub	amenity-nightclub wheelchair-no	Berlin, Dircksenstraße, 40, Berlin, Germany	417	open	rank 0.52962, popularity 2, pureCats 1
+Nachtclub	2	Clärchens Ballhaus	amenity-nightclub	amenity-nightclub wheelchair-no	Berlin, Auguststraße, 24, Berlin, Germany	905	open	rank 0.525567, popularity 9, pureCats 1
+Nachtclub	3	Mokka Mitte Bar	amenity-nightclub	amenity-nightclub	Berlin, Germany	517	open	rank 0.524419, popularity 0, pureCats 1
+Nachtclub	4	AM to PM	amenity-nightclub	amenity-nightclub internet_access-wlan wheelchair-no	Berlin, Am Zwirngraben, 2, Berlin, Germany	343	unknown	rank 0.524379, popularity 0, pureCats 1
+Nachtclub	5	Tresor Berlin	amenity-nightclub	amenity-nightclub wheelchair-yes	Berlin, Köpenicker Straße, 70, Berlin, Germany	1427	unknown	rank 0.521594, popularity 52, pureCats 1
+Bar	1	Palm Beach	amenity-bar	amenity-bar wheelchair-limited	Berlin, Germany	70	open	rank 0.530407, popularity 0, pureCats 1
+Bar	2	b-flat	amenity-nightclub	amenity-nightclub wheelchair-no	Berlin, Dircksenstraße, 40, Berlin, Germany	417	open	rank 0.52962, popularity 2, pureCats 1
+Bar	3	Lieschen Mueller	amenity-bar	amenity-bar wheelchair-yes	Berlin, Panoramastraße, 1A, Berlin, Germany	251	open	rank 0.527573, popularity 0, pureCats 1
+Bar	4	U Mendelssohn-Bartholdy-Park	building-train_station	building-train_station	Berlin, Germany	2720	unknown	rank 0.526848, popularity 0, pureCats 0
+Bar	5	Mendelssohn-Bartholdy-Park	railway-station-subway-berlin	railway-station-subway-berlin wheelchair-yes	Berlin, Germany	2729	unknown	rank 0.526816, popularity 2, pureCats 0
+Kneipe	1	Palm Beach	amenity-bar	amenity-bar wheelchair-limited	Berlin, Germany	70	open	rank 0.530407, popularity 0, pureCats 1
+Kneipe	2	Berlin Icebar - Polar Expedition	amenity-bar	amenity-bar amenity cuisine-ice_cream wheelchair-yes	Berlin, Spandauer Straße, 2, Berlin, Germany	168	open	rank 0.528783, popularity 0, pureCats 1
+Kneipe	3	Lieschen Mueller	amenity-bar	amenity-bar wheelchair-yes	Berlin, Panoramastraße, 1A, Berlin, Germany	251	open	rank 0.527573, popularity 0, pureCats 1
+Kneipe	4	Biermeisterei by Lemke Berlin	amenity-pub	amenity-pub internet_access-wlan wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 13, Berlin, Germany	346	open	rank 0.526332, popularity 0, pureCats 1
+Kneipe	5	Bata Bar & Billiards am Alex	amenity-bar	amenity-bar	Berlin, Germany	355	open	rank 0.526225, popularity 0, pureCats 1
+Cocktailbar	1	Palm Beach	amenity-bar	amenity-bar wheelchair-limited	Berlin, Germany	70	open	rank 0.530407, popularity 0, pureCats 1
+Cocktailbar	2	Berlin Icebar - Polar Expedition	amenity-bar	amenity-bar amenity cuisine-ice_cream wheelchair-yes	Berlin, Spandauer Straße, 2, Berlin, Germany	168	open	rank 0.528783, popularity 0, pureCats 1
+Cocktailbar	3	Lieschen Mueller	amenity-bar	amenity-bar wheelchair-yes	Berlin, Panoramastraße, 1A, Berlin, Germany	251	open	rank 0.527573, popularity 0, pureCats 1
+Cocktailbar	4	Biermeisterei by Lemke Berlin	amenity-pub	amenity-pub internet_access-wlan wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 13, Berlin, Germany	346	open	rank 0.526332, popularity 0, pureCats 1
+Cocktailbar	5	Bata Bar & Billiards am Alex	amenity-bar	amenity-bar	Berlin, Germany	355	open	rank 0.526225, popularity 0, pureCats 1
+Bars & Clubs	1	Club der polnischen Versager	amenity-pub	amenity-pub	Berlin, Ackerstraße, 168, Berlin, Germany	1216	unknown	rank 0.233685, popularity 0, pureCats 0
+Bars & Clubs	2	Frannz Club	amenity-bar	amenity-bar wheelchair-yes	Berlin, Schönhauser Allee, 36, Berlin, Germany	2092	open	rank 0.233269, popularity 0, pureCats 0
+Bars & Clubs	3	The Curtain Club	amenity-bar	amenity-bar	Berlin, Potsdamer Platz, 3, Berlin, Germany	2290	open	rank 0.233175, popularity 0, pureCats 0
+Bars & Clubs	4	Club Culture Houze	amenity-bar	amenity-bar	Berlin, Görlitzer Straße, 71, Berlin, Germany	3094	unknown	rank 0.232793, popularity 0, pureCats 0
+Bars & Clubs	5	Surprise Club	amenity-bar	amenity-bar internet_access-wlan wheelchair-no	Berlin, Potsdamer Straße, 84, Berlin, Germany	3243	closed	rank 0.232722, popularity 0, pureCats 0
+indisch	1	Indisches restaurant	amenity-restaurant	amenity-restaurant amenity cuisine-indian	Berlin, Germany	1719	unknown	rank 0.516857, popularity 0, pureCats 0
+indisch	2	Dada - Indisches Restaurant	amenity-restaurant	amenity-restaurant	Berlin, Germany	4323	unknown	rank 0.51562, popularity 0, pureCats 0
+indisch	3	Anant Indischer Supermarkt	shop-supermarket	shop-supermarket cuisine-indian	Berlin, Anzengruberstraße, 20, Berlin, Germany	4968	unknown	rank 0.515314, popularity 0, pureCats 0
+indisch	4	Indisch	shop-convenience	shop-convenience wheelchair-limited	Berlin, Beckerstraße, 9, Berlin, Germany	7361	unknown	rank 0.514177, popularity 0, pureCats 0
+indisch	5	Indischer Imbiss	amenity-fast_food	amenity-fast_food	Berlin, Germany	9235	unknown	rank 0.503287, popularity 0, pureCats 0
+indische	1	Indisches restaurant	amenity-restaurant	amenity-restaurant amenity cuisine-indian	Berlin, Germany	1719	unknown	rank 0.516857, popularity 0, pureCats 0
+indische	2	Dada - Indisches Restaurant	amenity-restaurant	amenity-restaurant	Berlin, Germany	4323	unknown	rank 0.51562, popularity 0, pureCats 0
+indische	3	Anant Indischer Supermarkt	shop-supermarket	shop-supermarket cuisine-indian	Berlin, Anzengruberstraße, 20, Berlin, Germany	4968	unknown	rank 0.515314, popularity 0, pureCats 0
+indische	4	Indische Straße	highway-residential	highway-residential psurface-paved_good hwtag-nocycleway hwtag-nofoot hwtag-lit	Berlin, Germany	4942	unknown	rank 0.509326, popularity 0, pureCats 0
+indische	5	Indische Laufente	attraction-animal	attraction-animal landuse-grass wheelchair-yes	Berlin, Hardenbergplatz, 8, Berlin, Germany	4690	unknown	rank 0.503446, popularity 0, pureCats 0
+Inder	1	Markt Indersdorf	place-town	place-town	Bavaria, Germany	484744	unknown	rank 0.34491, popularity 12, pureCats 0
+Inder	2	Underpaid Collectibles	shop	shop wheelchair-no	Berlin, Poststraße, 2, Berlin, Germany	302	closed	rank 0.11753, popularity 0, pureCats 0
+Inder	3	Bar Internazionale	amenity-restaurant	amenity-restaurant entrance amenity cuisine-italian cuisine-vegan cuisine-vegetarian	Berlin, Rosa-Luxemburg-Straße, 31, Berlin, Germany	793	open	rank 0.117297, popularity 0, pureCats 0
+Inder	4	Intersport	shop-sports	shop-sports wheelchair-no	Berlin, Germany	826	unknown	rank 0.117281, popularity 0, pureCats 0
+Inder	5	International Wardrobe	shop-gift	shop-gift wheelchair-no	Berlin, Germany	866	closed	rank 0.117262, popularity 0, pureCats 0
+indisches Restaurant	1	Dada - Indisches Restaurant	amenity-restaurant	amenity-restaurant	Berlin, Germany	4323	unknown	rank 0.51562, popularity 0, pureCats 0
+indisches Restaurant	2	Indisches restaurant	amenity-restaurant	amenity-restaurant amenity cuisine-indian	Berlin, Germany	1719	unknown	rank 0.509857, popularity 0, pureCats 1
+indisches Restaurant	3	Kashana – Indische Spezialitäten	amenity-restaurant	amenity-restaurant amenity cuisine-indian	Berlin, Wilhelmstraße, 35, Berlin, Germany	15270	open	rank 0.30342, popularity 0, pureCats 1
+indisches Restaurant	4	Frühstück 3000	amenity-restaurant	amenity-restaurant amenity cuisine-vegan cuisine-vegetarian wheelchair-yes	Berlin, Germany	2021	closed	rank 0.0028154, popularity 0, pureCats 1
+indisches Restaurant	5	Al Sham Snacks	amenity-restaurant	amenity-restaurant amenity cuisine-lebanese cuisine-oriental cuisine-pizza cuisine-vegan cuisine-vegetarian wheelchair-limited	Berlin, Germany	4597	closed	rank -0.298408, popularity 0, pureCats 1
+Indian	1	Indian Village	amenity-restaurant	amenity-restaurant amenity cuisine-indian	Berlin, Dircksenstraße, 94, Berlin, Germany	732	open	rank 0.510326, popularity 0, pureCats 1
+Indian	2	Masti Indian Kitchen	amenity-restaurant	amenity-restaurant amenity cuisine-indian	Berlin, Germany	2471	unknown	rank 0.509499, popularity 0, pureCats 1
+Indian	3	Indian Street Food	amenity-fast_food	amenity-fast_food amenity cuisine-indian cuisine-vegan cuisine-vegetarian	Berlin, Schöneberger Straße, 22, Berlin, Germany	2655	open	rank 0.509412, popularity 0, pureCats 1
+Indian	4	Indian Vibes	shop-clothes	shop-clothes wheelchair-no	Berlin, Germany	3364	closed	rank 0.509076, popularity 0, pureCats 0
+Indian	5	Kumar´s Indian Street Food	amenity-fast_food	amenity-fast_food organic-yes wheelchair-yes	Berlin, Germany	4209	closed	rank 0.508674, popularity 0, pureCats 0
+italienisch	1	Italienisches Eis Marcon	amenity-ice_cream	amenity-ice_cream	Berlin, Stephanstraße, 26, Berlin, Germany	4229	closed	rank 0.515665, popularity 0, pureCats 0
+italienisch	2	Italienische Snacks	amenity-fast_food	amenity-fast_food amenity cuisine-italian wheelchair-limited	Berlin, Residenzstraße, 109, Berlin, Germany	5627	open	rank 0.505001, popularity 0, pureCats 0
+italienisch	3	Italienischer Garten	leisure-garden	leisure-garden wheelchair-yes	Berlin, Germany	9796	unknown	rank 0.50302, popularity 0, pureCats 0
+italienisch	4	Italienische Eis Manufaktur	amenity-cafe	amenity-cafe amenity cuisine-ice_cream wheelchair-yes	Berlin, Germany	13804	unknown	rank 0.501116, popularity 0, pureCats 0
+italienisch	5	Italienisches Eis Da Dalt	amenity-ice_cream	amenity-ice_cream cuisine-vegan cuisine-vegetarian wheelchair-limited	Berlin, Bölschestraße, 94, Berlin, Germany	16647	open	rank 0.499766, popularity 0, pureCats 0
+Italiener	1	Ludwig Italiener	historic-memorial-stolperstein	historic-memorial-stolperstein	Berlin, Germany	4569	unknown	rank 0.485503, popularity 0, pureCats 0
+Italiener	2	Wilhelmine Italiener	historic-memorial-stolperstein	historic-memorial-stolperstein	Berlin, Germany	5252	unknown	rank 0.485179, popularity 0, pureCats 0
+Italiener	3	Karl Italiener	historic-memorial-stolperstein	historic-memorial-stolperstein	Berlin, Germany	5253	unknown	rank 0.485178, popularity 0, pureCats 0
+Italiener	4	Käthe Beutler (Käthe Beutler geb. Italiener)	historic-memorial-stolperstein	historic-memorial-stolperstein	Berlin, Germany	8980	unknown	rank 0.183408, popularity 0, pureCats 0
+Italiener	5	Italienisches Eis Marcon	amenity-ice_cream	amenity-ice_cream	Berlin, Stephanstraße, 26, Berlin, Germany	4229	closed	rank -0.284335, popularity 0, pureCats 0
+chinesisch	1	Chinesischer Musikpavillon	building	building	Berlin, Hardenbergplatz, 8, Berlin, Germany	4686	unknown	rank 0.502447, popularity 0, pureCats 0
+chinesisch	2	Chinesischer Garten	tourism-attraction	tourism-attraction	Berlin, Germany	11670	unknown	rank 0.50213, popularity 0, pureCats 0
+chinesisch	3	Chinesischer Garten	leisure-garden	leisure-garden	Berlin, Germany	11706	unknown	rank 0.502113, popularity 0, pureCats 0
+chinesisch	4	Chinesisches Kulturzentrum	office-diplomatic	office-diplomatic building wheelchair-yes	Berlin, Klingelhöferstraße, 21, Berlin, Germany	3808	closed	rank 0.495865, popularity 0, pureCats 0
+chinesisch	5	Chinesischer Schopfhirsch	attraction-animal	attraction-animal landuse-grass	Berlin, Hardenbergplatz, 8, Berlin, Germany	4668	unknown	rank 0.495456, popularity 0, pureCats 0
+Chinese	1	MingTastic Chinese Food Bar	amenity-fast_food	amenity-fast_food amenity cuisine-chinese	Berlin, Frankfurter Allee, 113-117, Berlin, Germany	4901	unknown	rank 0.508345, popularity 0, pureCats 1
+Chinese	2	chinese arrt	tourism-attraction	tourism-attraction	Berlin, Germany	11283	unknown	rank 0.505314, popularity 0, pureCats 0
+Chinese	3	Lucky chinese	amenity-restaurant	amenity-restaurant amenity toilets-yes cuisine-chinese cuisine-ice_cream cuisine-vegetarian wheelchair-limited	Berlin, Alt-Tegel, 29, Berlin, Germany	11449	open	rank 0.505235, popularity 0, pureCats 1
+Chinese	4	All Seasons - Chinesisches Erlebnisrestaurant	amenity-restaurant	amenity-restaurant amenity cuisine-chinese wheelchair-yes	Berlin, Am Juliusturm, 53, Berlin, Germany	12937	open	rank 0.104528, popularity 0, pureCats 1
+Chinese	5	Chinesischer Musikpavillon	building	building	Berlin, Hardenbergplatz, 8, Berlin, Germany	4686	unknown	rank 0.0954474, popularity 0, pureCats 0
+griechisch	1	VOREAS - Griechische Feinkost	shop-convenience	shop-convenience	Berlin, Germany	3437	unknown	rank 0.516041, popularity 0, pureCats 0
+griechisch	2	Griechischer Park	leisure-park	leisure-park	Berlin, Germany	9789	unknown	rank 0.503024, popularity 0, pureCats 0
+griechisch	3	Griechischer Park	leisure-park	leisure-park	Berlin, Germany	9883	unknown	rank 0.502979, popularity 0, pureCats 0
+griechisch	4	Griechischer Park	leisure-park	leisure-park	Berlin, Germany	9972	unknown	rank 0.502937, popularity 0, pureCats 0
+griechisch	5	Griechisch-Orthodoxer Friedhof	landuse-cemetery-christian	landuse-cemetery-christian	Berlin, Germany	7712	unknown	rank 0.50201, popularity 0, pureCats 0
+Grieche	1	Taverna Der Grieche	amenity-restaurant	amenity-restaurant building amenity cuisine-greek cuisine-vegetarian wheelchair-limited	Berlin, Müggelseedamm, 188, Berlin, Germany	17143	open	rank 0.48953, popularity 0, pureCats 0
+Grieche	2	Balkanhalbinsel & Griechenland	tourism-information-board	tourism-information-board	Berlin, Germany	9967	unknown	rank 0.482939, popularity 0, pureCats 0
+Grieche	3	Balkanhalbinsel & Griechenland	tourism-information-board	tourism-information-board	Berlin, Germany	9971	unknown	rank 0.482937, popularity 0, pureCats 0
+Grieche	4	Balkanhalbinsel & Griechenland	tourism-information-board	tourism-information-board	Berlin, Germany	9990	unknown	rank 0.482928, popularity 0, pureCats 0
+Grieche	5	Sarah Griechen - Aktiv. Beweglich. Fit.	healthcare-physiotherapist	healthcare-physiotherapist	Berlin, Alsenzer Weg, 33, Berlin, Germany	20957	unknown	rank 0.477719, popularity 0, pureCats 0
+türkisch	1	Türkischer Friedhof Berlin	landuse-cemetery	landuse-cemetery	Berlin, Germany	4275	unknown	rank 0.495643, popularity 0, pureCats 0
+türkisch	2	Türkischer Friedhof Berlin	landuse-cemetery	landuse-cemetery	Berlin, Germany	4281	unknown	rank 0.49564, popularity 0, pureCats 0
+türkisch	3	Deutsch-Türkischer Kinderklub	amenity-kindergarten	amenity-kindergarten	Berlin, Nostitzstraße, 6, Berlin, Germany	3121	unknown	rank 0.486191, popularity 0, pureCats 0
+türkisch	4	Muradiye Camii - Türkisch-Islamischer Kulturverein e.V.	amenity-place_of_worship-muslim	amenity-place_of_worship-muslim	Berlin, Kottbusser Damm, 75, Berlin, Germany	3526	unknown	rank 0.485999, popularity 0, pureCats 0
+türkisch	5	Residenz des türkischen Botschafters	office-diplomatic	office-diplomatic building	Berlin, Koenigsallee, 64, Berlin, Germany	10525	unknown	rank 0.482674, popularity 0, pureCats 0
+Thai	1	Peilin Thaimassage	shop-massage	shop-massage wheelchair-limited	Berlin, Garnisonkirchplatz, 2, Berlin, Germany	278	open	rank 0.510541, popularity 0, pureCats 0
+Thai	2	Longma Thaimassage	shop-medical_supply	shop-medical_supply entrance wheelchair-no	Berlin, Krausnickstraße, 24, Berlin, Germany	823	unknown	rank 0.510282, popularity 0, pureCats 0
+Thai	3	Varee Thai Massage	shop-massage	shop-massage	Berlin, Französische Straße, 28, Berlin, Germany	949	open	rank 0.510223, popularity 0, pureCats 0
+Thai	4	Nuad Thai Traditionelle Thai Massage	shop-massage	shop-massage wheelchair-limited	Berlin, Straßburger Straße, 58, Berlin, Germany	1086	closed	rank 0.510158, popularity 0, pureCats 0
+Thai	5	Dokkoon Thaimassage	shop-massage	shop-massage wheelchair-no	Berlin, Torstraße, 176, Berlin, Germany	1181	closed	rank 0.510112, popularity 0, pureCats 0
+thailändisch	1	Khonkan Thailändische Massagen	shop-massage	shop-massage wheelchair-no	Berlin, Perleberger Straße, 26, Berlin, Germany	3992	closed	rank 0.515777, popularity 0, pureCats 0
+thailändisch	2	Thailändischer Buddhistenverein Berlin e.V.	building-address	building-address	Berlin, Malchower Straße, 23-25, Berlin, Germany	6140	unknown	rank 0.501757, popularity 0, pureCats 0
+thailändisch	3	Rotjana Thailändische Massage	shop-massage	shop-massage wheelchair-no	Berlin, Richterstraße, 11, Berlin, Germany	16587	closed	rank 0.489794, popularity 0, pureCats 0
+thailändisch	4	Königlich Thailändische Botschaft	office-diplomatic	office-diplomatic	Berlin, Germany	8919	unknown	rank 0.483437, popularity 0, pureCats 0
+vietnamesisch	1	Vietnamesische Sikahirsche	attraction-animal	attraction-animal natural-grassland	Berlin, Am Tierpark, 125, Berlin, Germany	8440	unknown	rank 0.493664, popularity 0, pureCats 0
+vietnamesisch	2	Thai-Nippon Vietnamesisches Restaurant	amenity-fast_food	amenity-fast_food amenity cuisine-asian cuisine-japanese cuisine-vietnamese wheelchair-yes	Berlin, Märkische Allee, 166-172, Berlin, Germany	9164	open	rank 0.49332, popularity 0, pureCats 0
+vietnamesisch	3	HAKI-Vietnamesisches Restaurant & Sushi-Bar	amenity-restaurant	amenity-restaurant amenity toilets-yes cuisine-asian wheelchair-yes	Berlin, Seestraße, 34, Berlin, Germany	14067	open	rank 0.490991, popularity 0, pureCats 0
+vietnamesisch	4	Vietnamesische Mutter mit Kind	tourism-artwork-sculpture	tourism-artwork-sculpture	Berlin, Germany	14216	unknown	rank 0.490921, popularity 0, pureCats 0
+vietnamesisch	5	Vietnamesische Mutter mit Kind	tourism-artwork-statue	tourism-artwork-statue	Berlin, Peter-Hille-Straße, 7, Berlin, Germany	16393	unknown	rank 0.489886, popularity 0, pureCats 0
+Vietnamese	1	+84 Vietnamese Vegan Kitchen	amenity-restaurant	amenity-restaurant amenity cuisine-asian cuisine-vegan cuisine-vegetarian wheelchair-limited	Berlin, Habersaathstraße, 52, Berlin, Germany	2212	open	rank 0.516623, popularity 0, pureCats 0
+Vietnamese	2	Dream Vegan-Vietnamese Restaurant	amenity-restaurant	amenity-restaurant amenity cuisine-vietnamese cuisine-vegan cuisine-vegetarian wheelchair-yes	Berlin, Neue Bahnhofstraße, 7a, Berlin, Germany	4688	open	rank 0.515447, popularity 0, pureCats 0
+Vietnamese	3	Chum's Vietnamese Cuisine	amenity-restaurant	amenity-restaurant amenity cuisine-vietnamese cuisine-vegan cuisine-vegetarian wheelchair-yes	Berlin, Elberfelder Straße, 8, Berlin, Germany	4697	open	rank 0.515442, popularity 0, pureCats 0
+Vietnamese	4	Vietnamese sika deer	attraction-animal	attraction-animal natural-grassland	Berlin, Am Tierpark, 125, Berlin, Germany	8440	unknown	rank 0.501664, popularity 0, pureCats 0
+Vietnamese	5	Bui Family – Vietnamese Cuisine	amenity-restaurant	amenity-restaurant amenity cuisine-vietnamese	Berlin, Schulstraße, 27, Berlin, Germany	5438	open	rank 0.49509, popularity 0, pureCats 0
+japanisch	1	Japanischer Garten	tourism-attraction	tourism-attraction	Berlin, Germany	8726	unknown	rank 0.503528, popularity 0, pureCats 0
+japanisch	2	Japanischer Garten des zusammenfließenden Wassers	leisure-garden	leisure-garden	Berlin, Germany	12046	unknown	rank 0.501951, popularity 0, pureCats 0
+japanisch	3	Japanisch-Deutsches Zentrum Berlin	amenity-community_centre	amenity-community_centre	Berlin, Saargemünder Straße, 2, Berlin, Germany	11895	closed	rank 0.500023, popularity 0, pureCats 0
+japanisch	4	japanisches Gartenhaus	building	building	Berlin, Germany	12050	unknown	rank 0.498949, popularity 0, pureCats 0
+japanisch	5	Japanisches Tor	tourism-artwork-sculpture	tourism-artwork-sculpture	Berlin, Germany	9246	unknown	rank 0.493282, popularity 0, pureCats 0
+Japaner	1	Yume - Japanese Café & Diner	amenity-restaurant	amenity-restaurant amenity toilets-yes cuisine-japanese wheelchair-yes	Berlin, Gabriel-Max-Straße, 2, Berlin, Germany	3777	open	rank 0.115879, popularity 0, pureCats 0
+Japaner	2	Japanischer Garten des zusammenfließenden Wassers	leisure-garden	leisure-garden	Berlin, Germany	12046	unknown	rank 0.101951, popularity 0, pureCats 0
+Japaner	3	Rotgesichtsmakak	natural-bare_rock	natural-bare_rock attraction-animal	Berlin, Hardenbergplatz, 8, Berlin, Germany	4744	unknown	rank 0.0954199, popularity 0, pureCats 0
+Japaner	4	893 Ryōtei Japanese Restaurant	amenity-restaurant	amenity-restaurant amenity cuisine-japanese wheelchair-yes	Berlin, Kantstraße, 135, Berlin, Germany	6177	open	rank 0.0947394, popularity 0, pureCats 0
+Japaner	5	HIS Japanreisen	shop-travel_agency	shop-travel_agency	Berlin, Leibnizstraße, 59, Berlin, Germany	6510	closed	rank 0.0945809, popularity 0, pureCats 0
+koreanisch	1	Koreanischer Garten	leisure-garden	leisure-garden	Berlin, Germany	12028	unknown	rank 0.50196, popularity 0, pureCats 0
+koreanisch	2	Koreanischer Garten	tourism-information-board	tourism-information-board	Berlin, Germany	11996	unknown	rank 0.491975, popularity 0, pureCats 0
+koreanisch	3	Berliner Pavillon/koreanisches Gartenhaus	building	building	Berlin, Germany	12043	unknown	rank 0.488953, popularity 0, pureCats 0
+koreanisch	4	Kulturabteilung der Botschaft der Republik Korea, Koreanisches Kulturzentrum	office-diplomatic	office-diplomatic internet_access-wlan	Berlin, Leipziger Platz, 3, Berlin, Germany	2206	closed	rank 0.486626, popularity 0, pureCats 0
+koreanisch	5	Östliches China & Koreanische Halbinsel	tourism-information-board	tourism-information-board	Berlin, Germany	9841	unknown	rank 0.482999, popularity 0, pureCats 0
+mexikanisch	1	Botschaft der Vereinigten Mexikanischen Staaten	office-diplomatic	office-diplomatic building wheelchair-yes	Berlin, Klingelhöferstraße, 3, Berlin, Germany	3873	closed	rank 0.485834, popularity 5, pureCats 0
+mexikanisch	2	Mekkanische Rose	shop-perfumery	shop-perfumery wheelchair-no	Berlin, Leibnizstraße, 47, Berlin, Germany	6494	closed	rank -0.295411, popularity 0, pureCats 0
+mexikanisch	3	Ibero-Amerikanisches Institut	amenity-library	amenity-library internet_access-wlan wheelchair-limited	Berlin, Potsdamer Straße, 37, Berlin, Germany	2806	open	rank -0.541333, popularity 0, pureCats 0
+mexikanisch	4	Der US-amerikanische Luftwaffenstützpunkt	tourism-information-board	tourism-information-board	Berlin, Germany	4082	unknown	rank -0.551939, popularity 0, pureCats 0
+mexikanisch	5	US-amerikanische Botschaft (Konsularabteilung)	office-diplomatic	office-diplomatic wheelchair-yes	Berlin, Clayallee, 170, Berlin, Germany	11704	closed	rank -0.555559, popularity 0, pureCats 0
+Mexikaner	1	Botschaft der Vereinigten Mexikanischen Staaten	office-diplomatic	office-diplomatic building wheelchair-yes	Berlin, Klingelhöferstraße, 3, Berlin, Germany	3873	closed	rank -0.314166, popularity 5, pureCats 0
+spanisch	1	Gedenkstätte für die Interbrigadisten im Spanischen Bürgerkrieg	historic-memorial-war_memorial	historic-memorial-war_memorial wheelchair-yes	Berlin, Germany	1804	unknown	rank 0.516816, popularity 0, pureCats 0
+spanisch	2	Spanische Botschaft	office-diplomatic	office-diplomatic	Berlin, Germany	4173	unknown	rank 0.495691, popularity 0, pureCats 0
+spanisch	3	Spanische Allee	highway-secondary	highway-secondary psurface-paved_good hwtag-nosidewalk hwtag-yesbicycle hwtag-lit	Berlin, Germany	15866	unknown	rank 0.495137, popularity 0, pureCats 0
+spanisch	4	Spanische Allee/Potsdamer Chaussee	highway-bus_stop	highway-bus_stop amenity-shelter amenity-bench	Berlin, Germany	15812	unknown	rank 0.493163, popularity 0, pureCats 0
+spanisch	5	Spanische Allee/Potsdamer Chaussee	highway-pedestrian	highway-pedestrian amenity-bench hwtag-lit	Berlin, Germany	15821	unknown	rank 0.490158, popularity 0, pureCats 0
+französisch	1	Französischer Dom	tourism-attraction	tourism-attraction building wheelchair-no	Berlin, Gendarmenmarkt, 7, Berlin, Germany	1059	unknown	rank 0.517171, popularity 8, pureCats 0
+französisch	2	Les Épicuriens - Französische Delikatessen	shop-deli	shop-deli wheelchair-yes	Berlin, Germany	3476	closed	rank 0.516022, popularity 0, pureCats 0
+französisch	3	Französische Straße	highway-bus_stop	highway-bus_stop	Berlin, Germany	1174	unknown	rank 0.510116, popularity 0, pureCats 0
+französisch	4	Französisch Buchholz Kirche	highway-bus_stop	highway-bus_stop	Berlin, Germany	9767	unknown	rank 0.506034, popularity 0, pureCats 0
+französisch	5	Französisch Buchholz Kirche	railway-tram_stop	railway-tram_stop	Berlin, Germany	9890	unknown	rank 0.505976, popularity 0, pureCats 0
+libanesisch	1	Libanesischer Imbiss	amenity-fast_food	amenity-fast_food amenity cuisine-vegan cuisine-vegetarian wheelchair-yes	Berlin, Germany	4635	open	rank 0.515472, popularity 0, pureCats 0
+libanesisch	2	Tabbouleh Libanesische Spezialitäten	amenity-restaurant	amenity-restaurant amenity cuisine-lebanese	Berlin, Germany	8690	unknown	rank 0.493546, popularity 0, pureCats 0
+libanesisch	3	Libanesische Botschafts Residenz	office-diplomatic	office-diplomatic building	Berlin, Spechtstraße, 19, Berlin, Germany	10682	unknown	rank 0.492599, popularity 0, pureCats 0
+libanesisch	4	Deutsch-libanesische Al-Balagh e.V.	amenity-place_of_worship-muslim	amenity-place_of_worship-muslim	Berlin, Falckensteinstraße, 4, Berlin, Germany	3423	unknown	rank 0.486047, popularity 0, pureCats 0
+persisch	1	Persisches Pferdehaus	building	building	Berlin, Hardenbergplatz, 8, Berlin, Germany	4435	unknown	rank 0.502567, popularity 0, pureCats 0
+persisch	2	Persisches Restaurant Shahrzad	amenity-restaurant	amenity-restaurant	Berlin, Havelstraße, 4, Berlin, Germany	13600	unknown	rank 0.501214, popularity 0, pureCats 0
+persisch	3	Persischer Leopard	attraction-animal	attraction-animal natural-grassland	Berlin, Hardenbergplatz, 8, Berlin, Germany	4609	unknown	rank 0.495484, popularity 0, pureCats 0
+persisch	4	PERSICON AG	office-company	office-company wheelchair-yes	Berlin, Friedrichstrasse, 100, Berlin, Germany	1121	unknown	rank -0.302859, popularity 0, pureCats 0
+persisch	5	Atelier für physisches Theater – Internationale Schule für Bewegungsschauspiel	amenity-school	amenity-school	Berlin, Naunynstraße, 65, Berlin, Germany	2322	unknown	rank -0.313429, popularity 0, pureCats 0
+äthiopisch	1	Äthiopisch-Orthodoxe Gemeinde Berlin	amenity-place_of_worship-christian	amenity-place_of_worship-christian	Berlin, Germany	9984	unknown	rank 0.500931, popularity 0, pureCats 0
+amerikanisch	1	Ibero-Amerikanisches Institut	amenity-library	amenity-library internet_access-wlan wheelchair-limited	Berlin, Potsdamer Straße, 37, Berlin, Germany	2806	open	rank 0.513546, popularity 0, pureCats 0
+amerikanisch	2	Der US-amerikanische Luftwaffenstützpunkt	tourism-information-board	tourism-information-board	Berlin, Germany	4082	unknown	rank 0.479676, popularity 0, pureCats 0
+amerikanisch	3	US-amerikanische Botschaft (Konsularabteilung)	office-diplomatic	office-diplomatic wheelchair-yes	Berlin, Clayallee, 170, Berlin, Germany	11704	closed	rank 0.466259, popularity 0, pureCats 0
+amerikanisch	4	Amerikanisch-Samoa	place-state	place-state	Samoa	15766550	unknown	rank -0.0293147, popularity 194, pureCats 0
+amerikanisch	5	Amerikanische Jungferninseln	place-state	place-state	United States Virgin Islands	7657482	unknown	rank -0.155903, popularity 122, pureCats 0
+asiatisch	1	Bamboo’s Hut Asiatische Küche & Sushi Bar	amenity-restaurant	amenity-restaurant amenity cuisine-vietnamese cuisine-sushi	Berlin, Georgenkirchstraße, 3, Berlin, Germany	1461	unknown	rank 0.516979, popularity 0, pureCats 0
+asiatisch	2	Asia - asiatische Lebensmittel Geschenkartikel	shop-convenience	shop-convenience wheelchair-no	Berlin, Bredowstraße, 2, Berlin, Germany	4461	closed	rank 0.515554, popularity 0, pureCats 0
+asiatisch	3	Asiatische Lebensmittel	shop-convenience	shop-convenience	Berlin, Germany	4678	open	rank 0.515451, popularity 0, pureCats 0
+asiatisch	4	Janthra Asiatische Massagen	shop-massage	shop-massage wheelchair-limited	Berlin, Levetzowstraße, 19, Berlin, Germany	4732	closed	rank 0.515426, popularity 0, pureCats 0
+asiatisch	5	Asiatische Kunst Venzke	shop-antiques	shop-antiques	Berlin, Germany	5633	unknown	rank 0.504998, popularity 0, pureCats 0
+vegan	1	Bio Company	amenity-cafe	amenity-cafe shop-supermarket amenity cuisine-vegan cuisine-vegetarian wheelchair-limited organic-only	Berlin, Dircksenstraße, 145-147, Berlin, Germany	356	open	rank 0.530213, popularity 0, pureCats 1
+vegan	2	dean&david	amenity-fast_food	amenity-fast_food amenity cuisine-sandwich cuisine-vegan cuisine-vegetarian internet_access-wlan wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 7, Berlin, Germany	90	open	rank 0.530059, popularity 0, pureCats 1
+vegan	3	Eden	amenity-restaurant	amenity-restaurant amenity cuisine-asian cuisine-vegan cuisine-vegetarian internet_access-wlan wheelchair-yes	Berlin, Rosenstraße, 19, Berlin, Germany	215	open	rank 0.528083, popularity 0, pureCats 1
+vegan	4	Cancún	amenity-restaurant	amenity-restaurant amenity cuisine-mexican cuisine-vegan cuisine-vegetarian wheelchair-yes	Berlin, Rathausstraße, 5-13, Berlin, Germany	318	open	rank 0.526692, popularity 0, pureCats 1
+vegan	5	Zur Gerichtslaube	amenity-restaurant	amenity-restaurant amenity cuisine-regional cuisine-vegan cuisine-vegetarian wheelchair-limited	Berlin, Germany	337	open	rank 0.52645, popularity 0, pureCats 1
+vegetarisch	1	Bio Company	amenity-cafe	amenity-cafe shop-supermarket amenity cuisine-vegan cuisine-vegetarian wheelchair-limited organic-only	Berlin, Dircksenstraße, 145-147, Berlin, Germany	356	open	rank 0.530213, popularity 0, pureCats 1
+vegetarisch	2	dean&david	amenity-fast_food	amenity-fast_food amenity cuisine-sandwich cuisine-vegan cuisine-vegetarian internet_access-wlan wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 7, Berlin, Germany	90	open	rank 0.530059, popularity 0, pureCats 1
+vegetarisch	3	Eden	amenity-restaurant	amenity-restaurant amenity cuisine-asian cuisine-vegan cuisine-vegetarian internet_access-wlan wheelchair-yes	Berlin, Rosenstraße, 19, Berlin, Germany	215	open	rank 0.528083, popularity 0, pureCats 1
+vegetarisch	4	Mutter Hoppe	amenity-restaurant	amenity-restaurant amenity toilets-yes cuisine-german cuisine-vegetarian wheelchair-no	Berlin, Rathausstraße, 21, Berlin, Germany	275	open	rank 0.527248, popularity 0, pureCats 1
+vegetarisch	5	Maxim	amenity-cafe	amenity-cafe amenity cuisine-vegetarian internet_access-wlan wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 14, Berlin, Germany	309	open	rank 0.526803, popularity 0, pureCats 1
+Pizzeria	1	La Focaccia	amenity-fast_food	amenity-fast_food amenity cuisine-pizza cuisine-vegetarian wheelchair-yes	Berlin, Neue Promenade, 9, Berlin, Germany	406	open	rank 0.525624, popularity 0, pureCats 1
+Pizzeria	2	OLLA Grill & Orient Lounge	amenity-restaurant	amenity-restaurant amenity cuisine-oriental cuisine-pizza cuisine-vegetarian wheelchair-yes	Berlin, Germany	465	open	rank 0.524965, popularity 0, pureCats 1
+Pizzeria	3	Capvin	amenity-restaurant	amenity-restaurant amenity cuisine-italian cuisine-pizza wheelchair-limited	Berlin, Rosenthaler Straße, 36, Berlin, Germany	558	open	rank 0.523999, popularity 0, pureCats 1
+Pizzeria	4	Pergamon	amenity-fast_food	amenity-fast_food amenity cuisine-kebab cuisine-pizza wheelchair-yes	Berlin, Germany	475	open	rank 0.523864, popularity 0, pureCats 1
+Pizzeria	5	Pizza-Scheune	amenity-restaurant	amenity-restaurant amenity cuisine-italian cuisine-pizza cuisine-vegetarian wheelchair-no	Berlin, Rosa-Luxemburg-Straße, 49, Berlin, Germany	957	open	rank 0.520615, popularity 0, pureCats 1
+Burger	1	Das Lemke	amenity-restaurant	amenity-restaurant amenity cuisine-german cuisine-burger wheelchair-yes	Berlin, Dircksenstraße, 143, Berlin, Germany	365	open	rank 0.526111, popularity 0, pureCats 1
+Burger	2	The Pub	amenity-restaurant	amenity-restaurant amenity cuisine-burger wheelchair-yes	Berlin, Rochstraße, 14, Berlin, Germany	376	open	rank 0.525977, popularity 0, pureCats 1
+Burger	3	Peter Pane	amenity-restaurant	amenity-restaurant amenity cuisine-burger cuisine-vegan cuisine-vegetarian internet_access-wlan wheelchair-yes	Berlin, Neue Promenade, 4, Berlin, Germany	401	open	rank 0.525679, popularity 0, pureCats 1
+Burger	4	ALEX	amenity-restaurant	amenity-restaurant amenity cuisine-breakfast cuisine-steak_house cuisine-burger cuisine-international cuisine-vegan cuisine-vegetarian	Berlin, Panoramastraße, 1A, Berlin, Germany	259	unknown	rank 0.524465, popularity 0, pureCats 1
+Burger	5	Burgermeister	amenity-fast_food	amenity-fast_food amenity toilets-yes cuisine-burger cuisine-vegetarian wheelchair-limited	Berlin, Dircksenstraße, 112, Berlin, Germany	558	open	rank 0.524001, popularity 0, pureCats 1
+Ramen	1	Iimori Ramen	amenity-restaurant	amenity-restaurant amenity cuisine-ramen cuisine-vegan cuisine-vegetarian wheelchair-no	Berlin, Mulackstraße, 29, Berlin, Germany	817	open	rank 0.521691, popularity 0, pureCats 1
+Ramen	2	Cocolo Ramen	amenity-restaurant	amenity-restaurant amenity cuisine-ramen wheelchair-limited	Berlin, Gipsstraße, 3, Berlin, Germany	889	open	rank 0.521123, popularity 0, pureCats 1
+Ramen	3	IIMORI VEGAN	amenity-restaurant	amenity-restaurant amenity cuisine-ramen cuisine-vegan cuisine-vegetarian wheelchair-no	Berlin, Mulackstraße, 29, Berlin, Germany	818	open	rank 0.52068, popularity 0, pureCats 1
+Ramen	4	Marubi	amenity-restaurant	amenity-restaurant amenity cuisine-chinese cuisine-japanese cuisine-ramen wheelchair-no	Berlin, Schönhauser Allee, 187, Berlin, Germany	1074	open	rank 0.519787, popularity 0, pureCats 1
+Ramen	5	Mizu Ramen	amenity-restaurant	amenity-restaurant amenity cuisine-ramen cuisine-vegetarian wheelchair-yes	Berlin, Friedrichstrasse, 115, Berlin, Germany	1420	open	rank 0.516636, popularity 0, pureCats 1
+Curry	1	Berlin Currys	amenity-fast_food	amenity-fast_food amenity cuisine-german cuisine-vegan cuisine-vegetarian wheelchair-yes	Berlin, Karl-Liebknecht-Straße, 13, Berlin, Germany	341	open	rank 0.521399, popularity 0, pureCats 0
+Curry	2	Currywurst Express	amenity-fast_food	amenity-fast_food wheelchair-yes	Berlin, Dircksenstraße, 2, Berlin, Germany	485	open	rank 0.519752, popularity 0, pureCats 0
+Curry	3	Curry 61	amenity-fast_food	amenity-fast_food amenity cuisine-sausage cuisine-vegan cuisine-vegetarian wheelchair-yes	Berlin, Oranienburger Straße, 6, Berlin, Germany	505	open	rank 0.519544, popularity 0, pureCats 0
+Curry	4	Döner Curry	amenity-fast_food	amenity-fast_food amenity cuisine-kebab cuisine-sausage cuisine-vegetarian wheelchair-no	Berlin, Germany	532	unknown	rank 0.519259, popularity 0, pureCats 0
+Curry	5	Curry Inn	amenity-fast_food	amenity-fast_food	Berlin, Germany	565	unknown	rank 0.518938, popularity 0, pureCats 0
+Tapas	1	La Esperanza	amenity-restaurant	amenity-restaurant amenity toilets-yes cuisine-tapas cuisine-spanish cuisine-vegan cuisine-vegetarian wheelchair-no	Berlin, Germany	1494	open	rank 0.516221, popularity 0, pureCats 1
+Tapas	2	Vineria Carvalho	shop-wine	shop-wine cuisine-tapas cuisine-spanish wheelchair-limited	Berlin, Heinrich-Roller-Straße, 9, Berlin, Germany	1725	open	rank 0.516015, popularity 0, pureCats 1
+Tapas	3	Mundo Tapas	amenity-restaurant	amenity-restaurant amenity cuisine-tapas cuisine-spanish cuisine-seafood cuisine-international	Berlin, Zimmerstraße, 19, Berlin, Germany	1741	open	rank 0.515938, popularity 0, pureCats 1
+Tapas	4	Barcelona	amenity-restaurant	amenity-restaurant amenity cuisine-tapas cuisine-vegetarian internet_access-wlan wheelchair-limited	Berlin, Friedrichstrasse, 211, Berlin, Germany	1817	open	rank 0.515569, popularity 0, pureCats 1
+Tapas	5	Lola's Tapas	amenity-restaurant	amenity-restaurant amenity cuisine-tapas cuisine-spanish wheelchair-no	Berlin, Choriner Straße, 62, Berlin, Germany	1677	open	rank 0.51526, popularity 0, pureCats 1
+Italiener offen	1	Italien	place-country	place-country		1101339	unknown	rank -0.332099, popularity 245, pureCats 0
+Italiener offen	2	Wie zuhause in Italien	amenity-restaurant	amenity-restaurant amenity cuisine-italian	Berlin, Germany	7075	open	rank -0.543361, popularity 0, pureCats 0
+Inder Sonntag	1	Sonntagstraße	highway-residential	highway-residential psurface-paved_bad hwtag-nocycleway hwtag-nofoot hwtag-lit	Berlin, Germany	4186	unknown	rank 0.129488, popularity 0, pureCats 0
+Inder Sonntag	2	Kolonie Sonntagsfreude	highway-track	highway-track psurface-unpaved_bad hwtag-yesbicycle	Berlin, Germany	10074	unknown	rank 0.104691, popularity 0, pureCats 0
+Inder Sonntag	3	Unter den Linden	highway-primary	highway-primary psurface-paved_good hwtag-nofoot hwtag-oneway hwtag-yesbicycle hwtag-lit	Berlin, Germany	984	unknown	rank -0.0992701, popularity 15, pureCats 0
+indisch jetzt geöffnet	1	Indische Straße	highway-residential	highway-residential psurface-paved_good hwtag-nocycleway hwtag-nofoot hwtag-lit	Berlin, Germany	4942	unknown	rank 0.109326, popularity 0, pureCats 0
+indisch jetzt geöffnet	2	Kashana – Indische Spezialitäten	amenity-restaurant	amenity-restaurant amenity cuisine-indian	Berlin, Wilhelmstraße, 35, Berlin, Germany	15270	open	rank 0.0904201, popularity 0, pureCats 0
+Thai offen	1	Varee Thai Massage	shop-massage	shop-massage	Berlin, Französische Straße, 28, Berlin, Germany	949	open	rank 0.510223, popularity 0, pureCats 0
+Thai offen	2	Thai Sushi & More	amenity-restaurant	amenity-restaurant amenity cuisine-thai cuisine-vegan cuisine-vegetarian wheelchair-no	Berlin, Zionskirchstraße, 44, Berlin, Germany	1532	open	rank 0.509946, popularity 0, pureCats 1
+Thai offen	3	Thai Huong Snack	amenity-restaurant	amenity-restaurant amenity cuisine-vietnamese wheelchair-yes	Berlin, Heinrich-Heine-Platz, 12, Berlin, Germany	1696	open	rank 0.509868, popularity 0, pureCats 0
+Thai offen	4	Ammara Thai Massage	shop-massage	shop-massage wheelchair-yes	Berlin, Wilhelmstraße, 41, Berlin, Germany	1944	open	rank 0.50975, popularity 0, pureCats 0
+Thai offen	5	Taleh Thai	amenity-restaurant	amenity-restaurant amenity cuisine-thai cuisine-vegan cuisine-vegetarian wheelchair-limited	Berlin, Käthe-Niederkirchner-Straße, 14, Berlin, Germany	2144	open	rank 0.509655, popularity 0, pureCats 1
+Grieche heute 22 Uhr	1	Uhrmacherweg	highway-residential	highway-residential psurface-paved_good hwtag-nocycleway hwtag-nofoot hwtag-lit	Berlin, Germany	12158	unknown	rank 0.0413436, popularity 0, pureCats 0
+Grieche heute 22 Uhr	2	Robert-Uhrig-Straße	highway-tertiary	highway-tertiary psurface-paved_good hwtag-nofoot hwtag-yesbicycle hwtag-lit	Berlin, Germany	7370	unknown	rank 0.0346177, popularity 0, pureCats 0
+Grieche heute 22 Uhr	3	Robert-Uhrig-Straße	highway-residential	highway-residential psurface-paved_bad hwtag-nocycleway hwtag-yesfoot hwtag-lit	Berlin, Germany	7333	unknown	rank 0.0336357, popularity 0, pureCats 0
+Grieche heute 22 Uhr	4	Robert-Uhrig-Straße	highway-service	highway-service psurface-paved_bad hwtag-nocycleway hwtag-oneway hwtag-yesfoot hwtag-lit	Berlin, Germany	7368	unknown	rank 0.0336188, popularity 0, pureCats 0
+Grieche heute 22 Uhr	5	Robert-Uhrig-Straße	highway-pedestrian	highway-pedestrian amenity-bench hwtag-lit	Berlin, Germany	7252	unknown	rank 0.0296739, popularity 0, pureCats 0
+Alexanderplatz	1	Alexanderplatz Station	building-train_station	building-train_station wheelchair-yes	Berlin, Germany	453	unknown	rank 0.537458, popularity 7, pureCats 0
+Alexanderplatz	2	Alexanderplatz	railway-station-light_rail-berlin	railway-station-light_rail-berlin internet_access-wlan wheelchair-yes	Berlin, Dircksenstraße, 2, Berlin, Germany	459	unknown	rank 0.537455, popularity 7, pureCats 0
+Alexanderplatz	3	Alexanderplatz	railway-station-subway-berlin	railway-station-subway-berlin wheelchair-yes	Berlin, Germany	628	unknown	rank 0.537375, popularity 0, pureCats 0
+Alexanderplatz	4	Cinestar Cubix am Alexanderplatz	amenity-cinema	amenity-cinema wheelchair-yes	Berlin, Rathausstraße, 1, Berlin, Germany	480	open	rank 0.517445, popularity 0, pureCats 0
+Alexanderplatz	5	Wache am Alexanderplatz	amenity-police	amenity-police building wheelchair-yes	Berlin, Germany	579	open	rank 0.517398, popularity 0, pureCats 0
+Hauptbahnhof	1	Hauptbahnhof	railway-station-subway-berlin	railway-station-subway-berlin wheelchair-yes	Berlin, Germany	2434	unknown	rank 0.536517, popularity 0, pureCats 0
+Hauptbahnhof	2	Berlin Hauptbahnhof (tief)	railway-station	railway-station internet_access-wlan wheelchair-yes	Berlin, Europaplatz, 1, Berlin, Germany	2435	unknown	rank 0.536517, popularity 69, pureCats 0
+Hauptbahnhof	3	Berlin Hauptbahnhof	railway-station	railway-station internet_access-wlan wheelchair-yes	Berlin, Europaplatz, 1, Berlin, Germany	2455	unknown	rank 0.536507, popularity 69, pureCats 0
+Hauptbahnhof	4	Berlin Hauptbahnhof	building-train_station	building-train_station	Berlin, Germany	2471	unknown	rank 0.5365, popularity 69, pureCats 0
+Hauptbahnhof	5	Hauptbahnhof	railway-station-light_rail-berlin	railway-station-light_rail-berlin railway-halt internet_access-wlan wheelchair-yes	Berlin, Europaplatz, 1, Berlin, Germany	2484	unknown	rank 0.536494, popularity 0, pureCats 0
+Brandenburger Tor	1	Brandenburger Tor	railway-station-light_rail-berlin	railway-station-light_rail-berlin railway-halt wheelchair-no	Berlin, Germany	1617	unknown	rank 0.536905, popularity 3, pureCats 0
+Brandenburger Tor	2	Brandenburger Tor	railway-station-subway-berlin	railway-station-subway-berlin wheelchair-yes	Berlin, Germany	1669	unknown	rank 0.53688, popularity 3, pureCats 0
+Brandenburger Tor	3	Brandenburger Tor	historic-monument	historic-monument tourism-attraction building building-has_parts wheelchair-yes	Berlin, Pariser Platz, 1, Berlin, Germany	1894	open	rank 0.516773, popularity 53, pureCats 0
+Brandenburger Tor	4	S+U Brandenburger Tor	highway-bus_stop	highway-bus_stop	Berlin, Germany	1534	unknown	rank 0.509945, popularity 0, pureCats 0
+Brandenburger Tor	5	Brandenburger Tor	amenity-taxi	amenity-taxi	Berlin, Germany	2022	unknown	rank 0.509713, popularity 0, pureCats 0
+Fernsehturm	1	203 Bar im Fernsehturm	amenity-bar	amenity-bar wheelchair-no	Berlin, Panoramastraße, 1a, Berlin, Germany	310	open	rank 0.517526, popularity 0, pureCats 0
+Fernsehturm	2	Fernsehturm Berlin	man_made-communications_tower	man_made-communications_tower tourism-attraction building building-has_parts wheelchair-no	Berlin, Panoramastraße, 1a, Berlin, Germany	313	unknown	rank 0.517525, popularity 48, pureCats 0
+Fernsehturm	3	Fernsehturm Müggelberge	building	building	Berlin, Germany	19481	unknown	rank 0.50342, popularity 0, pureCats 0
+Fernsehturm	4	Wasserkaskaden am Fernsehturm	natural-water	natural-water amenity-fountain	Berlin, Germany	207	unknown	rank 0.487575, popularity 0, pureCats 0
+Fernsehturm	5	Wasserkaskaden am Fernsehturm	natural-water	natural-water amenity-fountain	Berlin, Germany	225	unknown	rank 0.487567, popularity 0, pureCats 0
+Tempelhofer Feld	1	Tempelhofer Feld Court	sport-basketball	sport-basketball leisure-pitch fee-no	Berlin, Germany	4415	unknown	rank 0.503576, popularity 0, pureCats 0
+Tempelhofer Feld	2	Tanzboden auf dem Tempelhofer Feld	building-address	building-address	Berlin, Tempelhofer Damm, 85, Berlin, Germany	5525	unknown	rank 0.492049, popularity 0, pureCats 0
+Tempelhofer Feld	3	Burger am Feld	amenity-fast_food	amenity-fast_food amenity cuisine-burger cuisine-vegan cuisine-vegetarian wheelchair-no	Berlin, Tempelhofer Damm, 106, Berlin, Germany	5605	open	rank 0.488011, popularity 0, pureCats 0
+Tempelhofer Feld	4	Grundschule auf dem Tempelhofer Feld	amenity-school	amenity-school wheelchair-no	Berlin, Schulenburgring, 7-11, Berlin, Germany	4582	unknown	rank 0.485497, popularity 0, pureCats 0
+Tempelhofer Feld	5	Kirche auf dem Tempelhofer Feld	amenity-place_of_worship-christian	amenity-place_of_worship-christian building toilets-yes wheelchair-yes	Berlin, Wolffring, 72, Berlin, Germany	4643	unknown	rank 0.485468, popularity 0, pureCats 0
+Museumsinsel	1	Museumsinsel	railway-station-subway-berlin	railway-station-subway-berlin wheelchair-yes	Berlin, Germany	514	unknown	rank 0.537429, popularity 8, pureCats 0
+Museumsinsel	2	Museumsinsel	tourism-attraction	tourism-attraction wheelchair-yes	Berlin, Germany	529	unknown	rank 0.517422, popularity 25, pureCats 0
+Museumsinsel	3	U Museumsinsel	highway-bus_stop	highway-bus_stop amenity-shelter amenity-bench	Berlin, Germany	298	unknown	rank 0.510532, popularity 0, pureCats 0
+Museumsinsel	4	Museumsinsel	railway-platform	railway-platform amenity-shelter public_transport-platform amenity-bench wheelchair-yes	Berlin, Germany	524	unknown	rank 0.507424, popularity 0, pureCats 0
+Museumsinsel	5	Museumsinsel Berlin	tourism-information-board	tourism-information-board	Berlin, Germany	440	unknown	rank 0.505465, popularity 0, pureCats 0
+Potsdamer Platz	1	U Potsdamer Platz	railway-station-subway-berlin	railway-station-subway-berlin wheelchair-yes	Berlin, Germany	2179	unknown	rank 0.536638, popularity 0, pureCats 0
+Potsdamer Platz	2	Potsdamer Platz	railway-station-light_rail-berlin	railway-station-light_rail-berlin wheelchair-limited	Berlin, Germany	2254	unknown	rank 0.536603, popularity 33, pureCats 0
+Potsdamer Platz	3	Motel One Potsdamer Platz	tourism-hotel	tourism-hotel internet_access-wlan wheelchair-yes	Berlin, Leipziger Platz, 12, Berlin, Germany	1975	open	rank 0.516735, popularity 0, pureCats 0
+Potsdamer Platz	4	ibis Berlin City Potsdamer Platz	tourism-hotel	tourism-hotel wheelchair-yes	Berlin, Anhalter Straße, 4, Berlin, Germany	2210	unknown	rank 0.516624, popularity 0, pureCats 0
+Potsdamer Platz	5	Novotel Suites Berlin City Potsdamer Platz	tourism-hotel	tourism-hotel internet_access-wlan wheelchair-yes	Berlin, Anhalter Straße, 2, Berlin, Germany	2257	open	rank 0.516601, popularity 0, pureCats 0
+Rotes Rathaus	1	Rotes Rathaus	railway-station-subway-berlin	railway-station-subway-berlin wheelchair-yes	Berlin, Germany	245	unknown	rank 0.537557, popularity 0, pureCats 0
+Rotes Rathaus	2	Rotes Rathaus	tourism-attraction	tourism-attraction amenity-townhall building wheelchair-yes	Berlin, Rathausstraße, 15, Berlin, Germany	308	closed	rank 0.517527, popularity 4, pureCats 0
+Rotes Rathaus	3	U Rotes Rathaus	highway-bus_stop	highway-bus_stop amenity-shelter amenity-bench	Berlin, Germany	157	unknown	rank 0.510599, popularity 0, pureCats 0
+Rotes Rathaus	4	Rotes Rathaus	railway-platform	railway-platform public_transport-platform amenity-bench wheelchair-yes	Berlin, Germany	228	unknown	rank 0.507565, popularity 0, pureCats 0
+Rotes Rathaus	5	Rotes Rathaus	railway-platform	railway-platform public_transport-platform amenity-bench wheelchair-yes	Berlin, Germany	249	unknown	rank 0.507555, popularity 0, pureCats 0
+Unter den Linden 1	1	Unter den Linden	railway-station-subway-berlin	railway-station-subway-berlin wheelchair-yes	Berlin, Germany	1146	unknown	rank 0.524618, popularity 0, pureCats 0
+Unter den Linden 1	2	Staatsoper Unter den Linden	amenity-theatre	amenity-theatre building building-has_parts wheelchair-yes	Berlin, Unter den Linden, 7, Berlin, Germany	784	unknown	rank 0.504789, popularity 23, pureCats 0
+Unter den Linden 1	3	Unter den Linden	highway-primary	highway-primary psurface-paved_good hwtag-nofoot hwtag-oneway hwtag-yesbicycle hwtag-lit	Berlin, Germany	544	unknown	rank 0.499904, popularity 15, pureCats 0
+Unter den Linden 1	4	Unter den Linden	highway-residential	highway-residential psurface-paved_good hwtag-nocycleway hwtag-nofoot hwtag-lit	Berlin, Germany	727	unknown	rank 0.498816, popularity 15, pureCats 0
+Unter den Linden 1	5	U Unter den Linden	highway-bus_stop	highway-bus_stop amenity-shelter amenity-bench	Berlin, Germany	1094	unknown	rank 0.497642, popularity 0, pureCats 0
+Friedrichstraße 43	1	Friedrichstraße, 43	building-address	building-address	Berlin, Friedrichstrasse, 43, Berlin, Germany	1750	unknown	rank 0.513842, popularity 0, pureCats 0
+Friedrichstraße 43	2	Checkpoint Charlie	tourism-attraction	tourism-attraction wheelchair-yes	Berlin, Friedrichstrasse, 43-45, Berlin, Germany	1714	unknown	rank 0.511859, popularity 37, pureCats 0
+Friedrichstraße 43	3	Mauermuseum	tourism-museum	tourism-museum fee-yes wheelchair-no	Berlin, Friedrichstrasse, 43-45, Berlin, Germany	1725	closed	rank 0.511854, popularity 15, pureCats 0
+Friedrichstraße 43	4	Kaiser-Friedrich-Straße, 43, 44	building	building	Berlin, Kaiser-Friedrich-Straße, 43, 44, Berlin, Germany	7116	unknown	rank 0.491293, popularity 0, pureCats 0
+Friedrichstraße 43	5	Joachim-Friedrich-Straße, 43	building-address	building-address	Berlin, Joachim-Friedrich-Straße, 43, Berlin, Germany	7754	unknown	rank 0.49099, popularity 0, pureCats 0
+Torstraße 1	1	Torstraße, 1	entrance-main	entrance-main	Berlin, Torstraße, 1, Berlin, Germany	1101	unknown	rank 0.420089, popularity 0, pureCats 0
+Torstraße 1	2	Soho House Berlin	tourism-hotel	tourism-hotel building amenity wheelchair-limited	Berlin, Torstraße, 1, Berlin, Germany	1121	unknown	rank 0.297141, popularity 0, pureCats 0
+Torstraße 1	3	The Store	shop-clothes	shop-clothes wheelchair-no	Berlin, Torstraße, 1, Berlin, Germany	1092	unknown	rank 0.287155, popularity 0, pureCats 0
+Torstraße 1	4	The Store Kitchen	amenity-cafe	amenity-cafe wheelchair-no	Berlin, Torstraße, 1, Berlin, Germany	1109	unknown	rank 0.287146, popularity 0, pureCats 0
+Torstraße 1	5	Onkel-Tom-Straße, 1	building	building	Berlin, Onkel-Tom-Straße, 1, Berlin, Germany	13658	unknown	rank 0.214125, popularity 0, pureCats 0
+Kurfürstendamm 21	1	SKW Schwarz	office-lawyer	office-lawyer	Berlin, Kurfürstendamm, 21, Berlin, Germany	5364	unknown	rank 0.512125, popularity 0, pureCats 0
+Kurfürstendamm 21	2	FernUniversität in Hagen – Campus Berlin	amenity-university	amenity-university wheelchair-yes	Berlin, Kurfürstendamm, 21, Berlin, Germany	5368	closed	rank 0.512123, popularity 0, pureCats 0
+Kurfürstendamm 21	3	Kurfürstendamm, 21	building	building	Berlin, Kurfürstendamm, 21, Berlin, Germany	5384	unknown	rank 0.512116, popularity 0, pureCats 0
+Kurfürstendamm 21	4	Coffee & Greek Bakery	amenity-cafe	amenity-cafe amenity cuisine-greek wheelchair-limited	Berlin, Kurfürstendamm, 21, Berlin, Germany	5392	unknown	rank 0.512112, popularity 0, pureCats 0
+Kurfürstendamm 21	5	dean&david	amenity-fast_food	amenity-fast_food amenity cuisine-sandwich cuisine-vegetarian wheelchair-limited	Berlin, Kurfürstendamm, 21, Berlin, Germany	5395	open	rank 0.512111, popularity 0, pureCats 0
+Oranienstraße 25	1	Oranienstraße, 25	building-address	building-address	Berlin, Oranienstraße, 25, Berlin, Germany	2365	unknown	rank 0.51355, popularity 0, pureCats 0
+Oranienstraße 25	2	Humana	shop-clothes	shop-clothes second_hand-only wheelchair-no	Berlin, Oranienstraße, 25, Berlin, Germany	2372	closed	rank 0.513547, popularity 0, pureCats 0
+Oranienstraße 25	3	Straße 251	highway-residential	highway-residential psurface-paved_bad hwtag-nocycleway hwtag-nosidewalk hwtag-lit	Berlin, Germany	7156	unknown	rank 0.0240597, popularity 0, pureCats 0
+Oranienstraße 25	4	Straße 250	highway-residential	highway-residential psurface-paved_good hwtag-nocycleway hwtag-yesfoot hwtag-lit	Berlin, Germany	7178	unknown	rank 0.0240496, popularity 0, pureCats 0
+Oranienstraße 25	5	Gate 25	highway-bus_stop	highway-bus_stop highway-pedestrian-area amenity-shelter public_transport-platform amenity-bench wheelchair-yes	Berlin, Masurenallee, 4-6, Berlin, Germany	8587	unknown	rank 0.0193801, popularity 0, pureCats 0
+Karl-Marx-Allee 93	1	James June	amenity-biergarten	amenity-biergarten amenity toilets-yes cuisine-german cuisine-pizza cuisine-vegan cuisine-vegetarian wheelchair-yes	Berlin, Karl-Marx-Allee, 93, Berlin, Germany	2481	unknown	rank 0.513495, popularity 0, pureCats 0
+Karl-Marx-Allee 93	2	James June	amenity-events_venue	amenity-events_venue building	Berlin, Karl-Marx-Allee, 93, Berlin, Germany	2487	unknown	rank 0.513492, popularity 0, pureCats 0
+Karl-Marx-Allee 93	3	Karl-Marx-Allee, 93	building-address	building-address	Berlin, Karl-Marx-Allee, 93, Berlin, Germany	2518	unknown	rank 0.513477, popularity 0, pureCats 0
+Karl-Marx-Allee 93	4	Computerspielemuseum	tourism-museum	tourism-museum wheelchair-limited fee-yes	Berlin, Karl-Marx-Allee, 93a, Berlin, Germany	2517	closed	rank 0.503478, popularity 8, pureCats 0
+Karl-Marx-Allee 93	5	Karl-Marx-Allee, 93a	entrance	entrance	Berlin, Karl-Marx-Allee, 93a, Berlin, Germany	2526	unknown	rank 0.503474, popularity 0, pureCats 0
+Unter den Linden	1	Unter den Linden	railway-station-subway-berlin	railway-station-subway-berlin wheelchair-yes	Berlin, Germany	1146	unknown	rank 0.537129, popularity 0, pureCats 0
+Unter den Linden	2	Staatsoper Unter den Linden	amenity-theatre	amenity-theatre building building-has_parts wheelchair-yes	Berlin, Unter den Linden, 7, Berlin, Germany	784	unknown	rank 0.517301, popularity 23, pureCats 0
+Unter den Linden	3	Unter den Linden	highway-primary	highway-primary psurface-paved_good hwtag-nofoot hwtag-oneway hwtag-yesbicycle hwtag-lit	Berlin, Germany	544	unknown	rank 0.512415, popularity 15, pureCats 0
+Unter den Linden	4	Unter den Linden	highway-residential	highway-residential psurface-paved_good hwtag-nocycleway hwtag-nofoot hwtag-lit	Berlin, Germany	727	unknown	rank 0.511328, popularity 15, pureCats 0
+Unter den Linden	5	U Unter den Linden	highway-bus_stop	highway-bus_stop amenity-shelter amenity-bench	Berlin, Germany	1094	unknown	rank 0.510154, popularity 0, pureCats 0
+Sonnenallee	1	Sonnenallee	railway-station-light_rail-berlin	railway-station-light_rail-berlin railway-halt wheelchair-yes	Berlin, Saalestraße, 50, Berlin, Germany	6260	unknown	rank 0.5347, popularity 0, pureCats 0
+Sonnenallee	2	S-Bahnhof Sonnenallee	building-train_station	building-train_station	Berlin, Germany	6261	unknown	rank 0.514699, popularity 0, pureCats 0
+Sonnenallee	3	Sonnenallee	highway-secondary	highway-secondary psurface-paved_good hwtag-nobicycle hwtag-nofoot hwtag-oneway hwtag-lit	Berlin, Germany	3843	unknown	rank 0.510848, popularity 6, pureCats 0
+Sonnenallee	4	Sonnenallee	highway-secondary-bridge	highway-secondary-bridge psurface-paved_good hwtag-nobicycle hwtag-nofoot hwtag-oneway hwtag-lit	Berlin, Germany	6592	unknown	rank 0.509542, popularity 6, pureCats 0
+Sonnenallee	5	U Hermannplatz/Sonnenallee	highway-bus_stop	highway-bus_stop amenity-shelter amenity-bench	Berlin, Germany	3868	unknown	rank 0.508836, popularity 0, pureCats 0
+Kastanienallee	1	Kastanienallee	highway-tertiary	highway-tertiary psurface-paved_good hwtag-nocycleway hwtag-nofoot hwtag-lit	Berlin, Germany	1502	unknown	rank 0.51196, popularity 0, pureCats 0
+Kastanienallee	2	Kastanienallee	highway-residential	highway-residential psurface-paved_good hwtag-nofoot hwtag-oneway hwtag-lit	Berlin, Germany	2291	unknown	rank 0.510585, popularity 0, pureCats 0
+Kastanienallee	3	Kastanienallee	highway-service	highway-service psurface-paved_bad	Berlin, Germany	5083	unknown	rank 0.509259, popularity 0, pureCats 0
+Kastanienallee	4	Kastanienallee	highway-tertiary	highway-tertiary psurface-paved_good hwtag-nocycleway hwtag-nofoot hwtag-oneway hwtag-lit	Berlin, Germany	7995	unknown	rank 0.508876, popularity 0, pureCats 0
+Kastanienallee	5	Kastanienallee	highway-service	highway-service psurface-paved_good hwtag-lit	Berlin, Germany	8038	unknown	rank 0.507855, popularity 0, pureCats 0
+Alexanderplatt	1	Bahnhof Alexanderplatz	building-train_station	building-train_station wheelchair-yes	Berlin, Germany	453	unknown	rank 0.137458, popularity 7, pureCats 0
+Alexanderplatt	2	Alexanderplatz	railway-station-light_rail-berlin	railway-station-light_rail-berlin internet_access-wlan wheelchair-yes	Berlin, Dircksenstraße, 2, Berlin, Germany	459	unknown	rank 0.137455, popularity 7, pureCats 0
+Alexanderplatt	3	Alexanderplatz	railway-station-subway-berlin	railway-station-subway-berlin wheelchair-yes	Berlin, Germany	628	unknown	rank 0.137375, popularity 0, pureCats 0
+Alexanderplatt	4	Cinestar Cubix am Alexanderplatz	amenity-cinema	amenity-cinema wheelchair-yes	Berlin, Rathausstraße, 1, Berlin, Germany	480	open	rank 0.117445, popularity 0, pureCats 0
+Alexanderplatt	5	Wache am Alexanderplatz	amenity-police	amenity-police building wheelchair-yes	Berlin, Germany	579	open	rank 0.117398, popularity 0, pureCats 0
+Brandenburgr Tor	1	Brandenburger Tor	railway-station-light_rail-berlin	railway-station-light_rail-berlin railway-halt wheelchair-no	Berlin, Germany	1617	unknown	rank 0.336905, popularity 3, pureCats 0
+Brandenburgr Tor	2	Brandenburger Tor	railway-station-subway-berlin	railway-station-subway-berlin wheelchair-yes	Berlin, Germany	1669	unknown	rank 0.33688, popularity 3, pureCats 0
+Brandenburgr Tor	3	Brandenburger Tor	historic-monument	historic-monument tourism-attraction building building-has_parts wheelchair-yes	Berlin, Pariser Platz, 1, Berlin, Germany	1894	open	rank 0.316773, popularity 53, pureCats 0
+Brandenburgr Tor	4	S+U Brandenburger Tor	highway-bus_stop	highway-bus_stop	Berlin, Germany	1534	unknown	rank 0.309945, popularity 0, pureCats 0
+Brandenburgr Tor	5	Brandenburger Tor	amenity-taxi	amenity-taxi	Berlin, Germany	2022	unknown	rank 0.309713, popularity 0, pureCats 0
+Kurfürstendam 21	1	SKW Schwarz	office-lawyer	office-lawyer	Berlin, Kurfürstendamm, 21, Berlin, Germany	5364	unknown	rank 0.312125, popularity 0, pureCats 0
+Kurfürstendam 21	2	FernUniversität in Hagen – Campus Berlin	amenity-university	amenity-university wheelchair-yes	Berlin, Kurfürstendamm, 21, Berlin, Germany	5368	closed	rank 0.312123, popularity 0, pureCats 0
+Kurfürstendam 21	3	Kurfürstendamm, 21	building	building	Berlin, Kurfürstendamm, 21, Berlin, Germany	5384	unknown	rank 0.312116, popularity 0, pureCats 0
+Kurfürstendam 21	4	Coffee & Greek Bakery	amenity-cafe	amenity-cafe amenity cuisine-greek wheelchair-limited	Berlin, Kurfürstendamm, 21, Berlin, Germany	5392	unknown	rank 0.312112, popularity 0, pureCats 0
+Kurfürstendam 21	5	dean&david	amenity-fast_food	amenity-fast_food amenity cuisine-sandwich cuisine-vegetarian wheelchair-limited	Berlin, Kurfürstendamm, 21, Berlin, Germany	5395	open	rank 0.312111, popularity 0, pureCats 0
+Apoteke	1	Apotheke Hackesches Quartier	amenity-pharmacy	amenity-pharmacy wheelchair-yes	Berlin, Henriette-Herz-Platz, 3, Berlin, Germany	296	closed	rank 0.119969, popularity 0, pureCats 0
+Apoteke	2	Apotheke im Berliner Hauptbahnhof	amenity-pharmacy	amenity-pharmacy wheelchair-yes	Berlin, Europaplatz, 1, Berlin, Germany	2479	open	rank 0.119742, popularity 0, pureCats 0
+Apoteke	3	Panorama Apotheke	amenity-pharmacy	amenity-pharmacy wheelchair-no	Berlin, Panoramastraße, 1, Berlin, Germany	385	closed	rank 0.118867, popularity 0, pureCats 0
+Apoteke	4	Theodor-Fontane-Apotheke im Bethanien	tourism-museum	tourism-museum	Berlin, Mariannenplatz, 2, Berlin, Germany	2201	closed	rank 0.115853, popularity 0, pureCats 0
+Apoteke	5	Alexa Apotheke	amenity-pharmacy	amenity-pharmacy wheelchair-yes	Berlin, Grunerstraße, 20, Berlin, Germany	717	closed	rank 0.115524, popularity 0, pureCats 0
+Supermakt	1	City Supermarkt	shop-supermarket	shop-supermarket wheelchair-limited	Berlin, Krausenstraße, 11, Berlin, Germany	1489	open	rank 0.122251, popularity 0, pureCats 0
+Supermakt	2	Kiezshop Supermarkt	shop-convenience	shop-convenience	Berlin, Germany	2349	unknown	rank 0.115249, popularity 0, pureCats 0
+Supermakt	3	Alnatura Supermarkt	shop-supermarket	shop-supermarket internet_access-wlan organic-only wheelchair-yes	Berlin, Turmstraße, 72, Berlin, Germany	4957	open	rank 0.114511, popularity 0, pureCats 0
+Supermakt	4	Baraka Supermarkt	shop-supermarket	shop-supermarket wheelchair-limited	Berlin, Badstraße, 58, Berlin, Germany	3801	open	rank 0.11444, popularity 0, pureCats 0
+Supermakt	5	Tariq Supermarkt	shop-supermarket	shop-supermarket wheelchair-no	Berlin, Germany	3871	open	rank 0.114247, popularity 0, pureCats 0
+Offenbach	1	Offenbacher Straße	highway-residential	highway-residential psurface-paved_good hwtag-nocycleway hwtag-nofoot hwtag-oneway hwtag-lit	Berlin, Germany	7470	unknown	rank 0.498125, popularity 0, pureCats 0
+Offenbach	2	Jacques-Offenbach-Platz	highway-bus_stop	highway-bus_stop amenity-shelter amenity-bench	Berlin, Germany	13993	unknown	rank 0.484027, popularity 0, pureCats 0
+Offenbach	3	Jacques-Offenbach-Platz	highway-pedestrian	highway-pedestrian amenity-bench hwtag-lit	Berlin, Germany	13988	unknown	rank 0.481029, popularity 0, pureCats 0
+Offenbach	4	Offenbach am Main	place-city	place-city	Hesse, Germany	420155	unknown	rank 0.465825, popularity 46, pureCats 0
+Offenbach	5	Jacques-Offenbach-Platz	landuse-grass	landuse-grass	Berlin, Germany	14028	unknown	rank 0.45601, popularity 0, pureCats 0
+Sonntagstraße	1	Sonntagstraße	highway-residential	highway-residential psurface-paved_bad hwtag-nocycleway hwtag-nofoot hwtag-lit	Berlin, Germany	4186	unknown	rank 0.509685, popularity 0, pureCats 0
+Sonntagstraße 1	1	Dr. Paul-Olaf Beeking und Paul Schewtschenko	amenity-dentist	amenity-dentist wheelchair-yes	Berlin, Sonntagstraße, 1, Berlin, Germany	4605	closed	rank 0.485486, popularity 0, pureCats 0
+Sonntagstraße 1	2	Sonntagstraße	highway-residential	highway-residential psurface-paved_bad hwtag-nocycleway hwtag-nofoot hwtag-lit	Berlin, Germany	4186	unknown	rank 0.299685, popularity 0, pureCats 0
+Sonntagstraße 1	3	Toddy Tales	amenity-restaurant	amenity-restaurant	Berlin, Sonntagstraße, 1, Berlin, Germany	4598	unknown	rank 0.295489, popularity 0, pureCats 0
+Sonntagstraße 1	4	Ostkreuz City gGmbH	amenity-social_facility	amenity-social_facility	Berlin, Sonntagstraße, 1, Berlin, Germany	4602	closed	rank 0.295487, popularity 0, pureCats 0
+Sonntagstraße 1	5	Therapiezentrum am Ostkreuz GbR	healthcare-physiotherapist	healthcare-physiotherapist	Berlin, Sonntagstraße, 1, Berlin, Germany	4605	closed	rank 0.295486, popularity 0, pureCats 0
+Indische Straße	1	Indische Straße	highway-residential	highway-residential psurface-paved_good hwtag-nocycleway hwtag-nofoot hwtag-lit	Berlin, Germany	4942	unknown	rank 0.509326, popularity 0, pureCats 0
+Indische Straße	2	Indisches restaurant	amenity-restaurant	amenity-restaurant amenity cuisine-indian	Berlin, Germany	1719	unknown	rank 0.0168569, popularity 0, pureCats 0
+Französische Straße	1	Französische Straße	highway-tertiary	highway-tertiary psurface-paved_good hwtag-nocycleway hwtag-nofoot hwtag-lit	Berlin, Germany	803	unknown	rank 0.512292, popularity 0, pureCats 0
+Französische Straße	2	Französische Straße	highway-bus_stop	highway-bus_stop	Berlin, Germany	1174	unknown	rank 0.510116, popularity 0, pureCats 0
+Französische Straße	3	Französische Straße	highway-pedestrian-area	highway-pedestrian-area amenity-bench hwtag-lit	Berlin, Germany	1170	unknown	rank 0.507118, popularity 0, pureCats 0
+Französische Straße	4	Kita Französische Straße	amenity-kindergarten	amenity-kindergarten wheelchair-limited	Berlin, Germany	1289	unknown	rank 0.487061, popularity 0, pureCats 0
+Französische Straße	5	Französisch Buchholz Kirche	highway-pedestrian	highway-pedestrian hwtag-lit	Berlin, Germany	9770	unknown	rank 0.225889, popularity 0, pureCats 0
+Französischer Dom	1	Französischer Dom	tourism-attraction	tourism-attraction building wheelchair-no	Berlin, Gendarmenmarkt, 7, Berlin, Germany	1059	unknown	rank 0.517171, popularity 8, pureCats 0
+Französischer Dom	2	Französischer Dom	tourism-information-board	tourism-information-board	Berlin, Germany	1076	unknown	rank 0.507162, popularity 0, pureCats 0
+Französischer Dom	3	Französische Friedrichstadtkirche	amenity-place_of_worship-christian	amenity-place_of_worship-christian building wheelchair-yes	Berlin, Germany	1088	unknown	rank 0.269968, popularity 0, pureCats 0
+Französischer Dom	4	St. Hedwigs-Kathedrale Berlin	tourism-attraction	tourism-attraction amenity-place_of_worship-christian building building-has_parts wheelchair-yes	Berlin, Hinter der Katholischen Kirche, 3, Berlin, Germany	834	closed	rank 0.257088, popularity 10, pureCats 1
+Französischer Dom	5	Nordend	amenity-place_of_worship-christian	amenity-place_of_worship-christian building wheelchair-yes	Berlin, Schönhauser Straße, 32, Berlin, Germany	8210	unknown	rank 0.0535847, popularity 0, pureCats 1
+Deutsche Oper	1	Deutsche Oper	railway-station-subway-berlin	railway-station-subway-berlin wheelchair-no	Berlin, Germany	6463	unknown	rank 0.534603, popularity 4, pureCats 0
+Deutsche Oper	2	Deutsche Oper Berlin	amenity-theatre	amenity-theatre wheelchair-yes	Berlin, Bismarckstraße, 35, Berlin, Germany	6603	unknown	rank 0.514537, popularity 18, pureCats 0
+Deutsche Oper	3	Deutsche Oper	amenity-taxi	amenity-taxi	Berlin, Germany	6578	unknown	rank 0.507549, popularity 0, pureCats 0
+Deutsche Oper	4	Deutsche Oper	railway-subway_entrance-berlin	railway-subway_entrance-berlin entrance wheelchair-no	Berlin, Germany	6392	unknown	rank 0.504637, popularity 0, pureCats 0
+Deutsche Oper	5	Deutsche Oper	railway-platform	railway-platform public_transport-platform amenity-bench	Berlin, Germany	6463	unknown	rank 0.504604, popularity 0, pureCats 0
+Thai Massage	1	Varee Thai Massage	shop-massage	shop-massage	Berlin, Französische Straße, 28, Berlin, Germany	949	open	rank 0.517223, popularity 0, pureCats 0
+Thai Massage	2	Nuad Thai Traditionelle Thai Massage	shop-massage	shop-massage wheelchair-limited	Berlin, Straßburger Straße, 58, Berlin, Germany	1086	closed	rank 0.517158, popularity 0, pureCats 0
+Thai Massage	3	Traditionelle Thai Massage	shop-massage	shop-massage wheelchair-no	Berlin, Germany	1210	closed	rank 0.517099, popularity 0, pureCats 0
+Thai Massage	4	The lily Thai Massage	shop-massage	shop-massage	Berlin, Metzer Straße, 20, Berlin, Germany	1481	unknown	rank 0.51697, popularity 0, pureCats 0
+Thai Massage	5	Bamboo Thai Massage	shop-massage	shop-massage wheelchair-no	Berlin, Invalidenstraße, 1A, Berlin, Germany	1482	closed	rank 0.51697, popularity 0, pureCats 0
+chinesische Medizin	1	Traditionelle chinesische Medizin & Massage	shop-massage	shop-massage wheelchair-no	Berlin, Seelenbinderstraße, 22, Berlin, Germany	13738	closed	rank 0.491148, popularity 0, pureCats 0
+chinesische Medizin	2	Praxis für Chinesische Medizin	healthcare-alternative	healthcare-alternative	Berlin, Kopenhagener Straße, 33, Berlin, Germany	3196	unknown	rank 0.486155, popularity 0, pureCats 0
+chinesische Medizin	3	Praxengemeinschaft Traditionelle Chinesische Medizin	healthcare-alternative	healthcare-alternative	Berlin, Vorbergstraße, 10A, Berlin, Germany	4836	unknown	rank 0.485376, popularity 0, pureCats 0
+chinesische Medizin	4	Shou Zhong Ausbildungszentrum für Chinesische Medizin	office	office	Berlin, Belziger Straße, 69/71, Berlin, Germany	5590	unknown	rank 0.485018, popularity 0, pureCats 0
+chinesische Medizin	5	Praxis für Chinesische Medizin	healthcare-alternative	healthcare-alternative	Berlin, Fregestraße, 23A, Berlin, Germany	7424	unknown	rank 0.484147, popularity 0, pureCats 0
+Französisch Buchholz	1	Französisch Buchholz Kirche	highway-bus_stop	highway-bus_stop	Berlin, Germany	9767	unknown	rank 0.506034, popularity 0, pureCats 0
+Französisch Buchholz	2	Französisch Buchholz Kirche	railway-tram_stop	railway-tram_stop	Berlin, Germany	9890	unknown	rank 0.505976, popularity 0, pureCats 0
+Französisch Buchholz	3	Französisch Buchholz Friedhof	railway-tram_stop	railway-tram_stop	Berlin, Germany	9934	unknown	rank 0.505955, popularity 0, pureCats 0
+Französisch Buchholz	4	Französisch Buchholz Friedhof	highway-bus_stop	highway-bus_stop	Berlin, Germany	9936	unknown	rank 0.505954, popularity 0, pureCats 0
+Französisch Buchholz	5	Französisch Buchholz	place-suburb	place-suburb	Berlin, Germany	10196	unknown	rank 0.50283, popularity 4, pureCats 0
+Spanische Allee	1	Spanische Allee	highway-secondary	highway-secondary psurface-paved_good hwtag-nosidewalk hwtag-yesbicycle hwtag-lit	Berlin, Germany	15866	unknown	rank 0.505137, popularity 0, pureCats 0
+Spanische Allee	2	Spanische Allee/Potsdamer Chaussee	highway-pedestrian	highway-pedestrian amenity-bench hwtag-lit	Berlin, Germany	15821	unknown	rank 0.498158, popularity 0, pureCats 0
+Spanische Allee	3	Spanische Allee/Potsdamer Chaussee	highway-bus_stop	highway-bus_stop amenity-shelter amenity-bench	Berlin, Germany	15812	unknown	rank 0.496163, popularity 0, pureCats 0
+Spanische Allee	4	Spanische Allee 10-14, 14129 Berlin	amenity-post_box	amenity-post_box	Berlin, Spanische Allee, 10-14, Berlin, Germany	15998	unknown	rank 0.491074, popularity 0, pureCats 0
+Spanische Allee	5	Spanische Allee 177, 14129 Berlin	amenity-post_box	amenity-post_box	Berlin, Germany	17385	unknown	rank 0.490416, popularity 0, pureCats 0
+Französisch	1	Französischer Dom	tourism-attraction	tourism-attraction building wheelchair-no	Berlin, Gendarmenmarkt, 7, Berlin, Germany	1059	unknown	rank 0.517171, popularity 8, pureCats 0
+Französisch	2	Les Épicuriens - Französische Delikatessen	shop-deli	shop-deli wheelchair-yes	Berlin, Germany	3476	closed	rank 0.516022, popularity 0, pureCats 0
+Französisch	3	Französische Straße	highway-bus_stop	highway-bus_stop	Berlin, Germany	1174	unknown	rank 0.510116, popularity 0, pureCats 0
+Französisch	4	Französisch Buchholz Kirche	highway-bus_stop	highway-bus_stop	Berlin, Germany	9767	unknown	rank 0.506034, popularity 0, pureCats 0
+Französisch	5	Französisch Buchholz Kirche	railway-tram_stop	railway-tram_stop	Berlin, Germany	9890	unknown	rank 0.505976, popularity 0, pureCats 0
