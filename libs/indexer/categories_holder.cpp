@@ -7,6 +7,9 @@
 #include "base/assert.hpp"
 #include "base/logging.hpp"
 
+#include <algorithm>
+#include <cctype>
+
 namespace
 {
 enum ParseState
@@ -54,10 +57,22 @@ bool ParseEmoji(CategoriesHolder::Category::Name & name)
 
 void FillPrefixLengthToSuggest(CategoriesHolder::Category::Name & name)
 {
-  if (std::isdigit(name.m_name.front()) && name.m_name.front() != '0')
+  // The prefix may have several digits ("12Asiatische Küche"). Lengths of 10 and more mean the same
+  // as 9, because kEmptyPrefixLength (10) marks synonyms that are never suggested.
+  size_t numDigits = 0;
+  uint32_t length = 0;
+  while (numDigits < name.m_name.size() && std::isdigit(static_cast<unsigned char>(name.m_name[numDigits])))
   {
-    name.m_prefixLengthToSuggest = name.m_name[0] - '0';
-    name.m_name = name.m_name.substr(1);
+    length = std::min<uint32_t>(length * 10 + (name.m_name[numDigits] - '0'), 1000);
+    ++numDigits;
+  }
+
+  // A name of digits only (or starting with 0) has no prefix length.
+  if (numDigits > 0 && numDigits < name.m_name.size() && name.m_name.front() != '0')
+  {
+    name.m_prefixLengthToSuggest =
+        static_cast<uint8_t>(std::min<uint32_t>(length, CategoriesHolder::Category::kEmptyPrefixLength - 1));
+    name.m_name = name.m_name.substr(numDigits);
   }
   else
   {
