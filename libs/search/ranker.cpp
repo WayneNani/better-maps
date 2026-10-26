@@ -896,6 +896,17 @@ void Ranker::Init(Params const & params, Geocoder::Params const & geocoderParams
   m_params = params;
   m_geocoderParams = geocoderParams;
 
+  // Highlight "Hauptbahnhof" for "Hbf" too, the results are found by such synonyms.
+  m_highlightTokens = m_params.m_query.m_tokens;
+  for (size_t i = 0; i < m_geocoderParams.GetNumTokens(); ++i)
+  {
+    m_geocoderParams.GetToken(i).ForEachSynonym([this](strings::UniString const & s)
+    {
+      if (!base::IsExist(m_highlightTokens, s))
+        m_highlightTokens.push_back(s);
+    });
+  }
+
   m_preRankerResults.clear();
   m_tentativeResults.clear();
 }
@@ -961,7 +972,7 @@ Result Ranker::MakeResult(RankerResult const & rankerResult, bool needAddress, b
   }
 
   if (needHighlighting)
-    HighlightResult(m_params.m_query.m_tokens, m_params.m_query.m_prefix, res);
+    HighlightResult(m_highlightTokens, m_params.m_query.m_prefix, res);
 
   res.SetRankingInfo(rankerResult.m_dbgInfo);
 

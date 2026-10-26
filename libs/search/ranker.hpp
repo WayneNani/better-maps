@@ -112,6 +112,8 @@ private:
 
   Params m_params;
   Geocoder::Params m_geocoderParams;
+  // Query tokens and their synonyms ("Hauptbahnhof" for "Hbf") to highlight in the results.
+  QueryTokens m_highlightTokens;
   ReverseGeocoder const m_reverseGeocoder;
   base::Cancellable const & m_cancellable;
   KeywordLangMatcher & m_keywordsScorer;
