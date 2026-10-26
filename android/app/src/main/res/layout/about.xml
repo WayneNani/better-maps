@@ -73,6 +73,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/margin_half"
+        android:visibility="gone"
         android:text="@string/about_developed_by_enthusiasts"
         android:textAppearance="@style/MwmTextAppearance.Body2"
         android:textColor="?android:textColorPrimary"
@@ -157,16 +158,16 @@
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/web"
         style="@style/MwmWidget.TextView.Item"
-        android:text="@string/website"
+        android:text="@string/about_based_on_comaps"
         android:textAlignment="viewStart"
         app:drawableStartCompat="@drawable/ic_website" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/code_repo"
         style="@style/MwmWidget.TextView.Item"
-        android:text="@string/codeberg"
+        android:text="@string/about_source_code"
         android:textAlignment="viewStart"
-        app:drawableStartCompat="@drawable/ic_codeberg" />
+        app:drawableStartCompat="@drawable/ic_source_code" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/mastodon"

@@ -8,8 +8,8 @@
   <color name="text_light_subtitle">@color/white_secondary</color>
   <color name="text_light_hint">@color/white_lightest</color>
 
-  <color name="base_accent">#FF37653F</color>
-  <color name="base_accent_pressed">#FF588157</color>
+  <color name="base_accent">#FF0F766E</color>
+  <color name="base_accent_pressed">#FF0D9488</color>
   <color name="base_accent_transparent">#1EF9B42D</color>
 
   <color name="dark_red">#F51E30</color>
@@ -61,10 +61,10 @@
 
   <!-- Backgrounds -->
   <color name="bg_window">#FFEEEEEE</color>
-  <color name="bg_primary">#588157</color> <!-- deep olive green - primary -->
+  <color name="bg_primary">#0F766E</color> <!-- Better Maps teal - primary -->
   <color name="bg_cards">@android:color/white</color>
   <color name="bg_panel">@color/bg_window</color>
-  <color name="bg_primary_dark">#37653F</color> <!-- secondary dark -->
+  <color name="bg_primary_dark">#115E59</color> <!-- secondary dark -->
   <color name="bg_app">@android:color/white</color>
 
   <color name="bg_dialog_translucent">#BB000000</color>
@@ -72,22 +72,14 @@
 
   <color name="bg_menu">#CCFFFFFF</color>
 
-  <color name="bg_statusbar">#004120</color>
+  <color name="bg_statusbar">#134E4A</color>
   <color name="bg_statusbar_translucent">#66000000</color>
 
   <!-- App icons background and foreground colors -->
-  <color name="bg_app_icon_release">#588157</color>
-  <color name="bg_app_icon_test">#588157</color>
+  <color name="bg_app_icon_release">#0F766E</color>
+  <color name="bg_app_icon_test">#155E75</color>
   <color name="bg_app_icon_debug">#f8b42e</color>
 
-  <color name="fg_app_icon_white">#fefdf6</color>
-  <color name="fg_app_icon_release">#ccdfca</color>
-  <color name="fg_app_icon_debug_border">#fbe0a6</color>
-  <color name="fg_app_icon_debug_fill1">#f8c152</color>
-  <color name="fg_app_icon_debug_fill2">#facb6d</color>
-  <color name="fg_app_icon_test_border">#ccdfca</color>
-  <color name="fg_app_icon_test_fill1">#7a9d7a</color>
-  <color name="fg_app_icon_test_fill2">#89a687</color>
 
   <!-- Buttons -->
   <color name="button_normal">#00000000</color>

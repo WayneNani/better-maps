@@ -30,6 +30,9 @@ public final class Constants
     public static final String BLUESKY = "https://bsky.app/profile/comaps.app";
     public static final String PIXELFED = "https://pixelfed.social/comaps";
     public static final String CODE_REPO = "https://codeberg.org/comaps/comaps";
+    public static final String BETTER_MAPS_REPO = "https://github.com/WayneNani/better-maps";
+    public static final String BETTER_MAPS_PRIVACY = BETTER_MAPS_REPO + "/blob/main/PRIVACY.md";
+    public static final String UPSTREAM_SITE = "https://www.comaps.app/";
 
     public static final String COPYRIGHT = "file:///android_asset/copyright.html";
     public static final String FAQ = "file:///android_asset/faq.html";

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: eigene Texte, getrennt von den aus Upstream übernommenen strings.xml. -->
+<resources>
+  <string name="about_based_on_comaps">Based on CoMaps</string>
+  <string name="about_source_code">Source code</string>
+</resources>

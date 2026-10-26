@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="about_based_on_comaps">Basiert auf CoMaps</string>
+  <string name="about_source_code">Quellcode</string>
+</resources>

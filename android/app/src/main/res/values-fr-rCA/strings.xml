@@ -27,7 +27,7 @@
     <string name="zoom_to_country">Afficher sur la carte</string>
     <string name="country_status_download_failed">Échec lors du téléchargement</string>
     <string name="try_again">Réessayer</string>
-    <string name="about_menu_title">À propos de CoMaps</string>
+    <string name="about_menu_title">À propos de Better Maps</string>
     <string name="about_headline">Projet ouvert propulsé par la communauté</string>
     <string name="about_proposition_1">• Soigné et facile à utiliser</string>
     <string name="about_proposition_2">• Centré sur la vie privée et sans pubs</string>
@@ -36,7 +36,7 @@
     <string name="close">Fermer</string>
     <string name="unsupported_phone">L’accélération OpenGL est nécessaire. Malheureusement, votre appareil n’est pas pris en charge.</string>
     <string name="download">Télécharger</string>
-    <string name="disconnect_usb_cable">Veuillez débrancher le câble USB ou insérer la carte SD pour utiliser CoMaps</string>
+    <string name="disconnect_usb_cable">Veuillez débrancher le câble USB ou insérer la carte SD pour utiliser Better Maps</string>
     <string name="not_enough_free_space_on_sdcard">Veuillez d’abord libérer de l’espace sur la carte SD/le stockage USB afin d’utiliser l’application</string>
     <string name="download_resources">Avant de commencer, permettez-nous de télécharger la carte du monde dans votre appareil. \n%s d’espace de stockage sont nécessaires.</string>
     <string name="download_resources_continue">Aller sur la carte</string>

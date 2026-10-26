@@ -70,7 +70,7 @@
     <string name="load_kmz_successful">Vendet e pëlqyera u ngarkuan me sukses! Mund t\'i gjeni ato në hartë ose te Të pëlqyerat.</string>
     <string name="edit">Redakto</string>
     <string name="unknown_current_position">Vendndodhja juaj nuk është caktuar akoma</string>
-    <string name="my_position_share_email_subject">Hej, shiko vendndodhjen time aktuale në hartën e CoMaps!</string>
+    <string name="my_position_share_email_subject">Hej, shiko vendndodhjen time aktuale në hartën e Better Maps!</string>
     <string name="email">Posta Elektronike</string>
     <string name="done">Përfundo</string>
     <string name="tracks_title">Itineraret</string>

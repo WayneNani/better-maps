@@ -20,13 +20,16 @@ convert() {
   uconv -x 'Serbian-Latin/BGN' "$INPUT" > "$OUTPUT"
 }
 
-mkdir -p "android/app/src/fdroid/play/listings/sr-Latn"
-convert "$ANDROID/app/src/fdroid/play/listings/sr/full-description.txt" \
-        "$ANDROID/app/src/fdroid/play/listings/sr-Latn/full-description.txt"
-convert "$ANDROID/app/src/fdroid/play/listings/sr/short-description.txt" \
-        "$ANDROID/app/src/fdroid/play/listings/sr-Latn/short-description.txt"
-convert "$ANDROID/app/src/fdroid/play/listings/sr/title.txt" \
-        "$ANDROID/app/src/fdroid/play/listings/sr-Latn/title.txt"
+# better-maps hat nur englische und deutsche Store-Texte; die serbische Variante gibt es nicht immer.
+if [ -d "$ANDROID/app/src/fdroid/play/listings/sr" ]; then
+  mkdir -p "android/app/src/fdroid/play/listings/sr-Latn"
+  convert "$ANDROID/app/src/fdroid/play/listings/sr/full-description.txt" \
+          "$ANDROID/app/src/fdroid/play/listings/sr-Latn/full-description.txt"
+  convert "$ANDROID/app/src/fdroid/play/listings/sr/short-description.txt" \
+          "$ANDROID/app/src/fdroid/play/listings/sr-Latn/short-description.txt"
+  convert "$ANDROID/app/src/fdroid/play/listings/sr/title.txt" \
+          "$ANDROID/app/src/fdroid/play/listings/sr-Latn/title.txt"
+fi
 
 mkdir -p "$ANDROID/app/src/main/res/values-b+sr+Latn"
 convert "$ANDROID/app/src/main/res/values-sr/strings.xml" \

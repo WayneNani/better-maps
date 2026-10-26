@@ -490,12 +490,8 @@ public class Utils
   @NonNull
   public static String getDonateUrl(@NonNull Context context)
   {
-    final String url = Config.getDonateUrl();
-    // Enable donations by default if not Google or Huawei. Replace comaps.app/donate/ with localized page.
-    if ((url.isEmpty() && !BuildConfig.FLAVOR.equals("google") && !BuildConfig.FLAVOR.equals("huawei"))
-        || url.endsWith("comaps.app/donate/"))
-      return context.getString(R.string.app_site_url) + "donate/";
-    return url;
+    // better-maps does not collect donations; upstream CoMaps donation links would be misleading in a fork.
+    return "";
   }
 
   public static boolean isAndroidAutoSupported(Context context)

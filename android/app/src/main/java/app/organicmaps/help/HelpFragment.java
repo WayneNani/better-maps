@@ -58,24 +58,21 @@ public class HelpFragment extends BaseMwmFragment implements View.OnClickListene
     }
 
     setupItem(R.id.faq, true, root);
-    setupItem(R.id.news, true, root);
     setupItem(R.id.web, true, root);
     setupItem(R.id.code_repo, true, root);
-    setupItem(R.id.mastodon, true, root);
-    setupItem(R.id.matrix, true, root);
-    setupItem(R.id.lemmy, true, root);
-    setupItem(R.id.bluesky, true, root);
-    setupItem(R.id.pixelfed, true, root);
     setupItem(R.id.openstreetmap, true, root);
-    setupItem(R.id.email, true, root);
     setupItem(R.id.report, isLandscape, root);
     setupItem(R.id.copyright, false, root);
 
-    final MaterialTextView supportUsView = root.findViewById(R.id.support_us);
-    if (BuildConfig.FLAVOR.equals("google") && !TextUtils.isEmpty(mDonateUrl))
-      supportUsView.setVisibility(View.GONE);
+    // better-maps is a fork: the CoMaps community, news and volunteer links belong to upstream.
+    for (int id : new int[] {R.id.news, R.id.mastodon, R.id.matrix, R.id.lemmy, R.id.bluesky, R.id.pixelfed,
+                             R.id.support_us, R.id.term_of_use_link})
+      root.findViewById(id).setVisibility(View.GONE);
+
+    if (TextUtils.isEmpty(BuildConfig.SUPPORT_MAIL))
+      root.findViewById(R.id.email).setVisibility(View.GONE);
     else
-      setupItem(R.id.support_us, true, root);
+      setupItem(R.id.email, true, root);
 
     final MaterialButton donateView = root.findViewById(R.id.donate);
     if (TextUtils.isEmpty(mDonateUrl))
@@ -92,12 +89,8 @@ public class HelpFragment extends BaseMwmFragment implements View.OnClickListene
     else
       setupItem(R.id.rate, true, root);
 
-    View termOfUseView = root.findViewById(R.id.term_of_use_link);
     View privacyPolicyView = root.findViewById(R.id.privacy_policy);
-    termOfUseView.setOnClickListener(
-        v -> Utils.openUrl(requireActivity(), getResources().getString(R.string.app_site_url) + "terms/"));
-    privacyPolicyView.setOnClickListener(
-        v -> Utils.openUrl(requireActivity(), getResources().getString(R.string.app_site_url) + "privacy/"));
+    privacyPolicyView.setOnClickListener(v -> Utils.openUrl(requireActivity(), Constants.Url.BETTER_MAPS_PRIVACY));
 
     shareLauncher = SharingUtils.RegisterLauncher(this);
 
@@ -111,13 +104,13 @@ public class HelpFragment extends BaseMwmFragment implements View.OnClickListene
   {
     final int id = v.getId();
     if (id == R.id.web)
-      Utils.openUrl(requireActivity(), getResources().getString(R.string.app_site_url));
+      Utils.openUrl(requireActivity(), Constants.Url.UPSTREAM_SITE);
     else if (id == R.id.news)
       Utils.openUrl(requireActivity(), "https://www.comaps.app/news/");
     else if (id == R.id.email)
       Utils.sendTo(requireContext(), BuildConfig.SUPPORT_MAIL, getString(R.string.project_name));
     else if (id == R.id.code_repo)
-      Utils.openUrl(requireActivity(), Constants.Url.CODE_REPO);
+      Utils.openUrl(requireActivity(), Constants.Url.BETTER_MAPS_REPO);
     else if (id == R.id.mastodon)
       Utils.openUrl(requireActivity(), Constants.Url.MASTODON);
     else if (id == R.id.matrix)

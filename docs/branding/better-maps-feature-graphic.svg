@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 500" width="1024" height="500">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0F766E"/><stop offset="1" stop-color="#155E75"/></linearGradient></defs>
+  <rect width="1024" height="500" fill="url(#bg)"/>
+  <path d="M-40,420 C160,330 300,480 500,400 S860,300 1080,370" fill="none" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="40" stroke-linecap="round"/>
+  <g transform="translate(70,95) scale(4.6)">
+    <g transform="translate(-0.5,1)">
+      <path d="M23.0,12.0H23.0A3.5,3.5 0 0,1 26.5,15.5V34.112A3.5,3.5 0 0,1 23.0,37.612H23.0A3.5,3.5 0 0,1 19.5,34.112V15.5A3.5,3.5 0 0,1 23.0,12.0Z" fill="#FFFFFF"/><path d="M24.591,36.612A11.5,11.5 0 1,1 43.409,36.612L34.0,50.0Z" fill="#FFFFFF"/><path d="M29.2,30.0a4.8,4.8 0 1,0 9.6,0a4.8,4.8 0 1,0 -9.6,0Z" fill="#F59E0B"/>
+    </g>
+  </g>
+  <text x="370" y="250" font-family="Inter, Noto Sans, DejaVu Sans, sans-serif" font-size="82" font-weight="700" fill="#FFFFFF">Better Maps</text>
+  <text x="374" y="312" font-family="Inter, Noto Sans, DejaVu Sans, sans-serif" font-size="27" fill="#CCFBF1">Offline. Open. Live transit &amp; traffic.</text>
+</svg>

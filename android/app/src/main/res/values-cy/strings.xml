@@ -160,7 +160,7 @@
     <string name="elevation_profile_descent">Disgyniad</string>
     <string name="yes_available">Ie</string>
     <string name="try_again">Ceisio Eto</string>
-    <string name="about_menu_title">CoMaps</string>
+    <string name="about_menu_title">Better Maps</string>
     <string name="location_settings">Gosodiadau Lleoliad</string>
     <string name="maps_storage_downloaded">Mapiau wedi\'u lawrlwytho</string>
     <string name="move_maps">Symud mapiau?</string>
@@ -309,5 +309,5 @@
     <string name="move_maps_error">Gwall wrth symud ffeiliau map</string>
     <string name="wait_several_minutes">Gall hyn gymryd ychydig funudau. \nArhoswch…</string>
     <string name="measurement_units_summary">Dewis rhwng milltiroedd a chilomedrau</string>
-    <string name="share_bookmarks_email_subject">Fy Ffefrynnau CoMaps</string>
+    <string name="share_bookmarks_email_subject">Fy Ffefrynnau Better Maps</string>
 </resources>

@@ -26,7 +26,7 @@ export CCACHE_NOHASHDIR=true
 NJOBS="${BM_NJOBS:-6}"
 LOCK_DIR="${BM_LOCK_DIR:-$HOME/.cache/bettermaps-locks}"
 AVD="${BM_AVD:-bettermaps_api35}"
-APP_ID="app.comaps.fdroid.debug"
+APP_ID="app.bettermaps.fdroid.debug"
 mkdir -p "$LOCK_DIR" "$CCACHE_DIR"
 
 log() { echo "[bm] $*" >&2; }
@@ -127,6 +127,10 @@ android_install_run() {
 android_connected() {
   emulator_start
   cd "$REPO_ROOT/android"
+  # Der Versionscode hängt vom Datum ab und kann kleiner sein als der einer früher installierten App.
+  # Gradle installiert ohne Downgrade-Erlaubnis; daher die App vorher selbst mit -d installieren.
+  with_build_slot ./gradlew --no-daemon --max-workers=4 -Px86_64 -Pnjobs="$NJOBS" assembleFdroidDebug
+  adb install -r -d -g "$(apk_path)" >/dev/null
   # leaveApksInstalledAfterRun: sonst deinstalliert Gradle die App und löscht die Karten im gemeinsamen Emulator.
   with_build_slot ./gradlew --no-daemon --max-workers=4 -Px86_64 -Pnjobs="$NJOBS" \
     -Pandroid.injected.androidTest.leaveApksInstalledAfterRun=true connectedFdroidDebugAndroidTest "$@"

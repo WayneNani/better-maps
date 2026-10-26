@@ -16,7 +16,7 @@
 # Environment:
 #   TRAFF_E2E_MAPS_DIR    directory containing Germany_Berlin.mwm (default ~/.cache/bettermaps-maps)
 #                         Locally, the map can be copied from the emulator, e.g.
-#                         adb pull /sdcard/Android/data/app.comaps.fdroid.debug/files/<version>/Germany_Berlin.mwm
+#                         adb pull /sdcard/Android/data/app.bettermaps.fdroid.debug/files/<version>/Germany_Berlin.mwm
 #   TRAFF_E2E_PORT        port of the TraFF server (default 18081)
 #   TRAFF_E2E_API_PORT    port of the fake Autobahn API (default 18082)
 #   TRAFFXML_TESTS_BIN    prebuilt traffxml_tests binary; if unset, it is built with bm.sh cpp-test
