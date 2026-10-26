@@ -63,6 +63,7 @@ public final class ConnectionsState
   final String mFromLabel;
   @NonNull
   final String mToLabel;
+  final boolean mFarAhead;
 
   ConnectionsState(@NonNull Screen screen, @NonNull String timeLabel, boolean arriveBy, boolean loading,
                    boolean loadingEarlier, boolean loadingLater, @Nullable TransitError error,
@@ -70,7 +71,7 @@ public final class ConnectionsState
                    boolean canLoadLater, @Nullable ItineraryItem selected, @NonNull List<LegItem> legs,
                    @Nullable String providerName, @Nullable String attributionUrl, @NonNull ViewMode viewMode,
                    boolean savedView, boolean selectedSaved, boolean past, @Nullable String selectedDate,
-                   @NonNull Instant now, @NonNull String fromLabel, @NonNull String toLabel)
+                   @NonNull Instant now, @NonNull String fromLabel, @NonNull String toLabel, boolean farAhead)
   {
     mScreen = screen;
     mTimeLabel = timeLabel;
@@ -95,6 +96,16 @@ public final class ConnectionsState
     mNow = now;
     mFromLabel = fromLabel;
     mToLabel = toLabel;
+    mFarAhead = farAhead;
+  }
+
+  /**
+   * The query time is so far ahead that the timetables may not be published yet: an empty result says so
+   * ({@link TransitDateRange#TIMETABLE_HINT_DAYS}).
+   */
+  public boolean isFarAhead()
+  {
+    return mFarAhead;
   }
 
   @NonNull

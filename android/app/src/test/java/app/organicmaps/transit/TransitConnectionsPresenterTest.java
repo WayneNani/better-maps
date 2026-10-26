@@ -885,4 +885,138 @@ public class TransitConnectionsPresenterTest
     assertEquals("Hauptbahnhof", mSaved.get("a").getToName());
     assertEquals(ALEX, mSaved.get("a").getFrom());
   }
+
+  // A query on another date (the time dialog allows any date up to a year ahead).
+
+  @Test
+  public void queryOnAnotherDate()
+  {
+    searchAndWait();
+    mProvider.lastPlan().complete(plan(null, null, Fixtures.s5("a", 29)));
+    final Instant friday = t("2026-11-13T08:30:00Z");
+    mPresenter.setTime(friday, false);
+    assertEquals("Depart Fr., 13. Nov., 09:30", state().getTimeLabel());
+    mScheduler.advance(TransitConnectionsPresenter.DEBOUNCE_MS);
+    assertEquals(2, mProvider.mPlanRequests.size());
+    assertEquals(friday, mProvider.lastRequest().getTime());
+    assertFalse(mProvider.lastRequest().isArriveBy());
+    assertEquals(friday, mPresenter.getTime());
+
+    mPresenter.setTime(friday, true);
+    assertEquals("Arrive by Fr., 13. Nov., 09:30", state().getTimeLabel());
+    mScheduler.advance(TransitConnectionsPresenter.DEBOUNCE_MS);
+    assertEquals(friday, mProvider.lastRequest().getTime());
+    assertTrue(mProvider.lastRequest().isArriveBy());
+  }
+
+  @Test
+  public void pagingKeepsTheDate()
+  {
+    final Instant friday = t("2026-11-13T08:30:00Z");
+    mPresenter.setTime(friday, false);
+    searchAndWait();
+    mProvider.lastPlan().complete(plan("prev", "next", Fixtures.s5("a", 29)));
+
+    mPresenter.loadLater();
+    assertEquals("next", mProvider.lastRequest().getPageCursor());
+    assertEquals(friday, mProvider.lastRequest().getTime());
+    mProvider.lastPlan().complete(plan(null, "next2", Fixtures.s5("b", 39)));
+
+    mPresenter.loadEarlier();
+    assertEquals("prev", mProvider.lastRequest().getPageCursor());
+    assertEquals(friday, mProvider.lastRequest().getTime());
+    mProvider.lastPlan().complete(plan(null, null, Fixtures.s5("c", 19)));
+    assertEquals(3, state().getItems().size());
+    // The label still shows the chosen date.
+    assertEquals("Depart Fr., 13. Nov., 09:30", state().getTimeLabel());
+  }
+
+  @Test
+  public void cacheKeepsDatesApart()
+  {
+    final Instant friday = t("2026-11-13T08:30:00Z");
+    final Instant saturday = t("2026-11-14T08:30:00Z");
+    mPresenter.setTime(friday, false);
+    searchAndWait();
+    mProvider.lastPlan().complete(plan(null, null, Fixtures.s5("friday", 29)));
+
+    // The same time of day on another date is another request.
+    mPresenter.setTime(saturday, false);
+    mScheduler.advance(TransitConnectionsPresenter.DEBOUNCE_MS);
+    assertEquals(2, mProvider.mPlanRequests.size());
+    assertEquals(saturday, mProvider.lastRequest().getTime());
+    mProvider.lastPlan().complete(plan(null, null, Fixtures.s5("saturday", 29)));
+    assertEquals("saturday", state().getItems().get(0).getKey());
+
+    // Back to the first date: answered from the cache.
+    mPresenter.setTime(friday, false);
+    mScheduler.advance(TransitConnectionsPresenter.DEBOUNCE_MS);
+    assertEquals(2, mProvider.mPlanRequests.size());
+    assertEquals("friday", state().getItems().get(0).getKey());
+  }
+
+  @Test
+  public void dateOfAPastDayIsSentForNow()
+  {
+    // E.g. chosen yesterday and the app was kept open.
+    mPresenter.setTime(t("2026-10-24T08:30:00Z"), true);
+    searchAndWait();
+    assertNull(mProvider.lastRequest().getTime());
+    assertFalse(mProvider.lastRequest().isArriveBy());
+    assertNull(mPresenter.getTime());
+    assertEquals("Depart now", state().getTimeLabel());
+  }
+
+  @Test
+  public void earlierTodayIsKept()
+  {
+    final Instant morning = t("2026-10-25T06:00:00Z");
+    mPresenter.setTime(morning, false);
+    searchAndWait();
+    assertEquals(morning, mProvider.lastRequest().getTime());
+  }
+
+  @Test
+  public void emptyResultFarAheadHintsAtTimetables()
+  {
+    mPresenter.setTime(t("2027-05-14T08:30:00Z"), false);
+    searchAndWait();
+    mProvider.lastPlan().complete(plan(null, null));
+    assertTrue(state().isEmpty());
+    assertTrue(state().isFarAhead());
+
+    // Next week: timetables are known, an empty result is just empty.
+    mPresenter.setTime(t("2026-10-30T08:30:00Z"), false);
+    mScheduler.advance(TransitConnectionsPresenter.DEBOUNCE_MS);
+    mProvider.lastPlan().complete(plan(null, null));
+    assertTrue(state().isEmpty());
+    assertFalse(state().isFarAhead());
+
+    mPresenter.setTime(null, false);
+    assertFalse(state().isFarAhead());
+  }
+
+  @Test
+  public void searchAgainFromFutureSavedSearchesAtItsTime()
+  {
+    // Saved for a later day: the search runs for that departure, not for now.
+    final TransitItinerary nextWeek = Fixtures.s5("next-week", 7 * 24 * 60);
+    mPresenter.showSaved(saved(nextWeek));
+    mPresenter.searchAgain();
+    assertEquals(1, mProvider.mPlanRequests.size());
+    assertEquals(nextWeek.getStartTime(), mProvider.lastRequest().getTime());
+    assertFalse(mProvider.lastRequest().isArriveBy());
+    assertEquals("Depart So., 1. Nov., 17:00", state().getTimeLabel());
+  }
+
+  @Test
+  public void searchAgainFromPastSavedAfterChoosingADate()
+  {
+    mPresenter.setTime(t("2026-11-13T08:30:00Z"), true);
+    mPresenter.showSaved(saved(Fixtures.s5("old", -24 * 60)));
+    mPresenter.searchAgain();
+    assertNull(mProvider.lastRequest().getTime());
+    assertFalse(mProvider.lastRequest().isArriveBy());
+    assertEquals("Depart now", state().getTimeLabel());
+  }
 }

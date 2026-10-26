@@ -148,4 +148,33 @@ public class TransitFormatterTest
     assertNull(mFormatter.formatDateIfNotToday(t("2026-10-25T22:59:00Z"), now));
     assertTrue(mFormatter.formatDateIfNotToday(t("2026-10-25T23:00:00Z"), now) != null);
   }
+
+  @Test
+  public void queryTimeOnAnotherDay()
+  {
+    final Instant now = t("2026-10-25T16:00:00Z");
+    // Weekday and short date, then the time (device zone), like "Abfahrt Sa., 14. Nov., 09:30".
+    assertEquals("Depart Mo., 26. Okt., 09:00", mFormatter.formatQueryTime(t("2026-10-26T08:00:00Z"), false, now));
+    assertEquals("Depart Sa., 14. Nov., 09:30", mFormatter.formatQueryTime(t("2026-11-14T08:30:00Z"), false, now));
+    assertEquals("Arrive by Sa., 14. Nov., 09:30", mFormatter.formatQueryTime(t("2026-11-14T08:30:00Z"), true, now));
+    // After midnight in the device zone it is the next day.
+    assertEquals("Depart So., 15. Nov., 00:30", mFormatter.formatQueryTime(t("2026-11-14T23:30:00Z"), false, now));
+    // Another year: with the year.
+    assertEquals("Depart Fr., 14. Mai 2027, 10:30", mFormatter.formatQueryTime(t("2027-05-14T08:30:00Z"), false, now));
+  }
+
+  @Test
+  public void shortDateInEnglish()
+  {
+    final TransitFormatter us = new TransitFormatter(Locale.US, BERLIN, false, new FakeTexts());
+    final java.time.LocalDate today = java.time.LocalDate.of(2026, 10, 25);
+    assertEquals("Sat, Nov 14", us.formatShortDate(java.time.LocalDate.of(2026, 11, 14), today));
+    assertEquals("Fri, May 14, 2027", us.formatShortDate(java.time.LocalDate.of(2027, 5, 14), today));
+    assertEquals("Depart Sat, Nov 14, 9:30 AM",
+                 us.formatQueryTime(t("2026-11-14T08:30:00Z"), false, t("2026-10-25T16:00:00Z")));
+    // Patterns from Android (DateFormat.getBestDateTimePattern) are used as given.
+    final TransitFormatter uk =
+        new TransitFormatter(Locale.UK, BERLIN, true, new FakeTexts(), "EEE d MMM", "EEE d MMM y");
+    assertEquals("Sat 14 Nov", uk.formatShortDate(java.time.LocalDate.of(2026, 11, 14), today));
+  }
 }

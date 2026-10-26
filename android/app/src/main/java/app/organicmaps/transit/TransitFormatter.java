@@ -39,10 +39,30 @@ public final class TransitFormatter
   private final DateTimeFormatter mDateFormat;
   @NonNull
   private final DateTimeFormatter mWeekdayFormat;
+  // Short weekday and date, e.g. "Fr., 14. Nov.", and with the year for another year.
+  @NonNull
+  private final DateTimeFormatter mShortDateFormat;
+  @NonNull
+  private final DateTimeFormatter mShortDateYearFormat;
 
   public TransitFormatter(@NonNull Locale locale, @NonNull ZoneId deviceZone, boolean is24Hour,
                           @NonNull TransitTexts texts)
   {
+    this(locale, deviceZone, is24Hour, texts, defaultShortDatePattern(locale, false),
+         defaultShortDatePattern(locale, true));
+  }
+
+  /**
+   * @param shortDatePattern pattern of a short weekday and date, e.g. "EEE, d. MMM" for German; on Android the best
+   *     pattern of the locale for the skeleton "EEEdMMM".
+   * @param shortDateYearPattern the same with the year (skeleton "EEEdMMMy").
+   */
+  public TransitFormatter(@NonNull Locale locale, @NonNull ZoneId deviceZone, boolean is24Hour,
+                          @NonNull TransitTexts texts, @NonNull String shortDatePattern,
+                          @NonNull String shortDateYearPattern)
+  {
+    mShortDateFormat = DateTimeFormatter.ofPattern(shortDatePattern, locale);
+    mShortDateYearFormat = DateTimeFormatter.ofPattern(shortDateYearPattern, locale);
     mLocale = locale;
     mDeviceZone = deviceZone;
     mTexts = texts;
@@ -110,6 +130,13 @@ public final class TransitFormatter
     return mDateFormat.format(date);
   }
 
+  /** Short weekday and date, e.g. "Fr., 14. Nov."; with the year if it is not the year of {@code today}. */
+  @NonNull
+  public String formatShortDate(@NonNull LocalDate date, @NonNull LocalDate today)
+  {
+    return (date.getYear() == today.getYear() ? mShortDateFormat : mShortDateYearFormat).format(date);
+  }
+
   /** Weekday and date in the stop's zone, e.g. "Sun, Oct 25, 2026". */
   @NonNull
   public String formatDate(@NonNull Instant time, @Nullable String timeZone)
@@ -173,17 +200,32 @@ public final class TransitFormatter
     return name;
   }
 
-  /** "Depart now", "Depart 14:05" or "Arrive by 14:05" (device time zone). */
+  /**
+   * "Depart now", "Depart 14:05" (today), "Depart Fri, Nov 14, 09:30" (another day) or "Arrive by 14:05", in the
+   * device time zone.
+   */
   @NonNull
   public String formatQueryTime(@Nullable Instant time, boolean arriveBy, @NonNull Instant now)
   {
     if (time == null)
       return arriveBy ? mTexts.arriveBy(formatDeviceTime(now)) : mTexts.departNow();
     String text = formatDeviceTime(time);
-    final String date = formatDateIfNotToday(time, now);
-    if (date != null)
-      text = date + ", " + text;
+    final LocalDate date = time.atZone(mDeviceZone).toLocalDate();
+    final LocalDate today = now.atZone(mDeviceZone).toLocalDate();
+    if (!date.equals(today))
+      text = formatShortDate(date, today) + ", " + text;
     return arriveBy ? mTexts.arriveBy(text) : mTexts.departAt(text);
+  }
+
+  /** Fallback patterns for {@link #formatShortDate} without Android's localized date skeletons (e.g. in tests). */
+  @NonNull
+  static String defaultShortDatePattern(@NonNull Locale locale, boolean withYear)
+  {
+    if ("de".equals(locale.getLanguage()))
+      return withYear ? "EEE, d. MMM y" : "EEE, d. MMM";
+    if ("en".equals(locale.getLanguage()) && !"US".equals(locale.getCountry()) && !locale.getCountry().isEmpty())
+      return withYear ? "EEE d MMM y" : "EEE d MMM";
+    return withYear ? "EEE, MMM d, y" : "EEE, MMM d";
   }
 
   @NonNull

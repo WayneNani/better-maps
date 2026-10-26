@@ -127,9 +127,17 @@ public final class TransitServices
   @NonNull
   public TransitItemFactory createItemFactory(@NonNull Context context)
   {
+    return new TransitItemFactory(createFormatter(context));
+  }
+
+  /** Formatter with the locale, time zone and clock format of the device. */
+  @NonNull
+  public static TransitFormatter createFormatter(@NonNull Context context)
+  {
     final Locale locale = context.getResources().getConfiguration().getLocales().get(0);
-    return new TransitItemFactory(new TransitFormatter(
-        locale, ZoneId.systemDefault(), DateFormat.is24HourFormat(context), new AndroidTransitTexts(context)));
+    return new TransitFormatter(locale, ZoneId.systemDefault(), DateFormat.is24HourFormat(context),
+                                new AndroidTransitTexts(context), DateFormat.getBestDateTimePattern(locale, "EEEdMMM"),
+                                DateFormat.getBestDateTimePattern(locale, "EEEdMMMy"));
   }
 
   /** The presenter of the online connection list; it lives as long as the app (route planning survives rotation). */
