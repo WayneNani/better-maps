@@ -11,6 +11,8 @@
 #include "geometry/mercator.hpp"
 #include "geometry/point2d.hpp"
 
+#include "base/string_utils.hpp"
+
 #include <string>
 #include <vector>
 
@@ -95,6 +97,7 @@ public:
   {
     auto params = GetDefaultSearchParams(query, "de");
     params.m_position = m2::PointD(0, 0);
+    params.m_needHighlighting = true;
     auto request = MakeRequest(params);
     return request->Results();
   }
@@ -151,6 +154,13 @@ UNIT_CLASS_TEST(StationRankingTest, CityAndMainStation)
   // The tram stop is not a part of the station, it is still found after it.
   auto const results = Search("Nürnberg Hbf");
   TEST(Contains(results, m_tramStop), (results));
+
+  // "Hauptbahnhof" is highlighted for its synonym "Hbf": the whole name answers the query.
+  auto const & station = results[0];
+  size_t highlighted = 0;
+  for (size_t i = 0; i < station.GetHighlightRangesCount(); ++i)
+    highlighted += station.GetHighlightRange(i).second;
+  TEST_EQUAL(highlighted, strings::MakeUniString("NürnbergHauptbahnhof").size(), (station));
 }
 
 UNIT_CLASS_TEST(StationRankingTest, StationWithAnotherName)
