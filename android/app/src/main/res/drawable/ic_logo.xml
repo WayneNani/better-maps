@@ -1,12 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generiert von tools/better-maps/branding/generate_icons.py, nicht von Hand ändern. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="64dp"
-    android:height="64dp"
-    android:viewportWidth="835"
-    android:viewportHeight="835">
-  <path
-      android:pathData="M698.5,141.1a20,20 0,0 1,30.8 -1.3A416,416 0,0 1,835 417.4a416,416 0,0 1,-93.3 263,20 20,0 0,1 -31.3,-0.6l-43,-56.6a20,20 0,0 1,-0.2 -24,307 307,0 0,0 59.3,-181.8c0,-74.2 -26.2,-142.3 -69.9,-195.6a20,20 0,0 1,-0.5 -24.8zM260.7,456.4a20,20 0,0 1,-7.7 -36.7l282,-177.4a20,20 0,0 1,29.9 22.7l-97,318.9a20,20 0,0 1,-37.5 2.2l-49.2,-111.5z"
-      android:fillColor="#ccdfca"/>
-  <path
-      android:pathData="M626.3,753a20,20 0,0 1,-6.2 29.6A416,416 0,0 1,417.5 835,417.7 417.7,0 0,1 0,417.4 417.7,417.7 0,0 1,603.3 43.5a20,20 0,0 1,7 30l-42.4,55.8a20,20 0,0 1,-24.2 6.1,307 307,0 0,0 -126.2,-27 309,309 0,0 0,-309 309c0,170.6 138.5,309 309,309a307,307 0,0 0,141.6 -34.3,20 20,0 0,1 25.1,5.6z"
-      android:fillColor="#fefdf6"/>
+  xmlns:aapt="http://schemas.android.com/aapt"
+  android:width="64dp" android:height="64dp"
+  android:viewportWidth="64" android:viewportHeight="64">
+  <path android:pathData="M14,0H50A14,14 0,0 1,64 14V50A14,14 0,0 1,50 64H14A14,14 0,0 1,0 50V14A14,14 0,0 1,14 0Z">
+    <aapt:attr name="android:fillColor">
+      <gradient android:type="linear" android:startX="0" android:startY="0" android:endX="64" android:endY="64">
+        <item android:offset="0" android:color="#0F766E"/>
+        <item android:offset="1" android:color="#155E75"/>
+      </gradient>
+    </aapt:attr>
+  </path>
+  <group android:translateX="0" android:translateY="0" android:scaleX="1" android:scaleY="1">
+    <path android:pathData="M23.0,12.0H23.0A3.5,3.5 0 0,1 26.5,15.5V34.112A3.5,3.5 0 0,1 23.0,37.612H23.0A3.5,3.5 0 0,1 19.5,34.112V15.5A3.5,3.5 0 0,1 23.0,12.0Z" android:fillColor="#FFFFFF"/>
+    <path android:pathData="M24.591,36.612A11.5,11.5 0 1,1 43.409,36.612L34.0,50.0Z" android:fillColor="#FFFFFF"/>
+    <path android:pathData="M29.2,30.0a4.8,4.8 0 1,0 9.6,0a4.8,4.8 0 1,0 -9.6,0Z" android:fillColor="#F59E0B"/>
+  </group>
 </vector>

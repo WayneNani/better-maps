@@ -1,6 +1,11 @@
 Copyright 2020 My.com B.V. (Mail.Ru Group)
 Copyright 2025 Organic Maps Contributors
 Copyright 2026 CoMaps Contributors
+Copyright 2026 Better Maps Contributors
+
+Better Maps is a modified version of CoMaps (https://codeberg.org/comaps/comaps).
+It changes the app name, logo and links and adds public transport, traffic,
+search and crowd-sourced congestion features; see git history for details.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

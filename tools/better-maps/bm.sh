@@ -26,7 +26,7 @@ export CCACHE_NOHASHDIR=true
 NJOBS="${BM_NJOBS:-6}"
 LOCK_DIR="${BM_LOCK_DIR:-$HOME/.cache/bettermaps-locks}"
 AVD="${BM_AVD:-bettermaps_api35}"
-APP_ID="app.comaps.fdroid.debug"
+APP_ID="app.bettermaps.fdroid.debug"
 mkdir -p "$LOCK_DIR" "$CCACHE_DIR"
 
 log() { echo "[bm] $*" >&2; }

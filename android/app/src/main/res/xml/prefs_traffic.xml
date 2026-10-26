@@ -7,7 +7,7 @@
     android:title="@string/traffic_http_enabled"
     app:singleLineTitle="false"
     android:summary="@string/traffic_http_enabled_description"
-    android:defaultValue="true"
+    android:defaultValue="false"
     android:widgetLayout="@layout/preference_switch"
     android:order="1"/>
   <EditTextPreference

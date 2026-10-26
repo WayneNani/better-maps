@@ -31,8 +31,8 @@ java {
     }
 }
 
-val appName = "CoMaps"
-val appId = "app.comaps"
+val appName = "Better Maps"
+val appId = "app.bettermaps"
 // These are properly set in the 'secure.properties.*' files but must be declared here for build sync to succeed.
 project.ext["secretTestStoreFile"] = "comaps-test.keystore"
 project.ext["secretTestStorePassword"] = ""
@@ -94,7 +94,8 @@ android {
         ndk.debugSymbolLevel = "full"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "REVIEW_URL", "\"\"")
-        buildConfigField("String", "SUPPORT_MAIL", "\"android@comaps.app\"") // Customized in flavors.
+        // better-maps has no support mailbox yet; empty hides the e-mail and bug report entries.
+        buildConfigField("String", "SUPPORT_MAIL", "\"\"")
         println("Version: ${versionName!!}")
         println("VersionCode: ${versionCode!!}")
     }
@@ -106,22 +107,18 @@ android {
             dimension = "default"
             applicationIdSuffix = ".google"
             versionName = "${android.defaultConfig.versionName!!}-Google"
-            buildConfigField("String", "SUPPORT_MAIL", "\"gplay@comaps.app\"")
-            buildConfigField("String", "REVIEW_URL", "\"market://details?id=app.comaps.google\"")
         }
 
         // Distributed directly by the project, e.g. in repo releases, chats, etc.
         create("web") {
             dimension = "default"
             versionName = android.defaultConfig.versionName!!
-            buildConfigField("String", "SUPPORT_MAIL", "\"apk@comaps.app\"")
         }
 
         create("fdroid") {
             dimension = "default"
             applicationIdSuffix = ".fdroid"
             versionName = "${android.defaultConfig.versionName!!}-FDroid"
-            buildConfigField("String", "SUPPORT_MAIL", "\"fdroid@comaps.app\"")
         }
 
         create("huawei") {
@@ -130,8 +127,6 @@ android {
             applicationIdSuffix = ".huawei"
             versionName = "${android.defaultConfig.versionName!!}-Huawei"
             versionCode = huaweiVersionCodeBase + android.defaultConfig.versionCode!!
-            buildConfigField("String", "SUPPORT_MAIL", "\"huawei@comaps.app\"")
-            buildConfigField("String", "REVIEW_URL", "\"appmarket://details?id=app.comaps\"")
         }
     }
 
@@ -199,7 +194,7 @@ android {
         getByName("debug") {
             storeFile = project.projectDir.resolve(File(comapsDebugKeystorePath))
             storePassword = "12345678"
-            keyAlias = "$appName Debug"
+            keyAlias = "CoMaps Debug" // Alias in the shared upstream debug keystore.
             keyPassword = "12345678"
         }
         create("test") {

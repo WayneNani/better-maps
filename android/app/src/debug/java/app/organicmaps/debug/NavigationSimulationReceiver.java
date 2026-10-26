@@ -13,7 +13,7 @@ import app.organicmaps.sdk.util.log.Logger;
  * Debug builds only: drives the current navigation route with simulated locations (the same simulation as
  * Android Auto's auto drive), for emulator tests of the navigation, e.g. the anonymous congestion reports:
  * <pre>
- * adb shell am broadcast -n app.comaps.fdroid.debug/app.organicmaps.debug.NavigationSimulationReceiver \
+ * adb shell am broadcast -n app.bettermaps.fdroid.debug/app.organicmaps.debug.NavigationSimulationReceiver \
  *   --ef speed 22.2
  * </pre>
  * "speed" is in m/s (one simulated location per second along the route).

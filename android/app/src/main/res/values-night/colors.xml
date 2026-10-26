@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <color name="base_accent">#FF7CBC7B</color>
-  <color name="base_accent_pressed">#FF588157</color>
+  <color name="base_accent">#FF5EEAD4</color>
+  <color name="base_accent_pressed">#FF14B8A6</color>
 
   <color name="icon_tint">#FFF</color>
 
@@ -11,15 +11,15 @@
 
   <!-- Backgrounds -->
   <color name="bg_window">#FF32363A</color>
-  <color name="bg_primary">#37653F</color>
+  <color name="bg_primary">#115E59</color>
   <color name="bg_cards">#FF3C4044</color>
   <color name="bg_panel">@color/bg_window</color>
-  <color name="bg_primary_dark">#FF588157</color>
+  <color name="bg_primary_dark">#0F766E</color>
   <color name="bg_app">#10140F</color>
 
   <color name="bg_menu">#CC2D3237</color>
 
-  <color name="bg_statusbar">#004120</color>
+  <color name="bg_statusbar">#042F2E</color>
 
   <!-- Buttons -->
   <color name="button_pressed">#40CCCCCC</color>
