@@ -121,15 +121,17 @@ vector<strings::UniString> RemoveStreetSynonyms(vector<strings::UniString> const
   return res;
 }
 
-NameScores GetNameScores(FeatureType & ft, Geocoder::Params const & params, TokenRange const & range, Model::Type type)
+template <typename Slice, typename SliceNoCategories>
+NameScores GetNameScores(FeatureType & ft, Geocoder::Params const & params, Slice const & slice,
+                         SliceNoCategories const & sliceNoCategories, Model::Type type, bool altOrOldNames = true)
 {
   NameScores bestScores;
 
-  TokenSlice const slice(params, range);
-  TokenSliceNoCategories const sliceNoCategories(params, range);
-
   for (auto const lang : params.GetLangs())
   {
+    if (!altOrOldNames && localisation::IsAlternativeOrOldName(lang))
+      continue;
+
     string_view const name = ft.GetName(lang);
     if (name.empty())
       continue;
@@ -214,6 +216,73 @@ NameScores GetNameScores(FeatureType & ft, Geocoder::Params const & params, Toke
       UpdateNameScores(shield, localisation::kDefaultNameIndex, sliceNoCategories, bestScores);
 
   return bestScores;
+}
+
+NameScores GetNameScores(FeatureType & ft, Geocoder::Params const & params, TokenRange const & range, Model::Type type)
+{
+  return GetNameScores(ft, params, TokenSlice(params, range), TokenSliceNoCategories(params, range), type);
+}
+
+// Scores the name of a POI against the tokens of its city and its own tokens, see PreRankingInfo::
+// GetCityAndPoiTokenRange(). The name may contain the city in front of the other tokens ("Nürnberg Hauptbahnhof")
+// or after them ("Hauptbahnhof Fürth") regardless of the order in the query ("Hbf Nürnberg", "Fürth Hbf").
+// |typesMatchedLength| is the length of the category tokens matched by the types of the POI: "Erlangen Hbf" is
+// matched by the station "Erlangen", the name matches "Erlangen" and the type matches "Hbf".
+// Returns nothing if the name doesn't match the city and the POI tokens well.
+optional<NameScores> GetCityAndPoiNameScores(FeatureType & ft, Geocoder::Params const & params,
+                                             PreRankingInfo const & info, TokenRange const & cityAndPoiRange,
+                                             size_t typesMatchedLength)
+{
+  // The tokens in the query order and with the city and the POI swapped.
+  vector<size_t> inOrder;
+  vector<size_t> swapped;
+  inOrder.reserve(cityAndPoiRange.Size());
+  swapped.reserve(cityAndPoiRange.Size());
+  for (size_t i : cityAndPoiRange)
+    inOrder.push_back(i);
+  auto const & poiRange = info.InnermostTokenRange();
+  for (size_t i = poiRange.End(); i < cityAndPoiRange.End(); ++i)
+    swapped.push_back(i);
+  for (size_t i : poiRange)
+    swapped.push_back(i);
+  for (size_t i = cityAndPoiRange.Begin(); i < poiRange.Begin(); ++i)
+    swapped.push_back(i);
+
+  auto const getScores = [&](bool altOrOldNames) -> optional<NameScores>
+  {
+    NameScores byName;
+    NameScores byNameAndTypes;
+    for (auto const * order : {&inOrder, &swapped})
+    {
+      TokenSliceOfIndexes const slice(params, *order, false /* skipCategories */);
+      byName.UpdateIfBetter(GetNameScores(ft, params, slice, slice, info.m_type, altOrOldNames));
+      if (typesMatchedLength != 0)
+      {
+        TokenSliceOfIndexes const sliceNoCategories(params, *order, true /* skipCategories */);
+        byNameAndTypes.UpdateIfBetter(
+            GetNameScores(ft, params, sliceNoCategories, sliceNoCategories, info.m_type, altOrOldNames));
+      }
+    }
+
+    if (max(byName.m_nameScore, byNameAndTypes.m_nameScore) < NameScore::FIRST_MATCH)
+      return {};
+
+    if (byNameAndTypes.m_nameScore >= NameScore::FIRST_MATCH)
+    {
+      // A name that matches all tokens ("Frankfurt (Main) Hauptbahnhof" for "Frankfurt Hbf") is better than a name
+      // that matches the city only ("Frankfurt (Main) Süd", a station too).
+      byNameAndTypes.m_nameScore = NameScore::PREFIX;
+      byNameAndTypes.m_matchedLength += typesMatchedLength;
+      byName.UpdateIfBetter(byNameAndTypes);
+    }
+    return byName;
+  };
+
+  // Alternative and old names are penalized in the ranking, so a good match of the name ("Frankfurt (Main)
+  // Hauptbahnhof" for "Frankfurt Hbf") is better than an exact match of the alternative name ("Frankfurt Hbf").
+  if (auto scores = getScores(false /* altOrOldNames */))
+    return scores;
+  return getScores(true /* altOrOldNames */);
 }
 
 void RemoveDuplicatingLinear(vector<RankerResult> & results)
@@ -621,6 +690,9 @@ private:
     if (totalLength == 0)
       totalLength = 1;
 
+    // Tokens matched by the name or the types of the feature itself.
+    TokenRange poiRange = preInfo.InnermostTokenRange();
+
     if (m_params.IsCategorialRequest())
     {
       info.m_hasName = ft.HasName();
@@ -632,7 +704,25 @@ private:
     }
     else
     {
-      auto const scores = GetNameScores(ft, m_params, preInfo.InnermostTokenRange(), info.m_type);
+      auto scores = GetNameScores(ft, m_params, poiRange, info.m_type);
+
+      // The name of a POI may contain the name of its city: "Nürnberg Hbf" is matched as the city "Nürnberg" and
+      // the POI "Hbf", but the station "Nürnberg Hauptbahnhof" should be scored like a POI named "Hauptbahnhof"
+      // in Nürnberg, not as a substring match. Then the city tokens are scored against the POI name too.
+      bool poiNameHasCity = false;
+      if (auto const cityAndPoiRange = preInfo.GetCityAndPoiTokenRange())
+      {
+        CategoriesInfo const withCityCategories(featureTypes, TokenSlice(m_params, *cityAndPoiRange),
+                                                m_ranker.m_params.m_categoryLocales, m_ranker.m_categories);
+        auto const withCity = GetCityAndPoiNameScores(ft, m_params, preInfo, *cityAndPoiRange,
+                                                      withCityCategories.GetMatchedLength());
+        if (withCity && withCity->m_nameScore > scores.m_nameScore)
+        {
+          scores = *withCity;
+          poiRange = *cityAndPoiRange;
+          poiNameHasCity = true;
+        }
+      }
 
       auto nameScore = scores.m_nameScore;
       auto errorsMade = scores.m_errorsMade;
@@ -691,6 +781,8 @@ private:
               cityNameScore = GetNameScores(ft, m_params, preInfo.m_tokenRanges[type], type).m_nameScore;
             }
           }
+          else if (poiNameHasCity)
+            cityNameScore = GetNameScores(*city, m_params, preInfo.m_tokenRanges[type], type).m_nameScore;
           else
             cityNameScore = updateScoreForFeature(*city, type);
 
@@ -713,7 +805,7 @@ private:
       info.m_nearbyMatch = preInfo.m_geoParts.IsPoiAndComplexPoi();
     }
 
-    CategoriesInfo const categoriesInfo(featureTypes, TokenSlice(m_params, preInfo.InnermostTokenRange()),
+    CategoriesInfo const categoriesInfo(featureTypes, TokenSlice(m_params, poiRange),
                                         m_ranker.m_params.m_categoryLocales, m_ranker.m_categories);
 
     info.m_pureCats = categoriesInfo.IsPureCategories();
@@ -722,7 +814,7 @@ private:
       // Compare with previous values, in case if was assigned by street or locality.
 
       info.m_nameScore = NameScore::SUBSTRING;
-      if (m_params.GetNumTokens() == preInfo.InnermostTokenRange().Size())
+      if (m_params.GetNumTokens() == poiRange.Size())
         info.m_nameScore = NameScore::FULL_PREFIX;
 
       ASSERT_LESS_OR_EQUAL(categoriesInfo.GetMatchedLength(), totalLength, (featureTypes));

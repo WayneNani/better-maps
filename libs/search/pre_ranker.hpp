@@ -144,6 +144,12 @@ public:
   void ClearCaches();
 
 private:
+  using PreResultsContainerT = std::vector<PreRankerResult>;
+
+  // Selects one of the interpretations [begin, end) of the same feature, sorted from the best tokens match.
+  static PreResultsContainerT::iterator SelectInterpretation(PreResultsContainerT::iterator begin,
+                                                             PreResultsContainerT::iterator end);
+
   // Computes missing fields for all pre-results.
   void FillMissingFieldsInPreResults();
   void DbgFindAndLog(std::set<uint32_t> const & ids) const;
@@ -156,7 +162,6 @@ private:
   DataSource const & m_dataSource;
   Ranker & m_ranker;
 
-  using PreResultsContainerT = std::vector<PreRankerResult>;
   PreResultsContainerT m_results, m_relaxedResults;
 
   Params m_params;

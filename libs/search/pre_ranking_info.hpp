@@ -11,6 +11,7 @@
 #include "base/assert.hpp"
 
 #include <array>
+#include <optional>
 #include <string>
 
 namespace search
@@ -33,6 +34,10 @@ struct PreRankingInfo
     ASSERT_LESS(m_type, Model::TYPE_COUNT, ());
     return m_tokenRanges[m_type];
   }
+
+  // Returns the tokens of the matched city (or village) and of the POI together, if they are adjacent in the query,
+  // e.g. "Nürnberg Hbf" for the station "Nürnberg Hauptbahnhof" matched as [City POI] in Nürnberg.
+  std::optional<TokenRange> GetCityAndPoiTokenRange() const;
 
   m2::PointD m_center{0, 0};
 
