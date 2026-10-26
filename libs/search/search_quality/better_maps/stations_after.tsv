@@ -1,0 +1,146 @@
+query	pos	name	type	address	distance_m	open	ranking	highlight
+berlin: Nürnberg Hbf	1	Nürnberg Hauptbahnhof	railway-station	Nuremberg, Bavaria, Germany	378962	unknown	rank 0.537184, popularity 41, pureCats 0	full
+berlin: Nürnberg Hbf	2	Nürnberg-Steinbühl	railway-station	Nuremberg, Bavaria, Germany	379632	unknown	rank 0.527009, popularity 1, pureCats 0	partial
+berlin: Nürnberg Hbf	3	Nürnberg-Dürrenhof	railway-station	Nuremberg, Bavaria, Germany	378217	unknown	rank 0.526909, popularity 1, pureCats 0	partial
+berlin: Nürnberg Hbf	4	Nürnberg Nordost	railway-station	Nuremberg, Bavaria, Germany	375333	unknown	rank 0.52622, popularity 4, pureCats 0	partial
+berlin: Nürnberg Hbf	5	Nürnberg-Schweinau	railway-station	Nuremberg, Bavaria, Germany	381143	unknown	rank 0.526187, popularity 0, pureCats 0	partial
+berlin: Nürnberg Hauptbahnhof	1	Nürnberg Hauptbahnhof	railway-station	Nuremberg, Bavaria, Germany	378962	unknown	rank 0.537184, popularity 41, pureCats 0	full
+berlin: Nürnberg Hauptbahnhof	2	Fürth (Bayern) Hauptbahnhof	railway-station	Fürth, Bavaria, Germany	379315	unknown	rank 0.514556, popularity 11, pureCats 0	partial
+berlin: Nürnberg Hauptbahnhof	3	Hauptbahnhof Westausgang - mobilpunkt	amenity-car_sharing	Nuremberg, Bavaria, Germany	378961	open	rank 0.513235, popularity 0, pureCats 0	partial
+berlin: Nürnberg Hauptbahnhof	4	Nürnberg Hauptbahnhof	highway-bus_stop	Nuremberg, Bavaria, Germany	378763	unknown	rank 0.510289, popularity 0, pureCats 0	full
+berlin: Nürnberg Hauptbahnhof	5	Nürnberg Hauptbahnhof	railway-tram_stop	Nuremberg, Bavaria, Germany	378715	unknown	rank 0.510286, popularity 0, pureCats 0	full
+berlin: Nürnberg Bahnhof	1	Nürnberg Hauptbahnhof	railway-station	Nuremberg, Bavaria, Germany	378962	unknown	rank 0.527184, popularity 41, pureCats 0	partial
+berlin: Nürnberg Bahnhof	2	Nürnberg-Steinbühl	railway-station	Nuremberg, Bavaria, Germany	379632	unknown	rank 0.527009, popularity 1, pureCats 0	partial
+berlin: Nürnberg Bahnhof	3	Nürnberg-Dürrenhof	railway-station	Nuremberg, Bavaria, Germany	378217	unknown	rank 0.526909, popularity 1, pureCats 0	partial
+berlin: Nürnberg Bahnhof	4	Nürnberg Nordost	railway-station	Nuremberg, Bavaria, Germany	375333	unknown	rank 0.52622, popularity 4, pureCats 0	partial
+berlin: Nürnberg Bahnhof	5	Nürnberg-Schweinau	railway-station	Nuremberg, Bavaria, Germany	381143	unknown	rank 0.526187, popularity 0, pureCats 0	partial
+berlin: Hbf Nürnberg	1	Nürnberg Hauptbahnhof	railway-station	Nuremberg, Bavaria, Germany	378962	unknown	rank 0.537184, popularity 41, pureCats 0	full
+berlin: Hbf Nürnberg	2	Nürnberg-Steinbühl	railway-station	Nuremberg, Bavaria, Germany	379632	unknown	rank 0.527009, popularity 1, pureCats 0	partial
+berlin: Hbf Nürnberg	3	Nürnberg-Dürrenhof	railway-station	Nuremberg, Bavaria, Germany	378217	unknown	rank 0.526909, popularity 1, pureCats 0	partial
+berlin: Hbf Nürnberg	4	Nürnberg Nordost	railway-station	Nuremberg, Bavaria, Germany	375333	unknown	rank 0.52622, popularity 4, pureCats 0	partial
+berlin: Hbf Nürnberg	5	Nürnberg-Schweinau	railway-station	Nuremberg, Bavaria, Germany	381143	unknown	rank 0.526187, popularity 0, pureCats 0	partial
+berlin: Fürth Hbf	1	Fürth (Bayern) Hauptbahnhof	railway-station	Fürth, Bavaria, Germany	379315	unknown	rank 0.529276, popularity 11, pureCats 0	full
+berlin: Fürth Hbf	2	Fürth-Burgfarrnbach	railway-station	Fürth, Bavaria, Germany	379290	unknown	rank 0.525335, popularity 0, pureCats 0	full
+berlin: Fürth Hbf	3	Fürth Hauptbahnhof	amenity-taxi	Fürth, Bavaria, Germany	379248	unknown	rank 0.5103, popularity 0, pureCats 0	full
+berlin: Fürth Hbf	4	Fürth Hauptbahnhof	amenity-bench	Fürth, Bavaria, Germany	379212	unknown	rank 0.5073, popularity 0, pureCats 0	full
+berlin: Fürth Hbf	5	Fürth Hauptbahnhof (U1)	railway-subway_entrance	Fürth, Bavaria, Germany	379215	unknown	rank 0.505316, popularity 0, pureCats 0	full
+berlin: Fürth Hauptbahnhof	1	Fürth (Bayern) Hauptbahnhof	railway-station	Fürth, Bavaria, Germany	379315	unknown	rank 0.529276, popularity 11, pureCats 0	full
+berlin: Fürth Hauptbahnhof	2	Hauptbahnhof	highway-bus_stop	Fürth, Bavaria, Germany	379211	unknown	rank 0.510337, popularity 0, pureCats 0	full
+berlin: Fürth Hauptbahnhof	3	Fürth Hauptbahnhof	amenity-taxi	Fürth, Bavaria, Germany	379248	unknown	rank 0.5103, popularity 0, pureCats 0	full
+berlin: Fürth Hauptbahnhof	4	Fürth Hauptbahnhof	amenity-bench	Fürth, Bavaria, Germany	379212	unknown	rank 0.5073, popularity 0, pureCats 0	full
+berlin: Fürth Hauptbahnhof	5	Fürth Hauptbahnhof (U1)	railway-subway_entrance	Fürth, Bavaria, Germany	379215	unknown	rank 0.505316, popularity 0, pureCats 0	full
+berlin: Erlangen Bahnhof	1	Erlangen	railway-station	Erlangen, Bahnhofplatz, 1, Bavaria, Germany	366305	unknown	rank 0.527559, popularity 19, pureCats 0	full
+berlin: Erlangen Bahnhof	2	Bahnhofplatz	highway-residential	Erlangen, Bavaria, Germany	366264	unknown	rank 0.502581, popularity 0, pureCats 0	full
+berlin: Erlangen Bahnhof	3	Erlangen Bahnhof (Parkplatzstraße)	highway-bus_stop	Erlangen, Bavaria, Germany	366296	unknown	rank 0.501539, popularity 0, pureCats 0	full
+berlin: Erlangen Bahnhof	4	Erlangen Paul-Gossen-Straße	railway-halt	Erlangen, Bavaria, Germany	368051	unknown	rank 0.499686, popularity 0, pureCats 0	full
+berlin: Erlangen Bahnhof	5	Erlangen-Bruck	railway-halt	Erlangen, Bavaria, Germany	369069	unknown	rank 0.49918, popularity 0, pureCats 0	full
+berlin: Erlangen Hbf	1	Erlangen	railway-station	Erlangen, Bahnhofplatz, 1, Bavaria, Germany	366305	unknown	rank 0.527559, popularity 19, pureCats 0	full
+berlin: Erlangen Hbf	2	Hauptbahnhof	amenity-car_sharing	Erlangen, Bavaria, Germany	366390	open	rank 0.508515, popularity 0, pureCats 0	full
+berlin: Erlangen Hbf	3	Erlangen Hauptbahnhof B	highway-bus_stop	Erlangen, Bavaria, Germany	366260	unknown	rank 0.501583, popularity 0, pureCats 0	full
+berlin: Erlangen Hbf	4	Erlangen Hauptbahnhof A	highway-bus_stop	Erlangen, Bavaria, Germany	366272	unknown	rank 0.501577, popularity 0, pureCats 0	full
+berlin: Erlangen Hbf	5	Erlangen Hauptbahnhof C	highway-bus_stop	Erlangen, Bavaria, Germany	366267	unknown	rank 0.501577, popularity 0, pureCats 0	full
+berlin: Nürnberg Frankenstadion	1	Nürnberg Frankenstadion	railway-station	Nuremberg, Bavaria, Germany	378997	unknown	rank 0.535497, popularity 6, pureCats 0	full
+berlin: Nürnberg Frankenstadion	2	Kiosk am Frankenstadion	shop-kiosk	Nuremberg, Regensburger Straße, 344, Bavaria, Germany	378840	unknown	rank 0.495481, popularity 0, pureCats 0	partial
+berlin: Nürnberg Frankenstadion	3	Frankenstadion	highway-bus_stop	Nuremberg, Bavaria, Germany	379026	unknown	rank 0.0306362, popularity 0, pureCats 0	partial
+berlin: Nürnberg Frankenstadion	4	Frankenstadion	highway-bus_stop	Nuremberg, Bavaria, Germany	379160	unknown	rank 0.0305726, popularity 0, pureCats 0	partial
+berlin: Nürnberg Frankenstadion	5	Nürnberg–Regensburg	railway-rail-main	Nuremberg, Bavaria, Germany	378932	unknown	rank 0.00768077, popularity 0, pureCats 0	partial
+berlin: Fürth Rathaus	1	Fürth Rathaus	railway-station-subway	Fürth, Bavaria, Germany	378594	unknown	rank 0.53764, popularity 1, pureCats 0	full
+berlin: Fürth Rathaus	2	Rathaus Shop Fürth	shop-second_hand	Fürth, Ludwig-Erhard-Straße, 16, Bavaria, Germany	378574	closed	rank 0.508633, popularity 0, pureCats 0	full
+berlin: Fürth Rathaus	3	Fürth Rathaus	amenity-bench	Fürth, Bavaria, Germany	378587	unknown	rank 0.507642, popularity 0, pureCats 0	full
+berlin: Fürth Rathaus	4	Rathaus	highway-bus_stop	Fürth, Bavaria, Germany	378545	unknown	rank 0.503643, popularity 0, pureCats 0	full
+berlin: Fürth Rathaus	5	Rathaus	amenity-shelter	Fürth, Bavaria, Germany	378544	unknown	rank 0.500649, popularity 0, pureCats 0	full
+berlin: Bahnhofstraße	1	Bahnhofstraße	highway-secondary	Berlin, Germany	8275	unknown	rank 0.508743, popularity 0, pureCats 0	full
+berlin: Bahnhofstraße	2	Neue Bahnhofstraße	highway-bus_stop	Berlin, Germany	4587	unknown	rank 0.508495, popularity 0, pureCats 0	full
+berlin: Bahnhofstraße	3	Bahnhofstraße	highway-service	Berlin, Germany	6794	unknown	rank 0.508446, popularity 0, pureCats 0	full
+berlin: Bahnhofstraße	4	Bahnhofstraße	highway-residential	Berlin, Germany	6896	unknown	rank 0.508398, popularity 0, pureCats 0	full
+berlin: Bahnhofstraße	5	Bahnhofstraße	highway-residential	Berlin, Germany	7077	unknown	rank 0.508312, popularity 0, pureCats 0	full
+berlin: Hotel Nürnberg Hauptbahnhof	1	ibis Hotel Nürnberg Hauptbahnhof	tourism-hotel	Nuremberg, Königstorgraben, 9, Bavaria, Germany	378600	unknown	rank 0.317838, popularity 0, pureCats 0	full
+berlin: Hotel Nürnberg Hauptbahnhof	2	Hotel Keiml	tourism-hotel	Nuremberg, Luitpoldstraße, 7, Bavaria, Germany	378767	open	rank 0.192352, popularity 0, pureCats 1	partial
+berlin: Hotel Nürnberg Hauptbahnhof	3	ibis-Hotel Altstadt	tourism-hotel	Nuremberg, Königstraße, 74, Bavaria, Germany	378725	open	rank 0.192347, popularity 0, pureCats 1	partial
+berlin: Hotel Nürnberg Hauptbahnhof	4	Le Méridien Grand Hotel Nürnberg	tourism-hotel	Nuremberg, Bahnhofstraße, 1-3, Bavaria, Germany	378682	unknown	rank 0.192303, popularity 0, pureCats 1	partial
+berlin: Hotel Nürnberg Hauptbahnhof	5	art & business Hotel	tourism-hotel	Nuremberg, Gleißbühlstraße, 15, Bavaria, Germany	378596	unknown	rank 0.192295, popularity 0, pureCats 1	partial
+berlin: Hotel am Hauptbahnhof	1	Steigenberger Hotel Am Kanzleramt	tourism-hotel	Berlin, Ella-Trebe-Straße, 5, Berlin, Germany	2570	unknown	rank 0.216452, popularity 0, pureCats 0	partial
+berlin: Hotel am Hauptbahnhof	2	IntercityHotel Berlin Ostbahnhof	tourism-hotel	Berlin, Am Ostbahnhof, 5, Berlin, Germany	2207	unknown	rank -0.157763, popularity 0, pureCats 1	partial
+berlin: Hotel am Hauptbahnhof	3	S+U Hauptbahnhof (Invalidenstraße)	highway-pedestrian	Berlin, Germany	2524	unknown	rank 0.117332, popularity 0, pureCats 0	partial
+berlin: Hotel am Hauptbahnhof	4	S+U Hauptbahnhof	highway-pedestrian-area	Berlin, Germany	2560	unknown	rank 0.117314, popularity 0, pureCats 0	partial
+berlin: Hotel am Hauptbahnhof	5	S+U Hauptbahnhof	highway-bus_stop	Berlin, Germany	2570	unknown	rank 0.11731, popularity 0, pureCats 0	partial
+berlin: Nürnberg Gostenhof	1	Gostenhof	railway-station-subway	Nuremberg, Bavaria, Germany	379192	unknown	rank 0.53695, popularity 0, pureCats 0	partial
+berlin: Nürnberg Gostenhof	2	Gostenhof Cafe Bar	amenity-cafe	Nuremberg, Eberhardshofstraße, 12, Bavaria, Germany	379289	open	rank 0.514903, popularity 0, pureCats 0	partial
+berlin: Nürnberg Gostenhof	3	Gostenhof-Apotheke zu Sankt Anton	amenity-pharmacy	Nuremberg, Adam-Klein-Straße, 47, Bavaria, Germany	379349	closed	rank 0.51467, popularity 0, pureCats 0	partial
+berlin: Nürnberg Gostenhof	4	Gostenhof	place-suburb	Nuremberg, Bavaria, Germany	379440	unknown	rank 0.50694, popularity 0, pureCats 0	partial
+berlin: Nürnberg Gostenhof	5	Gostenhofener Buch Cafe	amenity-cafe	Nuremberg, Eberhardshofstraße, 20, Bavaria, Germany	379322	unknown	rank 0.50687, popularity 0, pureCats 0	partial
+bonn: Nürnberg Hbf	1	Nürnberg Hauptbahnhof	railway-station	Nuremberg, Bavaria, Germany	318768	unknown	rank 0.537184, popularity 41, pureCats 0	full
+bonn: Nürnberg Hbf	2	Nürnberg-Steinbühl	railway-station	Nuremberg, Bavaria, Germany	317983	unknown	rank 0.527009, popularity 1, pureCats 0	partial
+bonn: Nürnberg Hbf	3	Nürnberg-Dürrenhof	railway-station	Nuremberg, Bavaria, Germany	319597	unknown	rank 0.526909, popularity 1, pureCats 0	partial
+bonn: Nürnberg Hbf	4	Nürnberg Nordost	railway-station	Nuremberg, Bavaria, Germany	318789	unknown	rank 0.52622, popularity 4, pureCats 0	partial
+bonn: Nürnberg Hbf	5	Nürnberg-Schweinau	railway-station	Nuremberg, Bavaria, Germany	317022	unknown	rank 0.526187, popularity 0, pureCats 0	partial
+bonn: Fürth Hbf	1	Fürth (Bayern) Hauptbahnhof	railway-station	Fürth, Bavaria, Germany	311588	unknown	rank 0.529276, popularity 11, pureCats 0	full
+bonn: Fürth Hbf	2	Fürth-Burgfarrnbach	railway-station	Fürth, Bavaria, Germany	306316	unknown	rank 0.525335, popularity 0, pureCats 0	full
+bonn: Fürth Hbf	3	Fürth Hauptbahnhof	amenity-taxi	Fürth, Bavaria, Germany	311600	unknown	rank 0.5103, popularity 0, pureCats 0	full
+bonn: Fürth Hbf	4	Fürth Hauptbahnhof	amenity-bench	Fürth, Bavaria, Germany	311650	unknown	rank 0.5073, popularity 0, pureCats 0	full
+bonn: Fürth Hbf	5	Fürth Hauptbahnhof (U1)	railway-subway_entrance	Fürth, Bavaria, Germany	311589	unknown	rank 0.505316, popularity 0, pureCats 0	full
+bonn: Berlin Hbf	1	Berlin Hauptbahnhof	railway-station	Berlin, Europaplatz, 1, Berlin, Germany	476627	unknown	rank 0.536761, popularity 69, pureCats 0	full
+bonn: Berlin Hbf	2	Berlin Friedrichstraße	railway-station	Berlin, Germany	477514	unknown	rank 0.527373, popularity 48, pureCats 0	full
+bonn: Berlin Hbf	3	Berlin Ostbahnhof	railway-station	Berlin, Germany	480119	unknown	rank 0.526342, popularity 12, pureCats 0	full
+bonn: Berlin Hbf	4	Berlin Gesundbrunnen	railway-station	Berlin, Germany	478915	unknown	rank 0.526013, popularity 13, pureCats 0	full
+bonn: Berlin Hbf	5	Berlin Zoo Bhf.	building-train_station	Berlin, Germany	473579	unknown	rank 0.525597, popularity 0, pureCats 0	full
+nuremberg: Berlin Hbf	1	Berlin Hauptbahnhof	railway-station	Berlin, Europaplatz, 1, Berlin, Germany	377867	unknown	rank 0.536761, popularity 69, pureCats 0	full
+nuremberg: Berlin Hbf	2	Berlin Friedrichstraße	railway-station	Berlin, Germany	377908	unknown	rank 0.527373, popularity 48, pureCats 0	full
+nuremberg: Berlin Hbf	3	Berlin Ostbahnhof	railway-station	Berlin, Germany	378383	unknown	rank 0.526342, popularity 12, pureCats 0	full
+nuremberg: Berlin Hbf	4	Berlin Gesundbrunnen	railway-station	Berlin, Germany	380848	unknown	rank 0.526013, popularity 13, pureCats 0	full
+nuremberg: Berlin Hbf	5	Berlin Zoo Bhf.	building-train_station	Berlin, Germany	375043	unknown	rank 0.525597, popularity 0, pureCats 0	full
+nuremberg: Berlin Hauptbahnhof	1	Berlin Hauptbahnhof	railway-station	Berlin, Europaplatz, 1, Berlin, Germany	377867	unknown	rank 0.536761, popularity 69, pureCats 0	full
+nuremberg: Berlin Hauptbahnhof	2	Hauptbahnhof	railway-station	Berlin, Germany	376613	unknown	rank 0.531962, popularity 0, pureCats 0	full
+nuremberg: Berlin Hauptbahnhof	3	Hauptbahnhof Nachrückhalteplatz Washingtonplatz	amenity-taxi	Berlin, Germany	377762	unknown	rank 0.507753, popularity 0, pureCats 0	full
+nuremberg: Berlin Hauptbahnhof	4	DB Casino Hauptbahnhof Berlin	amenity-fast_food	Berlin, Germany	377900	unknown	rank 0.496719, popularity 0, pureCats 0	full
+nuremberg: Berlin Hauptbahnhof	5	Ibis Berlin Hauptbahnhof	tourism-hotel	Berlin, Invalidenstraße, 53, Berlin, Germany	378096	unknown	rank 0.496718, popularity 0, pureCats 0	full
+nuremberg: Hbf Berlin	1	Berlin Hauptbahnhof	railway-station	Berlin, Europaplatz, 1, Berlin, Germany	377867	unknown	rank 0.536761, popularity 69, pureCats 0	full
+nuremberg: Hbf Berlin	2	Berlin Friedrichstraße	railway-station	Berlin, Germany	377908	unknown	rank 0.527373, popularity 48, pureCats 0	full
+nuremberg: Hbf Berlin	3	Berlin Ostbahnhof	railway-station	Berlin, Germany	378383	unknown	rank 0.526342, popularity 12, pureCats 0	full
+nuremberg: Hbf Berlin	4	Berlin Gesundbrunnen	railway-station	Berlin, Germany	380848	unknown	rank 0.526013, popularity 13, pureCats 0	full
+nuremberg: Hbf Berlin	5	Berlin Zoo Bhf.	building-train_station	Berlin, Germany	375043	unknown	rank 0.525597, popularity 0, pureCats 0	full
+nuremberg: Nürnberg Hbf	1	Nürnberg Hauptbahnhof	railway-station	Nuremberg, Bavaria, Germany	868	unknown	rank 0.537184, popularity 41, pureCats 0	full
+nuremberg: Nürnberg Hbf	2	Nürnberg-Steinbühl	railway-station	Nuremberg, Bavaria, Germany	1208	unknown	rank 0.527009, popularity 1, pureCats 0	partial
+nuremberg: Nürnberg Hbf	3	Nürnberg-Dürrenhof	railway-station	Nuremberg, Bavaria, Germany	1582	unknown	rank 0.526909, popularity 1, pureCats 0	partial
+nuremberg: Nürnberg Hbf	4	Nürnberg Nordost	railway-station	Nuremberg, Bavaria, Germany	3234	unknown	rank 0.52622, popularity 4, pureCats 0	partial
+nuremberg: Nürnberg Hbf	5	Nürnberg-Schweinau	railway-station	Nuremberg, Bavaria, Germany	2966	unknown	rank 0.526187, popularity 0, pureCats 0	partial
+nuremberg: Hauptbahnhof	1	Nürnberg Hauptbahnhof	railway-station	Nuremberg, Bavaria, Germany	868	unknown	rank 0.537261, popularity 41, pureCats 0	full
+nuremberg: Hauptbahnhof	2	Fürth (Bayern) Hauptbahnhof	railway-station	Fürth, Bavaria, Germany	6577	unknown	rank 0.514549, popularity 11, pureCats 0	full
+nuremberg: Hauptbahnhof	3	ibis Hotel Nürnberg Hauptbahnhof	tourism-hotel	Nuremberg, Königstorgraben, 9, Bavaria, Germany	599	unknown	rank 0.517389, popularity 0, pureCats 0	full
+nuremberg: Hauptbahnhof	4	City Apartment am Hauptbahnhof	tourism-apartment	Nuremberg, Aufseßplatz, 4, Bavaria, Germany	1160	unknown	rank 0.517122, popularity 0, pureCats 0	full
+nuremberg: Hauptbahnhof	5	Hauptbahnhof Westausgang - mobilpunkt	amenity-car_sharing	Nuremberg, Bavaria, Germany	747	open	rank 0.513319, popularity 0, pureCats 0	full
+nuremberg: Fürth Hbf	1	Fürth (Bayern) Hauptbahnhof	railway-station	Fürth, Bavaria, Germany	6577	unknown	rank 0.529276, popularity 11, pureCats 0	full
+nuremberg: Fürth Hbf	2	Fürth-Burgfarrnbach	railway-station	Fürth, Bavaria, Germany	11819	unknown	rank 0.525335, popularity 0, pureCats 0	full
+nuremberg: Fürth Hbf	3	Fürth Hauptbahnhof	amenity-taxi	Fürth, Bavaria, Germany	6554	unknown	rank 0.5103, popularity 0, pureCats 0	full
+nuremberg: Fürth Hbf	4	Fürth Hauptbahnhof	amenity-bench	Fürth, Bavaria, Germany	6497	unknown	rank 0.5073, popularity 0, pureCats 0	full
+nuremberg: Fürth Hbf	5	Fürth Hauptbahnhof (U1)	railway-subway_entrance	Fürth, Bavaria, Germany	6558	unknown	rank 0.505316, popularity 0, pureCats 0	full
+nuremberg: Erlangen Hbf	1	Erlangen	railway-station	Erlangen, Bahnhofplatz, 1, Bavaria, Germany	16920	unknown	rank 0.527559, popularity 19, pureCats 0	full
+nuremberg: Erlangen Hbf	2	Hauptbahnhof	amenity-car_sharing	Erlangen, Bavaria, Germany	16888	open	rank 0.508515, popularity 0, pureCats 0	full
+nuremberg: Erlangen Hbf	3	Erlangen Hauptbahnhof B	highway-bus_stop	Erlangen, Bavaria, Germany	16906	unknown	rank 0.501583, popularity 0, pureCats 0	full
+nuremberg: Erlangen Hbf	4	Erlangen Hauptbahnhof A	highway-bus_stop	Erlangen, Bavaria, Germany	16902	unknown	rank 0.501577, popularity 0, pureCats 0	full
+nuremberg: Erlangen Hbf	5	Erlangen Hauptbahnhof C	highway-bus_stop	Erlangen, Bavaria, Germany	16873	unknown	rank 0.501577, popularity 0, pureCats 0	full
+nuremberg: Bahnhofstraße	1	Bahnhofstraße	highway-secondary	Nuremberg, Bavaria, Germany	631	unknown	rank 0.512374, popularity 0, pureCats 0	full
+nuremberg: Bahnhofstraße	2	Bahnhofstraße	highway-secondary	Stein, Bavaria, Germany	5533	unknown	rank 0.510045, popularity 0, pureCats 0	full
+nuremberg: Bahnhofstraße	3	Bahnhofstraße	highway-secondary	Zirndorf, Bavaria, Germany	8080	unknown	rank 0.508835, popularity 0, pureCats 0	full
+nuremberg: Bahnhofstraße	4	Bahnhofstraße	highway-service	Oberasbach, Bavaria, Germany	7683	unknown	rank 0.508024, popularity 0, pureCats 0	full
+nuremberg: Bahnhofstraße	5	Bahnhofstraße	highway-cycleway	Nuremberg, Bavaria, Germany	670	unknown	rank 0.507355, popularity 0, pureCats 0	full
+nuremberg: ibis Nürnberg Hauptbahnhof	1	ibis Hotel Nürnberg Hauptbahnhof	tourism-hotel	Nuremberg, Königstorgraben, 9, Bavaria, Germany	599	unknown	rank 0.517389, popularity 0, pureCats 0	full
+nuremberg: ibis Nürnberg Hauptbahnhof	2	ibis-Hotel Altstadt	tourism-hotel	Nuremberg, Königstraße, 74, Bavaria, Germany	529	open	rank 0.217422, popularity 0, pureCats 0	partial
+nuremberg: ibis Nürnberg Hauptbahnhof	3	Hotel Ibis	amenity-parking_entrance	Nuremberg, Bavaria, Germany	595	unknown	rank 0.187391, popularity 0, pureCats 0	partial
+nuremberg: ibis Nürnberg Hauptbahnhof	4	Nürnberg Hauptbahnhof	highway-pedestrian-area	Nuremberg, Bavaria, Germany	659	unknown	rank 0.176081, popularity 0, pureCats 0	full
+nuremberg: ibis Nürnberg Hauptbahnhof	5	Nürnberg Hauptbahnhof	highway-bus_stop	Nuremberg, Bavaria, Germany	664	unknown	rank 0.176079, popularity 0, pureCats 0	full
+nuremberg: Hotel am Hauptbahnhof	1	City Apartment am Hauptbahnhof	tourism-apartment	Nuremberg, Aufseßplatz, 4, Bavaria, Germany	1160	unknown	rank 0.467734, popularity 0, pureCats 0	partial
+nuremberg: Hotel am Hauptbahnhof	2	Hotel am Stadtpark	tourism-hotel	Fürth, Nürnberger Straße, 8, Bavaria, Germany	6384	unknown	rank 0.194641, popularity 0, pureCats 0	partial
+nuremberg: Hotel am Hauptbahnhof	3	Nürnberg Hauptbahnhof	highway-pedestrian-area	Nuremberg, Bavaria, Germany	659	unknown	rank 0.118217, popularity 0, pureCats 0	partial
+nuremberg: Hotel am Hauptbahnhof	4	Nürnberg Hauptbahnhof	highway-bus_stop	Nuremberg, Bavaria, Germany	664	unknown	rank 0.118215, popularity 0, pureCats 0	partial
+nuremberg: Hotel am Hauptbahnhof	5	Am Plärrer	highway-secondary	Nuremberg, Bavaria, Germany	825	unknown	rank -0.0076371, popularity 0, pureCats 0	partial
+nuremberg: Nürnberg Bahnhofsplatz	1	Nürnberg Hauptbahnhof	railway-station-subway	Nuremberg, Bavaria, Germany	691	unknown	rank 0.535345, popularity 0, pureCats 0	partial
+nuremberg: Nürnberg Bahnhofsplatz	2	Bahnhofsplatz	highway-secondary	Nuremberg, Bavaria, Germany	616	unknown	rank 0.512314, popularity 0, pureCats 0	partial
+nuremberg: Nürnberg Bahnhofsplatz	3	Nürnberg Hauptbahnhof	highway-bus_stop	Nuremberg, Bavaria, Germany	659	unknown	rank 0.50836, popularity 0, pureCats 0	partial
+nuremberg: Nürnberg Bahnhofsplatz	4	Nürnberg Hauptbahnhof	railway-tram_stop	Nuremberg, Bavaria, Germany	678	unknown	rank 0.508351, popularity 0, pureCats 0	partial
+nuremberg: Nürnberg Bahnhofsplatz	5	Bahnhofsplatz	highway-cycleway	Nuremberg, Bavaria, Germany	634	unknown	rank 0.507302, popularity 0, pureCats 0	partial
+nuremberg: Nürnberg Hauptbahnhof Apotheke	1	Merian Apotheke	amenity-pharmacy	Nuremberg, Bahnhofsplatz, 9, Bavaria, Germany	778	closed	rank 0.192304, popularity 0, pureCats 1	partial
+nuremberg: Nürnberg Hauptbahnhof Apotheke	2	St.-Pauls-Apotheke	amenity-pharmacy	Fürth, Amalienstraße, 57, Bavaria, Germany	6445	closed	rank 0.189616, popularity 0, pureCats 1	partial
+nuremberg: Nürnberg Hauptbahnhof Apotheke	3	ABF Apotheke	amenity-pharmacy	Fürth, Königswarterstraße, 18, Bavaria, Germany	6472	closed	rank 0.189609, popularity 0, pureCats 1	partial
+nuremberg: Nürnberg Hauptbahnhof Apotheke	4	Apotheke im Forum	amenity-pharmacy	Fürth, Bahnhofplatz, 6, Bavaria, Germany	6475	closed	rank 0.189607, popularity 0, pureCats 1	partial
+nuremberg: Nürnberg Hauptbahnhof Apotheke	5	Friedrichs-Apotheke	amenity-pharmacy	Fürth, Friedrichstraße, 12, Bavaria, Germany	6678	closed	rank 0.189513, popularity 0, pureCats 1	partial
