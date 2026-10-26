@@ -121,7 +121,9 @@ import app.organicmaps.search.SearchFragment;
 import app.organicmaps.settings.RoutingOptionsActivity;
 import app.organicmaps.settings.SettingsActivity;
 import app.organicmaps.transit.OnlineTransitRouter;
+import app.organicmaps.transit.SavedConnection;
 import app.organicmaps.transit.TransitServices;
+import app.organicmaps.transit.ui.OnlineTransitPanel;
 import app.organicmaps.transit.ui.TransitConsentDialog;
 import app.organicmaps.util.SharingUtils;
 import app.organicmaps.util.ThemeSwitcher;
@@ -156,11 +158,14 @@ public class MwmActivity extends BaseMwmFragmentActivity
   public static final String EXTRA_BOOKMARK_ID = "bookmark_id";
   public static final String EXTRA_TRACK_ID = "track_id";
   public static final String EXTRA_UPDATE_THEME = "update_theme";
+  /** Key of a saved public transport connection to show in the route planner. */
+  public static final String EXTRA_SAVED_CONNECTION = "saved_transit_connection";
   private static final String EXTRA_CONSUMED = "mwm.extra.intent.processed";
   private boolean mPreciseLocationDialogShown = false;
 
   private static final String[] DOCKED_FRAGMENTS = {SearchFragment.class.getName(), DownloaderFragment.class.getName(),
-                                                    RoutingPlanFragment.class.getName(), EditorHostFragment.class.getName()};
+                                                    RoutingPlanFragment.class.getName(),
+                                                    EditorHostFragment.class.getName()};
 
   public final ActivityResultLauncher<Intent> startRoutingOptionsForResult =
       registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), activityResult -> {
@@ -307,6 +312,13 @@ public class MwmActivity extends BaseMwmFragmentActivity
     if (intent == null || intent.getBooleanExtra(EXTRA_CONSUMED, false))
       return;
     intent.putExtra(EXTRA_CONSUMED, true);
+
+    final String savedConnection = intent.getStringExtra(EXTRA_SAVED_CONNECTION);
+    if (savedConnection != null)
+    {
+      showSavedTransitConnection(savedConnection);
+      return;
+    }
 
     final long categoryId = intent.getLongExtra(EXTRA_CATEGORY_ID, -1);
     final long bookmarkId = intent.getLongExtra(EXTRA_BOOKMARK_ID, -1);
@@ -625,9 +637,8 @@ public class MwmActivity extends BaseMwmFragmentActivity
       removeCurrentFragment(false);
     }
 
-    mNavigationController =
-        new NavigationController(this, v -> onSettingsOptionSelected(), v -> onTrackRecordingOptionSelected(),
-                this::updateBottomWidgetsOffset);
+    mNavigationController = new NavigationController(
+        this, v -> onSettingsOptionSelected(), v -> onTrackRecordingOptionSelected(), this::updateBottomWidgetsOffset);
     // TrafficManager.INSTANCE.attach(mNavigationController);
 
     initMainMenu();
@@ -1205,6 +1216,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
     refreshLightStatusBar();
 
     MwmApplication.from(this).getSensorHelper().addListener(this);
+    processSavedConnectionIntent();
   }
 
   @Override
@@ -1291,7 +1303,26 @@ public class MwmActivity extends BaseMwmFragmentActivity
   {
     final RoutingController controller = RoutingController.get();
     return controller.isPlanning() && controller.isExternalRoute()
- && TransitServices.get(this).getConnectionsPresenter().back();
+ && OnlineTransitPanel.back(this, TransitServices.get(this).getConnectionsPresenter());
+  }
+
+  /** Opens the route planner with a saved public transport connection (from the saved connections). */
+  private void showSavedTransitConnection(@NonNull String key)
+  {
+    final TransitServices services = TransitServices.get(this);
+    final SavedConnection saved = services.getSavedConnections().get(key);
+    if (saved != null)
+      services.getRouter().showSaved(saved);
+  }
+
+  /** The saved connection is handled even if the map was not rendering when the intent arrived. */
+  private void processSavedConnectionIntent()
+  {
+    final Intent intent = getIntent();
+    if (intent == null || intent.getBooleanExtra(EXTRA_CONSUMED, false)
+        || intent.getStringExtra(EXTRA_SAVED_CONNECTION) == null || !Map.isEngineCreated())
+      return;
+    processIntent();
   }
 
   /** Opt-in dialog for online public transport, shown by the route planner before the first request. */
@@ -1406,7 +1437,8 @@ public class MwmActivity extends BaseMwmFragmentActivity
     else
     {
       // Only enter fullscreen if the setting is enabled.
-      if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_long_tap_fullscreen), false))
+      if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_long_tap_fullscreen),
+                                                                          false))
       {
         Toast.makeText(this, R.string.long_tap_disabled_toast, Toast.LENGTH_LONG).show();
         return;
@@ -2275,7 +2307,8 @@ public class MwmActivity extends BaseMwmFragmentActivity
   }
 
   @Override
-  public void onDirectionsPreviewOpen() {
+  public void onDirectionsPreviewOpen()
+  {
     mDirectionsPreviewBottomSheet = new DirectionsPreviewBottomSheet();
     mDirectionsPreviewBottomSheet.show(getSupportFragmentManager(), "DirectionsPreviewBottomSheet");
   }

@@ -133,6 +133,17 @@ public final class SavedConnectionsStore
     return saved;
   }
 
+  /** Puts back a connection removed before (e.g. "undo"), with its original save time. */
+  public void restore(@NonNull SavedConnection saved)
+  {
+    final List<SavedConnection> entries = entries();
+    removeEntry(saved.getKey());
+    while (entries.size() >= MAX_ENTRIES)
+      entries.remove(oldest(entries));
+    entries.add(saved);
+    persist();
+  }
+
   /** @return false if there was no such connection. */
   public boolean remove(@NonNull String key)
   {

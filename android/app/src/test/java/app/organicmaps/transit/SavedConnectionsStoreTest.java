@@ -309,4 +309,16 @@ public class SavedConnectionsStoreTest
     assertTrue(store.contains("a"));
     assertFalse(mFile.exists());
   }
+
+  @Test
+  public void restoreKeepsTheSaveTime()
+  {
+    final SavedConnectionsStore store = store();
+    final SavedConnection saved = save(store, Fixtures.s5("a", 29));
+    store.remove("a");
+    mNow = mNow.plusSeconds(3600);
+    store.restore(saved);
+    assertEquals(t("2026-10-25T16:00:00Z"), store.get("a").getSavedAt());
+    assertEquals(1, store().size());
+  }
 }
