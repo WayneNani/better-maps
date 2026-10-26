@@ -93,6 +93,13 @@ TestSearchRequest::TimeDurationT TestSearchRequest::CpuTime() const
   return m_endCpuTime - m_startCpuTime;
 }
 
+TestSearchRequest::TimeDurationT TestSearchRequest::QueueTime() const
+{
+  lock_guard<mutex> lock(m_mu);
+  CHECK(m_done, ("This function may be called only when request is processed."));
+  return m_startTime - m_requestTime;
+}
+
 vector<search::Result> const & TestSearchRequest::Results() const
 {
   lock_guard<mutex> lock(m_mu);
@@ -102,7 +109,17 @@ vector<search::Result> const & TestSearchRequest::Results() const
 
 void TestSearchRequest::Start()
 {
-  m_engine.Search(m_params);
+  {
+    lock_guard<mutex> lock(m_mu);
+    m_requestTime = m_timer.TimeElapsed();
+  }
+  m_handle = m_engine.Search(m_params);
+}
+
+void TestSearchRequest::Cancel()
+{
+  if (auto handle = m_handle.lock())
+    handle->Cancel();
 }
 
 void TestSearchRequest::Wait()
