@@ -7,6 +7,7 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
@@ -36,6 +37,8 @@ public final class TransitFormatter
   private final DateTimeFormatter mZoneFormat;
   @NonNull
   private final DateTimeFormatter mDateFormat;
+  @NonNull
+  private final DateTimeFormatter mWeekdayFormat;
 
   public TransitFormatter(@NonNull Locale locale, @NonNull ZoneId deviceZone, boolean is24Hour,
                           @NonNull TransitTexts texts)
@@ -46,6 +49,7 @@ public final class TransitFormatter
     mTimeFormat = DateTimeFormatter.ofPattern(is24Hour ? "HH:mm" : "h:mm a", locale);
     mZoneFormat = DateTimeFormatter.ofPattern("z", locale);
     mDateFormat = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale);
+    mWeekdayFormat = DateTimeFormatter.ofPattern("EEE", locale);
   }
 
   @NonNull
@@ -104,6 +108,14 @@ public final class TransitFormatter
     if (date.equals(now.atZone(mDeviceZone).toLocalDate()))
       return null;
     return mDateFormat.format(date);
+  }
+
+  /** Weekday and date in the stop's zone, e.g. "Sun, Oct 25, 2026". */
+  @NonNull
+  public String formatDate(@NonNull Instant time, @Nullable String timeZone)
+  {
+    final ZonedDateTime date = time.atZone(zoneOf(timeZone));
+    return mWeekdayFormat.format(date) + ", " + mDateFormat.format(date.toLocalDate());
   }
 
   /** Calendar days between two instants in the given zone, e.g. 1 for an arrival after midnight. */

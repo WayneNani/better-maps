@@ -28,6 +28,7 @@ public final class TransitSettings
   public static final String KEY_BIKE = "transit_bike";
   public static final String KEY_MAX_WALK = "transit_max_walk";
   public static final String KEY_EXCLUDED_MODES = "transit_excluded_modes";
+  public static final String KEY_DEFAULT_VIEW = "transit_default_view";
 
   /** Extra buffer for transfers (MOTIS additionalTransferTime). */
   public enum TransferTime
@@ -185,6 +186,14 @@ public final class TransitSettings
     {
       return DEFAULT_MAX_WALK_MINUTES;
     }
+  }
+
+  /** How the connections are shown when the route planner opens: list (default) or time grid. */
+  @NonNull
+  public ConnectionsState.ViewMode getDefaultViewMode()
+  {
+    return parseEnum(ConnectionsState.ViewMode.class, mStore.getString(KEY_DEFAULT_VIEW, null),
+                     ConnectionsState.ViewMode.LIST);
   }
 
   @NonNull

@@ -75,7 +75,8 @@ public final class TransitItemFactory
         transit ? mFormatter.delay(last.getArrivalDelaySeconds(), last.isRealTime()) : TransitFormatter.Delay.UNKNOWN,
         mFormatter.dayOffset(itinerary.getStartTime(), itinerary.getEndTime(), endZone),
         mFormatter.formatDuration(itinerary.getDurationSeconds()), mFormatter.formatTransfers(itinerary.getTransfers()),
-        Collections.unmodifiableList(badges), boarding, itinerary.isCancelled(), !transit, itinerary.hasRealTime());
+        Collections.unmodifiableList(badges), boarding, itinerary.isCancelled(), !transit, itinerary.hasRealTime(),
+        ItineraryTimeline.of(itinerary));
   }
 
   /** Server id, or a key from times and lines for servers without ids. */

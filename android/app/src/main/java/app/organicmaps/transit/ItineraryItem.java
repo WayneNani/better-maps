@@ -29,11 +29,14 @@ public final class ItineraryItem
   final boolean mCancelled;
   final boolean mWalkOnly;
   final boolean mRealTime;
+  @NonNull
+  final ItineraryTimeline mTimeline;
 
   ItineraryItem(@NonNull String key, @NonNull String departure, @NonNull TransitFormatter.Delay departureDelay,
                 @NonNull String arrival, @NonNull TransitFormatter.Delay arrivalDelay, long arrivalDayOffset,
                 @NonNull String duration, @NonNull String transfers, @NonNull List<LineBadge> badges,
-                @Nullable String boarding, boolean cancelled, boolean walkOnly, boolean realTime)
+                @Nullable String boarding, boolean cancelled, boolean walkOnly, boolean realTime,
+                @NonNull ItineraryTimeline timeline)
   {
     mKey = key;
     mDeparture = departure;
@@ -48,6 +51,7 @@ public final class ItineraryItem
     mCancelled = cancelled;
     mWalkOnly = walkOnly;
     mRealTime = realTime;
+    mTimeline = timeline;
   }
 
   /** Stable identity of the connection (server id), for list diffing. */
@@ -131,5 +135,12 @@ public final class ItineraryItem
   public boolean isRealTime()
   {
     return mRealTime;
+  }
+
+  /** Rides and walks on the time axis, for the bar in the list and the column in the time grid. */
+  @NonNull
+  public ItineraryTimeline getTimeline()
+  {
+    return mTimeline;
   }
 }
