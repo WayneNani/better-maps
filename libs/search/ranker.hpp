@@ -88,6 +88,9 @@ public:
 
   virtual void UpdateResults(bool lastUpdate);
 
+  // See Results::GetHiddenWithoutOpeningHoursCount().
+  virtual void SetHiddenWithoutOpeningHoursCount(size_t count) { m_emitter.SetHiddenWithoutOpeningHoursCount(count); }
+
   void ClearCaches();
 
   void BailIfCancelled() { ::search::BailIfCancelled(m_cancellable); }

@@ -122,6 +122,7 @@ void PreRanker::Init(Params const & params)
   m_relaxedResults.clear();
   m_params = params;
   m_currEmit.clear();
+  m_hiddenWithoutOpeningHours.clear();
 }
 
 void PreRanker::Finish(bool cancelled)
@@ -353,8 +354,9 @@ void PreRanker::FilterByOpeningHours()
 
   unique_ptr<FeaturesLoaderGuard> loader;
   // Many POIs share the same opening hours, parse each value only once.
-  ankerl::unordered_dense::map<string, bool> passedByOpeningHours;
+  ankerl::unordered_dense::map<string, osm::YesNoUnknown> isOpenByOpeningHours;
   size_t const sizeBefore = m_results.size();
+  size_t const hiddenBefore = m_hiddenWithoutOpeningHours.size();
   base::EraseIf(m_results, [&](PreRankerResult const & result)
   {
     // Opening hours make sense for POIs only. Streets, buildings (addresses), localities, etc. are kept.
@@ -370,17 +372,28 @@ void PreRanker::FilterByOpeningHours()
       return false;
 
     string openingHours(ft->GetMetadata(feature::Metadata::FMD_OPEN_HOURS));
-    auto const it = passedByOpeningHours.find(openingHours);
-    if (it != passedByOpeningHours.end())
-      return !it->second;
+    auto it = isOpenByOpeningHours.find(openingHours);
+    if (it == isOpenByOpeningHours.end())
+    {
+      auto const status = GetOpeningHoursStatus(openingHours, m_params.m_openingHoursTime);
+      it = isOpenByOpeningHours.emplace(std::move(openingHours), status.m_isOpen).first;
+    }
 
-    auto const status = GetOpeningHoursStatus(openingHours, m_params.m_openingHoursTime);
-    bool const passed = PassesOpeningHoursFilter(m_params.m_openingHoursFilter, status.m_isOpen);
-    passedByOpeningHours.emplace(std::move(openingHours), passed);
-    return !passed;
+    osm::YesNoUnknown const isOpen = it->second;
+    if (PassesOpeningHoursFilter(m_params.m_openingHoursFilter, isOpen))
+      return false;
+
+    // Count the POIs which "Also without opening hours" would show. Relaxed results (not all query tokens
+    // matched) are not counted, they are mostly not relevant. A feature may come again in a later batch.
+    if (isOpen == osm::Unknown && result.GetInfo().m_allTokensUsed)
+      m_hiddenWithoutOpeningHours.insert(id);
+    return true;
   });
 
-  LOG(LDEBUG, ("Removed", sizeBefore - m_results.size(), "results by", m_params.m_openingHoursFilter, "filter."));
+  LOG(LDEBUG, ("Removed", sizeBefore - m_results.size(), "results by", m_params.m_openingHoursFilter, "filter,",
+               m_hiddenWithoutOpeningHours.size(), "without opening hours in total."));
+  if (m_hiddenWithoutOpeningHours.size() != hiddenBefore)
+    m_ranker.SetHiddenWithoutOpeningHoursCount(m_hiddenWithoutOpeningHours.size());
 }
 
 void PreRanker::FilterForViewportSearch()

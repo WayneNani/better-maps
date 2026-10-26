@@ -310,6 +310,7 @@ void Results::Clear()
 {
   m_results.clear();
   m_bookmarksResults.clear();
+  m_hiddenWithoutOpeningHours = 0;
   m_status = Status::None;
 }
 

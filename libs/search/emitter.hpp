@@ -46,6 +46,9 @@ public:
 
   Results const & GetResults() const { return m_results; }
 
+  // See Results::GetHiddenWithoutOpeningHoursCount(), it's sent with the next emit.
+  void SetHiddenWithoutOpeningHoursCount(size_t count) { m_results.SetHiddenWithoutOpeningHoursCount(count); }
+
   void Finish(bool cancelled)
   {
     m_results.SetEndMarker(cancelled);

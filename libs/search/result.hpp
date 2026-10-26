@@ -223,6 +223,11 @@ public:
 
   bookmarks::Results const & GetBookmarksResults() const;
 
+  // better-maps: the number of POIs which match the query, but are hidden by OpeningHoursFilter::OpenNow
+  // because their opening hours are unknown. OpeningHoursFilter::OpenNowOrUnknown shows them.
+  size_t GetHiddenWithoutOpeningHoursCount() const { return m_hiddenWithoutOpeningHours; }
+  void SetHiddenWithoutOpeningHoursCount(size_t count) { m_hiddenWithoutOpeningHours = count; }
+
   /// @deprecated Fucntion is obsolete (used in tests) and doesn't take into account bookmarks.
   template <typename Fn>
   void SortBy(Fn && comparator)
@@ -248,6 +253,7 @@ private:
 
   std::vector<Result> m_results;
   bookmarks::Results m_bookmarksResults;
+  size_t m_hiddenWithoutOpeningHours = 0;
   Status m_status;
 };
 
