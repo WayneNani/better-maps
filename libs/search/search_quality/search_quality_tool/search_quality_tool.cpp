@@ -64,6 +64,8 @@ DEFINE_int64(opening_hours_time, 0, "Unix time to evaluate opening hours at (cur
 DEFINE_bool(prefix_free, true, "Append a space to every query, so the last token is not treated as a prefix");
 DEFINE_bool(detect_query_filters, false, "Recognize filter words in queries like the app does (\"Café offen\")");
 DEFINE_string(tsv_out, "", "File the top results are written to as TSV (query, position, name, type, ...)");
+DEFINE_int32(max_results, 0, "Maximum number of results of a query (the app's default when 0)");
+DEFINE_bool(tsv_debug, false, "Write the full ranking info (parse, name score, distance to pivot) to the TSV output");
 
 string const kDefaultQueriesPathSuffix = "/../search/search_quality/search_quality_tool/queries.txt";
 string const kEmptyResult = "<empty>";
@@ -193,6 +195,8 @@ void WriteTsv(ostream & os, string const & query, vector<Result> const & results
       auto const & info = r.GetRankingInfo();
       os << "rank " << info.GetLinearModelRank() << ", popularity " << static_cast<int>(info.m_popularity)
          << ", pureCats " << info.m_pureCats;
+      if (FLAGS_tsv_debug)
+        os << ", " << DebugPrint(info);
     }
     os << '\n';
   }
@@ -365,6 +369,8 @@ void RunRequests(TestSearchEngine & engine, m2::RectD const & viewport, string q
     params.m_mode = Mode::Everywhere;
     params.m_position = ParsePosition(FLAGS_position);
     params.m_needAddress = true;
+    if (FLAGS_max_results > 0)
+      params.m_maxNumResults = static_cast<size_t>(FLAGS_max_results);
     params.m_detectQueryFilters = FLAGS_detect_query_filters;
     if (FLAGS_opening_hours_time != 0)
       params.m_openingHoursTime = static_cast<time_t>(FLAGS_opening_hours_time);
