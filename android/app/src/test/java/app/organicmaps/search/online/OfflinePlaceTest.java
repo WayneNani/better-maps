@@ -4,6 +4,8 @@ import static app.organicmaps.search.online.OfflinePlace.Match.FULL;
 import static app.organicmaps.search.online.OfflinePlace.Match.PARTIAL;
 import static app.organicmaps.search.online.OfflinePlace.Match.UNHIGHLIGHTED;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import androidx.annotation.NonNull;
 import java.util.ArrayList;
@@ -75,6 +77,17 @@ public class OfflinePlaceTest
     assertEquals(0, OfflinePlace.countAnswers(places(PARTIAL, PARTIAL, UNHIGHLIGHTED, UNHIGHLIGHTED, UNHIGHLIGHTED)));
     assertEquals(2, OfflinePlace.countAnswers(places(FULL, FULL, PARTIAL, UNHIGHLIGHTED)));
     assertEquals(0, OfflinePlace.countAnswers(Collections.emptyList()));
+  }
+
+  @Test
+  public void bestResultAnswersTheQuery()
+  {
+    // "Nürnberg Hbf": the station "Nürnberg Hauptbahnhof" (full), then other stations of Nürnberg (partial).
+    assertTrue(OfflinePlace.bestIsAnswer(places(FULL, PARTIAL, PARTIAL, PARTIAL)));
+    // Only the first result counts: a full match further down may be a fuzzy one.
+    assertFalse(OfflinePlace.bestIsAnswer(places(PARTIAL, FULL)));
+    assertFalse(OfflinePlace.bestIsAnswer(places(UNHIGHLIGHTED)));
+    assertFalse(OfflinePlace.bestIsAnswer(Collections.emptyList()));
   }
 
   @Test

@@ -13,7 +13,9 @@ import androidx.annotation.Nullable;
  * lies in a map region that is not downloaded;</li>
  * <li>otherwise after the offline search finished with fewer than {@link #FEW_RESULTS} results that match the whole
  * query ({@link OfflinePlace#countAnswers}): searching "Marienplatz München" in Berlin finds the Marienplatz in Berlin
- * and some "Münchener Straße", but none of them is what the user wants;</li>
+ * and some "Münchener Straße", but none of them is what the user wants. A query is answered too if the best offline
+ * result matches it ({@link OfflinePlace#bestIsAnswer}): "Nürnberg Hbf" finds the station first, then other stations
+ * of Nürnberg;</li>
  * <li>otherwise not.</li>
  * </ol>
  * The user's consent is checked separately; without it nothing is sent.
@@ -61,6 +63,17 @@ public final class OnlineSearchPolicy
   public static Decision decide(@Nullable String query, boolean isCategory, @Nullable RegionInfo centerRegion,
                                 int offlineResults, boolean offlineFinished)
   {
+    return decide(query, isCategory, centerRegion, offlineResults, false, offlineFinished);
+  }
+
+  /**
+   * @param bestOfflineIsAnswer true if the best offline result matches the whole query.
+   * @see #decide(String, boolean, RegionInfo, int, boolean)
+   */
+  @NonNull
+  public static Decision decide(@Nullable String query, boolean isCategory, @Nullable RegionInfo centerRegion,
+                                int offlineResults, boolean bestOfflineIsAnswer, boolean offlineFinished)
+  {
     if (!isLongEnough(query))
       return Decision.QUERY_TOO_SHORT;
     if (isCategory)
@@ -69,6 +82,8 @@ public final class OnlineSearchPolicy
       return Decision.REGION_NOT_DOWNLOADED;
     if (!offlineFinished)
       return Decision.WAIT_FOR_OFFLINE;
+    if (bestOfflineIsAnswer)
+      return Decision.ENOUGH_OFFLINE_RESULTS;
     return offlineResults < FEW_RESULTS ? Decision.FEW_OFFLINE_RESULTS : Decision.ENOUGH_OFFLINE_RESULTS;
   }
 

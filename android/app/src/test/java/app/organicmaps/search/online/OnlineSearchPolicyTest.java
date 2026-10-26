@@ -66,6 +66,18 @@ public class OnlineSearchPolicyTest
   }
 
   @Test
+  public void bestOfflineAnswerStaysOffline()
+  {
+    // "Nürnberg Hbf" searched in Berlin: the station first, then a few stations that match "Nürnberg" only.
+    assertEquals(ENOUGH_OFFLINE_RESULTS, OnlineSearchPolicy.decide("Nürnberg Hbf", false, BERLIN, 1, true, true));
+    assertEquals(FEW_OFFLINE_RESULTS, OnlineSearchPolicy.decide("Nürnberg Hbf", false, BERLIN, 1, false, true));
+    // The other rules come first.
+    assertEquals(WAIT_FOR_OFFLINE, OnlineSearchPolicy.decide("Nürnberg Hbf", false, BERLIN, 1, true, false));
+    assertEquals(REGION_NOT_DOWNLOADED, OnlineSearchPolicy.decide("Nürnberg Hbf", false, BAVARIA, 1, true, true));
+    assertEquals(CATEGORY, OnlineSearchPolicy.decide("Bahnhof", true, BERLIN, 1, true, true));
+  }
+
+  @Test
   public void unknownRegionUsesTheOfflineResults()
   {
     // E.g. the map center is on the open sea.
