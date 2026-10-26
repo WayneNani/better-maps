@@ -32,6 +32,8 @@ inline constexpr size_t GetMaxErrorsForToken_Category(size_t length)
 size_t GetMaxErrorsForToken(strings::UniString const & token);
 
 strings::LevenshteinDFA BuildLevenshteinDFA(strings::UniString const & s);
+// Matches like BuildLevenshteinDFA(s), faster when only a few strings are matched with |s|.
+strings::LevenshteinMatcher BuildLevenshteinMatcher(strings::UniString const & s);
 strings::LevenshteinDFA BuildLevenshteinDFA_Category(strings::UniString const & s);
 
 // This function should be used for all search strings normalization.
