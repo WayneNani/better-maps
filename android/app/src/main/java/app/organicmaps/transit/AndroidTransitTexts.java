@@ -131,4 +131,11 @@ public final class AndroidTransitTexts implements TransitTexts
   {
     return mResources.getQuantityString(R.plurals.transit_connections, count, count);
   }
+
+  @NonNull
+  @Override
+  public String myPosition()
+  {
+    return mResources.getString(R.string.transit_my_position);
+  }
 }

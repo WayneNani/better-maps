@@ -39,6 +39,16 @@ import java.util.List;
  */
 public final class OnlineTransitPanel implements TransitConnectionsPresenter.View, TransitSheetLayout.DragListener
 {
+  /** Changes the start or the destination of the search (the route points of the route planner). */
+  public interface RoutePoints
+  {
+    /** Lets the user choose another start ({@code start}) or destination, e.g. with the search. */
+    void choose(boolean start);
+
+    /** Swaps start and destination. */
+    void swap();
+  }
+
   /** Share of the screen height the body (list, time grid, legs) takes in the half state. */
   private static final float HALF_HEIGHT_FRACTION = 0.45f;
   private static final long SETTLE_DURATION_MS = 220;
@@ -51,6 +61,13 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
   private final View mSummary;
   private final TextView mSummaryText;
   private final View mHeader;
+  private final View mPoints;
+  private final View mFrom;
+  private final View mTo;
+  private final TextView mFromName;
+  private final TextView mToName;
+  @Nullable
+  private final RoutePoints mRoutePoints;
   @NonNull
   private final TransitConnectionsPresenter mPresenter;
   private final MaterialButton mBack;
@@ -92,12 +109,24 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
 
   public OnlineTransitPanel(@NonNull Activity activity, @NonNull View panel)
   {
+    this(activity, panel, null);
+  }
+
+  /** @param routePoints changes start and destination; without it they are not shown. */
+  public OnlineTransitPanel(@NonNull Activity activity, @NonNull View panel, @Nullable RoutePoints routePoints)
+  {
     mActivity = activity;
+    mRoutePoints = routePoints;
     mPanel = (TransitSheetLayout) panel;
     mHandle = panel.findViewById(R.id.transit_handle);
     mSummary = panel.findViewById(R.id.transit_summary);
     mSummaryText = panel.findViewById(R.id.transit_summary_text);
     mHeader = panel.findViewById(R.id.transit_header);
+    mPoints = panel.findViewById(R.id.transit_points);
+    mFrom = panel.findViewById(R.id.transit_from);
+    mTo = panel.findViewById(R.id.transit_to);
+    mFromName = panel.findViewById(R.id.transit_from_name);
+    mToName = panel.findViewById(R.id.transit_to_name);
     mPresenter = TransitServices.get(activity).getConnectionsPresenter();
     mBack = panel.findViewById(R.id.transit_back);
     mTime = panel.findViewById(R.id.transit_time);
@@ -181,6 +210,12 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
       }
     });
     mRetry.setOnClickListener(v -> mPresenter.retry());
+    if (routePoints != null)
+    {
+      mFrom.setOnClickListener(v -> routePoints.choose(true));
+      mTo.setOnClickListener(v -> routePoints.choose(false));
+      panel.findViewById(R.id.transit_swap).setOnClickListener(v -> routePoints.swap());
+    }
     mTime.setOnClickListener(
         v -> TransitTimeDialog.show(activity, mPresenter.getTime(), mPresenter.isArriveBy(), mPresenter::setTime));
     panel.findViewById(R.id.transit_settings).setOnClickListener(v -> TransitSettingsActivity.start(activity));
@@ -268,6 +303,11 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
     final boolean grid = !detail && state.getViewMode() == ConnectionsState.ViewMode.GRID;
     UiUtils.showIf(detail, mBack, mDetailTitle, mSave);
     UiUtils.showIf(!detail, mTime, mViewToggle, mSavedList);
+    UiUtils.showIf(mRoutePoints != null && state.getScreen() == ConnectionsState.Screen.LIST, mPoints);
+    mFromName.setText(state.getFromLabel());
+    mToName.setText(state.getToLabel());
+    mFrom.setContentDescription(mActivity.getString(R.string.transit_change_start, state.getFromLabel()));
+    mTo.setContentDescription(mActivity.getString(R.string.transit_change_destination, state.getToLabel()));
     mTime.setText(state.getTimeLabel());
     mBinding = true;
     mViewToggle.check(grid ? R.id.transit_view_grid : R.id.transit_view_list);
@@ -345,7 +385,7 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
     UiUtils.showIf(collapsed, mSummary);
     UiUtils.showIf(!collapsed, mHeader);
     if (collapsed)
-      UiUtils.hide(mStatus, mSavedInfo, mAttribution, mList, mGridScroll);
+      UiUtils.hide(mPoints, mStatus, mSavedInfo, mAttribution, mList, mGridScroll);
   }
 
   private void rerender()

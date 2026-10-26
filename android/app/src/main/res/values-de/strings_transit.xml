@@ -129,4 +129,11 @@
   </plurals>
   <string name="transit_sheet_handle">Ziehen, um mehr oder weniger von den Verbindungen zu zeigen</string>
   <string name="transit_sheet_expand">Verbindungen zeigen</string>
+  <!-- Start und Ziel im Routenplaner. -->
+  <string name="transit_my_position">Mein Standort</string>
+  <string name="transit_from_label">Von</string>
+  <string name="transit_to_label">Nach</string>
+  <string name="transit_change_start">Start: %1$s. Zum Ändern tippen.</string>
+  <string name="transit_change_destination">Ziel: %1$s. Zum Ändern tippen.</string>
+  <string name="transit_swap">Start und Ziel tauschen</string>
 </resources>

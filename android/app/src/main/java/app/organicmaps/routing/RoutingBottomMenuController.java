@@ -167,7 +167,23 @@ final class RoutingBottomMenuController implements View.OnClickListener
 
     // Included next to the transit panel in both the phone and the tablet layout.
     mOnlineTransitPanel =
-        new OnlineTransitPanel(context, ((View) transitFrame.getParent()).findViewById(R.id.online_transit_panel));
+        new OnlineTransitPanel(context, ((View) transitFrame.getParent()).findViewById(R.id.online_transit_panel),
+                               new OnlineTransitPanel.RoutePoints() {
+                                 @Override
+                                 public void choose(boolean start)
+                                 {
+                                   // The route planner's own way to pick a point: the search (with "My position")
+                                   // or a tap on the map ("Route from"/"Route to" in the place page).
+                                   if (mListener != null)
+                                     mListener.onSearchRoutePoint(start ? RouteMarkType.Start : RouteMarkType.Finish);
+                                 }
+
+                                 @Override
+                                 public void swap()
+                                 {
+                                   RoutingController.get().swapPoints();
+                                 }
+                               });
   }
 
   /** Shows the connections of the online public transport planner. */

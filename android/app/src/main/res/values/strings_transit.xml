@@ -130,4 +130,11 @@
   </plurals>
   <string name="transit_sheet_handle">Drag to show more or less of the connections</string>
   <string name="transit_sheet_expand">Show connections</string>
+  <!-- Start and destination in the route planner. -->
+  <string name="transit_my_position">My position</string>
+  <string name="transit_from_label">From</string>
+  <string name="transit_to_label">To</string>
+  <string name="transit_change_start">Start: %1$s. Tap to change.</string>
+  <string name="transit_change_destination">Destination: %1$s. Tap to change.</string>
+  <string name="transit_swap">Swap start and destination</string>
 </resources>

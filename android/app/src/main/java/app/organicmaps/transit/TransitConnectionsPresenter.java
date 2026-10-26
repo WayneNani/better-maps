@@ -490,7 +490,7 @@ public final class TransitConnectionsPresenter
     if (!hasQuery())
       return new ConnectionsState(ConnectionsState.Screen.NONE, timeLabel, mArriveBy, false, false, false, null, null,
                                   Collections.emptyList(), false, false, null, Collections.emptyList(), providerName(),
-                                  attributionUrl(), viewMode, false, false, false, null, now);
+                                  attributionUrl(), viewMode, false, false, false, null, now, "", "");
 
     final List<TransitItinerary> all = getAllItineraries();
     final List<ItineraryItem> items = new ArrayList<>(all.size());
@@ -511,7 +511,8 @@ public final class TransitConnectionsPresenter
         selectedItem, detail ? mItems.legs(selected, mExpandedLegs) : Collections.emptyList(), providerName(),
         attributionUrl(), viewMode, mSaved != null, detail && mSavedStore.contains(TransitItemFactory.key(selected)),
         mSaved != null && mSaved.isPast(now),
-        detail ? mItems.getFormatter().formatDate(selected.getStartTime(), zoneOf(selected)) : null, now);
+        detail ? mItems.getFormatter().formatDate(selected.getStartTime(), zoneOf(selected)) : null, now,
+        label(mFromName), label(mToName));
   }
 
   private void startQuery(boolean debounce)
@@ -656,6 +657,13 @@ public final class TransitConnectionsPresenter
     if (leg != null)
       return mItems.getFormatter().placeName(start ? leg.getFrom() : leg.getTo());
     return start ? mItems.getFormatter().getTexts().start() : mItems.getFormatter().getTexts().destination();
+  }
+
+  /** The name of a place for the view; an empty name stands for the own position. */
+  @NonNull
+  private String label(@NonNull String name)
+  {
+    return name.trim().isEmpty() ? mItems.getFormatter().getTexts().myPosition() : name.trim();
   }
 
   @Nullable

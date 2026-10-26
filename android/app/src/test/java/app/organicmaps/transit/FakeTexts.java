@@ -110,4 +110,11 @@ class FakeTexts implements TransitTexts
   {
     return count + (count == 1 ? " connection" : " connections");
   }
+
+  @NonNull
+  @Override
+  public String myPosition()
+  {
+    return "My position";
+  }
 }

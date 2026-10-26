@@ -64,4 +64,8 @@ public interface TransitTexts
   /** E.g. "5 connections". */
   @NonNull
   String connections(int count);
+
+  /** E.g. "My position", for a search from or to the own position. */
+  @NonNull
+  String myPosition();
 }

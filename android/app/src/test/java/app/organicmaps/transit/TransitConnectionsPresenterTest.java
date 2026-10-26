@@ -788,4 +788,101 @@ public class TransitConnectionsPresenterTest
     assertEquals(ConnectionsState.Screen.LIST, state().getScreen());
     assertEquals(List.of("show a", "clear"), mDisplay);
   }
+
+  private static final TransitLocation SUEDKREUZ = TransitLocation.fromCoordinates(52.4753, 13.3655);
+
+  @Test
+  public void startAndDestinationNames()
+  {
+    mPresenter.search(HBF, ALEX, "Hauptbahnhof", "Alexanderplatz");
+    assertEquals("Hauptbahnhof", state().getFromLabel());
+    assertEquals("Alexanderplatz", state().getToLabel());
+
+    // The own position has no name.
+    mPresenter.search(HBF, ALEX, "", "Alexanderplatz");
+    assertEquals("My position", state().getFromLabel());
+
+    mPresenter.clear();
+    assertEquals("", state().getFromLabel());
+    assertEquals("", state().getToLabel());
+  }
+
+  @Test
+  public void anotherStartSearchesAgain()
+  {
+    mPresenter.search(HBF, ALEX, "", "Alexanderplatz");
+    mScheduler.advance(TransitConnectionsPresenter.DEBOUNCE_MS);
+    mProvider.lastPlan().complete(plan(null, null, Fixtures.s5("a", 29)));
+    mPresenter.select(0);
+    mPresenter.setViewMode(ConnectionsState.ViewMode.GRID);
+
+    // E.g. picked in the search: back to the list in the default view, a new (debounced) request.
+    mPresenter.search(SUEDKREUZ, ALEX, "Berlin Südkreuz", "Alexanderplatz");
+    assertEquals(ConnectionsState.Screen.LIST, state().getScreen());
+    assertTrue(state().isLoading());
+    assertTrue(state().getItems().isEmpty());
+    assertEquals(ConnectionsState.ViewMode.LIST, state().getViewMode());
+    assertEquals("Berlin Südkreuz", state().getFromLabel());
+    assertEquals(List.of("show a", "clear"), mDisplay);
+    mScheduler.advance(TransitConnectionsPresenter.DEBOUNCE_MS);
+    assertEquals(2, mProvider.mPlanRequests.size());
+    assertEquals(SUEDKREUZ, mProvider.lastRequest().getFrom());
+    assertEquals(ALEX, mProvider.lastRequest().getTo());
+  }
+
+  @Test
+  public void swappedPointsSearchTheOtherWay()
+  {
+    mPresenter.search(SUEDKREUZ, ALEX, "Berlin Südkreuz", "");
+    mScheduler.advance(TransitConnectionsPresenter.DEBOUNCE_MS);
+    mProvider.lastPlan().complete(plan(null, null, Fixtures.s5("a", 29)));
+    final Instant time = t("2026-10-25T17:00:00Z");
+    mPresenter.setTime(time, false);
+    mScheduler.advance(TransitConnectionsPresenter.DEBOUNCE_MS);
+
+    // As the route planner reports swapped points.
+    mPresenter.search(ALEX, SUEDKREUZ, "", "Berlin Südkreuz");
+    assertEquals("My position", state().getFromLabel());
+    assertEquals("Berlin Südkreuz", state().getToLabel());
+    mScheduler.advance(TransitConnectionsPresenter.DEBOUNCE_MS);
+    assertEquals(3, mProvider.mPlanRequests.size());
+    assertEquals(ALEX, mProvider.lastRequest().getFrom());
+    assertEquals(SUEDKREUZ, mProvider.lastRequest().getTo());
+    // The chosen time is kept.
+    assertEquals(time, mProvider.lastRequest().getTime());
+  }
+
+  @Test
+  public void savingAfterChangingTheStartUsesTheNewPlace()
+  {
+    mPresenter.search(HBF, ALEX, "Hauptbahnhof", "Alexanderplatz");
+    mScheduler.advance(TransitConnectionsPresenter.DEBOUNCE_MS);
+    mProvider.lastPlan().complete(plan(null, null, Fixtures.s5("a", 29)));
+
+    mPresenter.search(SUEDKREUZ, ALEX, "Berlin Südkreuz", "Alexanderplatz");
+    mScheduler.advance(TransitConnectionsPresenter.DEBOUNCE_MS);
+    mProvider.lastPlan().complete(plan(null, null, Fixtures.s5("b", 39)));
+    mPresenter.select(0);
+    mPresenter.toggleSaved();
+
+    final SavedConnection saved = mSaved.get("b");
+    assertEquals("Berlin Südkreuz", saved.getFromName());
+    assertEquals("Alexanderplatz", saved.getToName());
+    assertEquals(SUEDKREUZ, saved.getFrom());
+    assertEquals(ALEX, saved.getTo());
+  }
+
+  @Test
+  public void savingAfterSwappingKeepsTheNames()
+  {
+    mPresenter.search(HBF, ALEX, "Hauptbahnhof", "Alexanderplatz");
+    mPresenter.search(ALEX, HBF, "Alexanderplatz", "Hauptbahnhof");
+    mScheduler.advance(TransitConnectionsPresenter.DEBOUNCE_MS);
+    mProvider.lastPlan().complete(plan(null, null, Fixtures.s5("a", 29)));
+    mPresenter.select(0);
+    mPresenter.toggleSaved();
+    assertEquals("Alexanderplatz", mSaved.get("a").getFromName());
+    assertEquals("Hauptbahnhof", mSaved.get("a").getToName());
+    assertEquals(ALEX, mSaved.get("a").getFrom());
+  }
 }
