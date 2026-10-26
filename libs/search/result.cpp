@@ -173,6 +173,11 @@ bool Result::IsEqualFeature(Result const & r) const
   if (ftypes::IsWayChecker::Instance().GetSearchRank(m_matchedType) != ftypes::IsWayChecker::Default)
     return PointDistance(m_center, r.m_center) < 2000.0;
 
+  // better-maps: nameless POIs at the same place are told apart by their details only, e.g. a glass container
+  // and a clothes container ("Glass Bottles" vs "Clothes • Shoes • <operator>"). Keep them both.
+  if (m_str.empty() && m_details.m_description != r.m_details.m_description)
+    return false;
+
   // Filter real duplicates when say area park is present in 2 MWMs, or OSM data duplicates.
   return m_address == r.m_address && PointDistance(m_center, r.m_center) < 10.0;
 }
