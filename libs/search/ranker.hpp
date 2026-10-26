@@ -99,7 +99,9 @@ public:
 private:
   friend class RankerResultMaker;
 
-  void MakeRankerResults();
+  // Unless |lastUpdate|, bails out when the search is cancelled (making a result takes up to a millisecond). The
+  // pre-ranker results not made yet are kept for the next call.
+  void MakeRankerResults(bool lastUpdate);
 
   void GetBestMatchName(FeatureType & f, std::string & name) const;
   void MatchForSuggestions(strings::UniString const & token, int8_t locale, std::string const & prolog);

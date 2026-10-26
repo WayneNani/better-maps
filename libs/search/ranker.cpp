@@ -41,6 +41,7 @@
 #include "base/assert.hpp"
 #include "base/logging.hpp"
 #include "base/macros.hpp"
+#include "base/scope_guard.hpp"
 #include "base/stl_helpers.hpp"
 #include "base/string_utils.hpp"
 
@@ -1000,7 +1001,7 @@ void Ranker::UpdateResults(bool lastUpdate)
   if (!lastUpdate)
     BailIfCancelled();
 
-  MakeRankerResults();
+  MakeRankerResults(lastUpdate);
   RemoveDuplicatingLinear(m_tentativeResults);
   if (m_tentativeResults.empty())
     return;
@@ -1190,13 +1191,21 @@ void Ranker::LoadCountriesTree()
   m_regionInfoGetter.LoadCountriesTree();
 }
 
-void Ranker::MakeRankerResults()
+void Ranker::MakeRankerResults(bool lastUpdate)
 {
   LOG(LDEBUG, ("PreRankerResults number =", m_preRankerResults.size()));
 
   RankerResultMaker maker(*this, m_dataSource, m_infoGetter, m_reverseGeocoder, m_geocoderParams);
-  for (auto const & r : m_preRankerResults)
+  size_t numMade = 0;
+  SCOPE_GUARD(eraseMade, [&]()
+  { m_preRankerResults.erase(m_preRankerResults.begin(), m_preRankerResults.begin() + numMade); });
+
+  for (; numMade < m_preRankerResults.size(); ++numMade)
   {
+    if (!lastUpdate && numMade % 8 == 0)
+      BailIfCancelled();
+
+    auto const & r = m_preRankerResults[numMade];
     auto p = maker(r);
     if (!p)
       continue;
@@ -1205,9 +1214,7 @@ void Ranker::MakeRankerResults()
 
     // Do not filter any _duplicates_ here. Leave it for high level Results class.
     m_tentativeResults.push_back(std::move(*p));
-  };
-
-  m_preRankerResults.clear();
+  }
 }
 
 void Ranker::GetBestMatchName(FeatureType & f, string & name) const
