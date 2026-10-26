@@ -426,6 +426,43 @@ UNIT_TEST(CategorySynonyms_German_Nightlife)
                    false /* shouldMatch */);
 }
 
+// better-maps: recycling containers are found by their materials, also with "...container" words.
+UNIT_TEST(CategorySynonyms_German_Recycling)
+{
+  classificator::Load();
+
+  TestExpectations("de",
+                   {
+                       {"Wertstoffcontainer", "amenity-recycling-container"},
+                       {"Altglas", "recycling-glass_bottles"},
+                       {"Glascontainer", "recycling-glass_bottles"},
+                       {"Altglascontainer", "recycling-glass_bottles"},
+                       {"Altpapier", "recycling-paper"},
+                       {"Papiercontainer", "recycling-paper"},
+                       {"Altpapiercontainer", "recycling-paper"},
+                       {"Altkleider", "recycling-clothes"},
+                       {"Altkleidercontainer", "recycling-clothes"},
+                       {"Kleidercontainer", "recycling-clothes"},
+                       {"Schuhcontainer", "recycling-shoes"},
+                       {"Altschuhe", "recycling-shoes"},
+                       {"Batterien", "recycling-batteries"},
+                       {"Elektroschrott", "recycling-small_appliances"},
+                   },
+                   true /* shouldMatch */);
+
+  TestExpectations("de",
+                   {
+                       {"Glascontainer", "recycling-paper"},
+                       {"Papiercontainer", "recycling-glass_bottles"},
+                       {"Papiercontainer", "shop-stationery"},
+                       {"Kleidercontainer", "shop-clothes"},
+                       {"Kleidercontainer", "recycling-glass_bottles"},
+                       {"Altglas", "recycling-clothes"},
+                       {"Schuhcontainer", "shop-shoes"},
+                   },
+                   false /* shouldMatch */);
+}
+
 // better-maps: tapping a quick category of the search searches for its text as a categorial request. The texts
 // are in android/app/src/main/res/values*/strings_search_categories.xml; other languages fall back to English.
 UNIT_TEST(CategorySynonyms_QuickCategoriesForEatingAndDrinking)
