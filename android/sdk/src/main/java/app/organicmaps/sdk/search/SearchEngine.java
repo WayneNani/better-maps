@@ -33,11 +33,11 @@ public enum SearchEngine implements SearchListener, MapSearchListener,
   }
 
   @Override
-  public void onResultsEnd(final long timestamp)
+  public void onResultsEnd(final long timestamp, final int hiddenWithoutOpeningHours)
   {
     UiThread.run(() -> {
       for (SearchListener listener : mListeners)
-        listener.onResultsEnd(timestamp);
+        listener.onResultsEnd(timestamp, hiddenWithoutOpeningHours);
     });
   }
 

@@ -1021,6 +1021,15 @@
     <string name="search_filter_include_unknown_opening_hours">Also without opening hours</string>
     <!-- Search results filter chip for a day/time from the query, e.g. "Apotheke Sonntag". %s is a weekday and time, e.g. "Sun 12:00". -->
     <string name="search_filter_open_at">Open %s</string>
+    <!-- Search results: hint below the filter chips when "Open now" hides places without known opening hours. %d is their number. -->
+    <plurals name="search_filter_hidden_without_opening_hours">
+        <item quantity="one">%d place without opening hours hidden</item>
+        <item quantity="other">%d places without opening hours hidden</item>
+    </plurals>
+    <!-- The hint above for many hidden places. %d is a round number, e.g. 100. -->
+    <string name="search_filter_hidden_without_opening_hours_many">More than %d places without opening hours hidden</string>
+    <!-- Action of the hint above: show the hidden places too ("Also without opening hours"). -->
+    <string name="search_filter_show_hidden">Show</string>
     <!-- Used in navigation panel. -->
     <string name="destination">Destination</string>
     <!-- Used in navigation panel. "Stop" as in "Intermediate Stop" -->

@@ -26,7 +26,9 @@
 
 #include "defines.hpp"
 
+#include <algorithm>
 #include <chrono>
+#include <limits>
 #include <memory>
 #include <vector>
 
@@ -189,7 +191,9 @@ void OnResults(Results results, vector<search::ProductInfo> const & productInfo,
 
   if (results.IsEndMarker())
   {
-    env->CallVoidMethod(g_javaListener, g_endResultsId, timestamp);
+    auto const hidden = static_cast<jint>(
+        std::min<size_t>(results.GetHiddenWithoutOpeningHoursCount(), std::numeric_limits<jint>::max()));
+    env->CallVoidMethod(g_javaListener, g_endResultsId, timestamp, hidden);
     if (isMapAndTable && results.IsEndedNormal())
       g_framework->NativeFramework()->GetSearchAPI().PokeSearchInViewport();
   }
@@ -254,8 +258,8 @@ JNIEXPORT void JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeInit(J
   // public void onResultsUpdate(@NonNull SearchResult[] results, long timestamp)
   g_updateResultsId =
       jni::GetMethodID(env, g_javaListener, "onResultsUpdate", "([Lapp/organicmaps/sdk/search/SearchResult;J)V");
-  // public void onResultsEnd(long timestamp)
-  g_endResultsId = jni::GetMethodID(env, g_javaListener, "onResultsEnd", "(J)V");
+  // public void onResultsEnd(long timestamp, int hiddenWithoutOpeningHours)
+  g_endResultsId = jni::GetMethodID(env, g_javaListener, "onResultsEnd", "(JI)V");
   g_resultClass = jni::GetGlobalClassRef(env, "app/organicmaps/sdk/search/SearchResult");
   g_resultConstructor =
       jni::GetConstructorID(env, g_resultClass,

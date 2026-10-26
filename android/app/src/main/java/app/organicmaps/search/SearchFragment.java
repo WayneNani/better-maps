@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,7 +64,6 @@ import app.organicmaps.widget.PlaceholderView;
 import app.organicmaps.widget.SearchToolbarController;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
@@ -113,6 +111,7 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
 
       if (TextUtils.isEmpty(query))
       {
+        setHiddenWithoutOpeningHours(0);
         mSearchAdapter.clear();
         mOnlinePresenter.clear();
         stopSearch();
@@ -172,13 +171,9 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
 
   private View mResultsFrame;
   private View mTabFrame;
-  private Chip mOpenNowChip;
-  private Chip mIncludeUnknownOpeningHoursChip;
-  // Opening hours filter recognized in the query, e.g. "Café offen", it's shown as the active "Open now" chip.
+  // better-maps: "Open now" chips and the hint of places hidden by them.
   @Nullable
-  private QueryFilter mQueryFilter;
-  // Chips are being updated programmatically, ignore their listeners.
-  private boolean mUpdatingOpeningHoursChips;
+  private OpeningHoursFilterController mOpeningHoursFilter;
   private PlaceholderView mResultsPlaceholder;
   private ExtendedFloatingActionButton mShowOnMapFab;
   private FloatingActionButton mOpenContactPicker;
@@ -316,7 +311,11 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
     initOnlineSearch();
     // A recreated screen keeps the query of its text field; the arguments would replace it.
     if (savedInstanceState == null)
+    {
       readArguments();
+      // better-maps: a new search starts without the "Open now" filter of a previous one.
+      OpeningHoursFilterState.SESSION.onSearchOpened(mInitialQuery);
+    }
 
     ViewGroup root = (ViewGroup) view;
     mTabFrame = root.findViewById(R.id.tab_frame);
@@ -406,66 +405,41 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
 
   private void initOpeningHoursFilter(@NonNull View root)
   {
-    final OpeningHoursFilterState state = OpeningHoursFilterState.SESSION;
-    mOpenNowChip = root.findViewById(R.id.filter_open_now);
-    mIncludeUnknownOpeningHoursChip = root.findViewById(R.id.filter_include_unknown_opening_hours);
-    mIncludeUnknownOpeningHoursChip.setChecked(state.isIncludeUnknown());
-    updateOpeningHoursChips();
-
-    mOpenNowChip.setOnCheckedChangeListener((chip, isChecked) -> {
-      if (mUpdatingOpeningHoursChips)
-        return;
-      if (!isChecked && mQueryFilter != null)
+    final OpeningHoursFilterController.Listener listener = new OpeningHoursFilterController.Listener() {
+      @Override
+      public void onFilterChanged()
       {
-        // The filter comes from the query: remove the filter words, it starts a new search.
-        state.setOpenNow(false);
-        setQuery(mQueryFilter.getQuery(), false);
-        return;
+        onOpeningHoursFilterChanged();
       }
-      state.setOpenNow(isChecked);
-      updateOpeningHoursChips();
-      onOpeningHoursFilterChanged();
-    });
-    mIncludeUnknownOpeningHoursChip.setOnCheckedChangeListener((chip, isChecked) -> {
-      if (mUpdatingOpeningHoursChips)
-        return;
-      state.setIncludeUnknown(isChecked);
-      onOpeningHoursFilterChanged();
-    });
+
+      @Override
+      public void onQueryFilterRemoved(@NonNull String query)
+      {
+        setQuery(query, false);
+      }
+    };
+    mOpeningHoursFilter =
+        new OpeningHoursFilterController(root, OpeningHoursFilterState.SESSION, this::getQuery, listener);
+  }
+
+  /**
+   * @param count the number of places hidden by the "Open now" filter because of unknown opening hours.
+   */
+  private void setHiddenWithoutOpeningHours(int count)
+  {
+    if (mOpeningHoursFilter != null)
+      mOpeningHoursFilter.setHiddenWithoutOpeningHours(count);
   }
 
   private void updateQueryFilter(@Nullable String query)
   {
-    if (TextUtils.isEmpty(query) || isCategory())
-      mQueryFilter = null;
-    else
-      mQueryFilter = SearchEngine.detectQueryFilter(query, Language.getKeyboardLocale(requireContext()));
-    updateOpeningHoursChips();
-  }
-
-  private void updateOpeningHoursChips()
-  {
-    if (mOpenNowChip == null)
+    if (mOpeningHoursFilter == null)
       return;
-    final boolean checked = OpeningHoursFilterState.SESSION.isOpenNowChipChecked(mQueryFilter);
-    mUpdatingOpeningHoursChips = true;
-    mOpenNowChip.setChecked(checked);
-    mOpenNowChip.setText(getOpenNowChipText());
-    UiUtils.showIf(checked, mIncludeUnknownOpeningHoursChip);
-    mUpdatingOpeningHoursChips = false;
-  }
-
-  @NonNull
-  private String getOpenNowChipText()
-  {
-    if (mQueryFilter == null || !mQueryFilter.hasOpeningHoursTime())
-      return getString(R.string.open_now);
-
-    // "Apotheke Sonntag" -> "Open Sun 12:00".
-    final String time = DateUtils.formatDateTime(
-        requireContext(), mQueryFilter.getOpeningHoursTimeMillis(),
-        DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_ABBREV_WEEKDAY | DateUtils.FORMAT_SHOW_TIME);
-    return getString(R.string.search_filter_open_at, time);
+    final QueryFilter queryFilter =
+        TextUtils.isEmpty(query) || isCategory()
+            ? null
+            : SearchEngine.detectQueryFilter(query, Language.getKeyboardLocale(requireContext()));
+    mOpeningHoursFilter.onQueryChanged(query, queryFilter);
   }
 
   private void onOpeningHoursFilterChanged()
@@ -482,7 +456,7 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
   @NonNull
   private OpeningHoursFilter getOpeningHoursFilter()
   {
-    return OpeningHoursFilterState.SESSION.getFilter(mQueryFilter);
+    return mOpeningHoursFilter != null ? mOpeningHoursFilter.getFilter() : OpeningHoursFilter.OFF;
   }
 
   @Override
@@ -691,6 +665,8 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
       }
     }
 
+    // The hint is shown again at the end of the new search.
+    setHiddenWithoutOpeningHours(0);
     mSearchRunning = true;
     mToolbarController.showProgress(true);
 
@@ -714,6 +690,14 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
     onSearchEnd();
     if (isAdded() && timestamp == mLastQueryTimestamp && mToolbarController.hasQuery())
       mOnlinePresenter.onOfflineSearchFinished();
+  }
+
+  @Override
+  public void onResultsEnd(long timestamp, int hiddenWithoutOpeningHours)
+  {
+    onResultsEnd(timestamp);
+    if (isAdded() && timestamp == mLastQueryTimestamp && mToolbarController.hasQuery())
+      setHiddenWithoutOpeningHours(hiddenWithoutOpeningHours);
   }
 
   @Override
