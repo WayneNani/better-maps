@@ -23,6 +23,10 @@ export CCACHE_DIR="${CCACHE_DIR:-$HOME/.cache/ccache-bettermaps}"
 export CCACHE_BASEDIR="$MAIN_ROOT"
 export CCACHE_NOHASHDIR=true
 
+# Ziel für adb und instrumentierte Tests: immer der Emulator, nie ein per USB angeschlossenes Handy
+# (AGP und adb werten ANDROID_SERIAL aus). Für ein echtes Gerät ANDROID_SERIAL bewusst selbst setzen.
+export ANDROID_SERIAL="${ANDROID_SERIAL:-emulator-5554}"
+
 NJOBS="${BM_NJOBS:-6}"
 LOCK_DIR="${BM_LOCK_DIR:-$HOME/.cache/bettermaps-locks}"
 AVD="${BM_AVD:-bettermaps_api35}"
