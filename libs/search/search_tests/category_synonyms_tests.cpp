@@ -390,6 +390,39 @@ UNIT_TEST(CategorySynonyms_German_Cuisines)
                    false /* shouldMatch */);
 }
 
+UNIT_TEST(CategorySynonyms_German_Nightlife)
+{
+  classificator::Load();
+
+  TestExpectations("de",
+                   {
+                       {"Club", "amenity-nightclub"},
+                       {"Clubs", "amenity-nightclub"},
+                       {"Disco", "amenity-nightclub"},
+                       {"Disko", "amenity-nightclub"},
+                       {"Diskothek", "amenity-nightclub"},
+                       {"Disse", "amenity-nightclub"},
+                       {"Tanzclub", "amenity-nightclub"},
+                       {"Technoclub", "amenity-nightclub"},
+                       {"Clubbing", "amenity-nightclub"},
+                       {"Bar", "amenity-bar"},
+                       {"Bars", "amenity-bar"},
+                       {"Kneipe", "amenity-pub"},
+                       {"Cocktails", "amenity-bar"},
+                       {"Weinbar", "amenity-bar"},
+                   },
+                   true /* shouldMatch */);
+
+  TestExpectations("de",
+                   {
+                       {"Clubs", "leisure-fitness_centre"},
+                       {"Disse", "amenity-dentist"},
+                       {"Weinbar", "shop-wine"},
+                       {"Tanzclub", "leisure-dance"},
+                   },
+                   false /* shouldMatch */);
+}
+
 UNIT_TEST(CategorySynonyms_German_FullNameIsCategorial)
 {
   classificator::Load();
