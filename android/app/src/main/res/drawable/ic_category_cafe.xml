@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- Material icon "local_cafe" (Apache 2.0). -->
+  <item>
+    <shape android:shape="oval">
+      <size
+          android:width="40dp"
+          android:height="40dp" />
+      <solid android:color="@color/food" />
+    </shape>
+  </item>
+  <item>
+    <vector
+        android:width="24dp"
+        android:height="24dp"
+        android:viewportWidth="38"
+        android:viewportHeight="38">
+      <!-- 24x24 icon centered in the larger viewport, so it has the size of the other category icons. -->
+      <group
+          android:translateX="7"
+          android:translateY="7">
+        <path
+            android:fillColor="@color/foreground_color"
+            android:pathData="M2.02 21V18.98H20.02V21ZM20.02 8.02V5.02H18V8.02ZM20.02 3Q20.86 3 21.42 3.59Q21.98 4.17 21.98 5.02V8.02Q21.98 8.86 21.42 9.42Q20.86 9.98 20.02 9.98H18V12.98Q18 14.62 16.83 15.82Q15.66 17.02 14.02 17.02H8.02Q6.38 17.02 5.18 15.82Q3.98 14.62 3.98 12.98V3Z" />
+      </group>
+    </vector>
+  </item>
+</layer-list>

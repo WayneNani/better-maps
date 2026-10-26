@@ -57,7 +57,7 @@
         "defaultMessage": "3Geldwechselstelle|3Wechselstube|3Geld|3Geldumtausch"
     },
     "amenity-bar|amenity-pub|@category_eat|@category_nightlife": {
-        "defaultMessage": "2Bar|2Pub|4Kneipe|3Bier|4Trinken|4Gaststätte|4Bars und Kneipen|4Brauhaus|4Cocktail-Lounge|3Lokal|4Eckkneipe|4Schänke|4Schenke|4Bierbar|5Cocktailbar|3Beisl|3Beiz|Bars|Cocktails|Weinbar"
+        "defaultMessage": "2Bar|2Pub|4Kneipe|3Bier|4Trinken|4Gaststätte|4Bars und Kneipen|4Brauhaus|4Cocktail-Lounge|3Lokal|4Eckkneipe|4Schänke|4Schenke|4Bierbar|5Cocktailbar|3Beisl|3Beiz|Bars|Cocktails|Weinbar|Bars & Clubs"
     },
     "amenity-cafe|@category_eat": {
         "defaultMessage": "3Café|6Kaffeehaus|3Kaffeebar|3Cafeteria|3Kaffee|3Bistro|4Frühstück|4frühstücken|4Brunch|5Kaffeestube"
@@ -405,7 +405,7 @@
         "defaultMessage": "3Theater|4Schauspielhaus|U+1F3AD"
     },
     "amenity-nightclub|@category_entertainment|@category_nightlife": {
-        "defaultMessage": "3Nachtclub|3Nachtklub|3Nachtbar|3Nachtlokal|3Disko|3Tanzen|2Club|U+1F378|U+1F379|U+1F46F|U+1F483|Clubs|Diskothek|Discothek|Disco|Disse|Tanzclub|Technoclub|Tanzlokal|Clubbing"
+        "defaultMessage": "3Nachtclub|3Nachtklub|3Nachtbar|3Nachtlokal|3Disko|3Tanzen|2Club|U+1F378|U+1F379|U+1F46F|U+1F483|Clubs|Diskothek|Discothek|Disco|Disse|Tanzclub|Technoclub|Tanzlokal|Clubbing|Bars & Clubs"
     },
     "amenity-brothel": {
         "defaultMessage": "3Bordell|U+1F3E9"

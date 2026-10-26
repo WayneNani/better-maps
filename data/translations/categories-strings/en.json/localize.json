@@ -63,7 +63,7 @@
         "defaultMessage": "5Media studio|studio"
     },
     "amenity-bar|amenity-pub|@category_eat|@category_nightlife": {
-        "defaultMessage": "2Bar|2pub|beer|drink|U+1F37A|U+1F37B|U+1F376|tavern|bars and pubs|brew pub|cocktail lounge"
+        "defaultMessage": "2Bar|2pub|beer|drink|U+1F37A|U+1F37B|U+1F376|tavern|bars and pubs|brew pub|cocktail lounge|Bars & Clubs"
     },
     "amenity-cafe|@category_eat": {
         "defaultMessage": "3Cafe|U+2615|U+1F356|U+1F357|U+1F35A|U+1F35B|U+1F35C|U+1F35D|U+1F363|U+1F366|U+1F367|U+1F368|U+1F369|U+1F370|U+1F372|U+1F374|U+1F377|U+1F60B|U+1F375|coffee|cafeteria"
@@ -450,7 +450,7 @@
         "defaultMessage": "4Theatre|U+1F3AD"
     },
     "amenity-nightclub|@category_entertainment|@category_nightlife": {
-        "defaultMessage": "3Nightclub|night club|4disco|dance|U+1F378|U+1F379|U+1F46F|U+1F483|club|nightspot|night bar"
+        "defaultMessage": "3Nightclub|night club|4disco|dance|U+1F378|U+1F379|U+1F46F|U+1F483|club|nightspot|night bar|Bars & Clubs"
     },
     "amenity-music_venue|@category_entertainment|@category_nightlife": {
         "defaultMessage": "4Music venue|live music|4concert|concert hall|gig"

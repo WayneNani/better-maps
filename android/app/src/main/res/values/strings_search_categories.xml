@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: quick categories of the search (libs/search/displayed_categories.cpp).
+     Tapping a category searches for its text, so every text must be a full category name in
+     data/categories.txt: in English (always matched) and in the language of the translation.
+     Languages without a translation fall back to these English texts. -->
+<resources>
+  <!-- Search category for cafes; amenity-cafe in categories.txt -->
+  <string name="category_cafe">Café</string>
+  <!-- Search category for restaurants; amenity-restaurant in categories.txt -->
+  <string name="category_restaurant">Restaurant</string>
+  <!-- Search category for bakeries; shop-bakery in categories.txt -->
+  <string name="category_bakery">Bakery</string>
+  <!-- Search category for bars, pubs and nightclubs; amenity-bar|amenity-pub and amenity-nightclub in categories.txt -->
+  <string name="category_bar_club">Bars &amp; Clubs</string>
+</resources>

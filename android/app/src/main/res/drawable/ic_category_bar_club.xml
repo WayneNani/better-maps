@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- Material icons "local_bar" and "music_note" (Apache 2.0), like the "nightlife" symbol. -->
+  <item>
+    <shape android:shape="oval">
+      <size
+          android:width="40dp"
+          android:height="40dp" />
+      <solid android:color="@color/food" />
+    </shape>
+  </item>
+  <item>
+    <vector
+        android:width="24dp"
+        android:height="24dp"
+        android:viewportWidth="38"
+        android:viewportHeight="38">
+      <!-- 24x24 icon centered in the larger viewport, so it has the size of the other category icons. -->
+      <group
+          android:translateX="7"
+          android:translateY="7">
+        <group
+            android:scaleX="0.72"
+            android:scaleY="0.72"
+            android:translateX="-0.2"
+            android:translateY="2.2">
+          <path
+              android:fillColor="@color/foreground_color"
+              android:pathData="M7.45 6.98H16.55L18.33 5.02H5.67ZM21 5.02 12.98 14.02V18.98H18V21H6V18.98H11.02V14.02L3 5.02V3H21Z" />
+        </group>
+        <group
+            android:scaleX="0.6"
+            android:scaleY="0.6"
+            android:translateX="10.6"
+            android:translateY="6.2">
+          <path
+              android:fillColor="@color/foreground_color"
+              android:pathData="M12 3H18V6.98H14.02V17.02Q14.02 18.66 12.82 19.83Q11.62 21 9.98 21Q8.34 21 7.17 19.83Q6 18.66 6 17.02Q6 15.38 7.17 14.18Q8.34 12.98 9.98 12.98Q10.97 12.98 12 13.55Z" />
+        </group>
+      </group>
+    </vector>
+  </item>
+</layer-list>

@@ -1,6 +1,7 @@
 #include "testing/testing.hpp"
 
 #include "search/common.hpp"
+#include "search/displayed_categories.hpp"
 #include "search/token_slice.hpp"
 #include "search/utils.hpp"
 
@@ -423,6 +424,49 @@ UNIT_TEST(CategorySynonyms_German_Nightlife)
                        {"Club", "leisure-fitness_centre"},
                    },
                    false /* shouldMatch */);
+}
+
+// better-maps: tapping a quick category of the search searches for its text as a categorial request. The texts
+// are in android/app/src/main/res/values*/strings_search_categories.xml; other languages fall back to English.
+UNIT_TEST(CategorySynonyms_QuickCategoriesForEatingAndDrinking)
+{
+  classificator::Load();
+
+  struct QuickCategory
+  {
+    char const * m_key;
+    char const * m_en;
+    char const * m_de;
+    vector<char const *> m_types;
+  };
+
+  vector<QuickCategory> const quickCategories = {
+      {"category_restaurant", "Restaurant", "Restaurant", {"amenity-restaurant"}},
+      {"category_cafe", "Café", "Café", {"amenity-cafe"}},
+      {"category_bakery", "Bakery", "Bäckerei", {"shop-bakery"}},
+      {"category_bar_club", "Bars & Clubs", "Bars & Clubs", {"amenity-bar", "amenity-pub", "amenity-nightclub"}},
+  };
+
+  DisplayedCategories const displayed(GetDefaultCategories());
+  auto const & keys = displayed.GetKeys();
+  TEST_EQUAL(keys.front(), "category_eat", ());
+  for (size_t i = 0; i < quickCategories.size(); ++i)
+  {
+    auto const & c = quickCategories[i];
+    // Right after "Where to eat".
+    TEST_EQUAL(keys[i + 1], c.m_key, ());
+    for (auto const * type : c.m_types)
+    {
+      TEST(IsCategoryName(c.m_en, "en", type), (c.m_key, c.m_en, type));
+      TEST(IsCategoryName(c.m_de, "de", type), (c.m_key, c.m_de, type));
+    }
+  }
+
+  // Only bars and nightclubs, not everything of the nightlife group (casinos, music venues, ...).
+  TEST(!IsCategoryName("Bars & Clubs", "de", "amenity-casino"), ());
+  TEST(!IsCategoryName("Bars & Clubs", "de", "amenity-biergarten"), ());
+  // The plural keeps the singular words apart: "Club" is a nightclub and not a bar.
+  TestExpectations("de", {{"Club", "amenity-bar"}, {"Club", "amenity-pub"}}, false /* shouldMatch */);
 }
 
 UNIT_TEST(CategorySynonyms_German_FullNameIsCategorial)
