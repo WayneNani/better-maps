@@ -123,12 +123,15 @@ public final class JourneyBarView extends View
       mFill.setAlpha(alpha);
       mRect.set(left, top, right, bottom);
       canvas.drawRoundRect(mRect, dp(CORNER_DP), dp(CORNER_DP), mFill);
-      if (JourneyBarLayout.fitsLabel(piece.getWidth(), mText.measureText(badge.getText()),
-                                     Math.round(dp(LABEL_PADDING_DP))))
+      for (String label : JourneyBarLayout.labelCandidates(badge.getText()))
       {
-        mText.setColor(badge.getTextColor());
-        mText.setAlpha(alpha);
-        canvas.drawText(badge.getText(), (left + right) / 2, baseline, mText);
+        if (JourneyBarLayout.fitsLabel(piece.getWidth(), mText.measureText(label), Math.round(dp(LABEL_PADDING_DP))))
+        {
+          mText.setColor(badge.getTextColor());
+          mText.setAlpha(alpha);
+          canvas.drawText(label, (left + right) / 2, baseline, mText);
+          break;
+        }
       }
     }
   }

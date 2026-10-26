@@ -170,6 +170,30 @@ public final class JourneyBarLayout
     return Collections.unmodifiableList(pieces);
   }
 
+  /**
+   * Labels to try for a line, longest first, e.g. "RE8 (62012)", "RE8" or "FlixTrain FLX10", "FLX10": without a
+   * part in parentheses, then the last word (usually the line number).
+   */
+  @NonNull
+  public static List<String> labelCandidates(@NonNull String text)
+  {
+    final List<String> result = new ArrayList<>();
+    addCandidate(result, text);
+    final String withoutParentheses = text.replaceAll("\\s*\\([^)]*\\)", "");
+    addCandidate(result, withoutParentheses);
+    final String[] words = withoutParentheses.trim().split("\\s+");
+    if (words.length > 1)
+      addCandidate(result, words[words.length - 1]);
+    return result;
+  }
+
+  private static void addCandidate(@NonNull List<String> candidates, @NonNull String text)
+  {
+    final String trimmed = text.trim();
+    if (!trimmed.isEmpty() && !candidates.contains(trimmed))
+      candidates.add(trimmed);
+  }
+
   /** True if a text of this width fits into a piece with the given padding on both sides. */
   public static boolean fitsLabel(int pieceWidth, float textWidth, int padding)
   {

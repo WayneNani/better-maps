@@ -352,14 +352,19 @@ public final class TimeGridView extends View
       canvas.drawRoundRect(mRect, dp(CORNER_DP), dp(CORNER_DP), mFill);
       mBlockText.getFontMetrics(mMetrics);
       final float textHeight = mMetrics.descent - mMetrics.ascent;
-      if (block.getHeight() >= textHeight + dp(2)
-          && JourneyBarLayout.fitsLabel(column.getRight() - column.getLeft(), mBlockText.measureText(badge.getText()),
-                                        Math.round(dp(2))))
+      if (block.getHeight() >= textHeight + dp(2))
       {
-        mBlockText.setColor(badge.getTextColor());
-        mBlockText.setAlpha(alpha);
-        final float centerY = (block.getTop() + block.getBottom()) / 2f;
-        canvas.drawText(badge.getText(), centerX, centerY - (mMetrics.ascent + mMetrics.descent) / 2, mBlockText);
+        for (String label : JourneyBarLayout.labelCandidates(badge.getText()))
+        {
+          if (!JourneyBarLayout.fitsLabel(column.getRight() - column.getLeft(), mBlockText.measureText(label),
+                                          Math.round(dp(2))))
+            continue;
+          mBlockText.setColor(badge.getTextColor());
+          mBlockText.setAlpha(alpha);
+          final float centerY = (block.getTop() + block.getBottom()) / 2f;
+          canvas.drawText(label, centerX, centerY - (mMetrics.ascent + mMetrics.descent) / 2, mBlockText);
+          break;
+        }
       }
     }
 

@@ -181,4 +181,15 @@ public class JourneyBarLayoutTest
     assertFalse(JourneyBarLayout.fitsLabel(40, 20.5f, 10));
     assertFalse(JourneyBarLayout.fitsLabel(10, 4f, 4));
   }
+
+  @Test
+  public void shorterLabelsForLongLineNames()
+  {
+    assertEquals(List.of("S5"), JourneyBarLayout.labelCandidates("S5"));
+    assertEquals(List.of("RE8 (62012)", "RE8"), JourneyBarLayout.labelCandidates("RE8 (62012)"));
+    assertEquals(List.of("FlixTrain FLX10", "FLX10"), JourneyBarLayout.labelCandidates("FlixTrain FLX10"));
+    assertEquals(List.of("ICE 1601 (Hamburg)", "ICE 1601", "1601"),
+                 JourneyBarLayout.labelCandidates("ICE 1601 (Hamburg)"));
+    assertEquals(List.of("(x)"), JourneyBarLayout.labelCandidates("(x)"));
+  }
 }
