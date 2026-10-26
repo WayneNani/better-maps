@@ -20,6 +20,8 @@ public enum SearchEngine implements SearchListener, MapSearchListener,
   // Query, which results are shown on the map.
   @Nullable
   private String mQuery;
+  // better-maps: whether mQuery is a search category.
+  private boolean mQueryIsCategory;
 
   @Override
   public void onResultsUpdate(@NonNull final SearchResult[] results, final long timestamp)
@@ -197,7 +199,23 @@ public enum SearchEngine implements SearchListener, MapSearchListener,
 
   public void setQuery(@Nullable String query)
   {
+    setQuery(query, false);
+  }
+
+  /**
+   * @param isCategory true if the query is a search category (categorial request): the search screen opened again
+   *                   from the map searches it as a category, too.
+   */
+  public void setQuery(@Nullable String query, boolean isCategory)
+  {
     mQuery = query;
+    mQueryIsCategory = isCategory && query != null && !query.isEmpty();
+  }
+
+  /** True if {@link #getQuery()} is a search category. */
+  public boolean isQueryCategory()
+  {
+    return mQueryIsCategory;
   }
 
   @Nullable
@@ -222,21 +240,21 @@ public enum SearchEngine implements SearchListener, MapSearchListener,
   @MainThread
   public void cancelInteractiveSearch()
   {
-    mQuery = "";
+    setQuery("");
     nativeCancelInteractiveSearch();
   }
 
   @MainThread
   private void cancelAllSearches()
   {
-    mQuery = "";
+    setQuery("");
     nativeCancelAllSearches();
   }
 
   @MainThread
   public void showResult(int index)
   {
-    mQuery = "";
+    setQuery("");
     nativeShowResult(index);
   }
 

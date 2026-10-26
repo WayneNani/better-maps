@@ -423,16 +423,23 @@ public class MwmActivity extends BaseMwmFragmentActivity
 
   private void showSearch(String query)
   {
+    showSearch(query, false);
+  }
+
+  /** @param isCategory the query is a search category, e.g. the query of the search bar on the map. */
+  private void showSearch(String query, boolean isCategory)
+  {
     closeSearchToolbar(false, true);
     if (mIsTabletLayout)
     {
       final Bundle args = new Bundle();
       args.putString(SearchActivity.EXTRA_QUERY, query);
+      args.putBoolean(SearchActivity.EXTRA_IS_CATEGORY, isCategory);
       replaceFragment(SearchFragment.class, args, null);
     }
     else
     {
-      SearchActivity.start(this, query);
+      SearchActivity.start(this, query, null /* locale */, false /* isSearchOnMap */, isCategory);
     }
   }
 
@@ -701,7 +708,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
     final CharSequence query = SearchEngine.INSTANCE.getQuery();
     if (!TextUtils.isEmpty(query))
     {
-      mSearchController.setQuery(query);
+      mSearchController.setQuery(query, SearchEngine.INSTANCE.isQueryCategory());
       // Close all panels and tool bars (including search) but do not stop search backend
       closeFloatingToolbars(false, false);
       // Do not show the search tool bar if we are planning or navigating
@@ -2515,15 +2522,18 @@ public class MwmActivity extends BaseMwmFragmentActivity
   @Override
   public void onSearchUpClick(@Nullable String query)
   {
+    // Read before closing the toolbars, which may clear the search bar.
+    final boolean isCategory = mSearchController.isCategory();
     closeFloatingToolbarsAndPanels(true);
-    showSearch(query);
+    showSearch(query, isCategory);
   }
 
   @Override
   public void onSearchQueryClick(@Nullable String query)
   {
+    final boolean isCategory = mSearchController.isCategory();
     closeFloatingToolbarsAndPanels(true);
-    showSearch(query);
+    showSearch(query, isCategory);
   }
 
   @Override
