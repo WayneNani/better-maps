@@ -106,6 +106,13 @@ android_build() {
   with_build_slot ./gradlew --no-daemon --max-workers=4 -Px86_64 -Pnjobs="$NJOBS" assembleFdroidDebug "$@"
 }
 
+# Release-APK (F-Droid-Variante, minifiziert, ohne HWAsan) für echte Geräte (arm64) und den Emulator (x86_64).
+# Ohne secure.properties.release signiert Gradle mit dem Debug-Schlüssel.
+android_release() {
+  cd "$REPO_ROOT/android"
+  with_build_slot ./gradlew --no-daemon --max-workers=4 -Parm64 -Px86_64 -Pnjobs="$NJOBS" assembleFdroidRelease "$@"
+}
+
 android_unit() {
   cd "$REPO_ROOT/android"
   # App- und SDK-Modul; das SDK hat keine Produkt-Flavors.
@@ -198,6 +205,7 @@ worktree_setup() {
 cmd="${1:-help}"; shift || true
 case "$cmd" in
   android-build)   android_build "$@" ;;
+  android-release) android_release "$@" ;;
   android-unit)    android_unit "$@" ;;
   android-run)     with_emulator android_install_run ;;
   android-connected) with_emulator android_connected "$@" ;;
@@ -211,6 +219,7 @@ case "$cmd" in
   *) cat <<EOF
 Befehle:
   android-build [gradle-args]   Debug-APK (F-Droid, x86_64) bauen
+  android-release [gradle-args] Release-APK (F-Droid, arm64 + x86_64) für echte Geräte
   android-unit  [gradle-args]   JVM-Unit-Tests der App
   android-run                   APK im Emulator installieren und starten (exklusiv)
   android-connected [args]      Instrumentierte Tests im Emulator (exklusiv)
