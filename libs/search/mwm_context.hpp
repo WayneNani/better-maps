@@ -78,6 +78,19 @@ public:
     });
   }
 
+  // Lower level access to the scale index: ForEachIndex(intervals, scale, fn) calls ForEachIndexInBucket() for each
+  // interval and each bucket in [0, GetNumIndexBuckets(scale)) and skips duplicate and deleted indices.
+  size_t GetNumIndexBuckets(uint32_t scale) const { return m_index.GetNumBuckets(scale); }
+
+  // Calls |fn(key, index)| for each feature index with a key in [beg, end) in |bucket|, in the order of keys.
+  template <typename Fn>
+  void ForEachIndexInBucket(uint64_t beg, uint64_t end, size_t bucket, Fn && fn) const
+  {
+    m_index.ForEachInIntervalAndBucket(beg, end, bucket, fn);
+  }
+
+  bool IsDeleted(uint32_t index) const { return GetEditedStatus(index) == FeatureStatus::Deleted; }
+
   template <typename Fn>
   void ForEachIndex(m2::RectD const & rect, Fn && fn) const
   {

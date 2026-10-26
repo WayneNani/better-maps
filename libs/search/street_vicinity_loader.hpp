@@ -10,6 +10,11 @@
 
 class FeatureType;
 
+namespace base
+{
+class Cancellable;
+}
+
 namespace search
 {
 class MwmContext;
@@ -76,8 +81,16 @@ public:
 
   Street const & GetStreet(uint32_t featureId, bool ignoreEditedStatus = false);
 
+  // Loads the vicinities of all |streetIds| which are not loaded yet, so that GetStreet() returns them from the
+  // cache. Gives the same streets as GetStreet() for each id, but reads the geometry index only once where the
+  // vicinities overlap. Much faster for many streets, e.g. "Allee 5" matches all streets of a city ("Allee" is a
+  // category name of all roads) and the vicinity of every street segment is checked for a house number.
+  void LoadStreets(std::vector<uint32_t> const & streetIds, base::Cancellable const & cancellable);
+
 private:
   void LoadStreet(uint32_t featureId, Street & street, bool ignoreEditedStatus = false);
+  // Returns false when the feature is not a street (or deleted).
+  bool GetStreetRect(uint32_t featureId, bool ignoreEditedStatus, m2::RectD & rect) const;
 
   MwmContext * m_context;
   int m_scale;

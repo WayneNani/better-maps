@@ -47,6 +47,19 @@ public:
         m_IndexForScale[i]->ForEach(fn, beg, end);
   }
 
+  // ForEachInIntervalAndScale() reads the buckets [0, GetNumBuckets(scale)), one after the other.
+  size_t GetNumBuckets(int scale) const
+  {
+    auto const scaleBucket = BucketByScale(scale);
+    return scaleBucket < m_IndexForScale.size() ? scaleBucket + 1 : 0;
+  }
+
+  template <class FnT>
+  void ForEachInIntervalAndBucket(uint64_t beg, uint64_t end, size_t bucket, FnT && fn) const
+  {
+    m_IndexForScale[bucket]->ForEach(fn, beg, end);
+  }
+
 private:
   using IndexT = IntervalIndex<Reader, uint32_t>;
   std::vector<std::unique_ptr<IndexT>> m_IndexForScale;
