@@ -73,6 +73,7 @@
   <string name="transit_back">Zurück zu den Verbindungen</string>
   <string name="transit_settings_open">Einstellungen öffentlicher Verkehr</string>
   <string name="transit_no_connections">Keine Verbindungen gefunden.</string>
+  <string name="transit_no_connections_far_ahead">Keine Verbindungen gefunden. Fahrpläne stehen oft nur einige Wochen oder Monate im Voraus fest.</string>
   <string name="transit_retry">Erneut versuchen</string>
   <string name="transit_error_network">Keine Verbindung zum Server.</string>
   <string name="transit_error_server">Der Server ist gerade nicht erreichbar. Bitte später erneut versuchen.</string>
@@ -86,7 +87,8 @@
   <string name="transit_now">Jetzt</string>
   <string name="transit_today">Heute</string>
   <string name="transit_tomorrow">Morgen</string>
-  <string name="transit_day_after_tomorrow">Übermorgen</string>
+  <string name="transit_other_date">Anderes Datum</string>
+  <string name="transit_choose_date">Datum wählen</string>
 
   <string name="transit_departures">Abfahrten</string>
   <string name="transit_departures_from">Abfahrten ab %1$s</string>

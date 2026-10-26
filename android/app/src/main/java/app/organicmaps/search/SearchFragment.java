@@ -75,6 +75,8 @@ import java.util.List;
 
 public class SearchFragment extends BaseMwmFragment implements SearchListener, CategoriesAdapter.CategoriesUiListener
 {
+  private static final String STATE_CATEGORY_QUERY = "category_query";
+
   private long mLastQueryTimestamp;
   private boolean compatibleContactsAppInstalled = true;
   @NonNull
@@ -208,6 +210,8 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
   private final LastPosition mLastPosition = new LastPosition();
   private boolean mSearchRunning;
   private String mInitialQuery;
+  // better-maps: the initial query is a search category, e.g. opened again from the search bar on the map.
+  private boolean mInitialIsCategory;
   @Nullable
   private String mInitialLocale;
   private boolean mInitialSearchOnMap = false;
@@ -310,13 +314,18 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
     super.onViewCreated(view, savedInstanceState);
     mSearchAdapter = new SearchAdapter(this);
     initOnlineSearch();
-    readArguments();
+    // A recreated screen keeps the query of its text field; the arguments would replace it.
+    if (savedInstanceState == null)
+      readArguments();
 
     ViewGroup root = (ViewGroup) view;
     mTabFrame = root.findViewById(R.id.tab_frame);
     ViewPager2 pager = mTabFrame.findViewById(R.id.pages);
 
     mToolbarController = new ToolbarController(view);
+    // better-maps: the text field restores its text after this; a restored category text stays categorial.
+    if (savedInstanceState != null)
+      mToolbarController.restoreCategory(savedInstanceState.getString(STATE_CATEGORY_QUERY));
     TabLayout tabLayout = root.findViewById(R.id.tabs);
 
     if (Config.isSearchHistoryEnabled())
@@ -378,6 +387,21 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
 
     if (mInitialSearchOnMap)
       showAllResultsOnMap();
+  }
+
+  @Override
+  public void onViewStateRestored(@Nullable Bundle savedInstanceState)
+  {
+    super.onViewStateRestored(savedInstanceState);
+    mToolbarController.onViewStateRestored();
+  }
+
+  @Override
+  public void onSaveInstanceState(@NonNull Bundle outState)
+  {
+    super.onSaveInstanceState(outState);
+    if (getView() != null)
+      outState.putString(STATE_CATEGORY_QUERY, mToolbarController.getCategoryQuery());
   }
 
   private void initOpeningHoursFilter(@NonNull View root)
@@ -474,7 +498,7 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
     MwmApplication.from(requireContext()).getLocationHelper().addListener(mLocationListener);
     if (mInitialQuery != null)
     {
-      setQuery(mInitialQuery, false);
+      setQuery(mInitialQuery, mInitialIsCategory);
       mInitialQuery = null;
     }
   }
@@ -532,6 +556,7 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
       return;
 
     mInitialQuery = arguments.getString(SearchActivity.EXTRA_QUERY);
+    mInitialIsCategory = arguments.getBoolean(SearchActivity.EXTRA_IS_CATEGORY);
     mInitialLocale = arguments.getString(SearchActivity.EXTRA_LOCALE);
     mInitialSearchOnMap = arguments.getBoolean(SearchActivity.EXTRA_SEARCH_ON_MAP);
   }
@@ -568,7 +593,7 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
     if (Config.isSearchHistoryEnabled())
       SearchRecents.add(query, requireContext());
     SearchEngine.INSTANCE.cancel();
-    SearchEngine.INSTANCE.setQuery(query);
+    SearchEngine.INSTANCE.setQuery(query, isCategory());
 
     if (RoutingController.get().isWaitingPoiPick())
     {
@@ -608,7 +633,7 @@ public class SearchFragment extends BaseMwmFragment implements SearchListener, C
         !TextUtils.isEmpty(mInitialLocale) ? mInitialLocale : Language.getKeyboardLocale(requireContext()),
         mLastQueryTimestamp, false /* isMapAndTable */, getOpeningHoursFilter());
 
-    SearchEngine.INSTANCE.setQuery(query);
+    SearchEngine.INSTANCE.setQuery(query, isCategory());
     Utils.navigateToParent(requireActivity());
   }
 

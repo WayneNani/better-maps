@@ -272,7 +272,7 @@ public class SearchWheel implements View.OnClickListener
     final String query = mFrame.getContext().getString(searchOption.mQueryId);
     // Category request from navigation search wheel.
     SearchEngine.INSTANCE.searchInteractive(mFrame.getContext(), query, true, System.nanoTime(), false);
-    SearchEngine.INSTANCE.setQuery(query);
+    SearchEngine.INSTANCE.setQuery(query, true);
     refreshSearchButtonImage();
     toggleSearchLayout();
   }

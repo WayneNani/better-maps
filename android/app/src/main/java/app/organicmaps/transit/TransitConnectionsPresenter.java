@@ -222,7 +222,7 @@ public final class TransitConnectionsPresenter
 
   /**
    * Shows a saved connection in the detail view and on the map, without a query. {@link #back()} closes it,
-   * {@link #searchAgain()} searches between the same places now.
+   * {@link #searchAgain()} searches between the same places (at its time if still ahead, otherwise now).
    */
   public void showSaved(@NonNull SavedConnection saved)
   {
@@ -252,12 +252,16 @@ public final class TransitConnectionsPresenter
     return mSaved != null;
   }
 
-  /** Searches connections between the places of the shown saved connection, departing now. */
+  /**
+   * Searches connections between the places of the shown saved connection: departing at its time if it is still
+   * ahead (e.g. saved for next Friday), otherwise departing now.
+   */
   public void searchAgain()
   {
     if (mSaved == null)
       return;
-    mTime = null;
+    final Instant start = mSaved.getItinerary().getStartTime();
+    mTime = start.isAfter(mClock.now()) ? start : null;
     mArriveBy = false;
     startQuery(false);
   }
@@ -490,7 +494,7 @@ public final class TransitConnectionsPresenter
     if (!hasQuery())
       return new ConnectionsState(ConnectionsState.Screen.NONE, timeLabel, mArriveBy, false, false, false, null, null,
                                   Collections.emptyList(), false, false, null, Collections.emptyList(), providerName(),
-                                  attributionUrl(), viewMode, false, false, false, null, now, "", "");
+                                  attributionUrl(), viewMode, false, false, false, null, now, "", "", false);
 
     final List<TransitItinerary> all = getAllItineraries();
     final List<ItineraryItem> items = new ArrayList<>(all.size());
@@ -512,11 +516,17 @@ public final class TransitConnectionsPresenter
         attributionUrl(), viewMode, mSaved != null, detail && mSavedStore.contains(TransitItemFactory.key(selected)),
         mSaved != null && mSaved.isPast(now),
         detail ? mItems.getFormatter().formatDate(selected.getStartTime(), zoneOf(selected)) : null, now,
-        label(mFromName), label(mToName));
+        label(mFromName), label(mToName), mSaved == null && TransitDateRange.isFarAhead(mTime, now));
   }
 
   private void startQuery(boolean debounce)
   {
+    // A date chosen days ago (the presenter lives as long as the app): search for now instead of the past.
+    if (new TransitDateRange(mClock.now(), mItems.getFormatter().getDeviceZone()).isPastDay(mTime))
+    {
+      mTime = null;
+      mArriveBy = false;
+    }
     final int generation = ++mGeneration;
     final boolean hadSelection = mSelected >= 0 || mSaved != null;
     mSaved = null;

@@ -17,6 +17,7 @@ import androidx.annotation.StringRes;
 import app.organicmaps.R;
 import app.organicmaps.sdk.util.Config;
 import app.organicmaps.sdk.util.StringUtils;
+import app.organicmaps.search.SearchQueryState;
 import app.organicmaps.util.InputUtils;
 import app.organicmaps.util.UiUtils;
 import com.google.android.material.textfield.TextInputEditText;
@@ -31,10 +32,9 @@ public class SearchToolbarController extends ToolbarController implements View.O
   private final View mBack;
   @NonNull
   private final TextInputEditText mQuery;
-  private boolean mFromCategory = false;
-  // The text set by a tap on a search category. Editing it makes the query a normal one again.
-  @Nullable
-  private String mCategoryQuery;
+  // Whether the text is a tapped category. Editing it makes the query a normal one again.
+  @NonNull
+  private final SearchQueryState mQueryState = new SearchQueryState();
   @NonNull
   private final View mProgress;
   @NonNull
@@ -50,11 +50,7 @@ public class SearchToolbarController extends ToolbarController implements View.O
       final boolean isEmpty = TextUtils.isEmpty(s);
       // better-maps: a category stays categorial only while its text is unchanged. Otherwise "Italiener offen"
       // typed after tapping "Café" would be searched as a category name and find nothing.
-      if (mFromCategory && !s.toString().equals(mCategoryQuery))
-      {
-        mFromCategory = false;
-        mCategoryQuery = null;
-      }
+      mQueryState.onTextChanged(s);
       mBackPressedCallback.setEnabled(!isEmpty);
       updateViewsVisibility(isEmpty);
       SearchToolbarController.this.onTextChanged(s.toString());
@@ -172,13 +168,41 @@ public class SearchToolbarController extends ToolbarController implements View.O
   }
   public boolean isCategory()
   {
-    return mFromCategory;
+    return mQueryState.isCategory();
+  }
+
+  /** The text of the tapped category, null for a normal query; to be saved with the screen state. */
+  @Nullable
+  public String getCategoryQuery()
+  {
+    return mQueryState.getCategoryQuery();
+  }
+
+  /**
+   * Restores the category of a recreated screen. Call it before the text field restores its text: the restored text
+   * is then searched as the category again.
+   */
+  public void restoreCategory(@Nullable String categoryQuery)
+  {
+    mQueryState.restoreCategory(categoryQuery);
+  }
+
+  /** Drops a restored category if the field did not get its text back. */
+  public void onViewStateRestored()
+  {
+    mQueryState.onTextChanged(getQueryText());
+  }
+
+  @NonNull
+  private String getQueryText()
+  {
+    final CharSequence text = mQuery.getText();
+    return text != null ? text.toString() : "";
   }
 
   public void setQuery(CharSequence query, boolean fromCategory)
   {
-    mFromCategory = fromCategory;
-    mCategoryQuery = fromCategory ? query.toString() : null;
+    mQueryState.setQuery(query, fromCategory);
     mQuery.setText(query);
     if (!TextUtils.isEmpty(query))
       mQuery.setSelection(query.length());

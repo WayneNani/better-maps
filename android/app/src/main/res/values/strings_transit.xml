@@ -74,6 +74,7 @@
   <string name="transit_back">Back to connections</string>
   <string name="transit_settings_open">Public transport settings</string>
   <string name="transit_no_connections">No connections found.</string>
+  <string name="transit_no_connections_far_ahead">No connections found. Timetables are often published only a few weeks or months in advance.</string>
   <string name="transit_retry">Try again</string>
   <string name="transit_error_network">No connection to the server.</string>
   <string name="transit_error_server">The server is not available right now. Please try again later.</string>
@@ -87,7 +88,8 @@
   <string name="transit_now">Now</string>
   <string name="transit_today">Today</string>
   <string name="transit_tomorrow">Tomorrow</string>
-  <string name="transit_day_after_tomorrow">Day after tomorrow</string>
+  <string name="transit_other_date">Other date</string>
+  <string name="transit_choose_date">Choose a date</string>
 
   <string name="transit_departures">Departures</string>
   <string name="transit_departures_from">Departures from %1$s</string>
