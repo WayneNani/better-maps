@@ -313,7 +313,8 @@ Retrieval::ExtendedFeatures RetrieveGeometryFeaturesImpl(MwmContext const & cont
 
   FeaturesCollector collector(cancellable, features, exactlyMatchedFeatures);
 
-  context.ForEachIndex(coverage, scale, collector);
+  // The order doesn't matter, the features are sorted below.
+  context.ForEachIndexUnordered(coverage, scale, collector);
 
   holder.ForEachModifiedOrCreated([&](EditableMapObject const & emo, uint64_t index)
   {

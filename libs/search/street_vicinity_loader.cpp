@@ -162,27 +162,24 @@ void StreetVicinityLoader::LoadStreets(std::vector<uint32_t> const & streetIds, 
   uint32_t numRead = 0;
   for (size_t bucket = 0; bucket < numBuckets; ++bucket)
   {
-    for (auto const & interval : mergedIntervals)
+    m_context->ForEachIndexInBucket(mergedIntervals, bucket, [&](uint64_t key, uint32_t id)
     {
-      m_context->ForEachIndexInBucket(interval.first, interval.second, bucket, [&](uint64_t key, uint32_t id)
-      {
-        if ((++numRead & 0xFFF) == 0)
-          BailIfCancelled(cancellable);
+      if ((++numRead & 0xFFF) == 0)
+        BailIfCancelled(cancellable);
 
-        auto const [it, inserted] = featureToPending.try_emplace(id, kNotPending);
-        if (inserted && !m_context->IsDeleted(id))
+      auto const [it, inserted] = featureToPending.try_emplace(id, kNotPending);
+      if (inserted && !m_context->IsDeleted(id))
+      {
+        if (auto const street = m_context->GetStreet(id))
         {
-          if (auto const street = m_context->GetStreet(id))
-          {
-            auto const pendingIt = streetToPending.find(*street);
-            if (pendingIt != streetToPending.end())
-              it->second = pendingIt->second;
-          }
+          auto const pendingIt = streetToPending.find(*street);
+          if (pendingIt != streetToPending.end())
+            it->second = pendingIt->second;
         }
-        if (it->second != kNotPending)
-          entries[bucket].push_back({key, id, it->second});
-      });
-    }
+      }
+      if (it->second != kNotPending)
+        entries[bucket].push_back({key, id, it->second});
+    });
   }
 
   ankerl::unordered_dense::set<uint32_t> added;

@@ -9,6 +9,8 @@
 #include "base/macros.hpp"
 #include "base/stl_helpers.hpp"
 
+#include <algorithm>
+#include <random>
 #include <utility>
 #include <vector>
 
@@ -294,5 +296,56 @@ UNIT_TEST(IntervalIndex_Simple5)
     index.ForEach(IndexValueInserter(values), 0, 0xFFFFFFFFFFULL);
     sort(values.begin(), values.end());
     TEST_EQUAL(values, vector<uint32_t>(expected, expected + ARRAY_SIZE(expected)), ());
+  }
+}
+
+UNIT_TEST(IntervalIndex_ForEachInIntervals_SameAsForEach)
+{
+  std::mt19937 rng(42);
+  for (uint32_t const keyBits : {16, 24, 40})
+  {
+    uint64_t const keyEnd = uint64_t{1} << keyBits;
+    // Clustered keys with duplicates, like cells of features.
+    vector<CellIdFeaturePairForTest> data;
+    for (uint32_t i = 0; i < 5000; ++i)
+    {
+      uint64_t const cluster = rng() % 50;
+      uint64_t const key = (cluster * (keyEnd / 50) + rng() % (keyEnd / 1000)) % keyEnd;
+      data.emplace_back(key, i);
+      if (rng() % 5 == 0)
+        data.emplace_back(key, i + 100000);
+    }
+    sort(data.begin(), data.end(), [](auto const & l, auto const & r)
+    { return std::make_pair(l.GetCell(), l.GetValue()) < std::make_pair(r.GetCell(), r.GetValue()); });
+
+    vector<char> serialIndex;
+    MemWriter<vector<char>> writer(serialIndex);
+    BuildIntervalIndex(data.begin(), data.end(), writer, keyBits);
+    MemReader reader(&serialIndex[0], serialIndex.size());
+    IntervalIndex<MemReader, uint32_t> index(reader);
+
+    for (size_t iTest = 0; iTest < 300; ++iTest)
+    {
+      // Sorted, not overlapping intervals, some of them adjacent, some up to the end of keys.
+      vector<pair<int64_t, int64_t>> intervals;
+      uint64_t pos = rng() % (keyEnd / 4);
+      size_t const numIntervals = 1 + rng() % 40;
+      for (size_t i = 0; i < numIntervals && pos < keyEnd; ++i)
+      {
+        uint64_t const length = 1 + rng() % (rng() % 2 == 0 ? 16 : keyEnd / 20);
+        uint64_t const end = std::min(pos + length, keyEnd + (rng() % 3 == 0 ? 10 : 0));
+        intervals.emplace_back(pos, end);
+        pos = end + (rng() % 3 == 0 ? 0 : 1 + rng() % (keyEnd / 30));
+      }
+
+      vector<pair<uint64_t, uint32_t>> expected;
+      for (auto const & [beg, end] : intervals)
+        index.ForEach([&](uint64_t key, uint32_t value) { expected.emplace_back(key, value); }, beg, end);
+
+      vector<pair<uint64_t, uint32_t>> actual;
+      index.ForEachInIntervals([&](uint64_t key, uint32_t value) { actual.emplace_back(key, value); }, intervals);
+
+      TEST_EQUAL(actual, expected, (keyBits, intervals));
+    }
   }
 }

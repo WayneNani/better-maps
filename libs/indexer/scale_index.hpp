@@ -54,10 +54,12 @@ public:
     return scaleBucket < m_IndexForScale.size() ? scaleBucket + 1 : 0;
   }
 
-  template <class FnT>
-  void ForEachInIntervalAndBucket(uint64_t beg, uint64_t end, size_t bucket, FnT && fn) const
+  // Calls |fn(key, value)| for the keys in the sorted, not overlapping |intervals| ([beg, end) pairs) in |bucket|, in
+  // the order of keys.
+  template <class Intervals, class FnT>
+  void ForEachInIntervalsAndBucket(Intervals const & intervals, size_t bucket, FnT && fn) const
   {
-    m_IndexForScale[bucket]->ForEach(fn, beg, end);
+    m_IndexForScale[bucket]->ForEachInIntervals(fn, intervals);
   }
 
 private:
