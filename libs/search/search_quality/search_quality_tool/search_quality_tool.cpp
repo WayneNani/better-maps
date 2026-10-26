@@ -10,6 +10,8 @@
 #include "indexer/classificator.hpp"
 #include "indexer/classificator_loader.hpp"
 #include "indexer/data_source.hpp"
+#include "indexer/feature.hpp"
+#include "indexer/feature_data.hpp"
 #include "indexer/mwm_set.hpp"
 
 #include "platform/country_file.hpp"
@@ -167,10 +169,31 @@ string Sanitize(string s)
   return s;
 }
 
-// Writes |top| results of the query as TSV lines:
-// query, position, name, type, address, distance to the user position (m), opening state, ranking details.
-void WriteTsv(ostream & os, string const & query, vector<Result> const & results, size_t top,
-              optional<m2::PointD> const & position)
+// Returns all types of the result's feature (e.g. "amenity-restaurant cuisine-indian"), sorted by importance.
+string GetAllTypes(DataSource const & dataSource, Result const & r)
+{
+  if (r.GetResultType() != Result::Type::Feature)
+    return {};
+  FeaturesLoaderGuard guard(dataSource, r.GetFeatureID().m_mwmId);
+  auto ft = guard.GetFeatureByIndex(r.GetFeatureID().m_index);
+  if (!ft)
+    return {};
+  feature::TypesHolder types(*ft);
+  types.SortBySpec();
+  string res;
+  for (uint32_t t : types)
+  {
+    if (!res.empty())
+      res += ' ';
+    res += classif().GetReadableObjectName(t);
+  }
+  return res;
+}
+
+// Writes |top| results of the query as TSV lines: query, position, name, type, all types of the feature, address,
+// distance to the user position (m), opening state, ranking details.
+void WriteTsv(ostream & os, DataSource const & dataSource, string const & query, vector<Result> const & results,
+              size_t top, optional<m2::PointD> const & position)
 {
   for (size_t i = 0; i < min(top, results.size()); ++i)
   {
@@ -186,7 +209,7 @@ void WriteTsv(ostream & os, string const & query, vector<Result> const & results
       distance = strings::to_string(static_cast<int>(mercator::DistanceOnEarth(*position, r.GetFeatureCenter())));
 
     os << Sanitize(query) << '\t' << i + 1 << '\t' << Sanitize(r.GetString()) << '\t' << type << '\t'
-       << Sanitize(r.GetAddress()) << '\t' << distance << '\t'
+       << GetAllTypes(dataSource, r) << '\t' << Sanitize(r.GetAddress()) << '\t' << distance << '\t'
        << (r.GetResultType() == Result::Type::Feature ? OpenStateString(r.IsOpenNow()) : "") << '\t';
     if (r.GetResultType() == Result::Type::Feature)
     {
@@ -344,8 +367,8 @@ void CheckCompleteness(string const & path, DataSource & dataSource, TestSearchE
        << "%)." << endl;
 }
 
-void RunRequests(TestSearchEngine & engine, m2::RectD const & viewport, string queriesPath, string const & locale,
-                 string const & rankingCSVFile, size_t top)
+void RunRequests(DataSource const & dataSource, TestSearchEngine & engine, m2::RectD const & viewport,
+                 string queriesPath, string const & locale, string const & rankingCSVFile, size_t top)
 {
   vector<string> queries;
   {
@@ -376,7 +399,7 @@ void RunRequests(TestSearchEngine & engine, m2::RectD const & viewport, string q
   {
     tsv.open(FLAGS_tsv_out);
     CHECK(tsv.is_open(), ("Can't open", FLAGS_tsv_out));
-    tsv << "query\tpos\tname\ttype\taddress\tdistance_m\topen\tranking\n";
+    tsv << "query\tpos\tname\ttype\ttypes\taddress\tdistance_m\topen\tranking\n";
   }
 
   ofstream csv;
@@ -404,7 +427,7 @@ void RunRequests(TestSearchEngine & engine, m2::RectD const & viewport, string q
     responseTimes[i] = static_cast<double>(rt) / 1000;
     PrintTopResults(MakePrefixFree(queries[i]), requests[i]->Results(), top, responseTimes[i]);
     if (tsv.is_open())
-      WriteTsv(tsv, queries[i], requests[i]->Results(), top, ParsePosition(FLAGS_position));
+      WriteTsv(tsv, dataSource, queries[i], requests[i]->Results(), top, ParsePosition(FLAGS_position));
 
     if (dumpCSV)
     {
@@ -458,7 +481,7 @@ int main(int argc, char * argv[])
     return 0;
   }
 
-  RunRequests(*engine, viewport, FLAGS_queries_path, FLAGS_locale, FLAGS_ranking_csv_file,
+  RunRequests(dataSource, *engine, viewport, FLAGS_queries_path, FLAGS_locale, FLAGS_ranking_csv_file,
               static_cast<size_t>(FLAGS_top));
   return 0;
 }
