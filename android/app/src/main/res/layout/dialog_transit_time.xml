@@ -54,12 +54,13 @@
       android:layout_height="wrap_content"
       android:text="@string/transit_tomorrow" />
 
+    <!-- Any other date: opens the calendar, then shows the chosen date. -->
     <com.google.android.material.chip.Chip
-      android:id="@+id/transit_day_2"
+      android:id="@+id/transit_day_other"
       style="@style/Widget.Material3.Chip.Filter"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="@string/transit_day_after_tomorrow" />
+      android:text="@string/transit_other_date" />
   </com.google.android.material.chip.ChipGroup>
 
   <TimePicker

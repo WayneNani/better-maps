@@ -338,7 +338,8 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
     }
     else if (state.isEmpty() && state.getScreen() != ConnectionsState.Screen.NONE)
     {
-      mStatusText.setText(R.string.transit_no_connections);
+      mStatusText.setText(state.isFarAhead() ? R.string.transit_no_connections_far_ahead
+                                             : R.string.transit_no_connections);
       UiUtils.hide(mRetry);
       UiUtils.show(mStatus);
     }
