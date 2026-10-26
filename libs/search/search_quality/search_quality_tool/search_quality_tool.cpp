@@ -11,6 +11,7 @@
 #include "indexer/classificator_loader.hpp"
 #include "indexer/data_source.hpp"
 #include "indexer/mwm_set.hpp"
+#include "indexer/search_delimiters.hpp"
 
 #include "platform/country_file.hpp"
 #include "platform/helpers.hpp"
@@ -169,8 +170,30 @@ string Sanitize(string s)
   return s;
 }
 
+// How well a result answers the query, judged by the highlighted parts like the Android app does to decide whether
+// to search online (see OfflinePlace.match() there): "full" if at least 75% of the query's letters and digits are
+// highlighted in the name and the address, "partial" if less, "none" if nothing.
+string HighlightMatch(string const & query, Result const & r)
+{
+  size_t highlighted = 0;
+  for (size_t i = 0; i < r.GetHighlightRangesCount(); ++i)
+    highlighted += r.GetHighlightRange(i).second;
+  for (size_t i = 0; i < r.GetDescHighlightRangesCount(); ++i)
+    highlighted += r.GetDescHighlightRange(i).second;
+  if (highlighted == 0)
+    return "none";
+
+  search::Delimiters const delimiters;
+  size_t queryLength = 0;
+  for (auto const c : strings::MakeUniString(query))
+    if (!delimiters(c))
+      ++queryLength;
+  return highlighted >= 0.75 * queryLength ? "full" : "partial";
+}
+
 // Writes |top| results of the query as TSV lines:
-// query, position, name, type, address, distance to the user position (m), opening state, ranking details.
+// query, position, name, type, address, distance to the user position (m), opening state, ranking details,
+// highlight match (see HighlightMatch()).
 void WriteTsv(ostream & os, string const & query, vector<Result> const & results, size_t top,
               optional<m2::PointD> const & position)
 {
@@ -198,7 +221,7 @@ void WriteTsv(ostream & os, string const & query, vector<Result> const & results
       if (FLAGS_tsv_debug)
         os << ", " << DebugPrint(info);
     }
-    os << '\n';
+    os << '\t' << HighlightMatch(query, r) << '\n';
   }
 }
 
@@ -369,6 +392,7 @@ void RunRequests(TestSearchEngine & engine, m2::RectD const & viewport, string q
     params.m_mode = Mode::Everywhere;
     params.m_position = ParsePosition(FLAGS_position);
     params.m_needAddress = true;
+    params.m_needHighlighting = true;
     if (FLAGS_max_results > 0)
       params.m_maxNumResults = static_cast<size_t>(FLAGS_max_results);
     params.m_detectQueryFilters = FLAGS_detect_query_filters;
@@ -382,7 +406,7 @@ void RunRequests(TestSearchEngine & engine, m2::RectD const & viewport, string q
   {
     tsv.open(FLAGS_tsv_out);
     CHECK(tsv.is_open(), ("Can't open", FLAGS_tsv_out));
-    tsv << "query\tpos\tname\ttype\taddress\tdistance_m\topen\tranking\n";
+    tsv << "query\tpos\tname\ttype\taddress\tdistance_m\topen\tranking\thighlight\n";
   }
 
   ofstream csv;
