@@ -20,6 +20,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.testing.FragmentScenario;
 import androidx.recyclerview.widget.RecyclerView;
@@ -76,6 +79,15 @@ public class OnlineTransitFlowTest
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
+      // The test activity is drawn edge-to-edge (Android 15+). Keep the panel clear of the system bars like in the
+      // route planner, otherwise taps on its top row (e.g. the back button) land on the status bar.
+      ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
+        final Insets bars =
+            insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+        v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+        return insets;
+      });
+      ViewCompat.requestApplyInsets(view);
       mPanel = new OnlineTransitPanel(requireActivity(), view);
       mPanel.show();
     }
