@@ -1,6 +1,7 @@
 # better-maps search evaluation set for Berlin (AP2b).
 # Columns (tab separated): id, kind, query, expectation.
 # kind: category|filter|typo_category -> expectation is a regex for the expected result types (classificator names);
+#       cuisine|cuisine_filter -> expectation is a regex for any type of the result (e.g. cuisine-indian);
 #       place|address|street|typo|collision -> expectation is a regex for the expected result ("name | address | type").
 # Queries are run as typed in the app (no trailing space), see run_eval.sh.
 c01	category	Café	^amenity-cafe
@@ -30,6 +31,62 @@ f05	filter	Restaurant heute 22 Uhr	^amenity-restaurant
 f06	filter	cafe open now	^amenity-cafe
 f07	filter	Tankstelle geöffnet	^amenity-fuel
 f08	filter	Bäckerei am Sonntag	^shop-bakery
+c20	category	Club	^amenity-nightclub
+c21	category	Disco	^amenity-nightclub
+c22	category	Nachtclub	^amenity-nightclub
+c23	category	Bar	^amenity-(bar|pub)
+c24	category	Kneipe	^amenity-(pub|bar)
+c25	category	Cocktailbar	^amenity-bar
+c26	category	Bars & Clubs	^amenity-(bar|pub|nightclub)
+k01	cuisine	indisch	\bcuisine-indian\b
+k02	cuisine	indische	\bcuisine-indian\b
+k03	cuisine	Inder	\bcuisine-indian\b
+k04	cuisine	indisches Restaurant	\bcuisine-indian\b
+k05	cuisine	Indian	\bcuisine-indian\b
+k06	cuisine	italienisch	\bcuisine-(italian|pizza)\b
+k07	cuisine	Italiener	\bcuisine-(italian|pizza)\b
+k08	cuisine	chinesisch	\bcuisine-chinese\b
+k09	cuisine	Chinese	\bcuisine-chinese\b
+k10	cuisine	griechisch	\bcuisine-greek\b
+k11	cuisine	Grieche	\bcuisine-greek\b
+k12	cuisine	türkisch	\bcuisine-(turkish|kebab)\b
+k13	cuisine	Thai	\bcuisine-thai\b
+k14	cuisine	thailändisch	\bcuisine-thai\b
+k15	cuisine	vietnamesisch	\bcuisine-vietnamese\b
+k16	cuisine	Vietnamese	\bcuisine-vietnamese\b
+k17	cuisine	japanisch	\bcuisine-(japanese|sushi|ramen)\b
+k18	cuisine	Japaner	\bcuisine-(japanese|sushi|ramen)\b
+k19	cuisine	koreanisch	\bcuisine-korean\b
+k20	cuisine	mexikanisch	\bcuisine-mexican\b
+k21	cuisine	Mexikaner	\bcuisine-mexican\b
+k22	cuisine	spanisch	\bcuisine-(spanish|tapas)\b
+k23	cuisine	französisch	\bcuisine-french\b
+k24	cuisine	libanesisch	\bcuisine-lebanese\b
+k25	cuisine	persisch	\bcuisine-persian\b
+k26	cuisine	äthiopisch	\bcuisine-ethiopian\b
+k27	cuisine	amerikanisch	\bcuisine-(american|burger)\b
+k28	cuisine	asiatisch	\bcuisine-(asian|chinese|japanese|korean|thai|vietnamese|indonesian|malaysian|lao|sushi|ramen)\b
+k29	cuisine	vegan	\bcuisine-vegan\b
+k30	cuisine	vegetarisch	\bcuisine-(vegetarian|vegan)\b
+k31	cuisine	Pizzeria	\bcuisine-pizza\b
+k32	cuisine	Burger	\bcuisine-burger\b
+k33	cuisine	Ramen	\bcuisine-ramen\b
+k34	cuisine	Curry	\bcuisine-(curry|indian)\b
+k35	cuisine	Tapas	\bcuisine-tapas\b
+kf1	cuisine_filter	Italiener offen	\bcuisine-(italian|pizza)\b
+kf2	cuisine_filter	Inder Sonntag	\bcuisine-indian\b
+kf3	cuisine_filter	indisch jetzt geöffnet	\bcuisine-indian\b
+kf4	cuisine_filter	Thai offen	\bcuisine-thai\b
+kf5	cuisine_filter	Grieche heute 22 Uhr	\bcuisine-greek\b
+x04	collision	Indische Straße	^Indische Stra(ß|ss)e
+x05	collision	Französische Straße	^(U )?Französische Stra(ß|ss)e
+x06	collision	Französischer Dom	^Französischer Dom
+x07	collision	Deutsche Oper	^(U )?Deutsche Oper
+x08	collision	Thai Massage	massage
+x09	collision	chinesische Medizin	(?i)chines.*medizin|TCM|healthcare|doctors
+x10	collision	Französisch Buchholz	^Französisch Buchholz
+x11	collision	Spanische Allee	^Spanische Allee \|.*\| highway-
+x12	collision	Französisch	^Französisch Buchholz
 p01	place	Alexanderplatz	^Alexanderplatz
 p02	place	Hauptbahnhof	Berlin Hauptbahnhof|^Hauptbahnhof
 p03	place	Brandenburger Tor	^Brandenburger Tor

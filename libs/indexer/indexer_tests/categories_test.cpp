@@ -97,6 +97,38 @@ UNIT_TEST(LoadCategories)
   TEST_EQUAL(count, 3, ());
 }
 
+UNIT_TEST(CategoriesHolder_MultiDigitPrefixLength)
+{
+  classificator::Load();
+
+  char const kCategories[] =
+      "amenity-cafe\n"
+      "en:3Cafe|12Cafe and Bakery|00|112\n"
+      "de:10Kaffeehaus|9Kaffee";
+
+  CategoriesHolder holder(make_unique<MemReader>(kCategories, sizeof(kCategories) - 1));
+  vector<CategoriesHolder::Category::Name> names;
+  holder.ForEachName([&names](CategoriesHolder::Category::Name const & name) { names.push_back(name); });
+
+  TEST_EQUAL(names.size(), 6, ());
+  TEST_EQUAL(names[0].m_name, "Cafe", ());
+  TEST_EQUAL(names[0].m_prefixLengthToSuggest, 3, ());
+  // All digits are the prefix length, the name starts after them. Lengths above 9 are capped,
+  // because 10 means "never suggest".
+  TEST_EQUAL(names[1].m_name, "Cafe and Bakery", ());
+  TEST_EQUAL(names[1].m_prefixLengthToSuggest, 9, ());
+  // A leading zero is not a prefix length.
+  TEST_EQUAL(names[2].m_name, "00", ());
+  TEST_EQUAL(names[2].m_prefixLengthToSuggest, CategoriesHolder::Category::kEmptyPrefixLength, ());
+  // A name of digits only.
+  TEST_EQUAL(names[3].m_name, "112", ());
+  TEST_EQUAL(names[3].m_prefixLengthToSuggest, CategoriesHolder::Category::kEmptyPrefixLength, ());
+  TEST_EQUAL(names[4].m_name, "Kaffeehaus", ());
+  TEST_EQUAL(names[4].m_prefixLengthToSuggest, 9, ());
+  TEST_EQUAL(names[5].m_name, "Kaffee", ());
+  TEST_EQUAL(names[5].m_prefixLengthToSuggest, 9, ());
+}
+
 UNIT_TEST(CategoriesHolder_Smoke)
 {
   auto const & mappings = CategoriesHolder::kLocaleMapping;

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="category_cafe">Café</string>
+  <string name="category_restaurant">Restaurant</string>
+  <string name="category_bakery">Bäckerei</string>
+  <string name="category_bar_club">Bars &amp; Clubs</string>
+</resources>

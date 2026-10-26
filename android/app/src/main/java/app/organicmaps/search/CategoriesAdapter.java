@@ -12,6 +12,7 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
+import androidx.annotation.VisibleForTesting;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
@@ -81,14 +82,16 @@ class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ViewHolde
 
   @SuppressLint("DiscouragedApi")
   @StringRes
-  private static int getStringResIdByKey(@NonNull Resources resources, @NonNull String packageName, @NonNull String key)
+  @VisibleForTesting
+  static int getStringResIdByKey(@NonNull Resources resources, @NonNull String packageName, @NonNull String key)
   {
     return resources.getIdentifier(key, "string", packageName);
   }
 
   @SuppressLint("DiscouragedApi")
   @DrawableRes
-  private static int getDrawableResIdByKey(@NonNull Context context, @NonNull String packageName, @NonNull String key)
+  @VisibleForTesting
+  static int getDrawableResIdByKey(@NonNull Context context, @NonNull String packageName, @NonNull String key)
   {
     return context.getResources().getIdentifier("ic_" + key, "drawable", packageName);
   }

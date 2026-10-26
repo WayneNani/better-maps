@@ -32,6 +32,9 @@ public class SearchToolbarController extends ToolbarController implements View.O
   @NonNull
   private final TextInputEditText mQuery;
   private boolean mFromCategory = false;
+  // The text set by a tap on a search category. Editing it makes the query a normal one again.
+  @Nullable
+  private String mCategoryQuery;
   @NonNull
   private final View mProgress;
   @NonNull
@@ -45,6 +48,13 @@ public class SearchToolbarController extends ToolbarController implements View.O
     public void onTextChanged(CharSequence s, int start, int before, int count)
     {
       final boolean isEmpty = TextUtils.isEmpty(s);
+      // better-maps: a category stays categorial only while its text is unchanged. Otherwise "Italiener offen"
+      // typed after tapping "Café" would be searched as a category name and find nothing.
+      if (mFromCategory && !s.toString().equals(mCategoryQuery))
+      {
+        mFromCategory = false;
+        mCategoryQuery = null;
+      }
       mBackPressedCallback.setEnabled(!isEmpty);
       updateViewsVisibility(isEmpty);
       SearchToolbarController.this.onTextChanged(s.toString());
@@ -168,6 +178,7 @@ public class SearchToolbarController extends ToolbarController implements View.O
   public void setQuery(CharSequence query, boolean fromCategory)
   {
     mFromCategory = fromCategory;
+    mCategoryQuery = fromCategory ? query.toString() : null;
     mQuery.setText(query);
     if (!TextUtils.isEmpty(query))
       mQuery.setSelection(query.length());

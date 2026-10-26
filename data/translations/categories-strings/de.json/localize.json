@@ -57,7 +57,7 @@
         "defaultMessage": "3Geldwechselstelle|3Wechselstube|3Geld|3Geldumtausch"
     },
     "amenity-bar|amenity-pub|@category_eat|@category_nightlife": {
-        "defaultMessage": "2Bar|2Pub|4Kneipe|3Bier|4Trinken|4Gaststätte|4Bars und Kneipen|4Brauhaus|4Cocktail-Lounge|3Lokal|4Eckkneipe|4Schänke|4Schenke|4Bierbar|5Cocktailbar|3Beisl|3Beiz"
+        "defaultMessage": "2Bar|2Pub|4Kneipe|3Bier|4Trinken|4Gaststätte|4Bars und Kneipen|4Brauhaus|4Cocktail-Lounge|3Lokal|4Eckkneipe|4Schänke|4Schenke|4Bierbar|5Cocktailbar|3Beisl|3Beiz|Bars|Cocktails|Weinbar|Bars & Clubs"
     },
     "amenity-cafe|@category_eat": {
         "defaultMessage": "3Café|6Kaffeehaus|3Kaffeebar|3Cafeteria|3Kaffee|3Bistro|4Frühstück|4frühstücken|4Brunch|5Kaffeestube"
@@ -405,7 +405,7 @@
         "defaultMessage": "3Theater|4Schauspielhaus|U+1F3AD"
     },
     "amenity-nightclub|@category_entertainment|@category_nightlife": {
-        "defaultMessage": "3Nachtclub|3Nachtklub|3Nachtbar|3Nachtlokal|3Disko|3Tanzen|2Club|U+1F378|U+1F379|U+1F46F|U+1F483"
+        "defaultMessage": "3Nachtclub|3Nachtklub|3Nachtbar|3Nachtlokal|3Disko|3Tanzen|2Club|U+1F378|U+1F379|U+1F46F|U+1F483|Clubs|Diskothek|Discothek|Disco|Disse|Tanzclub|Technoclub|Tanzlokal|Clubbing|Bars & Clubs"
     },
     "amenity-brothel": {
         "defaultMessage": "3Bordell|U+1F3E9"
@@ -1632,7 +1632,7 @@
         "defaultMessage": "Frühstück"
     },
     "cuisine-burger|@fastfood": {
-        "defaultMessage": "Burger|4Hamburger"
+        "defaultMessage": "Burger|4Hamburger|Burgerladen|Burgerrestaurant|Burgerbude"
     },
     "cuisine-cake": {
         "defaultMessage": "Kuchen|Bäckerei"
@@ -1665,7 +1665,7 @@
         "defaultMessage": "Eis|Sorbet"
     },
     "cuisine-kebab|@fastfood": {
-        "defaultMessage": "Kebab|Döner"
+        "defaultMessage": "Kebab|Döner|Dönerladen|Dönerbude|Dönerimbiss"
     },
     "cuisine-noodles": {
         "defaultMessage": "Nudeln"
@@ -1686,19 +1686,19 @@
         "defaultMessage": "Sandwich"
     },
     "cuisine-sausage|@fastfood": {
-        "defaultMessage": "Wurst"
+        "defaultMessage": "Wurst|Currywurst|Bratwurst|Wurstbude"
     },
     "cuisine-seafood|cuisine-fish": {
-        "defaultMessage": "Meeresfrüchte|Fisch|Krabe|Garnelen"
+        "defaultMessage": "Meeresfrüchte|Fisch|Krabe|Garnelen|Fischrestaurant"
     },
     "cuisine-soba": {
         "defaultMessage": "Soba-Nudeln"
     },
     "cuisine-steak_house": {
-        "defaultMessage": "Steakhaus"
+        "defaultMessage": "Steakhaus|Steakhouse"
     },
     "cuisine-sushi": {
-        "defaultMessage": "Sushi"
+        "defaultMessage": "Sushi|Sushibar"
     },
     "cuisine-tapas": {
         "defaultMessage": "Tapas"
@@ -1707,136 +1707,136 @@
         "defaultMessage": "Tee"
     },
     "@cuisine_all_vegetarian": {
-        "defaultMessage": "4Vegetarisch|12Vegetarisches Essen|13Vegetarische Küche"
+        "defaultMessage": "4Vegetarisch|12Vegetarisches Essen|13Vegetarische Küche|Vegetarische|Veggie"
     },
     "cuisine-vegan|@cuisine_all_vegetarian": {
-        "defaultMessage": "4Vegan|6Veganes Essen|7Vegane Küche"
+        "defaultMessage": "4Vegan|6Veganes Essen|7Vegane Küche|Vegane"
     },
     "@cuisine_all_asian": {
-        "defaultMessage": "9Asiatisches Essen|12Asiatische Küche"
+        "defaultMessage": "9Asiatisches Essen|12Asiatische Küche|5Asiatisch|Asiatische|Asiatisches|Asiatisches Restaurant|Asiatischer Imbiss|Asiate"
     },
     "cuisine-vietnamese|@cuisine_all_asian": {
-        "defaultMessage": "13Vietnamesisches Essen|16Vietnamesische Küche"
+        "defaultMessage": "13Vietnamesisches Essen|16Vietnamesische Küche|6Vietnamesisch|Vietnamesische|Vietnamesisches|Vietnamesisches Restaurant|Vietnamesischer Imbiss|Vietnamese|Pho"
     },
     "cuisine-turkish": {
-        "defaultMessage": "8Türkisches Essen|11Türkische Küche"
+        "defaultMessage": "8Türkisches Essen|11Türkische Küche|5Türkisch|Türkische|Türkisches|Türkisches Restaurant|Türkischer Imbiss"
     },
     "cuisine-thai|@cuisine_all_asian": {
-        "defaultMessage": "11Thailändisches Essen|14Thailändische Küche"
+        "defaultMessage": "11Thailändisches Essen|14Thailändische Küche|4Thai|Thai Restaurant|Thai Imbiss|6Thailändisch|Thailändische|Thailändisches|Thailändisches Restaurant"
     },
     "cuisine-spanish": {
-        "defaultMessage": "8Spanisches Essen|11Spanische Küche"
+        "defaultMessage": "8Spanisches Essen|11Spanische Küche|5Spanisch|Spanische|Spanisches|Spanisches Restaurant|Spanier"
     },
     "cuisine-russian": {
-        "defaultMessage": "8Russisches Essen|11Russische Küche"
+        "defaultMessage": "8Russisches Essen|11Russische Küche|5Russisch|Russische|Russisches|Russisches Restaurant"
     },
     "cuisine-portuguese": {
-        "defaultMessage": "13Portugiesisches Essen|16Portugiesische Küche"
+        "defaultMessage": "13Portugiesisches Essen|16Portugiesische Küche|5Portugiesisch|Portugiesische|Portugiesisches|Portugiesisches Restaurant|Portugiese"
     },
     "cuisine-polish": {
-        "defaultMessage": "8Polnisches Essen|11Polnische Küche"
+        "defaultMessage": "8Polnisches Essen|11Polnische Küche|5Polnisch|Polnische|Polnisches|Polnisches Restaurant"
     },
     "cuisine-peruvian": {
-        "defaultMessage": "10Peruanisches Essen|13Peruanische Küche"
+        "defaultMessage": "10Peruanisches Essen|13Peruanische Küche|5Peruanisch|Peruanische|Peruanisches|Peruanisches Restaurant"
     },
     "cuisine-persian": {
-        "defaultMessage": "8Persisches Essen|11Persische Küche"
+        "defaultMessage": "8Persisches Essen|11Persische Küche|5Persisch|Persische|Persisches|Persisches Restaurant|Iranisch|Iranische|Iranisches Restaurant"
     },
     "cuisine-oriental": {
-        "defaultMessage": "12Orientalisches Essen|15Orientalische Küche|10Fernöstliches Essen|13Fernöstliche Küche"
+        "defaultMessage": "12Orientalisches Essen|15Orientalische Küche|10Fernöstliches Essen|13Fernöstliche Küche|5Orientalisch|Orientalische|Orientalisches|Orientalisches Restaurant"
     },
     "cuisine-moroccan": {
-        "defaultMessage": "12Marokkanisches Essen|15Marokkanische Küche"
+        "defaultMessage": "12Marokkanisches Essen|15Marokkanische Küche|5Marokkanisch|Marokkanische|Marokkanisches|Marokkanisches Restaurant"
     },
     "cuisine-mexican": {
-        "defaultMessage": "11Mexikanisches Essen|14Mexikanische Küche"
+        "defaultMessage": "11Mexikanisches Essen|14Mexikanische Küche|5Mexikanisch|Mexikanische|Mexikanisches|Mexikanisches Restaurant|Mexikaner"
     },
     "cuisine-mediterranean": {
-        "defaultMessage": "10Mediterranes Essen|13Mediterrane Küche"
+        "defaultMessage": "10Mediterranes Essen|13Mediterrane Küche|5Mediterran|Mediterrane|Mediterranes Restaurant"
     },
     "cuisine-malaysian|@cuisine_all_asian": {
-        "defaultMessage": "10Malaysisches Essen|13Malaysische Küche"
+        "defaultMessage": "10Malaysisches Essen|13Malaysische Küche|5Malaysisch|Malaysische|Malaysisches|Malaysisches Restaurant"
     },
     "cuisine-malagasy": {
         "defaultMessage": "12Madegassisches Essen|15Madegassische Küche"
     },
     "cuisine-lebanese": {
-        "defaultMessage": "11Libanesisches Essen|14Libanesische Küche"
+        "defaultMessage": "11Libanesisches Essen|14Libanesische Küche|5Libanesisch|Libanesische|Libanesisches|Libanesisches Restaurant|Libanese"
     },
     "cuisine-lao|@cuisine_all_asian": {
-        "defaultMessage": "8Laotisches Essen|11Laotische Küche"
+        "defaultMessage": "8Laotisches Essen|11Laotische Küche|5Laotisch|Laotische|Laotisches|Laotisches Restaurant"
     },
     "cuisine-korean|@cuisine_all_asian": {
-        "defaultMessage": "10Koreanisches Essen|13Koreanische Küche"
+        "defaultMessage": "10Koreanisches Essen|13Koreanische Küche|5Koreanisch|Koreanische|Koreanisches|Koreanisches Restaurant|Koreaner"
     },
     "cuisine-japanese|@cuisine_all_asian": {
-        "defaultMessage": "9Japanisches Essen|12Japanische Küche"
+        "defaultMessage": "9Japanisches Essen|12Japanische Küche|5Japanisch|Japanische|Japanisches|Japanisches Restaurant|Japaner"
     },
     "cuisine-italian": {
-        "defaultMessage": "11Italienisches Essen|14Italienische Küche"
+        "defaultMessage": "11Italienisches Essen|14Italienische Küche|5Italienisch|Italienische|Italienisches|Italienisches Restaurant|Italiener"
     },
     "cuisine-irish": {
-        "defaultMessage": "6Irisches Essen|9Irische Küche"
+        "defaultMessage": "6Irisches Essen|9Irische Küche|5Irisch|Irische|Irisches|Irisches Restaurant"
     },
     "cuisine-indonesian|@cuisine_all_asian": {
-        "defaultMessage": "11Indonesisches Essen|14Indonesische Küche"
+        "defaultMessage": "11Indonesisches Essen|14Indonesische Küche|5Indonesisch|Indonesische|Indonesisches|Indonesisches Restaurant"
     },
     "cuisine-indian": {
-        "defaultMessage": "7Indisches Essen|10Indische Küche"
+        "defaultMessage": "7Indisches Essen|10Indische Küche|5Indisch|Indische|Indisches|Indisches Restaurant|Indischer Imbiss|Inder"
     },
     "cuisine-hungarian": {
-        "defaultMessage": "9Ungarisches Essen|12Ungarische Küche"
+        "defaultMessage": "9Ungarisches Essen|12Ungarische Küche|5Ungarisch|Ungarische|Ungarisches|Ungarisches Restaurant"
     },
     "cuisine-greek": {
-        "defaultMessage": "10Griechisches Essen|13Griechische Küche"
+        "defaultMessage": "10Griechisches Essen|13Griechische Küche|5Griechisch|Griechische|Griechisches|Griechisches Restaurant|Griechischer Imbiss|Grieche"
     },
     "cuisine-german": {
-        "defaultMessage": "7Deutsches Essen|10Deutsche Küche"
+        "defaultMessage": "7Deutsches Essen|10Deutsche Küche|6Gutbürgerlich|Gutbürgerliche Küche|Hausmannskost"
     },
     "cuisine-georgian": {
-        "defaultMessage": "9Georgisches Essen|12Georgische Küche"
+        "defaultMessage": "9Georgisches Essen|12Georgische Küche|5Georgisch|Georgische|Georgisches|Georgisches Restaurant"
     },
     "cuisine-french": {
-        "defaultMessage": "10Französisches Essen|13Französische Küche"
+        "defaultMessage": "10Französisches Essen|13Französische Küche|5Französisch|Französische|Französisches|Französisches Restaurant|Franzose"
     },
     "cuisine-filipino": {
-        "defaultMessage": "13Philippinisches Essen|16Philippinische Küche"
+        "defaultMessage": "13Philippinisches Essen|16Philippinische Küche|5Philippinisch|Philippinische|Philippinisches|Philippinisches Restaurant"
     },
     "cuisine-ethiopian": {
-        "defaultMessage": "9Äthiopisches Essen|12Äthiopische Küche"
+        "defaultMessage": "9Äthiopisches Essen|12Äthiopische Küche|5Äthiopisch|Äthiopische|Äthiopisches|Äthiopisches Restaurant"
     },
     "cuisine-croatian": {
-        "defaultMessage": "9Kroatisches Essen|12Kroatische Küche"
+        "defaultMessage": "9Kroatisches Essen|12Kroatische Küche|5Kroatisch|Kroatische|Kroatisches|Kroatisches Restaurant"
     },
     "cuisine-chinese|@cuisine_all_asian": {
-        "defaultMessage": "10Chinesisches Essen|13Chinesische Küche"
+        "defaultMessage": "10Chinesisches Essen|13Chinesische Küche|5Chinesisch|Chinesische|Chinesisches|Chinesisches Restaurant|Chinesischer Imbiss|Chinese|Chinarestaurant"
     },
     "cuisine-caribbean": {
-        "defaultMessage": "9Karibisches Essen|12Karibische Küche"
+        "defaultMessage": "9Karibisches Essen|12Karibische Küche|5Karibisch|Karibische|Karibisches|Karibisches Restaurant"
     },
     "cuisine-brazilian": {
-        "defaultMessage": "13Brasilianisches Essen|16Brasilianische Küche"
+        "defaultMessage": "13Brasilianisches Essen|16Brasilianische Küche|5Brasilianisch|Brasilianische|Brasilianisches|Brasilianisches Restaurant"
     },
     "cuisine-bavarian": {
         "defaultMessage": "9Bayerisches Essen|12Bayerische Küche"
     },
     "cuisine-balkan": {
-        "defaultMessage": "10Balkanisches Essen|13Balkanische Küche"
+        "defaultMessage": "10Balkanisches Essen|13Balkanische Küche|5Balkanisch|Balkanische|Balkanisches|Balkanisches Restaurant|Balkanrestaurant"
     },
     "cuisine-austrian": {
-        "defaultMessage": "13Österreichisches Essen|16Österreichische Küche"
+        "defaultMessage": "13Österreichisches Essen|16Österreichische Küche|5Österreichisch|Österreichische|Österreichisches|Österreichisches Restaurant"
     },
     "cuisine-argentinian": {
-        "defaultMessage": "12Argentinisches Essen|15Argentinische Küche"
+        "defaultMessage": "12Argentinisches Essen|15Argentinische Küche|5Argentinisch|Argentinische|Argentinisches|Argentinisches Restaurant"
     },
     "cuisine-arab": {
-        "defaultMessage": "8Arabisches Essen|11Arabische Küche"
+        "defaultMessage": "8Arabisches Essen|11Arabische Küche|5Arabisch|Arabische|Arabisches|Arabisches Restaurant"
     },
     "cuisine-american": {
-        "defaultMessage": "14US-amerikanisches Essen|17US-amerikanische Küche"
+        "defaultMessage": "14US-amerikanisches Essen|17US-amerikanische Küche|5Amerikanisch|Amerikanische|Amerikanisches|Amerikanisches Restaurant"
     },
     "cuisine-african": {
-        "defaultMessage": "11Afrikanisches Essen|14Afrikanische Küche"
+        "defaultMessage": "11Afrikanisches Essen|14Afrikanische Küche|5Afrikanisch|Afrikanische|Afrikanisches|Afrikanisches Restaurant"
     },
     "shop-water|@category_water|@category_food|@shop": {
         "defaultMessage": "4Trinkwasser|4Trinkwasserflaschen"

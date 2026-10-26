@@ -4,7 +4,9 @@
 Usage: evaluate.py queries.tsv before.tsv [after.tsv] > comparison.md
 
 For every query the top 5 results are judged against the expectation from queries.tsv:
-- category, filter, typo_category: the expectation is a regex for the result type. Reported are
+- category, filter, typo_category: the expectation is a regex for the result type.
+- cuisine, cuisine_filter: the expectation is a regex for all types of the result, e.g. "cuisine-indian".
+  For these kinds and the ones above reported are
   precision@5 (relevant types in the top 5), the mean distance of the top 5 to the user position and
   the opening state (open/closed/unknown) of the top 5 at the evaluation moment.
 - place, address, street, typo, collision: the expectation is a regex for "name | address | type".
@@ -16,7 +18,9 @@ import re
 import sys
 from collections import defaultdict
 
-TYPE_KINDS = {"category", "filter", "typo_category"}
+TYPE_KINDS = {"category", "filter", "typo_category", "cuisine", "cuisine_filter"}
+# Kinds judged against all types of a result (the "types" column), not only the main type.
+ALL_TYPES_KINDS = {"cuisine", "cuisine_filter"}
 TOP = 5
 
 
@@ -42,11 +46,16 @@ def read_results(path):
 def judge(query, rows):
     rows = rows[:TOP]
     if query["kind"] in TYPE_KINDS:
-        relevant = sum(1 for r in rows if query["re"].search(r["type"]))
+        column = "types" if query["kind"] in ALL_TYPES_KINDS else "type"
+
+        def matches(r):
+            return query["re"].search(r.get(column) or r["type"])
+
+        relevant = sum(1 for r in rows if matches(r))
         distances = [int(r["distance_m"]) for r in rows if r["distance_m"]]
         states = defaultdict(int)
         for r in rows:
-            if query["re"].search(r["type"]):
+            if matches(r):
                 states[r["open"] or "unknown"] += 1
         return {
             "precision": relevant / TOP,
@@ -73,6 +82,9 @@ def fmt_top(rows):
     for r in rows[:TOP]:
         name = r["name"] or "(ohne Namen)"
         details = [r["type"]]
+        cuisines = [t for t in (r.get("types") or "").split() if t.startswith("cuisine-")]
+        if cuisines:
+            details.append(" ".join(cuisines))
         if r["distance_m"]:
             details.append(f'{r["distance_m"]} m')
         if r["open"] and r["open"] != "unknown":

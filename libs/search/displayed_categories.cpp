@@ -6,7 +6,9 @@ namespace search
 {
 DisplayedCategories::DisplayedCategories(CategoriesHolder const & holder) : m_holder(holder)
 {
-  m_keys = {"category_eat",      "category_hotel",      "category_food",          "category_tourism",
+  // better-maps: single places to eat and drink right after "category_eat" (texts and icons only on Android).
+  m_keys = {"category_eat",      "category_restaurant", "category_cafe",          "category_bakery",
+            "category_bar_club", "category_hotel",      "category_food",          "category_tourism",
             "category_wifi",     "category_transport",  "category_fuel",          "category_parking",
             "category_shopping", "category_secondhand", "category_atm",           "category_nightlife",
             "category_children", "category_bank",       "category_entertainment", "category_water",

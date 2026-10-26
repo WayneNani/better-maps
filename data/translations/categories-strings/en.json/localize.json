@@ -63,7 +63,7 @@
         "defaultMessage": "5Media studio|studio"
     },
     "amenity-bar|amenity-pub|@category_eat|@category_nightlife": {
-        "defaultMessage": "2Bar|2pub|beer|drink|U+1F37A|U+1F37B|U+1F376|tavern|bars and pubs|brew pub|cocktail lounge"
+        "defaultMessage": "2Bar|2pub|beer|drink|U+1F37A|U+1F37B|U+1F376|tavern|bars and pubs|brew pub|cocktail lounge|Bars & Clubs"
     },
     "amenity-cafe|@category_eat": {
         "defaultMessage": "3Cafe|U+2615|U+1F356|U+1F357|U+1F35A|U+1F35B|U+1F35C|U+1F35D|U+1F363|U+1F366|U+1F367|U+1F368|U+1F369|U+1F370|U+1F372|U+1F374|U+1F377|U+1F60B|U+1F375|coffee|cafeteria"
@@ -450,7 +450,7 @@
         "defaultMessage": "4Theatre|U+1F3AD"
     },
     "amenity-nightclub|@category_entertainment|@category_nightlife": {
-        "defaultMessage": "3Nightclub|night club|4disco|dance|U+1F378|U+1F379|U+1F46F|U+1F483|club|nightspot|night bar"
+        "defaultMessage": "3Nightclub|night club|4disco|dance|U+1F378|U+1F379|U+1F46F|U+1F483|club|nightspot|night bar|Bars & Clubs"
     },
     "amenity-music_venue|@category_entertainment|@category_nightlife": {
         "defaultMessage": "4Music venue|live music|4concert|concert hall|gig"
@@ -1134,7 +1134,7 @@
         "defaultMessage": "4Emergency Phone"
     },
     "leisure-fitness_centre": {
-        "defaultMessage": "3Fitness Centre|gym|U+1F4AA|fitness|workout|fitness gym|fitness club|health club|fitness studio|workout studio|sport|sports"
+        "defaultMessage": "3Fitness Centre|gym|U+1F4AA|fitness|workout|fitness gym|fitness studio|workout studio|sport|sports"
     },
     "leisure-sauna": {
         "defaultMessage": "3Sauna|sweatbath|sweat lodge|steam room|steam sauna|sauna room"
@@ -1779,19 +1779,19 @@
         "defaultMessage": "4Vegan|6Vegan Food|7Vegan Cuisine|veg cafe"
     },
     "@cuisine_all_asian": {
-        "defaultMessage": "5Asian Food|7Asian Cuisine"
+        "defaultMessage": "5Asian Food|7Asian Cuisine|Asian|Asian restaurant"
     },
     "cuisine-vietnamese|@cuisine_all_asian": {
-        "defaultMessage": "10Vietnamese Food|12Vietnamese Cuisine"
+        "defaultMessage": "10Vietnamese Food|12Vietnamese Cuisine|Vietnamese|Vietnamese restaurant|Pho"
     },
     "cuisine-turkish": {
-        "defaultMessage": "7Turkish Food|9Turkish Cuisine"
+        "defaultMessage": "7Turkish Food|9Turkish Cuisine|Turkish|Turkish restaurant"
     },
     "cuisine-thai|@cuisine_all_asian": {
-        "defaultMessage": "4Thai Food|6Thai Cuisine"
+        "defaultMessage": "4Thai Food|6Thai Cuisine|Thai|Thai restaurant"
     },
     "cuisine-spanish": {
-        "defaultMessage": "7Spanish Food|9Spanish Cuisine"
+        "defaultMessage": "7Spanish Food|9Spanish Cuisine|Spanish restaurant"
     },
     "cuisine-russian": {
         "defaultMessage": "7Russian Food|9Russian Cuisine"
@@ -1806,7 +1806,7 @@
         "defaultMessage": "8Peruvian Food|10Peruvian Cuisine"
     },
     "cuisine-persian": {
-        "defaultMessage": "7Persian Food|9Persian Cuisine"
+        "defaultMessage": "7Persian Food|9Persian Cuisine|Persian|Persian restaurant"
     },
     "cuisine-oriental": {
         "defaultMessage": "10Far Eastern Food|12Far Eastern Cuisine|8Oriental Food|10Oriental Cuisine"
@@ -1815,7 +1815,7 @@
         "defaultMessage": "8Moroccan Food|10Moroccan Cuisine"
     },
     "cuisine-mexican": {
-        "defaultMessage": "7Mexican Food|9Mexican Cuisine"
+        "defaultMessage": "7Mexican Food|9Mexican Cuisine|Mexican|Mexican restaurant"
     },
     "cuisine-mediterranean": {
         "defaultMessage": "13Mediterranean Food|15Mediterranean Cuisine"
@@ -1827,19 +1827,19 @@
         "defaultMessage": "8Malagasy Food|10Malagasy Cuisine"
     },
     "cuisine-lebanese": {
-        "defaultMessage": "8Lebanese Food|10Lebanese Cuisine"
+        "defaultMessage": "8Lebanese Food|10Lebanese Cuisine|Lebanese|Lebanese restaurant"
     },
     "cuisine-lao|@cuisine_all_asian": {
         "defaultMessage": "3Lao Food|5Lao Cuisine"
     },
     "cuisine-korean|@cuisine_all_asian": {
-        "defaultMessage": "6Korean Food|8Korean Cuisine"
+        "defaultMessage": "6Korean Food|8Korean Cuisine|Korean|Korean restaurant"
     },
     "cuisine-japanese|@cuisine_all_asian": {
-        "defaultMessage": "8Japanese Food|10Japanese Cuisine"
+        "defaultMessage": "8Japanese Food|10Japanese Cuisine|Japanese|Japanese restaurant"
     },
     "cuisine-italian": {
-        "defaultMessage": "7Italian Food|9Italian Cuisine"
+        "defaultMessage": "7Italian Food|9Italian Cuisine|Italian|Italian restaurant"
     },
     "cuisine-irish": {
         "defaultMessage": "5Irish Food|7Irish Cuisine"
@@ -1848,34 +1848,34 @@
         "defaultMessage": "10Indonesian Food|12Indonesian Cuisine"
     },
     "cuisine-indian": {
-        "defaultMessage": "6Indian Food|8Indian Cuisine"
+        "defaultMessage": "6Indian Food|8Indian Cuisine|Indian|Indian restaurant"
     },
     "cuisine-hungarian": {
         "defaultMessage": "9Hungarian Food|11Hungarian Cuisine"
     },
     "cuisine-greek": {
-        "defaultMessage": "5Greek Food|7Greek Cuisine"
+        "defaultMessage": "5Greek Food|7Greek Cuisine|Greek|Greek restaurant"
     },
     "cuisine-german": {
-        "defaultMessage": "6German Food|8German Cuisine"
+        "defaultMessage": "6German Food|8German Cuisine|German restaurant"
     },
     "cuisine-georgian": {
         "defaultMessage": "8Georgian Food|10Georgian Cuisine"
     },
     "cuisine-french": {
-        "defaultMessage": "6French Food|8French Cuisine"
+        "defaultMessage": "6French Food|8French Cuisine|French restaurant"
     },
     "cuisine-filipino": {
         "defaultMessage": "8Filipino Food|10Filipino Cuisine"
     },
     "cuisine-ethiopian": {
-        "defaultMessage": "9Ethiopian Food|11Ethiopian Cuisine"
+        "defaultMessage": "9Ethiopian Food|11Ethiopian Cuisine|Ethiopian|Ethiopian restaurant"
     },
     "cuisine-croatian": {
         "defaultMessage": "8Croatian Food|10Croatian Cuisine"
     },
     "cuisine-chinese|@cuisine_all_asian": {
-        "defaultMessage": "7Chinese Food|9Chinese Cuisine"
+        "defaultMessage": "7Chinese Food|9Chinese Cuisine|Chinese|Chinese restaurant"
     },
     "cuisine-caribbean": {
         "defaultMessage": "9Caribbean Food|11Caribbean Cuisine"
@@ -1902,7 +1902,7 @@
         "defaultMessage": "4Arab Food|6Arab Cuisine"
     },
     "cuisine-american": {
-        "defaultMessage": "8American Food|10American Cuisine"
+        "defaultMessage": "8American Food|10American Cuisine|American restaurant"
     },
     "cuisine-african": {
         "defaultMessage": "7African Food|9African Cuisine"
