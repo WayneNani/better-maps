@@ -29,6 +29,7 @@
 #include <memory>
 #include <random>
 #include <string>
+#include <string_view>
 
 #include "3party/ankerl/unordered_dense.h"
 
@@ -220,8 +221,23 @@ void PreRanker::Filter()
 {
   auto const lessForUnique = [](PreRankerResult const & lhs, PreRankerResult const & rhs)
   {
-    if (lhs.GetId() != rhs.GetId())
-      return lhs.GetId() < rhs.GetId();
+    auto const & lhsId = lhs.GetId();
+    auto const & rhsId = rhs.GetId();
+    if (lhsId != rhsId)
+    {
+      // FeatureIDs of different maps are ordered by the addresses of the maps' MwmInfos, so the order of results with
+      // equal ranks (and which of them are selected below) would depend on the memory layout of the process.
+      if (lhsId.m_mwmId != rhsId.m_mwmId)
+      {
+        auto const & lhsInfo = lhsId.m_mwmId.GetInfo();
+        auto const & rhsInfo = rhsId.m_mwmId.GetInfo();
+        std::string_view const lhsName = lhsInfo ? std::string_view(lhsInfo->GetCountryName()) : std::string_view();
+        std::string_view const rhsName = rhsInfo ? std::string_view(rhsInfo->GetCountryName()) : std::string_view();
+        if (lhsName != rhsName)
+          return lhsName < rhsName;
+      }
+      return lhsId < rhsId;
+    }
 
     // It's enough to compare by tokens match and select a better one,
     // because same result can be matched by different set of tokens.
