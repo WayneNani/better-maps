@@ -310,7 +310,8 @@ UNIT_TEST(IntervalIndex_ForEachInIntervals_SameAsForEach)
     for (uint32_t i = 0; i < 5000; ++i)
     {
       uint64_t const cluster = rng() % 50;
-      uint64_t const key = (cluster * (keyEnd / 50) + rng() % (keyEnd / 1000)) % keyEnd;
+      // The index doesn't allow the key 0.
+      uint64_t const key = 1 + (cluster * (keyEnd / 50) + rng() % (keyEnd / 1000)) % (keyEnd - 1);
       data.emplace_back(key, i);
       if (rng() % 5 == 0)
         data.emplace_back(key, i + 100000);
