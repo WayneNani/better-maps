@@ -895,6 +895,7 @@ void Ranker::Init(Params const & params, Geocoder::Params const & geocoderParams
 {
   m_params = params;
   m_geocoderParams = geocoderParams;
+
   m_preRankerResults.clear();
   m_tentativeResults.clear();
 }
@@ -1111,11 +1112,16 @@ void Ranker::MergeStationParts(vector<RankerResult> & results)
     return;
 
   // The biggest feature of a station represents it, e.g. railway=station rather than its subway station or building.
+  // Of two stations the one with the shorter name: "Berlin Hauptbahnhof" rather than "Berlin Hauptbahnhof (tief)".
   sort(stations.begin(), stations.end(), [&results](Station const & lhs, Station const & rhs)
   {
     if (lhs.m_part != rhs.m_part)
       return lhs.m_part > rhs.m_part;
-    return results[lhs.m_index].GetLinearModelRank() > results[rhs.m_index].GetLinearModelRank();
+    auto const & l = results[lhs.m_index];
+    auto const & r = results[rhs.m_index];
+    if (l.GetName().size() != r.GetName().size())
+      return l.GetName().size() < r.GetName().size();
+    return l.GetLinearModelRank() > r.GetLinearModelRank();
   });
 
   vector<bool> merged(results.size(), false);

@@ -189,13 +189,13 @@ std::string DebugPrint(NameScores const & scores);
 // shown as the biggest feature.
 enum class StationPart : uint8_t
 {
-  None,      // Not a part of a station.
-  Part,      // Subway entrance, railway platform.
-  Building,  // building=train_station.
-  Subway,    // railway=station + station=subway, funicular, monorail.
+  None,       // Not a part of a station.
+  Part,       // Subway entrance, railway platform.
+  Building,   // building=train_station.
+  Subway,     // railway=station + station=subway, funicular, monorail.
+  Halt,       // railway=halt.
   LightRail,  // railway=station + station=light_rail (S-Bahn).
-  Halt,      // railway=halt.
-  Station,   // railway=station.
+  Station,    // railway=station.
 };
 
 std::string DebugPrint(StationPart part);
