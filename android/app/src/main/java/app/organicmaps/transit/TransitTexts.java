@@ -52,4 +52,16 @@ public interface TransitTexts
   /** E.g. "2 stops"; used for collapsed intermediate stops. */
   @NonNull
   String stops(int count);
+
+  /** E.g. "Searching connections…". */
+  @NonNull
+  String searching();
+
+  /** E.g. "No connections found." */
+  @NonNull
+  String noConnections();
+
+  /** E.g. "5 connections". */
+  @NonNull
+  String connections(int count);
 }

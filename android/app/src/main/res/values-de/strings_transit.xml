@@ -121,4 +121,12 @@
   </plurals>
   <string name="transit_pref_category_display">Anzeige</string>
   <string name="transit_pref_default_view">Standardansicht</string>
+  <!-- Ziehbares Verbindungs-Panel im Routenplaner. -->
+  <string name="transit_searching">Suche Verbindungen…</string>
+  <plurals name="transit_connections">
+    <item quantity="one">%d Verbindung</item>
+    <item quantity="other">%d Verbindungen</item>
+  </plurals>
+  <string name="transit_sheet_handle">Ziehen, um mehr oder weniger von den Verbindungen zu zeigen</string>
+  <string name="transit_sheet_expand">Verbindungen zeigen</string>
 </resources>

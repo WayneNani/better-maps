@@ -458,6 +458,14 @@ public final class TransitConnectionsPresenter
     render();
   }
 
+  /** Draws the shown connection again, e.g. to fit it into a map area that has changed. */
+  public void refreshRouteDisplay()
+  {
+    final TransitItinerary itinerary = getSelectedItinerary();
+    if (itinerary != null)
+      mRouteDisplay.show(itinerary);
+  }
+
   /** The selected connection, null in the list. */
   @Nullable
   public TransitItinerary getSelectedItinerary()

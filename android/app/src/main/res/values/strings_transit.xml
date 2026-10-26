@@ -122,4 +122,12 @@
   </plurals>
   <string name="transit_pref_category_display">Display</string>
   <string name="transit_pref_default_view">Default view</string>
+  <!-- Draggable connection sheet in the route planner. -->
+  <string name="transit_searching">Searching connections…</string>
+  <plurals name="transit_connections">
+    <item quantity="one">%d connection</item>
+    <item quantity="other">%d connections</item>
+  </plurals>
+  <string name="transit_sheet_handle">Drag to show more or less of the connections</string>
+  <string name="transit_sheet_expand">Show connections</string>
 </resources>
