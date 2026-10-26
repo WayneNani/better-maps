@@ -419,6 +419,8 @@ UNIT_TEST(CategorySynonyms_German_Nightlife)
                        {"Disse", "amenity-dentist"},
                        {"Weinbar", "shop-wine"},
                        {"Tanzclub", "leisure-dance"},
+                       // better-maps: "club" alone means a nightclub, see the English fitness centre synonyms.
+                       {"Club", "leisure-fitness_centre"},
                    },
                    false /* shouldMatch */);
 }
