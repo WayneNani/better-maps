@@ -70,27 +70,41 @@
       android:id="@+id/duration"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:textAppearance="@style/MwmTextAppearance.Body2"
-      tools:text="17 min" />
+      android:textAppearance="@style/MwmTextAppearance.Body3"
+      tools:text="17 min · Direct" />
   </LinearLayout>
 
-  <com.google.android.material.chip.ChipGroup
-    android:id="@+id/badges"
+  <!-- The whole connection: rides in line colors, walks dotted, waits empty. -->
+  <app.organicmaps.transit.ui.JourneyBarView
+    android:id="@+id/bar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/margin_quarter"
-    app:chipSpacingHorizontal="4dp"
-    app:chipSpacingVertical="4dp" />
+    android:layout_marginTop="6dp" />
 
-  <com.google.android.material.textview.MaterialTextView
-    android:id="@+id/details"
+  <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/margin_quarter"
-    android:ellipsize="end"
-    android:maxLines="2"
-    android:textAppearance="@style/MwmTextAppearance.Body3"
-    tools:text="S+U Berlin Hauptbahnhof · Pl. 15 · Direct" />
+    android:layout_marginTop="6dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <include
+      android:id="@+id/first_badge"
+      layout="@layout/item_transit_badge"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="@dimen/margin_half" />
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/details"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:ellipsize="end"
+      android:maxLines="2"
+      android:textAppearance="@style/MwmTextAppearance.Body3"
+      tools:text="S+U Berlin Hauptbahnhof · Pl. 15" />
+  </LinearLayout>
 
   <com.google.android.material.textview.MaterialTextView
     android:id="@+id/cancelled"
