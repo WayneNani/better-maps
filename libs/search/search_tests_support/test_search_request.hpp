@@ -10,6 +10,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -43,6 +44,10 @@ public:
   // Call these functions only after call to Wait().
   using TimeDurationT = base::Timer::DurationT;
   TimeDurationT ResponseTime() const;
+  // Time until the first non-empty batch of results arrived (the whole response time if none did).
+  TimeDurationT FirstResultsTime() const;
+  // CPU time of the search thread for the request (less dependent on the machine's load than ResponseTime()).
+  TimeDurationT CpuTime() const;
   std::vector<search::Result> const & Results() const;
 
 protected:
@@ -67,6 +72,8 @@ protected:
 
   base::Timer m_timer;
   TimeDurationT m_startTime, m_endTime;
+  std::optional<TimeDurationT> m_firstResultsTime;
+  TimeDurationT m_startCpuTime, m_endCpuTime;
 
   TestSearchEngine & m_engine;
   SearchParams m_params;

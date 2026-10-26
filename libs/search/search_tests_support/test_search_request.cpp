@@ -5,12 +5,25 @@
 
 #include "base/assert.hpp"
 
+#include <ctime>
 #include <functional>
 
 namespace search
 {
 namespace tests_support
 {
+namespace
+{
+// OnStarted() and OnResults() are called on the search thread.
+TestSearchRequest::TimeDurationT ThreadCpuTime()
+{
+  timespec ts{};
+  clock_gettime(CLOCK_THREAD_CPUTIME_ID, &ts);
+  return std::chrono::duration_cast<TestSearchRequest::TimeDurationT>(std::chrono::seconds(ts.tv_sec) +
+                                                                      std::chrono::nanoseconds(ts.tv_nsec));
+}
+}  // namespace
+
 using namespace std::chrono;
 using namespace std;
 
@@ -66,6 +79,20 @@ TestSearchRequest::TimeDurationT TestSearchRequest::ResponseTime() const
   return m_endTime - m_startTime;
 }
 
+TestSearchRequest::TimeDurationT TestSearchRequest::FirstResultsTime() const
+{
+  lock_guard<mutex> lock(m_mu);
+  CHECK(m_done, ("This function may be called only when request is processed."));
+  return m_firstResultsTime.value_or(m_endTime) - m_startTime;
+}
+
+TestSearchRequest::TimeDurationT TestSearchRequest::CpuTime() const
+{
+  lock_guard<mutex> lock(m_mu);
+  CHECK(m_done, ("This function may be called only when request is processed."));
+  return m_endCpuTime - m_startCpuTime;
+}
+
 vector<search::Result> const & TestSearchRequest::Results() const
 {
   lock_guard<mutex> lock(m_mu);
@@ -114,16 +141,20 @@ void TestSearchRequest::OnStarted()
 {
   lock_guard<mutex> lock(m_mu);
   m_startTime = m_timer.TimeElapsed();
+  m_startCpuTime = ThreadCpuTime();
 }
 
 void TestSearchRequest::OnResults(search::Results const & results)
 {
   lock_guard<mutex> lock(m_mu);
   m_results.assign(results.begin(), results.end());
+  if (!m_firstResultsTime && results.GetCount() != 0)
+    m_firstResultsTime = m_timer.TimeElapsed();
   if (results.IsEndMarker())
   {
     m_done = true;
     m_endTime = m_timer.TimeElapsed();
+    m_endCpuTime = ThreadCpuTime();
     m_cv.notify_one();
   }
 }
