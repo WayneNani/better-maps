@@ -89,4 +89,53 @@ class FakeTexts implements TransitTexts
   {
     return count + " stops";
   }
+
+  @NonNull
+  @Override
+  public String searching()
+  {
+    return "Searching";
+  }
+
+  @NonNull
+  @Override
+  public String noConnections()
+  {
+    return "No connections";
+  }
+
+  @NonNull
+  @Override
+  public String connections(int count)
+  {
+    return count + (count == 1 ? " connection" : " connections");
+  }
+
+  @NonNull
+  @Override
+  public String myPosition()
+  {
+    return "My position";
+  }
+
+  @NonNull
+  @Override
+  public String inTime(@NonNull String duration)
+  {
+    return "in " + duration;
+  }
+
+  @NonNull
+  @Override
+  public String departingNow()
+  {
+    return "now";
+  }
+
+  @NonNull
+  @Override
+  public String onTheWay()
+  {
+    return "on the way";
+  }
 }

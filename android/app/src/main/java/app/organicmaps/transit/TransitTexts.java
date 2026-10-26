@@ -52,4 +52,32 @@ public interface TransitTexts
   /** E.g. "2 stops"; used for collapsed intermediate stops. */
   @NonNull
   String stops(int count);
+
+  /** E.g. "Searching connections…". */
+  @NonNull
+  String searching();
+
+  /** E.g. "No connections found." */
+  @NonNull
+  String noConnections();
+
+  /** E.g. "5 connections". */
+  @NonNull
+  String connections(int count);
+
+  /** E.g. "My position", for a search from or to the own position. */
+  @NonNull
+  String myPosition();
+
+  /** E.g. "in 25 min" for a departure. */
+  @NonNull
+  String inTime(@NonNull String duration);
+
+  /** E.g. "now" for a departure within the current minute. */
+  @NonNull
+  String departingNow();
+
+  /** E.g. "on the way", for a connection that has departed and not arrived yet. */
+  @NonNull
+  String onTheWay();
 }

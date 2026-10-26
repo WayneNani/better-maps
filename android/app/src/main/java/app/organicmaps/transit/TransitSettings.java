@@ -10,6 +10,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Settings of the online public transport feature and their mapping to MOTIS routing options. Keys are shared
@@ -29,6 +30,9 @@ public final class TransitSettings
   public static final String KEY_MAX_WALK = "transit_max_walk";
   public static final String KEY_EXCLUDED_MODES = "transit_excluded_modes";
   public static final String KEY_DEFAULT_VIEW = "transit_default_view";
+  public static final String KEY_SHOW_ON_MAP = "transit_show_on_map";
+  /** Keys of saved connections the user hid on the map, separated by line breaks. */
+  static final String KEY_HIDDEN_ON_MAP = "transit_hidden_on_map";
 
   /** Extra buffer for transfers (MOTIS additionalTransferTime). */
   public enum TransferTime
@@ -237,6 +241,39 @@ public final class TransitSettings
       if (!excluded.contains(group))
         allowed.addAll(group.getModes());
     return allowed;
+  }
+
+  /** True if the next saved connection is shown on the map (default). */
+  public boolean isShownOnMap()
+  {
+    return mStore.getBoolean(KEY_SHOW_ON_MAP, true);
+  }
+
+  /** Saved connections the user hid on the map. */
+  @NonNull
+  public Set<String> getHiddenOnMap()
+  {
+    final String value = mStore.getString(KEY_HIDDEN_ON_MAP, null);
+    final Set<String> result = new HashSet<>();
+    if (value == null)
+      return result;
+    for (String key : value.split("\n"))
+      if (!key.isEmpty())
+        result.add(key);
+    return result;
+  }
+
+  /**
+   * Hides a saved connection on the map. Keys of connections that are no longer saved are dropped.
+   *
+   * @param saved keys of all saved connections.
+   */
+  public void hideOnMap(@NonNull String key, @NonNull Set<String> saved)
+  {
+    final Set<String> hidden = getHiddenOnMap();
+    hidden.retainAll(saved);
+    hidden.add(key);
+    mStore.putString(KEY_HIDDEN_ON_MAP, String.join("\n", new TreeSet<>(hidden)));
   }
 
   /** Routing options for a query according to these settings. */

@@ -34,6 +34,15 @@
       app:useSimpleSummaryProvider="true"
       app:iconSpaceReserved="false" />
 
+    <SwitchPreferenceCompat
+      android:key="transit_show_on_map"
+      android:defaultValue="true"
+      android:title="@string/transit_pref_show_on_map"
+      android:summary="@string/transit_pref_show_on_map_summary"
+      android:widgetLayout="@layout/preference_switch"
+      app:singleLineTitle="false"
+      app:iconSpaceReserved="false" />
+
     <Preference
       android:key="transit_saved"
       android:title="@string/transit_saved_title"

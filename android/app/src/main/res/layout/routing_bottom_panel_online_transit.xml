@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- better-maps: connections of the online public transport planner (list and detail view). -->
-<LinearLayout
+<!-- better-maps: connections of the online public transport planner (list and detail view). A sheet that can be
+     dragged between collapsed (handle and summary), half and expanded, see OnlineTransitPanel. -->
+<app.organicmaps.transit.ui.TransitSheetLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
@@ -8,11 +9,62 @@
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
   android:orientation="vertical"
-  android:paddingTop="@dimen/margin_quarter"
   android:visibility="gone"
   tools:visibility="visible">
 
+  <!-- Tap: collapse or open to half; drag: resize. -->
+  <FrameLayout
+    android:id="@+id/transit_handle"
+    android:layout_width="match_parent"
+    android:layout_height="16dp"
+    android:background="?selectableItemBackground"
+    android:contentDescription="@string/transit_sheet_handle">
+
+    <com.google.android.material.imageview.ShapeableImageView
+      android:layout_width="32dp"
+      android:layout_height="4dp"
+      android:layout_gravity="center"
+      android:importantForAccessibility="no"
+      app:srcCompat="@drawable/bottom_sheet_handle"
+      app:tint="?colorControlHighlight" />
+  </FrameLayout>
+
+  <!-- Collapsed sheet: one line, e.g. "11:44 – 11:57 · 13 min · 1 transfer". -->
   <LinearLayout
+    android:id="@+id/transit_summary"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?selectableItemBackground"
+    android:contentDescription="@string/transit_sheet_expand"
+    android:gravity="center_vertical"
+    android:minHeight="48dp"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/margin_base"
+    android:paddingEnd="@dimen/margin_base"
+    android:visibility="gone"
+    tools:visibility="visible">
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/transit_summary_text"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:ellipsize="end"
+      android:maxLines="1"
+      android:textAppearance="@style/MwmTextAppearance.Body2"
+      android:textStyle="bold"
+      tools:text="11:44 – 11:57 · 13 min · 1 transfer" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+      android:layout_width="24dp"
+      android:layout_height="24dp"
+      android:layout_marginStart="@dimen/margin_half"
+      android:importantForAccessibility="no"
+      app:srcCompat="@drawable/ic_transit_expand" />
+  </LinearLayout>
+
+  <LinearLayout
+    android:id="@+id/transit_header"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
@@ -120,6 +172,97 @@
       app:iconTint="?iconTint" />
   </LinearLayout>
 
+  <!-- Start and destination of the search: tap to choose another place, or swap them. -->
+  <LinearLayout
+    android:id="@+id/transit_points"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/margin_half"
+    android:paddingEnd="@dimen/margin_half"
+    android:visibility="gone"
+    tools:visibility="visible">
+
+    <LinearLayout
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:orientation="vertical">
+
+      <LinearLayout
+        android:id="@+id/transit_from"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:gravity="center_vertical"
+        android:minHeight="40dp"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/margin_half"
+        android:paddingEnd="@dimen/margin_half">
+
+        <com.google.android.material.textview.MaterialTextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:minWidth="48dp"
+          android:importantForAccessibility="no"
+          android:text="@string/transit_from_label"
+          android:textAppearance="@style/MwmTextAppearance.Body3"
+          android:textColor="?android:textColorSecondary" />
+
+        <com.google.android.material.textview.MaterialTextView
+          android:id="@+id/transit_from_name"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:ellipsize="end"
+          android:maxLines="1"
+          android:textAppearance="@style/MwmTextAppearance.Body2"
+          tools:text="My position" />
+      </LinearLayout>
+
+      <LinearLayout
+        android:id="@+id/transit_to"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:gravity="center_vertical"
+        android:minHeight="40dp"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/margin_half"
+        android:paddingEnd="@dimen/margin_half">
+
+        <com.google.android.material.textview.MaterialTextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:minWidth="48dp"
+          android:importantForAccessibility="no"
+          android:text="@string/transit_to_label"
+          android:textAppearance="@style/MwmTextAppearance.Body3"
+          android:textColor="?android:textColorSecondary" />
+
+        <com.google.android.material.textview.MaterialTextView
+          android:id="@+id/transit_to_name"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:ellipsize="end"
+          android:maxLines="1"
+          android:textAppearance="@style/MwmTextAppearance.Body2"
+          tools:text="Berlin Hauptbahnhof" />
+      </LinearLayout>
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/transit_swap"
+      style="@style/Widget.Material3.Button.IconButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:contentDescription="@string/transit_swap"
+      app:icon="@drawable/ic_transit_swap"
+      app:iconTint="?iconTint" />
+  </LinearLayout>
+
   <com.google.android.material.progressindicator.LinearProgressIndicator
     android:id="@+id/transit_progress"
     android:layout_width="match_parent"
@@ -215,4 +358,4 @@
     android:paddingBottom="@dimen/margin_quarter"
     android:textAppearance="@style/MwmTextAppearance.Body4"
     tools:text="Data: Transitous and sources" />
-</LinearLayout>
+</app.organicmaps.transit.ui.TransitSheetLayout>

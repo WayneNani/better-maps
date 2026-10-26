@@ -23,6 +23,14 @@
       android:id="@+id/map_buttons"
       android:layout_width="match_parent"
       android:layout_height="match_parent" />
+    <!-- better-maps: next saved public transport connection, above the bottom buttons (margin set in code). -->
+    <include
+      layout="@layout/transit_saved_card"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_alignParentBottom="true"
+      android:layout_marginStart="@dimen/margin_half"
+      android:layout_marginEnd="@dimen/transit_card_margin_end" />
     <include
       android:id="@+id/position_chooser"
       layout="@layout/position_chooser" />

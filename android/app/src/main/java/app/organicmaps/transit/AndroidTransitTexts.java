@@ -110,4 +110,53 @@ public final class AndroidTransitTexts implements TransitTexts
   {
     return mResources.getQuantityString(R.plurals.transit_stops, count, count);
   }
+
+  @NonNull
+  @Override
+  public String searching()
+  {
+    return mResources.getString(R.string.transit_searching);
+  }
+
+  @NonNull
+  @Override
+  public String noConnections()
+  {
+    return mResources.getString(R.string.transit_no_connections);
+  }
+
+  @NonNull
+  @Override
+  public String connections(int count)
+  {
+    return mResources.getQuantityString(R.plurals.transit_connections, count, count);
+  }
+
+  @NonNull
+  @Override
+  public String myPosition()
+  {
+    return mResources.getString(R.string.transit_my_position);
+  }
+
+  @NonNull
+  @Override
+  public String inTime(@NonNull String duration)
+  {
+    return mResources.getString(R.string.transit_in_time, duration);
+  }
+
+  @NonNull
+  @Override
+  public String departingNow()
+  {
+    return mResources.getString(R.string.transit_departing_now);
+  }
+
+  @NonNull
+  @Override
+  public String onTheWay()
+  {
+    return mResources.getString(R.string.transit_on_the_way);
+  }
 }

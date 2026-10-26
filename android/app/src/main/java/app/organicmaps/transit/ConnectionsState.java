@@ -59,6 +59,10 @@ public final class ConnectionsState
   final String mSelectedDate;
   @NonNull
   final Instant mNow;
+  @NonNull
+  final String mFromLabel;
+  @NonNull
+  final String mToLabel;
 
   ConnectionsState(@NonNull Screen screen, @NonNull String timeLabel, boolean arriveBy, boolean loading,
                    boolean loadingEarlier, boolean loadingLater, @Nullable TransitError error,
@@ -66,7 +70,7 @@ public final class ConnectionsState
                    boolean canLoadLater, @Nullable ItineraryItem selected, @NonNull List<LegItem> legs,
                    @Nullable String providerName, @Nullable String attributionUrl, @NonNull ViewMode viewMode,
                    boolean savedView, boolean selectedSaved, boolean past, @Nullable String selectedDate,
-                   @NonNull Instant now)
+                   @NonNull Instant now, @NonNull String fromLabel, @NonNull String toLabel)
   {
     mScreen = screen;
     mTimeLabel = timeLabel;
@@ -89,6 +93,8 @@ public final class ConnectionsState
     mPast = past;
     mSelectedDate = selectedDate;
     mNow = now;
+    mFromLabel = fromLabel;
+    mToLabel = toLabel;
   }
 
   @NonNull
@@ -224,5 +230,19 @@ public final class ConnectionsState
   public Instant getNow()
   {
     return mNow;
+  }
+
+  /** Name of the start, e.g. "My position" or "Berlin Hauptbahnhof"; empty without a search. */
+  @NonNull
+  public String getFromLabel()
+  {
+    return mFromLabel;
+  }
+
+  /** Name of the destination; empty without a search. */
+  @NonNull
+  public String getToLabel()
+  {
+    return mToLabel;
   }
 }

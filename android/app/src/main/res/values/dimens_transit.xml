@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: dimensions of the public transport UI. -->
+<resources>
+  <!-- The card with the next saved connection keeps clear of the zoom and position buttons on the right
+       (button 48dp and the frame padding on both sides) and stays this wide at most. -->
+  <dimen name="transit_card_margin_end">72dp</dimen>
+  <dimen name="transit_card_max_width">440dp</dimen>
+</resources>
