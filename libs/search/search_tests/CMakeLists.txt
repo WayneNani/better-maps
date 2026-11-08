@@ -23,6 +23,7 @@ set(SRC
   query_saver_tests.cpp
   ranking_tests.cpp
   results_tests.cpp
+  route_corridor_tests.cpp
   region_info_getter_tests.cpp
   segment_tree_tests.cpp
   suggest_tests.cpp

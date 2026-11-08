@@ -12,6 +12,7 @@ set(SRC
   query_filters_test.cpp
   ranker_test.cpp
   recycling_search_test.cpp
+  route_search_test.cpp
   search_edited_features_test.cpp
   smoke_test.cpp
   station_ranking_test.cpp

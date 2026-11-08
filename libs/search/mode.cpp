@@ -10,6 +10,7 @@ std::string DebugPrint(Mode mode)
   case Mode::Viewport: return "Viewport";
   case Mode::Downloader: return "Downloader";
   case Mode::Bookmarks: return "Bookmarks";
+  case Mode::Route: return "Route";
   case Mode::Count: return "Count";
   }
   return "Unknown";

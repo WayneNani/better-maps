@@ -427,6 +427,28 @@ void Geocoder::GoInViewport()
   GoImpl(infos, true /* inViewport */);
 }
 
+void Geocoder::GoAlongRoute()
+{
+  TRACE(GoAlongRoute);
+
+  auto const & corridor = m_params.m_routeCorridor;
+  if (m_params.GetNumTokens() == 0 || !corridor || corridor->IsEmpty())
+    return;
+
+  vector<MwmInfoPtr> infos;
+  m_dataSource.GetMwmsInfo(infos);
+
+  auto const rects = corridor->GetCoveringRects();
+  base::EraseIf(infos, [&](MwmInfoPtr const & info)
+  {
+    auto const & borders = info->m_bordersRect;
+    return !corridor->GetLimitRect().IsIntersect(borders) ||
+           none_of(rects.begin(), rects.end(), [&borders](m2::RectD const & r) { return r.IsIntersect(borders); });
+  });
+
+  GoImpl(infos, true /* inViewport */);
+}
+
 void Geocoder::Finish(bool cancelled)
 {
   m_preRanker.Finish(cancelled);
@@ -436,6 +458,8 @@ void Geocoder::ClearCaches()
 {
   m_pivotRectsCache.Clear();
   m_localityRectsCache.Clear();
+  m_routeCorridorFeatures.clear();
+  m_routeCorridorOfCache.reset();
 
   m_matchersCache.clear();
   m_streetsCache.Clear();
@@ -599,9 +623,11 @@ void Geocoder::GoImpl(vector<MwmInfoPtr> const & infos, bool inViewport)
     BaseContext ctx;
     InitBaseContext(ctx);
 
+    bool const alongRoute = m_params.m_mode == Mode::Route;
     if (inViewport)
     {
-      auto const viewportCBV = RetrieveGeometryFeatures(*m_context, m_params.m_pivot, RectId::Pivot);
+      auto const viewportCBV = alongRoute ? RetrieveRouteCorridorFeatures(*m_context)
+                                          : RetrieveGeometryFeatures(*m_context, m_params.m_pivot, RectId::Pivot);
       for (auto & features : ctx.m_features)
         features = features.Intersect(viewportCBV);
     }
@@ -614,7 +640,8 @@ void Geocoder::GoImpl(vector<MwmInfoPtr> const & infos, bool inViewport)
 
     if (m_params.IsCategorialRequest())
     {
-      MatchCategories(ctx, m_context->GetType().m_viewportIntersected /* aroundPivot */);
+      // Features along a route are already in the corridor, which may be much larger than the pivot rect cache.
+      MatchCategories(ctx, m_context->GetType().m_viewportIntersected && !alongRoute /* aroundPivot */);
     }
     else
     {
@@ -1922,6 +1949,26 @@ CBV Geocoder::RetrieveGeometryFeatures(MwmContext const & context, m2::RectD con
   case RectId::Count: ASSERT(false, ("Invalid RectId.")); return CBV();
   }
   UNREACHABLE();
+}
+
+CBV Geocoder::RetrieveRouteCorridorFeatures(MwmContext const & context)
+{
+  auto const & corridor = m_params.m_routeCorridor;
+  CHECK(corridor, ());
+  if (m_routeCorridorOfCache.lock() != corridor)
+  {
+    m_routeCorridorFeatures.clear();
+    m_routeCorridorOfCache = corridor;
+  }
+
+  auto it = m_routeCorridorFeatures.find(context.GetId());
+  if (it == m_routeCorridorFeatures.end())
+  {
+    Retrieval retrieval(context, m_cancellable);
+    CBV features(retrieval.RetrieveGeometryFeatures(corridor->GetCoveringRects(), m_params.m_scale));
+    it = m_routeCorridorFeatures.emplace(context.GetId(), std::move(features)).first;
+  }
+  return it->second;
 }
 
 bool Geocoder::GetTypeInGeocoding(BaseContext const & ctx, uint32_t featureId, Model::Type & type)

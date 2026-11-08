@@ -1,6 +1,7 @@
 #pragma once
 
 #include "search/bookmarks/results.hpp"
+#include "search/route_corridor.hpp"
 
 #include "indexer/feature_decl.hpp"
 
@@ -13,6 +14,7 @@
 #include "base/checked_cast.hpp"
 
 #include <algorithm>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -78,6 +80,11 @@ public:
   std::string const & GetAddress() const { return m_address; }
   std::string const & GetDescription() const { return m_details.m_description; }
   std::string const & GetBranch() const { return m_branch; }
+
+  // Along a route (Mode::Route): where the result is relative to the route. Opening hours (IsOpenNow() etc.) are
+  // then evaluated at the estimated arrival at the result.
+  std::optional<RoutePosition> const & GetRoutePosition() const { return m_routePosition; }
+  void SetRoutePosition(std::optional<RoutePosition> const & position) { m_routePosition = position; }
 
   osm::YesNoUnknown IsOpenNow() const { return m_details.m_isOpenNow; }
   uint16_t GetMinutesUntilOpen() const { return m_details.m_minutesUntilOpen; }
@@ -163,6 +170,8 @@ private:
   buffer_vector<std::pair<uint16_t, uint16_t>, 4> m_descHightlightRanges;
 
   std::shared_ptr<RankingInfo> m_dbgInfo;  // used in debug logs and tests, nullptr in production
+
+  std::optional<RoutePosition> m_routePosition;
 
   // The position that this result occupied in the vector returned by
   // a search query. -1 if undefined.

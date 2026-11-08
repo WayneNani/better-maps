@@ -5,6 +5,7 @@
 #include "search/opening_hours_filter.hpp"
 #include "search/pre_ranking_info.hpp"
 #include "search/ranker.hpp"
+#include "search/route_corridor.hpp"
 
 #include "indexer/feature_decl.hpp"
 #include "indexer/mwm_set.hpp"
@@ -15,7 +16,9 @@
 #include "base/macros.hpp"
 
 #include <ctime>
+#include <functional>
 #include <limits>
+#include <memory>
 #include <optional>
 #include <set>
 #include <vector>
@@ -23,6 +26,7 @@
 #include "3party/ankerl/unordered_dense.h"
 
 class DataSource;
+class FeatureType;
 
 namespace search
 {
@@ -67,6 +71,13 @@ public:
     // POIs which don't pass this filter at |m_openingHoursTime| are dropped.
     OpeningHoursFilter m_openingHoursFilter = OpeningHoursFilter::Off;
     time_t m_openingHoursTime = 0;
+
+    // POIs for which it returns false are dropped, see SearchParams::m_poiFilter.
+    std::function<bool(FeatureType &)> m_poiFilter;
+
+    // Search along a route (Mode::Route): only results in the corridor, ordered along the route. Opening hours are
+    // evaluated at the estimated arrival, |m_openingHoursTime| is the moment at the corridor start.
+    std::shared_ptr<RouteCorridor const> m_routeCorridor;
   };
 
   PreRanker(DataSource const & dataSource, Ranker & ranker);
@@ -155,14 +166,21 @@ private:
   void DbgFindAndLog(std::set<uint32_t> const & ids) const;
 
   void FilterForViewportSearch();
+  // Drops POIs by their opening hours (Params::m_openingHoursFilter) and by Params::m_poiFilter.
   void FilterByOpeningHours();
+  // Keeps the best interpretation of each feature.
+  void KeepUniqueResults();
   void Filter();
+  // UpdateResults() of a search along a route.
+  void UpdateRouteResults(bool lastUpdate);
   void FilterRelaxedResults(bool lastUpdate);
 
   DataSource const & m_dataSource;
   Ranker & m_ranker;
 
   PreResultsContainerT m_results, m_relaxedResults;
+  // Results in the corridor of a search along a route, collected in all maps until the last update.
+  PreResultsContainerT m_routeResults;
 
   Params m_params;
 

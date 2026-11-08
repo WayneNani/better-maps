@@ -46,6 +46,7 @@
 #include "base/string_utils.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <initializer_list>
 #include <memory>
 #include <optional>
@@ -477,7 +478,14 @@ public:
     if (!ft)
       return {};
 
-    RankerResult res(*ft, center, std::move(name), country, m_ranker.m_params.m_openingHoursTime);
+    // Along a route, opening hours are evaluated at the estimated arrival.
+    auto const & routePosition = preResult.GetRoutePosition();
+    time_t openingHoursTime = m_ranker.m_params.m_openingHoursTime;
+    if (routePosition)
+      openingHoursTime += static_cast<time_t>(std::lround(routePosition->GetTimeToPlaceSec()));
+
+    RankerResult res(*ft, center, std::move(name), country, openingHoursTime);
+    res.m_routePosition = routePosition;
 
     RankingInfo info;
     InitRankingInfo(*ft, center, preResult, info);
@@ -976,6 +984,7 @@ Result Ranker::MakeResult(RankerResult const & rankerResult, bool needAddress, b
     HighlightResult(m_highlightTokens, m_params.m_query.m_prefix, res);
 
   res.SetRankingInfo(rankerResult.m_dbgInfo);
+  res.SetRoutePosition(rankerResult.m_routePosition);
 
 #ifdef SEARCH_USE_PROVENANCE
   res.SetProvenance(std::move(rankerResult.m_provenance));
@@ -1006,7 +1015,17 @@ void Ranker::UpdateResults(bool lastUpdate)
   if (m_tentativeResults.empty())
     return;
 
-  if (m_params.m_viewportSearch)
+  if (m_params.m_routeSearch)
+  {
+    // All results in the corridor match the query (see PreRanker::UpdateRouteResults), the next ones come first.
+    std::stable_sort(m_tentativeResults.begin(), m_tentativeResults.end(),
+                     [](RankerResult const & lhs, RankerResult const & rhs)
+    {
+      ASSERT(lhs.GetRoutePosition() && rhs.GetRoutePosition(), ());
+      return lhs.GetRoutePosition()->m_distanceAlongRouteM < rhs.GetRoutePosition()->m_distanceAlongRouteM;
+    });
+  }
+  else if (m_params.m_viewportSearch)
   {
     // https://github.com/organicmaps/organicmaps/issues/5566
     /// @todo https://github.com/organicmaps/organicmaps/issues/5251 Should review later
@@ -1074,7 +1093,7 @@ void Ranker::UpdateResults(bool lastUpdate)
     // Don't make move here in case of BailIfCancelled() throw. Objects in m_tentativeResults should remain valid.
     Result result = MakeResult(rankerResult, m_params.m_needAddress, m_params.m_needHighlighting);
 
-    if (m_params.m_viewportSearch)
+    if (m_params.m_viewportSearch || m_params.m_routeSearch)
     {
       m_emitter.AddResultNoChecks(std::move(result));
       ++count;

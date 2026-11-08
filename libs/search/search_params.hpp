@@ -4,6 +4,7 @@
 #include "search/filtering_params.hpp"
 #include "search/mode.hpp"
 #include "search/opening_hours_filter.hpp"
+#include "search/route_corridor.hpp"
 
 #include "geometry/point2d.hpp"
 #include "geometry/rect2d.hpp"
@@ -18,6 +19,8 @@
 #include <optional>
 #include <string>
 
+class FeatureType;
+
 namespace search
 {
 class Results;
@@ -29,6 +32,7 @@ struct SearchParams
   static size_t constexpr kDefaultBatchSizeEverywhere = 10;
   static size_t constexpr kDefaultNumResultsEverywhere = 30;
   static size_t constexpr kDefaultNumResultsInViewport = 200;
+  static size_t constexpr kDefaultNumResultsAlongRoute = 200;
   static size_t constexpr kPreResultsCount = 200;
 
   using TimeDurationT = base::Timer::DurationT;
@@ -37,6 +41,8 @@ struct SearchParams
 
   using OnStarted = std::function<void()>;
   using OnResults = std::function<void(Results const &)>;
+  // Returns true if a POI may be in results, see |m_poiFilter|.
+  using PoiFilter = std::function<bool(FeatureType & ft)>;
 
   bool IsEqualCommon(SearchParams const & rhs) const;
 
@@ -111,6 +117,14 @@ struct SearchParams
   // An explicitly set filter has priority over the one from the query. A day or time from the query
   // ("Sonntag", "20 Uhr") is relative to |m_openingHoursTime| and replaces it.
   bool m_detectQueryFilters = false;
+
+  // The corridor to search in, for Mode::Route. Results get Result::GetRoutePosition(). Opening hours are evaluated
+  // at the estimated arrival at each place, |m_openingHoursTime| is the moment at the corridor start.
+  std::shared_ptr<RouteCorridor const> m_routeCorridor;
+
+  // Keeps only POIs for which it returns true, e.g. charging stations with a certain socket. Other results (streets,
+  // addresses, localities, ...) are kept. Works for Everywhere, Viewport and Route modes.
+  PoiFilter m_poiFilter;
 
   // Set to true for debug logs and tests.
 #ifdef DEBUG

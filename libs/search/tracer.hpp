@@ -53,6 +53,7 @@ public:
   {
     GoEverywhere,
     GoInViewport,
+    GoAlongRoute,
     MatchCategories,
     MatchRegions,
     MatchCities,

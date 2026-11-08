@@ -300,13 +300,17 @@ Retrieval::ExtendedFeatures RetrievePostcodeFeaturesImpl(Retrieval::TrieRoot<Val
 }
 
 Retrieval::ExtendedFeatures RetrieveGeometryFeaturesImpl(MwmContext const & context,
-                                                         base::Cancellable const & cancellable, m2::RectD const & rect,
-                                                         int scale)
+                                                         base::Cancellable const & cancellable,
+                                                         vector<m2::RectD> const & rects, int scale)
 {
   EditedFeaturesHolder holder(context.GetId());
 
   covering::Intervals coverage;
-  CoverRect(rect, scale, coverage);
+  for (auto const & rect : rects)
+    CoverRect(rect, scale, coverage);
+  // Coverings of nearby rects share cells, e.g. the bigger cells of features with large geometry.
+  if (rects.size() > 1)
+    coverage = covering::SortAndMergeIntervals(coverage);
 
   vector<uint64_t> features;
   vector<uint64_t> exactlyMatchedFeatures;
@@ -319,7 +323,7 @@ Retrieval::ExtendedFeatures RetrieveGeometryFeaturesImpl(MwmContext const & cont
   holder.ForEachModifiedOrCreated([&](EditableMapObject const & emo, uint64_t index)
   {
     auto const center = emo.GetMercator();
-    if (rect.IsPointInside(center))
+    if (any_of(rects.begin(), rects.end(), [&center](m2::RectD const & rect) { return rect.IsPointInside(center); }))
       features.push_back(index);
   });
   return SortFeaturesAndBuildResult(std::move(features), std::move(exactlyMatchedFeatures));
@@ -412,7 +416,12 @@ Retrieval::Features Retrieval::RetrievePostcodeFeatures(TokenSlice const & slice
 
 Retrieval::Features Retrieval::RetrieveGeometryFeatures(m2::RectD const & rect, int scale) const
 {
-  return RetrieveGeometryFeaturesImpl(m_context, m_cancellable, rect, scale).m_features;
+  return RetrieveGeometryFeaturesImpl(m_context, m_cancellable, {rect}, scale).m_features;
+}
+
+Retrieval::Features Retrieval::RetrieveGeometryFeatures(vector<m2::RectD> const & rects, int scale) const
+{
+  return RetrieveGeometryFeaturesImpl(m_context, m_cancellable, rects, scale).m_features;
 }
 
 template <template <typename> class R, typename... Args>

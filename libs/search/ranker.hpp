@@ -46,6 +46,8 @@ public:
     bool m_needAddress = false;
     bool m_needHighlighting = false;
     bool m_viewportSearch = false;
+    // Search along a route: results are ordered by their distance along the route.
+    bool m_routeSearch = false;
     bool m_categorialRequest = false;
 
     // Moment to evaluate opening hours at, see Result::IsOpenNow().

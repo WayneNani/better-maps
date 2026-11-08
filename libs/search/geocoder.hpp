@@ -14,6 +14,7 @@
 #include "search/mwm_context.hpp"
 #include "search/postcode_points.hpp"
 #include "search/query_params.hpp"
+#include "search/route_corridor.hpp"
 #include "search/streets_matcher.hpp"
 #include "search/token_range.hpp"
 #include "search/tracer.hpp"
@@ -80,6 +81,9 @@ public:
 
     RecommendedFilteringParams m_filteringParams;
 
+    // The corridor of Mode::Route.
+    std::shared_ptr<RouteCorridor const> m_routeCorridor;
+
     int m_scale = scales::GetUpperScale();
 
     bool m_useDebugInfo = false;  // Set to true for debug logs and tests.
@@ -108,6 +112,8 @@ public:
   // |results|.
   void GoEverywhere();
   void GoInViewport();
+  // Searches in Params::m_routeCorridor, like GoInViewport() in a viewport.
+  void GoAlongRoute();
 
   // Ends geocoding and informs the following stages
   // of the pipeline (PreRanker and further).
@@ -291,6 +297,9 @@ private:
   // A caching wrapper around Retrieval::RetrieveGeometryFeatures.
   CBV RetrieveGeometryFeatures(MwmContext const & context, m2::RectD const & rect, RectId id);
 
+  // Features in the rects covering Params::m_routeCorridor, cached for the corridor.
+  CBV RetrieveRouteCorridorFeatures(MwmContext const & context);
+
   // This is a faster wrapper around SearchModel::GetSearchType(), as
   // it uses pre-loaded lists of streets and villages.
   [[nodiscard]] bool GetTypeInGeocoding(BaseContext const & ctx, uint32_t featureId, Model::Type & type);
@@ -344,6 +353,10 @@ private:
   PivotRectsCache m_postcodesRectsCache;
   PivotRectsCache m_suburbsRectsCache;
   LocalityRectsCache m_localityRectsCache;
+
+  // Features of Params::m_routeCorridor in each mwm, see RetrieveRouteCorridorFeatures().
+  std::weak_ptr<RouteCorridor const> m_routeCorridorOfCache;
+  std::map<MwmSet::MwmId, CBV> m_routeCorridorFeatures;
 
   PostcodePointsCache m_postcodePointsCache;
 
