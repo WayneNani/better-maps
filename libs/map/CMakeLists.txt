@@ -106,6 +106,7 @@ target_link_libraries(${PROJECT_NAME}
     search
     storage
     traffic
+    traffxml
     transit
   PRIVATE
     cppjansson
