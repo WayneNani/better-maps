@@ -233,6 +233,43 @@
       </LinearLayout>
     </LinearLayout>
   </LinearLayout>
+  <!-- better-maps: a result of the search along the route, see RouteSearchPlacePage. -->
+  <LinearLayout
+    android:id="@+id/route_search_frame"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/margin_base"
+    android:paddingEnd="@dimen/margin_base"
+    android:paddingBottom="@dimen/margin_half"
+    android:visibility="gone"
+    tools:visibility="visible">
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/route_search_position"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:textAlignment="viewStart"
+      android:textAppearance="@style/MwmTextAppearance.Body2"
+      android:textColor="?colorSecondary"
+      android:textStyle="bold"
+      tools:text="in 12 km · Detour ~3 min" />
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/route_search_open"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/margin_quarter"
+      android:textAlignment="viewStart"
+      android:textAppearance="@style/MwmTextAppearance.Body3"
+      tools:text="Open on arrival" />
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/route_search_add"
+      style="@style/Widget.Material3.Button.Icon"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/margin_half"
+      android:text="@string/route_search_add_to_route"
+      app:icon="@drawable/ic_plus" />
+  </LinearLayout>
   <LinearLayout
     android:id="@+id/category_container"
     android:layout_width="match_parent"

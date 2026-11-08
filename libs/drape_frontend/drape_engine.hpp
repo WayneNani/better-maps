@@ -206,6 +206,9 @@ public:
   void SetWidgetLayout(gui::TWidgetsLayoutInfo && info);
 
   void AllowAutoZoom(bool allowAutoZoom);
+  // better-maps: while |hold| is true, the map does not go back to following the position by itself during the
+  // navigation (normally some seconds after the user moved it), e.g. while places along the route are shown.
+  void HoldMapPositionInRouting(bool hold);
 
   void Allow3dMode(bool allowPerspectiveInNavigation, bool allow3dBuildings);
   void EnablePerspective();

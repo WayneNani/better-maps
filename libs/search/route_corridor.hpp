@@ -72,6 +72,9 @@ public:
   std::vector<m2::PointD> const & GetPoints() const { return m_points; }
 
   m2::RectD const & GetLimitRect() const { return m_limitRect; }
+  // Bounding rect of the route inside the corridor from the corridor start up to |distanceM| along the route
+  // (without the corridor width), e.g. to show the route ahead up to some places on the map. Empty if IsEmpty().
+  m2::RectD GetRouteRect(double distanceM) const;
   // Rectangles which cover the whole corridor, e.g. to retrieve its features from the map index.
   std::vector<m2::RectD> GetCoveringRects() const;
 

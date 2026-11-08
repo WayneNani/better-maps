@@ -29,4 +29,21 @@
   <string name="route_search_add_stop">Add as stop</string>
   <!-- Message after adding a result of the search along the route as a stop. -->
   <string name="route_search_stop_added">Stop added, the route is being recalculated</string>
+  <!-- Button on the place page of a result of the search along the route: add the place to the route as a stop. -->
+  <string name="route_search_add_to_route">Add to route</string>
+  <!-- The place of a result of the search along the route is already a stop of the route. -->
+  <string name="route_search_added_to_route">Added to the route</string>
+  <!-- Search along the route: button to show the results as a list. -->
+  <string name="route_search_show_list">List</string>
+  <!-- Search along the route: button to show the results on the map. -->
+  <string name="route_search_show_map">Map</string>
+  <!-- Search along the route before a category was chosen or a text entered. -->
+  <string name="route_search_choose">Choose a category or search for a place</string>
+  <!-- Search along the route is running. -->
+  <string name="route_search_searching">Searching along the route…</string>
+  <!-- Number of places found along the route. -->
+  <plurals name="route_search_places">
+    <item quantity="one">%d place along the route</item>
+    <item quantity="other">%d places along the route</item>
+  </plurals>
 </resources>

@@ -144,6 +144,28 @@ void RouteCorridor::BuildChunks()
   }
 }
 
+m2::RectD RouteCorridor::GetRouteRect(double distanceM) const
+{
+  m2::RectD rect;
+  if (IsEmpty())
+    return rect;
+  rect.Add(m_points.front());
+  for (size_t i = 1; i < m_points.size(); ++i)
+  {
+    if (m_distancesM[i] <= distanceM)
+    {
+      rect.Add(m_points[i]);
+      continue;
+    }
+    // The route ends at |distanceM| in this segment.
+    double const segmentM = m_distancesM[i] - m_distancesM[i - 1];
+    double const fraction = segmentM > 0.0 ? std::clamp((distanceM - m_distancesM[i - 1]) / segmentM, 0.0, 1.0) : 0.0;
+    rect.Add(m_points[i - 1] + (m_points[i] - m_points[i - 1]) * fraction);
+    break;
+  }
+  return rect;
+}
+
 std::vector<m2::RectD> RouteCorridor::GetCoveringRects() const
 {
   std::vector<m2::RectD> rects;

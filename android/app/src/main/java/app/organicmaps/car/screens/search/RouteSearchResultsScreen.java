@@ -61,9 +61,7 @@ public class RouteSearchResultsScreen extends BaseMapScreen implements RouteSear
     mTexts = new AndroidRouteSearchTexts(carContext);
     mPresenter = new RouteSearchPresenter(
         Router.Vehicle, RouteSearchSettings.from(carContext),
-        new NativeRouteSearchEngine(Language.getKeyboardLocale(carContext)),
-        new RouteStops(
-            () -> CarToast.makeText(getCarContext(), R.string.route_search_stop_added, CarToast.LENGTH_LONG).show()),
+        new NativeRouteSearchEngine(Language.getKeyboardLocale(carContext), false /* withMap */), new RouteStops(),
         System::nanoTime);
   }
 
@@ -166,6 +164,22 @@ public class RouteSearchResultsScreen extends BaseMapScreen implements RouteSear
   @Override
   public void showHiddenWithoutOpeningHours(int count)
   {}
+
+  @Override
+  public void showDisplay(@NonNull RouteSearchPresenter.Display display)
+  {}
+
+  @Override
+  public void prepareMap()
+  {}
+
+  @Override
+  public void showStopAdded(@NonNull SearchResult result)
+  {
+    CarToast.makeText(getCarContext(), R.string.route_search_stop_added, CarToast.LENGTH_LONG).show();
+    // Back to the navigation, which goes on with the new route.
+    mPresenter.close();
+  }
 
   @Override
   public void close()

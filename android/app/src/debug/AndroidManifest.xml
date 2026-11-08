@@ -10,5 +10,10 @@
       android:name="app.organicmaps.debug.NavigationSimulationReceiver"
       android:exported="true"
       tools:ignore="ExportedReceiver" />
+    <!-- Instrumented tests: host of fragments that need an AppCompatActivity. -->
+    <activity
+      android:name="app.organicmaps.debug.FragmentTestHostActivity"
+      android:exported="false"
+      android:theme="@style/MwmTheme" />
   </application>
 </manifest>

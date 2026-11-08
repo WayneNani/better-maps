@@ -865,6 +865,20 @@ private:
   bool const m_allowAutoZoom;
 };
 
+// better-maps: see DrapeEngine::HoldMapPositionInRouting().
+class HoldMapPositionInRoutingMessage : public Message
+{
+public:
+  explicit HoldMapPositionInRoutingMessage(bool hold) : m_hold(hold) {}
+
+  Type GetType() const override { return Type::HoldMapPositionInRouting; }
+
+  bool IsHold() const { return m_hold; }
+
+private:
+  bool const m_hold;
+};
+
 class Allow3dBuildingsMessage : public Message
 {
 public:

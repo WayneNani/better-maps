@@ -227,6 +227,12 @@ public class Framework
 
   public static native void nativeFollowRoute();
 
+  /**
+   * better-maps: while {@code hold} is true, the map does not go back to following the position by itself during the
+   * navigation, e.g. while places along the route are shown.
+   */
+  public static native void nativeHoldMapPositionInRouting(boolean hold);
+
   public static native void nativeDisableFollowing();
 
   @Nullable

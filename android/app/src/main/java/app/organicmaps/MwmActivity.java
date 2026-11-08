@@ -119,7 +119,7 @@ import app.organicmaps.sdk.widget.placepage.PlacePageData;
 import app.organicmaps.search.FloatingSearchToolbarController;
 import app.organicmaps.search.SearchActivity;
 import app.organicmaps.search.SearchFragment;
-import app.organicmaps.search.route.RouteSearchActivity;
+import app.organicmaps.search.route.RouteSearchFragment;
 import app.organicmaps.search.route.RouteSearchSettings;
 import app.organicmaps.settings.RoutingOptionsActivity;
 import app.organicmaps.settings.SettingsActivity;
@@ -154,7 +154,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
                FloatingSearchToolbarController.SearchToolbarListener,
                MenuBottomSheetFragment.MenuBottomSheetInterfaceWithHeader,
                PlacePageController.PlacePageRouteSettingsListener, MapButtonsController.MapButtonClickListener,
-               DisplayChangedListener
+               DisplayChangedListener, RouteSearchFragment.Host
 {
   private static final String TAG = MwmActivity.class.getSimpleName();
 
@@ -1445,7 +1445,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
   {
     final RoutingController routingController = RoutingController.get();
     if (!closeBottomSheet(MAIN_MENU_ID) && !closeBottomSheet(LAYERS_MENU_ID) && !collapseNavMenu() && !closePlacePage()
-        && !closeSearchToolbar(true, true) && !closeSidePanel() && !closePositionChooser()
+        && !closeRouteSearch() && !closeSearchToolbar(true, true) && !closeSidePanel() && !closePositionChooser()
         && !closeTransitConnectionDetails() && !routingController.resetToPlanningStateIfNavigating()
         && !routingController.cancel())
     {
@@ -1639,6 +1639,12 @@ public class MwmActivity extends BaseMwmFragmentActivity
   @Override
   public void updateMenu()
   {
+    updateMenuInternal();
+    hideRoutingUiForRouteSearch();
+  }
+
+  private void updateMenuInternal()
+  {
     final RoutingController controller = RoutingController.get();
 
     if (controller.isNavigating())
@@ -1794,6 +1800,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
       else
       {
         mRoutingPlanInplaceController.show(true);
+        hideRoutingUiForRouteSearch();
         if (completionListener != null)
           completionListener.run();
       }
@@ -1818,6 +1825,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
     // TODO:
     // mPlacePage.refreshViews();
     mNavigationController.show(show);
+    hideRoutingUiForRouteSearch();
     if (mOnmapDownloader != null)
       mOnmapDownloader.updateState(false);
   }
@@ -1856,6 +1864,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
   @Override
   public void onNavigationCancelled()
   {
+    closeRouteSearch();
     closeFloatingToolbarsAndPanels(true);
     ThemeSwitcher.INSTANCE.restart(mMapController.isRenderingActive());
     if (mRoutingPlanInplaceController == null)
@@ -1892,6 +1901,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
   @Override
   public void onPlanningCancelled()
   {
+    closeRouteSearch();
     closeFloatingToolbarsAndPanels(true);
     mMapButtonsViewModel.setLayoutMode(MapButtonsController.LayoutMode.regular);
     refreshLightStatusBar();
@@ -1931,6 +1941,11 @@ public class MwmActivity extends BaseMwmFragmentActivity
   @Override
   public void onBuiltRoute()
   {
+    // better-maps: the results of the search along the route along the new route, e.g. with an added stop.
+    final RouteSearchFragment routeSearch = getRouteSearch();
+    if (routeSearch != null && !routeSearch.isRemoving())
+      routeSearch.onRouteChanged();
+
     if (!RoutingController.get().isPlanning())
       return;
 
@@ -2426,7 +2441,81 @@ public class MwmActivity extends BaseMwmFragmentActivity
     if (!RouteSearchSettings.isSupported(router))
       return;
     closeSearchToolbar(true, true);
-    RouteSearchActivity.start(this, router, query, isCategory);
+    closePlacePage();
+    // A new search replaces the open one.
+    final RouteSearchFragment open = getRouteSearch();
+    if (open != null)
+      open.closeSearch();
+    mNavigationController.collapseNavMenu();
+    getSupportFragmentManager()
+        .beginTransaction()
+        .setReorderingAllowed(true)
+        .replace(R.id.route_search_container, RouteSearchFragment.class,
+                 RouteSearchFragment.arguments(router, query, isCategory), RouteSearchFragment.TAG)
+        .commitNow();
+    hideRoutingUiForRouteSearch();
+  }
+
+  @Nullable
+  private RouteSearchFragment getRouteSearch()
+  {
+    return (RouteSearchFragment) getSupportFragmentManager().findFragmentByTag(RouteSearchFragment.TAG);
+  }
+
+  /** better-maps: the search along the route is shown over the map. */
+  public boolean isRouteSearchShown()
+  {
+    final RouteSearchFragment fragment = getRouteSearch();
+    return fragment != null && !fragment.isRemoving();
+  }
+
+  /** @return true if the search along the route was open. */
+  private boolean closeRouteSearch()
+  {
+    final RouteSearchFragment fragment = getRouteSearch();
+    if (fragment == null || fragment.isRemoving())
+      return false;
+    fragment.closeSearch();
+    return true;
+  }
+
+  @Override
+  public void onRouteSearchClosed()
+  {
+    final RouteSearchFragment fragment = getRouteSearch();
+    if (fragment != null && !getSupportFragmentManager().isStateSaved())
+      getSupportFragmentManager().beginTransaction().remove(fragment).commitNow();
+    else if (fragment != null)
+      getSupportFragmentManager().beginTransaction().remove(fragment).commitAllowingStateLoss();
+    closePlacePage();
+    // Back to the route planner or the navigation, as they were.
+    final RoutingController controller = RoutingController.get();
+    final View navigation = findViewById(R.id.navigation_frame);
+    if (controller.isNavigating() && navigation != null)
+      navigation.setVisibility(View.VISIBLE);
+    final View plan = findViewById(R.id.routing_plan_frame);
+    if (controller.isPlanning() && !mIsTabletLayout && plan != null)
+    {
+      plan.setTranslationY(0);
+      plan.setVisibility(View.VISIBLE);
+    }
+    updateMenu();
+  }
+
+  /**
+   * The route planner and the navigation are hidden under the search along the route. Invisible rather than gone:
+   * their layout and animations stay as they are, so that they come back as they were.
+   */
+  private void hideRoutingUiForRouteSearch()
+  {
+    if (!isRouteSearchShown())
+      return;
+    for (int id : new int[] {R.id.routing_plan_frame, R.id.navigation_frame, R.id.menu_frame})
+    {
+      final View view = findViewById(id);
+      if (view != null && view.getVisibility() == View.VISIBLE)
+        view.setVisibility(View.INVISIBLE);
+    }
   }
 
   @Override

@@ -20,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
@@ -32,12 +31,6 @@ import androidx.fragment.app.FragmentFactory;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-
-import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.imageview.ShapeableImageView;
-import com.google.android.material.textview.MaterialTextView;
-
 import app.organicmaps.MwmActivity;
 import app.organicmaps.MwmApplication;
 import app.organicmaps.R;
@@ -71,6 +64,8 @@ import app.organicmaps.sdk.util.DateUtils;
 import app.organicmaps.sdk.util.StringUtils;
 import app.organicmaps.sdk.util.concurrency.UiThread;
 import app.organicmaps.sdk.widget.placepage.CoordinatesFormat;
+import app.organicmaps.search.route.RouteSearchPlacePage;
+import app.organicmaps.search.route.RouteSearchViewModel;
 import app.organicmaps.util.Graphics;
 import app.organicmaps.util.SharingUtils;
 import app.organicmaps.util.UiUtils;
@@ -88,7 +83,10 @@ import app.organicmaps.widget.placepage.sections.PlacePagePhoneFragment;
 import app.organicmaps.widget.placepage.sections.PlacePageTrackFragment;
 import app.organicmaps.widget.placepage.sections.PlacePageTransitDeparturesFragment;
 import app.organicmaps.widget.placepage.sections.PlacePageWikipediaFragment;
-
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.textview.MaterialTextView;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -224,6 +222,10 @@ public class PlacePageView extends Fragment
   private PlacePageViewListener mPlacePageViewListener;
 
   private PlacePageViewModel mViewModel;
+  // better-maps: "Add to route" for a result of the search along the route.
+  private RouteSearchViewModel mRouteSearchViewModel;
+  private RouteSearchPlacePage mRouteSearchPlacePage;
+  private final Observer<Integer> mRouteSearchObserver = changes -> refreshRouteSearch();
   private MapObject mMapObject;
 
   private static void refreshMetadataOrHide(@Nullable String metadata, @NonNull View metaLayout,
@@ -269,6 +271,8 @@ public class PlacePageView extends Fragment
     mFrame = view;
     mFrame.setOnClickListener((v) -> mPlacePageViewListener.onPlacePageRequestToggleState());
     mPreview = mFrame.findViewById(R.id.pp__preview);
+    mRouteSearchViewModel = new ViewModelProvider(requireActivity()).get(RouteSearchViewModel.class);
+    mRouteSearchPlacePage = new RouteSearchPlacePage(mPreview.findViewById(R.id.route_search_frame));
 
     mFrame.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
       final int oldHeight = oldBottom - oldTop;
@@ -413,6 +417,7 @@ public class PlacePageView extends Fragment
   {
     super.onStart();
     mViewModel.getMapObject().observe(requireActivity(), this);
+    mRouteSearchViewModel.getChanges().observe(requireActivity(), mRouteSearchObserver);
     BookmarkManager.INSTANCE.addSharingListener(this);
     MwmApplication.from(requireContext()).getLocationHelper().addListener(this);
     MwmApplication.from(requireContext()).getSensorHelper().addListener(this);
@@ -423,6 +428,7 @@ public class PlacePageView extends Fragment
   {
     super.onStop();
     mViewModel.getMapObject().removeObserver(this);
+    mRouteSearchViewModel.getChanges().removeObserver(mRouteSearchObserver);
     BookmarkManager.INSTANCE.removeSharingListener(this);
     MwmApplication.from(requireContext()).getLocationHelper().removeListener(this);
     MwmApplication.from(requireContext()).getSensorHelper().removeListener(this);
@@ -535,9 +541,17 @@ public class PlacePageView extends Fragment
                        hasWikipediaEntry());
   }
 
+  /** better-maps: the place of a result of the search along the route. */
+  private void refreshRouteSearch()
+  {
+    if (mRouteSearchPlacePage != null)
+      mRouteSearchPlacePage.bind(mRouteSearchViewModel.getPresenter(), mMapObject);
+  }
+
   private void refreshPreview()
   {
     UiUtils.setTextAndHideIfEmpty(mTvTitle, mMapObject.getTitle());
+    refreshRouteSearch();
 
     if (mMapObject.getStarRating() != null)
     {
