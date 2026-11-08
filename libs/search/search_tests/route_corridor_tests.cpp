@@ -192,6 +192,35 @@ UNIT_TEST(RouteCorridor_CoveringRects)
   }
 }
 
+UNIT_TEST(RouteCorridor_RouteRect)
+{
+  auto params = StraightRoute(30, 1000);
+  params.m_passedDistanceM = 10000;
+  RouteCorridor const corridor(params);
+
+  // About 50 m: distances along the route are measured on the earth.
+  double const eps = At(0.05).x - At(0).x;
+
+  // From the corridor start (10 km) up to 5.5 km ahead of it, without the corridor width.
+  auto const rect = corridor.GetRouteRect(5500);
+  TEST(AlmostEqual(rect.minX(), At(10).x, eps), (rect));
+  TEST(AlmostEqual(rect.maxX(), At(15.5).x, eps), (rect));
+  TEST(AlmostEqual(rect.SizeY(), 0, 1e-9), (rect));
+
+  // Beyond the route end: the whole route ahead.
+  auto const whole = corridor.GetRouteRect(1e9);
+  TEST(AlmostEqual(whole.maxX(), At(30).x, eps), (whole));
+
+  // Nothing ahead: the corridor start only.
+  auto const start = corridor.GetRouteRect(0);
+  TEST(AlmostEqual(start.minX(), At(10).x, eps), (start));
+  TEST(AlmostEqual(start.maxX(), At(10).x, eps), (start));
+
+  auto empty = StraightRoute(5, 1000);
+  empty.m_passedDistanceM = 6000;
+  TEST(!RouteCorridor(empty).GetRouteRect(1000).IsValid(), ());
+}
+
 UNIT_TEST(SpreadAlongRoute_Smoke)
 {
   // Fewer places than the limit: all of them, ordered along the route.
