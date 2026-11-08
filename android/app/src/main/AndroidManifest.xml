@@ -411,6 +411,15 @@
         android:windowSoftInputMode="adjustResize" />
 
     <activity
+        android:name="app.organicmaps.search.route.RouteSearchActivity"
+        android:theme="@style/MwmTheme.CardBg"
+        android:configChanges="orientation|screenLayout|screenSize"
+        android:screenOrientation="fullUser"
+        android:label="@string/route_search"
+        android:parentActivityName="app.organicmaps.MwmActivity"
+        android:windowSoftInputMode="stateHidden|adjustResize" />
+
+    <activity
         android:name="app.organicmaps.search.SearchActivity"
         android:theme="@style/MwmTheme.CardBg"
         android:configChanges="orientation|screenLayout|screenSize"

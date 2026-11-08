@@ -4,4 +4,7 @@
   <string name="category_restaurant">Restaurant</string>
   <string name="category_bakery">Bäckerei</string>
   <string name="category_bar_club">Bars &amp; Clubs</string>
+  <string name="category_charging_station">Ladestation</string>
+  <string name="category_supermarket">Supermarkt</string>
+  <string name="category_recycling_container">Wertstoffcontainer</string>
 </resources>

@@ -79,6 +79,18 @@
       app:icon="@drawable/ic_edit"
       app:iconTint="?android:textColorPrimary" />
 
+    <!-- better-maps: search along the route. -->
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/btn__search_along_route"
+      style="@style/Widget.Material3.Button.IconButton"
+      android:layout_width="@dimen/nav_icon_size"
+      android:layout_height="@dimen/nav_icon_size"
+      android:layout_marginStart="@dimen/margin_base"
+      android:contentDescription="@string/route_search"
+      android:tooltipText="@string/route_search"
+      app:icon="@drawable/ic_search"
+      app:iconTint="?android:textColorPrimary" />
+
     <com.google.android.material.button.MaterialButton
       android:id="@+id/btn__directions_preview"
       style="@style/Widget.Material3.Button.IconButton"

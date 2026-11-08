@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="route_search">Entlang der Route suchen</string>
+  <string name="route_search_in_distance">in %s</string>
+  <string name="route_search_detour">Umweg ~%s</string>
+  <string name="route_search_on_route">Direkt an der Route</string>
+  <string name="route_search_open_on_arrival">Bei Ankunft geöffnet</string>
+  <string name="route_search_closed_on_arrival">Bei Ankunft geschlossen</string>
+  <string name="route_search_filter_open_on_arrival">Bei Ankunft geöffnet</string>
+  <string name="route_search_half_width">Bis %s neben der Route</string>
+  <string name="route_search_half_width_title">Abstand zur Route</string>
+  <string name="route_search_not_found">Nichts entlang der Route gefunden</string>
+  <string name="route_search_not_found_hint">Versuche einen größeren Abstand zur Route oder eine andere Kategorie.</string>
+  <string name="route_search_no_route">Es gibt keine Route, entlang der gesucht werden kann.</string>
+  <string name="route_search_add_stop">Als Zwischenstopp hinzufügen</string>
+  <string name="route_search_stop_added">Zwischenstopp hinzugefügt, die Route wird neu berechnet</string>
+</resources>

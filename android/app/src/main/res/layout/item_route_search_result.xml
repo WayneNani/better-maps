@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: a result of the search along the route, see RouteSearchAdapter. -->
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:background="?selectableItemBackground"
+  android:gravity="center_vertical"
+  android:minHeight="@dimen/search_item_height"
+  android:orientation="horizontal"
+  android:paddingStart="@dimen/margin_half_double_plus"
+  android:paddingTop="@dimen/margin_half"
+  android:paddingEnd="@dimen/margin_half"
+  android:paddingBottom="@dimen/margin_half">
+
+  <LinearLayout
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:orientation="vertical">
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/title"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:ellipsize="end"
+      android:maxLines="2"
+      android:textAlignment="viewStart"
+      android:textAppearance="@style/MwmTextAppearance.Body1"
+      tools:text="Aral" />
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/description"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/margin_quarter"
+      android:ellipsize="end"
+      android:maxLines="1"
+      android:textAlignment="viewStart"
+      android:textAppearance="@style/MwmTextAppearance.Body3"
+      tools:text="Gas Station" />
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/route_position"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/margin_quarter"
+      android:textAlignment="viewStart"
+      android:textAppearance="@style/MwmTextAppearance.Body2"
+      android:textColor="?colorSecondary"
+      android:textStyle="bold"
+      tools:text="in 12 km · Detour ~2 min" />
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/open"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/margin_quarter"
+      android:textAlignment="viewStart"
+      android:textAppearance="@style/MwmTextAppearance.Body3"
+      tools:text="Open on arrival" />
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/region"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/margin_quarter"
+      android:ellipsize="end"
+      android:maxLines="1"
+      android:textAlignment="viewStart"
+      android:textAppearance="@style/MwmTextAppearance.Body3"
+      android:textStyle="italic"
+      tools:text="Siegburg" />
+  </LinearLayout>
+
+  <com.google.android.material.button.MaterialButton
+    android:id="@+id/add_stop"
+    style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+    android:layout_width="@dimen/nav_icon_size"
+    android:layout_height="@dimen/nav_icon_size"
+    android:layout_marginStart="@dimen/margin_half"
+    android:contentDescription="@string/route_search_add_stop"
+    android:tooltipText="@string/route_search_add_stop"
+    app:icon="@drawable/ic_plus" />
+</LinearLayout>
