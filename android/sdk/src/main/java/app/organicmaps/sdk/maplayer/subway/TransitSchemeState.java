@@ -1,6 +1,7 @@
 package app.organicmaps.sdk.maplayer.subway;
 
 import android.content.Context;
+import android.os.SystemClock;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import app.organicmaps.sdk.R;
@@ -13,7 +14,9 @@ enum TransitSchemeState
     @Override
     public void activate(@NonNull Context context)
     {
-      Toast.makeText(context, R.string.subway_data_unavailable, Toast.LENGTH_SHORT).show();
+      // better-maps: only right after the user turned the layer on, see SubwayNoDataNotice.
+      if (SubwayManager.NOTICE.onNoData(SystemClock.elapsedRealtime()))
+        Toast.makeText(context, R.string.subway_data_unavailable, Toast.LENGTH_SHORT).show();
     }
   };
 
