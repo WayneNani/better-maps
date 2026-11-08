@@ -2,23 +2,17 @@ package app.organicmaps.search.route;
 
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
+import app.organicmaps.sdk.Framework;
 import app.organicmaps.sdk.bookmarks.data.FeatureId;
 import app.organicmaps.sdk.bookmarks.data.MapObject;
+import app.organicmaps.sdk.routing.RouteMarkData;
+import app.organicmaps.sdk.routing.RouteMarkType;
 import app.organicmaps.sdk.routing.RoutingController;
 import app.organicmaps.sdk.search.SearchResult;
 
 /** Stops of the current route, for {@link RouteSearchPresenter}. */
 public class RouteStops implements RouteSearchPresenter.Stops
 {
-  @NonNull
-  private final Runnable mOnAdded;
-
-  /** @param onAdded called after a stop was added, e.g. to tell that the route is recalculated. */
-  public RouteStops(@NonNull Runnable onAdded)
-  {
-    mOnAdded = onAdded;
-  }
-
   @Override
   public boolean canAddStop()
   {
@@ -26,10 +20,24 @@ public class RouteStops implements RouteSearchPresenter.Stops
   }
 
   @Override
+  public boolean isStop(@NonNull SearchResult result)
+  {
+    final RouteMarkData[] points = Framework.nativeGetRoutePoints();
+    if (points == null)
+      return false;
+    for (RouteMarkData point : points)
+    {
+      // The start is where one comes from, e.g. the current position.
+      if (point.mPointType != RouteMarkType.Start && RouteSearchPlaces.isAt(result, point.mLat, point.mLon))
+        return true;
+    }
+    return false;
+  }
+
+  @Override
   public void addStop(@NonNull SearchResult result)
   {
     RoutingController.get().addStop(toMapObject(result));
-    mOnAdded.run();
   }
 
   @NonNull

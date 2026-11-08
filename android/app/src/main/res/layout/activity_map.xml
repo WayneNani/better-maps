@@ -57,6 +57,11 @@
       android:layout_below="@id/toolbar"
       android:paddingBottom="@dimen/margin_base"
       android:visibility="invisible" />
+    <!-- better-maps: search along the route over the map, see RouteSearchFragment. -->
+    <FrameLayout
+      android:id="@+id/route_search_container"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent" />
   </RelativeLayout>
   <androidx.fragment.app.FragmentContainerView
     android:id="@+id/place_page_container_fragment"

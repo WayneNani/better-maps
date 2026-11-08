@@ -23,6 +23,9 @@ class RouteSearchAdapter extends RecyclerView.Adapter<RouteSearchAdapter.ViewHol
     void onAddStopClicked(@NonNull SearchResult result);
 
     boolean canAddStop();
+
+    /** The result is already a stop of the route. */
+    boolean isStop(@NonNull SearchResult result);
   }
 
   @NonNull
@@ -111,7 +114,15 @@ class RouteSearchAdapter extends RecyclerView.Adapter<RouteSearchAdapter.ViewHol
       UiUtils.setTextAndHideIfEmpty(mRegion, result.getFormattedAddress(itemView.getContext()));
 
       itemView.setOnClickListener(v -> mListener.onResultClicked(index));
-      UiUtils.showIf(mListener.canAddStop(), mAddStop);
+      // An added result stays in the list, marked as a stop.
+      final boolean isStop = mListener.isStop(result);
+      UiUtils.showIf(isStop || mListener.canAddStop(), mAddStop);
+      mAddStop.setEnabled(!isStop);
+      mAddStop.setIconResource(isStop ? R.drawable.ic_checkmark : R.drawable.ic_plus);
+      final String description = itemView.getContext().getString(isStop ? R.string.route_search_added_to_route
+                                                                        : R.string.route_search_add_stop);
+      mAddStop.setContentDescription(description);
+      mAddStop.setTooltipText(description);
       mAddStop.setOnClickListener(v -> mListener.onAddStopClicked(result));
     }
   }

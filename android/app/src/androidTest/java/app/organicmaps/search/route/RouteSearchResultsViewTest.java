@@ -115,6 +115,12 @@ public class RouteSearchResultsViewTest
     {
       return mCanAddStop;
     }
+
+    @Override
+    public boolean isStop(@NonNull SearchResult result)
+    {
+      return false;
+    }
   }
 
   @NonNull

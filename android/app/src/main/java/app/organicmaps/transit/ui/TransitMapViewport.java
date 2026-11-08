@@ -13,7 +13,7 @@ import app.organicmaps.sdk.Map;
  * The part of the map that is not covered by the route planner (its toolbar at the top and the connection sheet at
  * the bottom), like the place page does: the map shows routes and places within this part.
  */
-final class TransitMapViewport
+public final class TransitMapViewport
 {
   // Below this height the map would be useless; then the whole map is used.
   private static final int MIN_HEIGHT_DP = 100;
@@ -49,8 +49,33 @@ final class TransitMapViewport
     return true;
   }
 
+  /**
+   * better-maps: restricts the map to the area between the bottom of {@code top} and the top of {@code bottom}, e.g.
+   * between the search field and the result list of the search along the route.
+   *
+   * @return false if there is no map (e.g. in tests) or the area is too small.
+   */
+  public static boolean fitBetween(@NonNull Activity activity, @NonNull View top, @NonNull View bottom)
+  {
+    final View map = map(activity);
+    if (map == null || !top.isShown() || !bottom.isShown())
+      return false;
+    final int[] mapLocation = new int[2];
+    map.getLocationOnScreen(mapLocation);
+    final int[] location = new int[2];
+    top.getLocationOnScreen(location);
+    final int mapTop = Math.max(0, location[1] + top.getHeight() - mapLocation[1]);
+    bottom.getLocationOnScreen(location);
+    final int mapBottom = Math.min(map.getHeight(), location[1] - mapLocation[1]);
+    final float density = activity.getResources().getDisplayMetrics().density;
+    if (mapBottom - mapTop < MIN_HEIGHT_DP * density)
+      return false;
+    Framework.nativeSetVisibleRect(0, mapTop, map.getWidth(), mapBottom);
+    return true;
+  }
+
   /** The whole map again, e.g. when the route planner closes. */
-  static void reset(@NonNull Activity activity)
+  public static void reset(@NonNull Activity activity)
   {
     final View map = map(activity);
     if (map != null && map.getWidth() > 0 && map.getHeight() > 0)

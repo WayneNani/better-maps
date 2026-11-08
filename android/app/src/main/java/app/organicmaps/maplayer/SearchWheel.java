@@ -3,6 +3,7 @@ package app.organicmaps.maplayer;
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -13,6 +14,7 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import app.organicmaps.MwmActivity;
 import app.organicmaps.R;
 import app.organicmaps.sdk.Router;
 import app.organicmaps.sdk.routing.RoutingController;
@@ -272,12 +274,20 @@ public class SearchWheel implements View.OnClickListener
 
   private void startSearch(SearchOption searchOption)
   {
-    mMapButtonsViewModel.setSearchOption(searchOption);
     final Context context = mFrame.getContext();
     final String query = context.getString(searchOption.mQueryId);
     // Category request from navigation search wheel.
-    // better-maps: the places along the route ahead, shown on the map; around the map center without a route.
+    // better-maps: the places along the route ahead, in the search along the route over the map (with "Add to
+    // route" on their place pages); around the map center without a route.
     final Router router = RoutingController.get().getLastRouterType();
+    final MwmActivity activity = findMwmActivity(context);
+    if (activity != null && RouteSearchSettings.isSupported(router) && RoutingController.get().isNavigating())
+    {
+      toggleSearchLayout();
+      activity.showRouteSearch(query, true /* isCategory */);
+      return;
+    }
+    mMapButtonsViewModel.setSearchOption(searchOption);
     final boolean alongRoute =
         RouteSearchSettings.isSupported(router)
         && SearchEngine.INSTANCE.searchAlongRoute(
@@ -288,5 +298,18 @@ public class SearchWheel implements View.OnClickListener
     SearchEngine.INSTANCE.setQuery(query, true);
     refreshSearchButtonImage();
     toggleSearchLayout();
+  }
+
+  @Nullable
+  private static MwmActivity findMwmActivity(@NonNull Context context)
+  {
+    Context current = context;
+    while (current instanceof ContextWrapper wrapper)
+    {
+      if (current instanceof MwmActivity activity)
+        return activity;
+      current = wrapper.getBaseContext();
+    }
+    return null;
   }
 }

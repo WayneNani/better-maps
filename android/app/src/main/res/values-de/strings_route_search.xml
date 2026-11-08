@@ -14,4 +14,14 @@
   <string name="route_search_no_route">Es gibt keine Route, entlang der gesucht werden kann.</string>
   <string name="route_search_add_stop">Als Zwischenstopp hinzufügen</string>
   <string name="route_search_stop_added">Zwischenstopp hinzugefügt, die Route wird neu berechnet</string>
+  <string name="route_search_add_to_route">Zur Route hinzufügen</string>
+  <string name="route_search_added_to_route">Zur Route hinzugefügt</string>
+  <string name="route_search_show_list">Liste</string>
+  <string name="route_search_show_map">Karte</string>
+  <string name="route_search_choose">Kategorie wählen oder nach einem Ort suchen</string>
+  <string name="route_search_searching">Suche entlang der Route …</string>
+  <plurals name="route_search_places">
+    <item quantity="one">%d Ort entlang der Route</item>
+    <item quantity="other">%d Orte entlang der Route</item>
+  </plurals>
 </resources>

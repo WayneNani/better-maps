@@ -1,17 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- better-maps: search along the route, see RouteSearchFragment. -->
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<!-- better-maps: search along the route over the map, see RouteSearchFragment. The search field and the filters at
+     the top, the results as marks on the map and in a list panel at the bottom that can be opened. -->
+<FrameLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
-  style="@style/MwmWidget.Floating"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
 
   <LinearLayout
+    android:id="@+id/route_search_top"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:layout_gravity="top"
+    android:background="?appBackground"
+    android:clickable="true"
+    android:elevation="4dp"
+    android:focusable="false"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/margin_quarter">
 
     <com.google.android.material.appbar.AppBarLayout
       android:id="@+id/app_bar"
@@ -36,36 +43,103 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/margin_base"
-        android:paddingTop="@dimen/margin_half"
+        android:paddingTop="@dimen/margin_quarter"
         android:paddingEnd="@dimen/margin_base"
         app:selectionRequired="false"
         app:singleLine="true"
         app:singleSelection="true" />
     </HorizontalScrollView>
 
-    <!-- Distance from the route. -->
-    <com.google.android.material.chip.Chip
-      android:id="@+id/half_width"
-      style="@style/Widget.Material3.Chip.Assist"
-      android:layout_width="wrap_content"
+    <!-- Distance from the route and "Open on arrival" in one line. -->
+    <LinearLayout
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_marginStart="@dimen/margin_base"
-      app:closeIcon="@drawable/ic_expand_more"
-      app:closeIconVisible="true"
-      tools:text="Up to 1 km from the route" />
+      android:gravity="center_vertical"
+      android:orientation="horizontal">
+      <com.google.android.material.chip.Chip
+        android:id="@+id/half_width"
+        style="@style/Widget.Material3.Chip.Assist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_base"
+        app:closeIcon="@drawable/ic_expand_more"
+        app:closeIconVisible="true"
+        tools:text="Up to 1 km from the route" />
+      <include
+        layout="@layout/search_opening_hours_filter"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+    </LinearLayout>
+  </LinearLayout>
 
-    <!-- "Open on arrival". -->
-    <include layout="@layout/search_opening_hours_filter" />
+  <!-- The results as a list: collapsed (only the header) while the map shows them, see RouteSearchSheet. -->
+  <app.organicmaps.transit.ui.TransitSheetLayout
+    android:id="@+id/route_search_sheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:background="@drawable/bg_bottomsheet"
+    android:clickable="true"
+    android:elevation="8dp"
+    android:focusable="false"
+    android:orientation="vertical">
+
+    <!-- Tap: list or map; drag: resize. -->
+    <FrameLayout
+      android:id="@+id/route_search_handle"
+      android:layout_width="match_parent"
+      android:layout_height="16dp"
+      android:background="?selectableItemBackground"
+      android:contentDescription="@string/route_search_show_list">
+      <com.google.android.material.imageview.ShapeableImageView
+        android:layout_width="32dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center"
+        android:importantForAccessibility="no"
+        app:srcCompat="@drawable/bottom_sheet_handle"
+        app:tint="?colorControlHighlight" />
+    </FrameLayout>
+
+    <LinearLayout
+      android:id="@+id/route_search_header"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center_vertical"
+      android:minHeight="48dp"
+      android:orientation="horizontal"
+      android:paddingStart="@dimen/margin_base"
+      android:paddingEnd="@dimen/margin_half">
+
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/route_search_summary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textAppearance="@style/MwmTextAppearance.Body2"
+        android:textStyle="bold"
+        tools:text="12 places along the route" />
+
+      <com.google.android.material.button.MaterialButton
+        android:id="@+id/route_search_display"
+        style="@style/Widget.Material3.Button.TonalButton.Icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_half"
+        android:text="@string/route_search_show_list"
+        app:icon="@drawable/ic_transit_view_list" />
+    </LinearLayout>
 
     <FrameLayout
+      android:id="@+id/route_search_body"
       android:layout_width="match_parent"
-      android:layout_height="0dp"
-      android:layout_weight="1">
+      android:layout_height="0dp">
       <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?appBackground"
         android:clipToPadding="false" />
 
       <app.organicmaps.widget.PlaceholderView
@@ -74,17 +148,10 @@
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
         android:paddingStart="@dimen/margin_double_and_half"
-        android:paddingTop="@dimen/placeholder_margin_top"
+        android:paddingTop="@dimen/margin_base"
         android:paddingEnd="@dimen/margin_double_and_half"
         android:visibility="gone"
         tools:visibility="visible" />
     </FrameLayout>
-  </LinearLayout>
-
-  <include
-    layout="@layout/show_on_map_fab"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="bottom|center"
-    android:layout_margin="@dimen/margin_base" />
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+  </app.organicmaps.transit.ui.TransitSheetLayout>
+</FrameLayout>
