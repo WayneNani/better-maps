@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.text.style.StyleSpan;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import app.organicmaps.sdk.bookmarks.data.FeatureId;
 import app.organicmaps.sdk.util.Distance;
 
@@ -79,6 +80,10 @@ public class SearchResult
   @NonNull
   private final Popularity mPopularity;
 
+  // better-maps: position relative to the route, for results of the search along the route.
+  @Nullable
+  public final RoutePosition routePosition;
+
   public SearchResult(String name, String suggestion, double lat, double lon, int[] highlightRanges,
                       int[] descHighlightRanges)
   {
@@ -95,11 +100,20 @@ public class SearchResult
     this.highlightRanges = highlightRanges;
     this.descHighlightRanges = descHighlightRanges;
     mPopularity = Popularity.defaultInstance();
+    this.routePosition = null;
   }
 
   public SearchResult(String name, Description description, double lat, double lon, int[] highlightRanges,
                       int[] descHighlightRanges, @NonNull Popularity popularity)
   {
+    this(name, description, lat, lon, highlightRanges, descHighlightRanges, popularity, null);
+  }
+
+  /** A result of the search along the route. */
+  public SearchResult(String name, Description description, double lat, double lon, int[] highlightRanges,
+                      int[] descHighlightRanges, @NonNull Popularity popularity, @Nullable RoutePosition routePosition)
+  {
+    this.routePosition = routePosition;
     this.type = TYPE_RESULT;
     this.name = name;
     mPopularity = popularity;

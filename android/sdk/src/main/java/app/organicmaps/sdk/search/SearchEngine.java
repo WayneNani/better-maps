@@ -179,6 +179,30 @@ public enum SearchEngine implements SearchListener, MapSearchListener,
     searchInteractive(context, query, isCategory, timestamp, isMapAndTable, OpeningHoursFilter.OFF);
   }
 
+  /**
+   * better-maps: searches along the current route, ahead of the current position, in a corridor of
+   * {@code halfWidthMeters} on both sides of the route. Results are ordered by the distance along the route and have
+   * {@link SearchResult#routePosition}; opening hours are evaluated at the estimated arrival at each place.
+   *
+   * @param showOnMap show the results on the map when the search is finished.
+   * @return false if there is no route to search along.
+   */
+  @MainThread
+  public boolean searchAlongRoute(@NonNull String query, boolean isCategory, @NonNull String locale, long timestamp,
+                                  double halfWidthMeters, @NonNull OpeningHoursFilter openingHoursFilter,
+                                  boolean showOnMap)
+  {
+    return nativeRunSearchAlongRoute(query.getBytes(StandardCharsets.UTF_8), isCategory, locale, timestamp,
+                                     halfWidthMeters, openingHoursFilter.toNative(), showOnMap);
+  }
+
+  /** better-maps: shows the results of the last search on the map, e.g. of the search along the route. */
+  @MainThread
+  public void showResultsOnMap()
+  {
+    nativeShowResultsOnMap();
+  }
+
   @MainThread
   public static void searchMaps(@NonNull Context context, @NonNull String query, long timestamp)
   {
@@ -298,6 +322,16 @@ public enum SearchEngine implements SearchListener, MapSearchListener,
   private static native void nativeRunInteractiveSearch(byte[] bytes, boolean isCategory, String language,
                                                         long timestamp, boolean isMapAndTable, boolean hasLocation,
                                                         double lat, double lon, int openingHoursFilter);
+
+  /**
+   * @param bytes utf-8 formatted query bytes
+   * @param openingHoursFilter native value of {@link OpeningHoursFilter}.
+   */
+  private static native boolean nativeRunSearchAlongRoute(byte[] bytes, boolean isCategory, String language,
+                                                          long timestamp, double halfWidthMeters,
+                                                          int openingHoursFilter, boolean showOnMap);
+
+  private static native void nativeShowResultsOnMap();
 
   /**
    * @param bytes utf-8 formatted query bytes

@@ -6,6 +6,7 @@
 #include "map/bookmarks_search_params.hpp"
 #include "map/everywhere_search_params.hpp"
 #include "map/place_page_info.hpp"
+#include "map/route_search_params.hpp"
 #include "map/viewport_search_params.hpp"
 
 #include "search/mode.hpp"
@@ -28,6 +29,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <limits>
 #include <memory>
 #include <vector>
@@ -59,6 +61,10 @@ jclass g_descriptionClass;
 jmethodID g_descriptionConstructor;
 jclass g_popularityClass;
 jmethodID g_popularityConstructor;
+// better-maps: results of the search along the route.
+jmethodID g_routeResultConstructor;
+jclass g_routePositionClass;
+jmethodID g_routePositionConstructor;
 
 // Implements 'MapSearchListener' java interface.
 jmethodID g_mapResultsMethod;
@@ -154,6 +160,19 @@ jobject ToJavaResult(Result const & result, search::ProductInfo const & productI
                                                       /// @todo Restore when popularity will be available
                                                       0 /*static_cast<jint>(result.GetRankingInfo().m_popularity)*/));
 
+  if (auto const & routePosition = result.GetRoutePosition())
+  {
+    jni::TScopedLocalRef alongRoute(
+        env, ToJavaDistance(env, platform::Distance::CreateFormatted(routePosition->m_distanceAlongRouteM)));
+    jni::TScopedLocalRef position(
+        env, env->NewObject(g_routePositionClass, g_routePositionConstructor, alongRoute.get(),
+                            routePosition->m_distanceAlongRouteM, routePosition->m_distanceFromRouteM,
+                            static_cast<jint>(std::lround(routePosition->GetTimeToPlaceSec())),
+                            static_cast<jint>(std::lround(routePosition->m_detourSec))));
+    return env->NewObject(g_resultClass, g_routeResultConstructor, name.get(), desc.get(), ll.m_lat, ll.m_lon,
+                          ranges.get(), descRanges.get(), popularity.get(), position.get());
+  }
+
   return env->NewObject(g_resultClass, g_resultConstructor, name.get(), desc.get(), ll.m_lat, ll.m_lon, ranges.get(),
                         descRanges.get(), popularity.get());
 }
@@ -196,6 +215,33 @@ void OnResults(Results results, vector<search::ProductInfo> const & productInfo,
     env->CallVoidMethod(g_javaListener, g_endResultsId, timestamp, hidden);
     if (isMapAndTable && results.IsEndedNormal())
       g_framework->NativeFramework()->GetSearchAPI().PokeSearchInViewport();
+  }
+}
+
+// better-maps: results of the search along the route. |showOnMap|: show them on the map at the end.
+void OnRouteResults(Results results, jlong timestamp, bool showOnMap)
+{
+  // Ignore results from obsolete searches.
+  if (g_queryTimestamp > timestamp)
+    return;
+
+  JNIEnv * env = jni::GetEnv();
+
+  if (!results.IsEndMarker() || results.IsEndedNormal())
+  {
+    g_results = std::move(results);
+    vector<search::ProductInfo> const productInfo(g_results.GetCount());
+    jni::TScopedLocalObjectArrayRef jResults(env, BuildSearchResults(productInfo, false /* hasPosition */, 0, 0));
+    env->CallVoidMethod(g_javaListener, g_updateResultsId, jResults.get(), timestamp);
+  }
+
+  if (results.IsEndMarker())
+  {
+    auto const hidden = static_cast<jint>(
+        std::min<size_t>(results.GetHiddenWithoutOpeningHoursCount(), std::numeric_limits<jint>::max()));
+    env->CallVoidMethod(g_javaListener, g_endResultsId, timestamp, hidden);
+    if (showOnMap && results.IsEndedNormal())
+      g_framework->NativeFramework()->FillSearchResultsMarks(true /* clear */, g_results);
   }
 }
 
@@ -281,6 +327,16 @@ JNIEXPORT void JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeInit(J
   g_popularityClass = jni::GetGlobalClassRef(env, "app/organicmaps/sdk/search/Popularity");
   g_popularityConstructor = jni::GetConstructorID(env, g_popularityClass, "(I)V");
 
+  g_routeResultConstructor =
+      jni::GetConstructorID(env, g_resultClass,
+                            "(Ljava/lang/String;Lapp/organicmaps/sdk/search/SearchResult$Description;DD[I[I"
+                            "Lapp/organicmaps/sdk/search/Popularity;Lapp/organicmaps/sdk/search/RoutePosition;)V");
+  g_routePositionClass = jni::GetGlobalClassRef(env, "app/organicmaps/sdk/search/RoutePosition");
+  // RoutePosition(Distance distanceAlongRoute, double distanceAlongRouteMeters, double distanceFromRouteMeters,
+  //               int timeToPlaceSec, int detourSec)
+  g_routePositionConstructor =
+      jni::GetConstructorID(env, g_routePositionClass, "(Lapp/organicmaps/sdk/util/Distance;DDII)V");
+
   g_mapResultsMethod = jni::GetMethodID(env, g_javaListener, "onMapSearchResults",
                                         "([Lapp/organicmaps/sdk/search/MapSearchListener$Result;JZ)V");
   g_mapResultClass = jni::GetGlobalClassRef(env, "app/organicmaps/sdk/search/MapSearchListener$Result");
@@ -337,6 +393,30 @@ JNIEXPORT void JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeRunInt
     if (g_framework->NativeFramework()->GetSearchAPI().SearchEverywhere(std::move(eparams)))
       g_queryTimestamp = timestamp;
   }
+}
+
+JNIEXPORT jboolean JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeRunSearchAlongRoute(
+    JNIEnv * env, jclass clazz, jbyteArray bytes, jboolean isCategory, jstring lang, jlong timestamp,
+    jdouble halfWidthM, jint openingHoursFilter, jboolean showOnMap)
+{
+  auto & framework = *g_framework->NativeFramework();
+  search::RouteSearchParams params;
+  params.m_query = jni::ToNativeString(env, bytes);
+  params.m_inputLocale = jni::ToNativeString(env, lang);
+  params.m_isCategory = static_cast<bool>(isCategory);
+  params.m_corridor = framework.GetRoutingManager().MakeSearchCorridor(halfWidthM);
+  params.m_openingHoursFilter = ToOpeningHoursFilter(openingHoursFilter);
+  params.m_onResults = bind(&OnRouteResults, _1, timestamp, static_cast<bool>(showOnMap));
+
+  bool const searchStarted = framework.GetSearchAPI().SearchAlongRoute(std::move(params));
+  if (searchStarted)
+    g_queryTimestamp = timestamp;
+  return searchStarted;
+}
+
+JNIEXPORT void JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeShowResultsOnMap(JNIEnv * env, jclass clazz)
+{
+  g_framework->NativeFramework()->FillSearchResultsMarks(true /* clear */, g_results);
 }
 
 JNIEXPORT jobject JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeDetectQueryFilter(JNIEnv * env,
