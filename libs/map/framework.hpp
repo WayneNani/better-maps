@@ -875,6 +875,8 @@ public:
 
   bool LoadAutoZoom();
   void AllowAutoZoom(bool allowAutoZoom);
+  // better-maps: see df::DrapeEngine::HoldMapPositionInRouting(). Kept when the drape engine is created again.
+  void HoldMapPositionInRouting(bool hold);
   void SaveAutoZoom(bool allowAutoZoom);
 
   static bool GetShowBookmarkLabels();
@@ -946,4 +948,6 @@ public:
 private:
   void Refresh3dMode();
   bool m_wasRoutingActive = false;
+  // better-maps: see HoldMapPositionInRouting().
+  bool m_holdMapPositionInRouting = false;
 };

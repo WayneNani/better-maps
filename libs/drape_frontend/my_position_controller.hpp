@@ -144,6 +144,8 @@ public:
 
   void EnablePerspectiveInRouting(bool enablePerspective);
   void EnableAutoZoomInRouting(bool enableAutoZoom);
+  // better-maps: see DrapeEngine::HoldMapPositionInRouting().
+  void HoldMapPositionInRouting(bool hold);
 
   void StopLocationFollow();
   void NextMode(ScreenBase const & screen);
@@ -241,6 +243,7 @@ private:
   base::Timer m_lastGPSBearingTimer;
   base::Timer m_routingNotFollowTimer;
   bool m_blockRoutingNotFollowTimer = false;
+  bool m_holdMapPositionInRouting = false;
   base::Timer m_blockAutoZoomTimer;
   base::Timer m_updateLocationTimer;
   double m_lastLocationTimestamp;

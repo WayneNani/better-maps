@@ -1626,6 +1626,8 @@ void Framework::CreateDrapeEngine(ref_ptr<dp::GraphicsContextFactory> contextFac
   OnSize(params.m_surfaceWidth, params.m_surfaceHeight);
 
   Allow3dMode(allow3d, allow3dBuildings);
+  if (m_holdMapPositionInRouting)
+    m_drapeEngine->HoldMapPositionInRouting(true);
 
   RefreshMapLanguage();
 
@@ -2681,6 +2683,13 @@ void Framework::AllowAutoZoom(bool allowAutoZoom)
 
   if (m_drapeEngine != nullptr)
     m_drapeEngine->AllowAutoZoom(allowAutoZoom && !isPedestrianRoute);
+}
+
+void Framework::HoldMapPositionInRouting(bool hold)
+{
+  m_holdMapPositionInRouting = hold;
+  if (m_drapeEngine != nullptr)
+    m_drapeEngine->HoldMapPositionInRouting(hold);
 }
 
 void Framework::SaveAutoZoom(bool allowAutoZoom)

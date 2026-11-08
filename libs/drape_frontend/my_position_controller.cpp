@@ -1055,9 +1055,17 @@ void MyPositionController::DeactivateRouting()
     });                                                                                                            \
   }
 
+void MyPositionController::HoldMapPositionInRouting(bool hold)
+{
+  m_holdMapPositionInRouting = hold;
+  // The time until the map follows the position again starts now.
+  if (!hold)
+    ResetRoutingNotFollowTimer();
+}
+
 void MyPositionController::CheckNotFollowRouting()
 {
-  if (!m_blockRoutingNotFollowTimer && IsInRouting() && m_mode == location::NotFollow)
+  if (!m_blockRoutingNotFollowTimer && !m_holdMapPositionInRouting && IsInRouting() && m_mode == location::NotFollow)
   {
     CHECK_ON_TIMEOUT(m_routingNotFollowNotifyId, kMaxNotFollowRoutingTimeSec, CheckNotFollowRouting);
     if (m_routingNotFollowTimer.ElapsedSeconds() >= kMaxNotFollowRoutingTimeSec)

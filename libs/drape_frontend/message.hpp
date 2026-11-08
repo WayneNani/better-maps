@@ -69,6 +69,7 @@ public:
     OnEnterForeground,
     SetAddNewPlaceMode,
     AllowAutoZoom,
+    HoldMapPositionInRouting,
     RequestSymbolsSize,
     RecoverContextDependentResources,
     SetVisibleViewport,

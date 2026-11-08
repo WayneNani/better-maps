@@ -696,6 +696,13 @@ void FrontendRenderer::AcceptMessage(ref_ptr<Message> message)
     break;
   }
 
+  case Message::Type::HoldMapPositionInRouting:
+  {
+    ref_ptr<HoldMapPositionInRoutingMessage> const msg = message;
+    m_myPositionController->HoldMapPositionInRouting(msg->IsHold());
+    break;
+  }
+
   case Message::Type::EnablePerspective:
   {
     AddUserEvent(make_unique_dp<SetAutoPerspectiveEvent>(true /* isAutoPerspective */));

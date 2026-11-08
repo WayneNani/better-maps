@@ -68,6 +68,7 @@ std::string DebugPrint(Message::Type msgType)
   case Message::Type::OnEnterForeground: return "OnEnterForeground";
   case Message::Type::SetAddNewPlaceMode: return "SetAddNewPlaceMode";
   case Message::Type::AllowAutoZoom: return "AllowAutoZoom";
+  case Message::Type::HoldMapPositionInRouting: return "HoldMapPositionInRouting";
   case Message::Type::RequestSymbolsSize: return "RequestSymbolsSize";
   case Message::Type::RecoverContextDependentResources: return "RecoverContextDependentResources";
   case Message::Type::SetVisibleViewport: return "SetVisibleViewport";

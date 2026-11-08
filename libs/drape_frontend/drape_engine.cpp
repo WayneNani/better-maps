@@ -697,6 +697,12 @@ void DrapeEngine::AllowAutoZoom(bool allowAutoZoom)
                                   MessagePriority::Normal);
 }
 
+void DrapeEngine::HoldMapPositionInRouting(bool hold)
+{
+  m_threadCommutator->PostMessage(ThreadsCommutator::RenderThread,
+                                  make_unique_dp<HoldMapPositionInRoutingMessage>(hold), MessagePriority::Normal);
+}
+
 void DrapeEngine::Allow3dMode(bool allowPerspectiveInNavigation, bool allow3dBuildings)
 {
   m_threadCommutator->PostMessage(ThreadsCommutator::ResourceUploadThread,
