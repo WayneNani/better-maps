@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -38,6 +37,8 @@ import app.organicmaps.sdk.bookmarks.data.Track;
 import app.organicmaps.sdk.routing.RoutingController;
 import app.organicmaps.sdk.settings.RoadType;
 import app.organicmaps.sdk.util.log.Logger;
+import app.organicmaps.search.route.RouteSearchPlacePage;
+import app.organicmaps.search.route.RouteSearchViewModel;
 import app.organicmaps.util.ThemeUtils;
 import app.organicmaps.util.UiUtils;
 import app.organicmaps.util.bottomsheet.MenuBottomSheetFragment;
@@ -725,6 +726,11 @@ public class PlacePageController
                                              : PlacePageButtons.ButtonType.BOOKMARK_SAVE);
       }
     }
+    // better-maps: a result of the search along the route has its own "Add to route" button on the place page.
+    if (RouteSearchPlacePage.findResult(
+            new ViewModelProvider(requireActivity()).get(RouteSearchViewModel.class).getPresenter(), mapObject)
+        != null)
+      buttons.remove(PlacePageButtons.ButtonType.ROUTE_ADD);
     mViewModel.setCurrentButtons(buttons);
   }
 
