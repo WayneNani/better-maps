@@ -2,4 +2,5 @@
 <resources>
   <string name="about_based_on_comaps">Basiert auf CoMaps</string>
   <string name="about_source_code">Quellcode</string>
+  <string name="car_vehicle_data">Fahrzeugdaten</string>
 </resources>

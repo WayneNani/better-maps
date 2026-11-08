@@ -3,4 +3,5 @@
 <resources>
   <string name="about_based_on_comaps">Based on CoMaps</string>
   <string name="about_source_code">Source code</string>
+  <string name="car_vehicle_data">Vehicle data</string>
 </resources>

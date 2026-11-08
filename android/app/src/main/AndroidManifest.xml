@@ -49,6 +49,10 @@
 
   <uses-permission android:name="androidx.car.app.NAVIGATION_TEMPLATES"/>
   <uses-permission android:name="androidx.car.app.ACCESS_SURFACE"/>
+  <!-- better-maps: car data (battery/fuel level, range, connectors, speed, odometer) for EV charging planning. -->
+  <uses-permission android:name="com.google.android.gms.permission.CAR_FUEL"/>
+  <uses-permission android:name="com.google.android.gms.permission.CAR_SPEED"/>
+  <uses-permission android:name="com.google.android.gms.permission.CAR_MILEAGE"/>
 
   <permission
       android:name="${applicationId}.permission.READ_NAVIGATION_DATA"

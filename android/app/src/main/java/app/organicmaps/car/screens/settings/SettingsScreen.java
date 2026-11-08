@@ -71,6 +71,7 @@ public class SettingsScreen extends BaseMapScreen
     builder.addItem(
         createSharedPrefsToggle(R.string.transliteration_title, Config::isTransliteration, Config::setTransliteration));
     builder.addItem(createHelpItem());
+    builder.addItem(createVehicleDataItem());
     return new ListTemplate.Builder().setHeader(createHeader()).setSingleList(builder.build()).build();
   }
 
@@ -129,6 +130,18 @@ public class SettingsScreen extends BaseMapScreen
     final Row.Builder builder = new Row.Builder();
     builder.setTitle(getCarContext().getString(R.string.about_help));
     builder.setOnClickListener(() -> getScreenManager().push(new HelpScreen(getCarContext(), getSurfaceRenderer())));
+    builder.setBrowsable(true);
+    return builder.build();
+  }
+
+  // better-maps: diagnostics of the values the connected car provides.
+  @NonNull
+  private Item createVehicleDataItem()
+  {
+    final Row.Builder builder = new Row.Builder();
+    builder.setTitle(getCarContext().getString(R.string.car_vehicle_data));
+    builder.setOnClickListener(
+        () -> getScreenManager().push(new VehicleDataScreen(getCarContext(), getSurfaceRenderer())));
     builder.setBrowsable(true);
     return builder.build();
   }
