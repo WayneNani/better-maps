@@ -33,6 +33,7 @@ endif()
 
 omim_add_tool_subdirectory(features_collector_tool)
 omim_add_tool_subdirectory(samples_generation_tool)
+omim_add_tool_subdirectory(route_search_tool)
 omim_add_tool_subdirectory(search_quality_tool)
 
 omim_add_test_subdirectory(search_quality_tests)
