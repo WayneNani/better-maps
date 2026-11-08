@@ -118,6 +118,9 @@ public class RoutingController
   private int mInvalidRoutePointsTransactionId;
   private int mRemovingIntermediatePointsTransactionId;
 
+  // better-maps: a stop was added during the navigation, the navigation goes on with the new route.
+  private boolean mFollowAfterBuild;
+
   @SuppressWarnings("FieldCanBeLocal")
   private final RoutingListener mRoutingListener = new RoutingListener() {
     @MainThread
@@ -151,6 +154,13 @@ public class RoutingController
 
   private void onBuiltRoute()
   {
+    final boolean routeFound = mLastResultCode == ResultCodes.NO_ERROR || mLastResultCode == ResultCodes.HAS_WARNINGS;
+    if (mFollowAfterBuild && routeFound)
+    {
+      mFollowAfterBuild = false;
+      if (isNavigating())
+        Framework.nativeFollowRoute();
+    }
     mCachedRoutingInfo = Framework.nativeGetRouteFollowingInfo();
     if (mLastRouterType == Router.Transit)
       mCachedTransitRouteInfo = Framework.nativeGetTransitRouteInfo();
@@ -234,6 +244,14 @@ public class RoutingController
       setBuildState(BuildState.NONE);
       updatePlan();
       return;
+    }
+
+    // better-maps: the route with the stop added during the navigation failed, show the error in the planning.
+    if (mFollowAfterBuild)
+    {
+      mFollowAfterBuild = false;
+      if (isNavigating())
+        switchToPlanning();
     }
 
     if (mLastResultCode != ResultCodes.NEED_MORE_MAPS)
@@ -491,13 +509,28 @@ public class RoutingController
     Framework.nativeFollowRoute();
   }
 
+  /**
+   * Adds a stop to the route and builds the route again. During the navigation, the navigation goes on with the new
+   * route (better-maps); otherwise the route planning shows it.
+   */
   public void addStop(@NonNull MapObject mapObject)
   {
+    if (isNavigating())
+    {
+      // Passed stops are removed with the route, otherwise the new route would lead to them again.
+      Framework.nativeRemoveRoute();
+      addRoutePoint(RouteMarkType.Intermediate, mapObject);
+      mFollowAfterBuild = true;
+      build();
+      if (mContainer != null)
+        mContainer.onAddedStop();
+      return;
+    }
+
     addRoutePoint(RouteMarkType.Intermediate, mapObject);
     build();
     if (mContainer != null)
       mContainer.onAddedStop();
-    resetToPlanningStateIfNavigating();
   }
 
   public void removeStop(@NonNull MapObject mapObject)
@@ -533,16 +566,21 @@ public class RoutingController
     if (isNavigating())
     {
       build();
-      setState(State.PREPARE);
-      cancelNavigation(false);
-      startPlanning();
-      if (mContainer != null)
-        mContainer.updateMenu();
-      if (mContainer != null)
-        mContainer.onResetToPlanningState();
+      switchToPlanning();
       return true;
     }
     return false;
+  }
+
+  private void switchToPlanning()
+  {
+    setState(State.PREPARE);
+    cancelNavigation(false);
+    startPlanning();
+    if (mContainer != null)
+      mContainer.updateMenu();
+    if (mContainer != null)
+      mContainer.onResetToPlanningState();
   }
 
   @NonNull
@@ -573,6 +611,7 @@ public class RoutingController
     Logger.d(TAG, "cancelInternal");
 
     mWaitingPoiPickType = null;
+    mFollowAfterBuild = false;
 
     setBuildState(BuildState.NONE);
     setState(State.NONE);
