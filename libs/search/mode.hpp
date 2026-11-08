@@ -10,6 +10,8 @@ enum class Mode
   Viewport,
   Downloader,
   Bookmarks,
+  // Along a route: in SearchParams::m_routeCorridor, ordered by the distance along the route.
+  Route,
   Count
 };
 

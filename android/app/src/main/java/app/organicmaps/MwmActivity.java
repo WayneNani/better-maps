@@ -119,6 +119,8 @@ import app.organicmaps.sdk.widget.placepage.PlacePageData;
 import app.organicmaps.search.FloatingSearchToolbarController;
 import app.organicmaps.search.SearchActivity;
 import app.organicmaps.search.SearchFragment;
+import app.organicmaps.search.route.RouteSearchActivity;
+import app.organicmaps.search.route.RouteSearchSettings;
 import app.organicmaps.settings.RoutingOptionsActivity;
 import app.organicmaps.settings.SettingsActivity;
 import app.organicmaps.transit.OnlineTransitRouter;
@@ -653,6 +655,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
 
     mNavigationController = new NavigationController(
         this, v -> onSettingsOptionSelected(), v -> onTrackRecordingOptionSelected(), this::updateBottomWidgetsOffset);
+    mNavigationController.setOnSearchAlongRouteListener(() -> showRouteSearch(null, false));
     // TrafficManager.INSTANCE.attach(mNavigationController);
 
     initMainMenu();
@@ -2404,6 +2407,26 @@ public class MwmActivity extends BaseMwmFragmentActivity
     // Create and show 'Manage Route' Bottom Sheet panel.
     mManageRouteBottomSheet = new ManageRouteBottomSheet();
     mManageRouteBottomSheet.show(getSupportFragmentManager(), "ManageRouteBottomSheet");
+  }
+
+  @Override
+  public void onSearchAlongRoute()
+  {
+    showRouteSearch(null, false);
+  }
+
+  /**
+   * better-maps: search along the route, in the route planner and during the navigation.
+   *
+   * @param query searched right away if not null, e.g. a category name.
+   */
+  public void showRouteSearch(@Nullable String query, boolean isCategory)
+  {
+    final Router router = RoutingController.get().getLastRouterType();
+    if (!RouteSearchSettings.isSupported(router))
+      return;
+    closeSearchToolbar(true, true);
+    RouteSearchActivity.start(this, router, query, isCategory);
   }
 
   @Override

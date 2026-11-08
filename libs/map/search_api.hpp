@@ -33,6 +33,7 @@ namespace search
 {
 struct BookmarksSearchParams;
 struct EverywhereSearchParams;
+struct RouteSearchParams;
 struct DiscoverySearchParams;
 }  // namespace search
 
@@ -92,6 +93,9 @@ public:
 
   // Search for bookmarks.
   bool SearchInBookmarks(search::BookmarksSearchParams params);
+
+  // Search along a route, in RouteSearchParams::m_corridor.
+  bool SearchAlongRoute(search::RouteSearchParams params);
 
   search::Engine & GetEngine() { return m_engine; }
   search::Engine const & GetEngine() const { return m_engine; }

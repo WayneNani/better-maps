@@ -41,6 +41,19 @@
     android:paddingEnd="@dimen/nav_bottom_gap"
     tools:background="#300000FF">
 
+    <!-- better-maps: search along the route. -->
+    <com.google.android.material.imageview.ShapeableImageView
+      android:id="@+id/search_along_route"
+      android:layout_width="0dp"
+      android:layout_height="@dimen/nav_icon_size"
+      android:layout_weight="0.2"
+      android:background="?selectableItemBackgroundBorderless"
+      android:scaleType="center"
+      android:contentDescription="@string/route_search"
+      android:tooltipText="@string/route_search"
+      app:srcCompat="@drawable/ic_search"
+      app:tint="?iconTint" />
+
     <com.google.android.material.imageview.ShapeableImageView
       android:id="@+id/tts_volume"
       android:layout_width="0dp"

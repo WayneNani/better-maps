@@ -66,6 +66,29 @@ UNIT_TEST(FollowingInfoProvidesRoadShieldsForUnannotatedLink)
   TEST_EQUAL(info.m_nextStreetShields.m_targetRoadShields[1].m_name, "Ring 3", ());
 }
 
+// better-maps: the route polyline with times, for the search along the route.
+UNIT_TEST(RoutePolylineWithTimes)
+{
+  RoutingSession session;
+  vector<m2::PointD> points;
+  vector<double> times;
+  double passedM = -1;
+  // No route yet.
+  TEST(!session.GetRoutePolylineWithTimes(points, times, passedM), ());
+
+  auto route = make_shared<Route>("dummy", kTestRoute.begin(), kTestRoute.end(), 0 /* route id */);
+  FillSubroutesInfo(*route);
+  session.AssignRouteForTesting(std::move(route), RouterResultCode::NoError);
+
+  TEST(session.GetRoutePolylineWithTimes(points, times, passedM), ());
+  TEST_EQUAL(points, kTestRoute, ());
+  TEST_EQUAL(times.size(), points.size(), ());
+  TEST_EQUAL(times.front(), 0.0, ());
+  TEST_EQUAL(times.back(), kTestTimes.back(), ());
+  TEST(is_sorted(times.begin(), times.end()), (times));
+  TEST_EQUAL(passedM, 0.0, ());
+}
+
 // Simple router. It returns route given to him on creation.
 class DummyRouter : public IRouter
 {

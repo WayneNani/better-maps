@@ -114,6 +114,9 @@ public:
   // Retrieves all features belonging to |rect| from the geometry index.
   Features RetrieveGeometryFeatures(m2::RectD const & rect, int scale) const;
 
+  // Retrieves all features belonging to any of |rects| from the geometry index, in one pass over the index.
+  Features RetrieveGeometryFeatures(std::vector<m2::RectD> const & rects, int scale) const;
+
 private:
   template <template <typename> class R, typename... Args>
   ExtendedFeatures Retrieve(Args &&... args) const;

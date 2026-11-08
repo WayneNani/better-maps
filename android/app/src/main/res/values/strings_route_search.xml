@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: search along the route (planned route and navigation). -->
+<resources>
+  <!-- Button in the route planner and the navigation, and the hint of the search field of the search along the route. -->
+  <string name="route_search">Search along the route</string>
+  <!-- A result of the search along the route: where one leaves the route for it. %s is a distance, e.g. "12 km". -->
+  <string name="route_search_in_distance">in %s</string>
+  <!-- A result of the search along the route: rough extra travel time to visit it and come back. %s is a duration, e.g. "2 min". -->
+  <string name="route_search_detour">Detour ~%s</string>
+  <!-- A result of the search along the route right next to it, without a detour worth mentioning. -->
+  <string name="route_search_on_route">On the route</string>
+  <!-- A result of the search along the route: open at the estimated arrival. -->
+  <string name="route_search_open_on_arrival">Open on arrival</string>
+  <!-- A result of the search along the route: closed at the estimated arrival. -->
+  <string name="route_search_closed_on_arrival">Closed on arrival</string>
+  <!-- Filter chip of the search along the route: only places open at the estimated arrival. -->
+  <string name="route_search_filter_open_on_arrival">Open on arrival</string>
+  <!-- Chip of the search along the route to choose how far from the route places may be. %s is a distance, e.g. "1 km". -->
+  <string name="route_search_half_width">Up to %s from the route</string>
+  <!-- Title of the menu to choose how far from the route places may be. -->
+  <string name="route_search_half_width_title">Distance from the route</string>
+  <!-- Search along the route found nothing. -->
+  <string name="route_search_not_found">Nothing found along the route</string>
+  <!-- Hint when the search along the route found nothing. -->
+  <string name="route_search_not_found_hint">Try a larger distance from the route or another category.</string>
+  <!-- Search along the route without a route, e.g. after arriving. -->
+  <string name="route_search_no_route">There is no route to search along.</string>
+  <!-- Button of a result of the search along the route: add it to the route as an intermediate stop. -->
+  <string name="route_search_add_stop">Add as stop</string>
+  <!-- Message after adding a result of the search along the route as a stop. -->
+  <string name="route_search_stop_added">Stop added, the route is being recalculated</string>
+</resources>

@@ -564,6 +564,11 @@ void Processor::Search(SearchParams params)
     ApplyQueryFilters(params);
 
   bool const viewportSearch = params.m_mode == Mode::Viewport;
+  bool const routeSearch = params.m_mode == Mode::Route;
+
+  // The corridor is the viewport of a search along a route.
+  if (routeSearch && params.m_routeCorridor && !params.m_routeCorridor->IsEmpty())
+    params.m_viewport = params.m_routeCorridor->GetLimitRect();
 
   auto const & viewport = params.m_viewport;
   ASSERT(viewport.IsValid(), ());
@@ -583,7 +588,8 @@ void Processor::Search(SearchParams params)
   {
   case Mode::Everywhere:  // fallthrough
   case Mode::Viewport:    // fallthrough
-  case Mode::Downloader:
+  case Mode::Downloader:  // fallthrough
+  case Mode::Route:
   {
     Geocoder::Params geocoderParams;
     InitGeocoder(geocoderParams, params);
@@ -592,7 +598,12 @@ void Processor::Search(SearchParams params)
 
     try
     {
-      if (!SearchCoordinates() && !SearchDebug())
+      if (routeSearch)
+      {
+        if (params.m_routeCorridor && !params.m_routeCorridor->IsEmpty())
+          m_geocoder.GoAlongRoute();
+      }
+      else if (!SearchCoordinates() && !SearchDebug())
       {
         SearchPlusCode();
         SearchPostcode();
@@ -884,12 +895,14 @@ void Processor::InitParams(QueryParams & params) const
 
 void Processor::InitGeocoder(Geocoder::Params & geocoderParams, SearchParams const & searchParams)
 {
-  auto const viewportSearch = searchParams.m_mode == Mode::Viewport;
+  // The pivot of a search along a route is the corridor's limit rect.
+  auto const viewportSearch = searchParams.m_mode == Mode::Viewport || searchParams.m_mode == Mode::Route;
 
   InitParams(geocoderParams);
 
   geocoderParams.m_mode = searchParams.m_mode;
   geocoderParams.m_pivot = GetPivotRect(viewportSearch);
+  geocoderParams.m_routeCorridor = searchParams.m_routeCorridor;
   geocoderParams.m_position = m_position;
   geocoderParams.m_categoryLocales = GetCategoryLocales();
   geocoderParams.m_preferredTypes = m_preferredTypes;
@@ -920,6 +933,9 @@ void Processor::InitPreRanker(Geocoder::Params const & geocoderParams, SearchPar
   params.m_openingHoursFilter = searchParams.m_openingHoursFilter;
   ASSERT(searchParams.m_openingHoursTime, ());
   params.m_openingHoursTime = *searchParams.m_openingHoursTime;
+  params.m_poiFilter = searchParams.m_poiFilter;
+  if (searchParams.m_mode == Mode::Route)
+    params.m_routeCorridor = searchParams.m_routeCorridor;
 
   m_preRanker.Init(params);
 }
@@ -966,6 +982,7 @@ void Processor::InitRanker(Geocoder::Params const & geocoderParams, SearchParams
   params.m_query = m_query;
   params.m_categoryLocales = GetCategoryLocales();
   params.m_viewportSearch = viewportSearch;
+  params.m_routeSearch = searchParams.m_mode == Mode::Route;
   params.m_viewport = GetViewport();
   params.m_categorialRequest = geocoderParams.IsCategorialRequest();
   ASSERT(searchParams.m_openingHoursTime, ());

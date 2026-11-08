@@ -12,4 +12,10 @@
   <string name="category_bakery">Bakery</string>
   <!-- Search category for bars, pubs and nightclubs; amenity-bar|amenity-pub and amenity-nightclub in categories.txt -->
   <string name="category_bar_club">Bars &amp; Clubs</string>
+  <!-- Search category for charging stations of electric vehicles; amenity-charging_station in categories.txt -->
+  <string name="category_charging_station">Charging Station</string>
+  <!-- Search category for supermarkets; shop-supermarket in categories.txt -->
+  <string name="category_supermarket">Supermarket</string>
+  <!-- Search category for recycling containers; amenity-recycling-container in categories.txt -->
+  <string name="category_recycling_container">Recycling Container</string>
 </resources>

@@ -3,6 +3,7 @@
 #include "map/bookmark_helpers.hpp"
 #include "map/bookmarks_search_params.hpp"
 #include "map/everywhere_search_params.hpp"
+#include "map/route_search_params.hpp"
 
 #include "search/bookmarks/types.hpp"
 #include "search/geometry_utils.hpp"
@@ -264,6 +265,39 @@ bool SearchAPI::SearchInBookmarks(search::BookmarksSearchParams params)
 
   p.m_bookmarksGroupId = params.m_groupId;
   p.m_onResults = BookmarksSearchCallback(m_delegate, std::move(params.m_onResults));
+
+  return Search(std::move(p), true /* forceSearch */);
+}
+
+bool SearchAPI::SearchAlongRoute(RouteSearchParams params)
+{
+  if (!params.m_corridor || params.m_corridor->IsEmpty())
+    return false;
+
+  SearchParams p;
+  p.m_query = std::move(params.m_query);
+  p.m_inputLocale = std::move(params.m_inputLocale);
+  p.m_mode = Mode::Route;
+  p.m_position = m_delegate.GetCurrentPosition();
+  // The corridor is the viewport of the search.
+  p.m_viewport = params.m_corridor->GetLimitRect();
+  p.m_routeCorridor = std::move(params.m_corridor);
+  p.m_maxNumResults = SearchParams::kDefaultNumResultsAlongRoute;
+  p.m_suggestsEnabled = false;
+  p.m_needAddress = true;
+  p.m_needHighlighting = true;
+  p.m_categorialRequest = params.m_isCategory;
+  p.m_openingHoursFilter = params.m_openingHoursFilter;
+  p.m_poiFilter = std::move(params.m_poiFilter);
+  p.m_detectQueryFilters = true;
+  if (params.m_timeout)
+    p.m_timeout = *params.m_timeout;
+
+  p.m_onResults = [this, onResults = std::move(params.m_onResults)](Results const & results)
+  {
+    if (onResults)
+      RunUITask([onResults, results]() { onResults(results); });
+  };
 
   return Search(std::move(p), true /* forceSearch */);
 }

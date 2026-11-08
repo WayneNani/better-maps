@@ -142,6 +142,8 @@ set(SRC
   retrieval.hpp
   reverse_geocoder.cpp
   reverse_geocoder.hpp
+  route_corridor.cpp
+  route_corridor.hpp
   search_index_values.hpp
   search_params.cpp
   search_params.hpp

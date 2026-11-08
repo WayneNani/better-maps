@@ -65,6 +65,9 @@ public class NavigationController implements TrafficManager.TrafficCallback, Nav
   private final NavMenu mNavMenu;
   View.OnClickListener mOnSettingsClickListener;
   View.OnClickListener mOnTrackRecordingClickListener;
+  // better-maps: search along the route.
+  @Nullable
+  private Runnable mOnSearchAlongRouteListener;
   private final SharedPreferences mSharedPreferences;
 
   private void addWindowsInsets(@NonNull View topFrame)
@@ -292,6 +295,19 @@ public class NavigationController implements TrafficManager.TrafficCallback, Nav
   public void onTrackRecordingClicked()
   {
     mOnTrackRecordingClickListener.onClick(null);
+  }
+
+  /** better-maps: the "Search along the route" button of the navigation menu. */
+  public void setOnSearchAlongRouteListener(@Nullable Runnable listener)
+  {
+    mOnSearchAlongRouteListener = listener;
+  }
+
+  @Override
+  public void onSearchAlongRouteClicked()
+  {
+    if (mOnSearchAlongRouteListener != null)
+      mOnSearchAlongRouteListener.run();
   }
   @Override
   public void onStopClicked()

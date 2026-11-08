@@ -145,7 +145,8 @@ void TestSearchRequest::SetUpResultParams()
 {
   switch (m_params.m_mode)
   {
-  case Mode::Everywhere:
+  case Mode::Everywhere:  // fallthrough
+  case Mode::Route:
     m_params.m_needAddress = true;
     m_params.m_suggestsEnabled = false;
     m_params.m_needHighlighting = true;

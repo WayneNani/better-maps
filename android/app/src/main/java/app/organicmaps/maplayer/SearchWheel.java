@@ -14,9 +14,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import app.organicmaps.R;
+import app.organicmaps.sdk.Router;
 import app.organicmaps.sdk.routing.RoutingController;
+import app.organicmaps.sdk.search.OpeningHoursFilter;
 import app.organicmaps.sdk.search.SearchEngine;
+import app.organicmaps.sdk.util.Language;
 import app.organicmaps.sdk.util.concurrency.UiThread;
+import app.organicmaps.search.route.RouteSearchSettings;
 import app.organicmaps.util.Graphics;
 import app.organicmaps.util.UiUtils;
 
@@ -269,9 +273,18 @@ public class SearchWheel implements View.OnClickListener
   private void startSearch(SearchOption searchOption)
   {
     mMapButtonsViewModel.setSearchOption(searchOption);
-    final String query = mFrame.getContext().getString(searchOption.mQueryId);
+    final Context context = mFrame.getContext();
+    final String query = context.getString(searchOption.mQueryId);
     // Category request from navigation search wheel.
-    SearchEngine.INSTANCE.searchInteractive(mFrame.getContext(), query, true, System.nanoTime(), false);
+    // better-maps: the places along the route ahead, shown on the map; around the map center without a route.
+    final Router router = RoutingController.get().getLastRouterType();
+    final boolean alongRoute =
+        RouteSearchSettings.isSupported(router)
+        && SearchEngine.INSTANCE.searchAlongRoute(
+            query, true /* isCategory */, Language.getKeyboardLocale(context), System.nanoTime(),
+            RouteSearchSettings.from(context).getHalfWidth(router), OpeningHoursFilter.OFF, true /* showOnMap */);
+    if (!alongRoute)
+      SearchEngine.INSTANCE.searchInteractive(context, query, true, System.nanoTime(), false);
     SearchEngine.INSTANCE.setQuery(query, true);
     refreshSearchButtonImage();
     toggleSearchLayout();

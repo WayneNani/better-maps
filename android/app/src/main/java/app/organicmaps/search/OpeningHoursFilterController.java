@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import app.organicmaps.R;
 import app.organicmaps.sdk.search.OpeningHoursFilter;
 import app.organicmaps.sdk.search.QueryFilter;
@@ -61,6 +62,9 @@ public class OpeningHoursFilterController
   private QueryFilter mQueryFilter;
   // Chips are being updated programmatically, ignore their listeners.
   private boolean mUpdatingChips;
+  // Text of the "Open now" chip, e.g. "Open on arrival" for the search along the route.
+  @StringRes
+  private int mOpenNowText = R.string.open_now;
 
   /**
    * @param root a view containing the views of search_opening_hours_filter.xml.
@@ -117,6 +121,13 @@ public class OpeningHoursFilterController
     updateChips();
   }
 
+  /** Sets the text of the "Open now" chip, e.g. "Open on arrival" for the search along the route. */
+  public void setOpenNowText(@StringRes int text)
+  {
+    mOpenNowText = text;
+    updateChips();
+  }
+
   @NonNull
   public OpeningHoursFilter getFilter()
   {
@@ -154,7 +165,7 @@ public class OpeningHoursFilterController
   private String getOpenNowChipText(@NonNull Context context)
   {
     if (mQueryFilter == null || !mQueryFilter.hasOpeningHoursTime())
-      return context.getString(R.string.open_now);
+      return context.getString(mOpenNowText);
 
     // "Apotheke Sonntag" -> "Open Sun 12:00".
     final String time = DateUtils.formatDateTime(

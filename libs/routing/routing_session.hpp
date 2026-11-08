@@ -179,6 +179,13 @@ public:
   /// \returns true if there is valid route information. If the route is not valid returns false.
   bool GetRouteJunctionPoints(std::vector<geometry::PointWithAltitude> & routeJunctionPoints) const;
 
+  /// \brief Copies the route polyline to |points| and the estimated travel time from the route beginning to each of
+  /// its points to |timesSec|, and returns the distance already travelled along the route in |passedDistanceM|.
+  /// |timesSec| is empty if the route has no times for its points.
+  /// \returns true if there is valid route information. If the route is not valid returns false.
+  bool GetRoutePolylineWithTimes(std::vector<m2::PointD> & points, std::vector<double> & timesSec,
+                                 double & passedDistanceM) const;
+
   SessionState OnLocationPositionChanged(location::GpsInfo const & info);
   void GetRouteFollowingInfo(FollowingInfo & info) const;
   double GetDistanceToNextTurn() const;

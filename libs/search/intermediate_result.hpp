@@ -14,6 +14,7 @@
 #include "geometry/rect2d.hpp"
 
 #include <ctime>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -83,11 +84,16 @@ public:
     m_info.m_centerLoaded = true;
   }
 
+  // Position relative to the route of a search along a route (Mode::Route).
+  std::optional<RoutePosition> const & GetRoutePosition() const { return m_routePosition; }
+  void SetRoutePosition(RoutePosition const & position) { m_routePosition = position; }
+
   friend std::string DebugPrint(PreRankerResult const & r);
 
 private:
   FeatureID m_id;
   PreRankingInfo m_info;
+  std::optional<RoutePosition> m_routePosition;
 
   size_t m_matchedTokensNumber;
   bool m_isRelaxed;
@@ -140,6 +146,7 @@ public:
   m2::PointD GetCenter() const { return m_region.m_point; }
   feature::GeomType GetGeomType() const { return m_geomType; }
   Result::Details GetDetails() const { return m_details; }
+  std::optional<RoutePosition> const & GetRoutePosition() const { return m_routePosition; }
 
   double GetDistanceToPivot() const { return m_info.m_distanceToPivot; }
   double GetLinearModelRank() const { return m_finalRank; }
@@ -180,6 +187,7 @@ private:
   feature::TypesHolder m_types;
   std::string m_str;
   Result::Details m_details;
+  std::optional<RoutePosition> m_routePosition;
 
   StoredRankingInfo m_info;
   std::shared_ptr<RankingInfo> m_dbgInfo;  // used in debug logs and tests, nullptr in production

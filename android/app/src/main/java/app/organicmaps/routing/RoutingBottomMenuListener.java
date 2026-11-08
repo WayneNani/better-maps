@@ -10,4 +10,6 @@ public interface RoutingBottomMenuListener
   void onRoutingStart();
   void onManageRouteOpen();
   void onDirectionsPreviewOpen();
+  // better-maps: search along the route.
+  void onSearchAlongRoute();
 }

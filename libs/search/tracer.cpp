@@ -93,6 +93,7 @@ string DebugPrint(ResultTracer::Branch branch)
   {
   case ResultTracer::Branch::GoEverywhere: return "GoEverywhere";
   case ResultTracer::Branch::GoInViewport: return "GoInViewport";
+  case ResultTracer::Branch::GoAlongRoute: return "GoAlongRoute";
   case ResultTracer::Branch::MatchCategories: return "MatchCategories";
   case ResultTracer::Branch::MatchRegions: return "MatchRegions";
   case ResultTracer::Branch::MatchCities: return "MatchCities";

@@ -25,6 +25,7 @@
 #include "defines.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <iterator>
 #include <memory>
 #include <random>
@@ -120,6 +121,7 @@ void PreRanker::Init(Params const & params)
   m_haveFullyMatchedResult = false;
   m_results.clear();
   m_relaxedResults.clear();
+  m_routeResults.clear();
   m_params = params;
   m_currEmit.clear();
   m_hiddenWithoutOpeningHours.clear();
@@ -218,7 +220,7 @@ void PreRanker::DbgFindAndLog(std::set<uint32_t> const & ids) const
       LOG(LDEBUG, (r));
 }
 
-void PreRanker::Filter()
+void PreRanker::KeepUniqueResults()
 {
   auto const lessForUnique = [](PreRankerResult const & lhs, PreRankerResult const & rhs)
   {
@@ -261,6 +263,11 @@ void PreRanker::Filter()
     }
     m_results.swap(unique);
   }
+}
+
+void PreRanker::Filter()
+{
+  KeepUniqueResults();
 
   if (m_params.m_viewportSearch)
     FilterForViewportSearch();
@@ -325,6 +332,12 @@ void PreRanker::Filter()
 
 void PreRanker::UpdateResults(bool lastUpdate)
 {
+  if (m_params.m_routeCorridor)
+  {
+    UpdateRouteResults(lastUpdate);
+    return;
+  }
+
   FilterRelaxedResults(lastUpdate);
   FillMissingFieldsInPreResults();
   Filter();
@@ -337,6 +350,56 @@ void PreRanker::UpdateResults(bool lastUpdate)
     m_currEmit.swap(m_prevEmit);
 }
 
+void PreRanker::UpdateRouteResults(bool lastUpdate)
+{
+  auto const & corridor = *m_params.m_routeCorridor;
+
+  // Places are ordered by the distance along the route, which is known only when all maps are searched: keep the
+  // places in the corridor of each map and send them up the pipeline at the end.
+  FillMissingFieldsInPreResults();
+  for (auto & result : m_results)
+  {
+    // Like in the viewport, results that match only a part of the query are not relevant.
+    if (!result.GetInfo().m_centerLoaded || result.SkipForViewportSearch(m_params.m_numQueryTokens))
+      continue;
+    auto const position = corridor.Locate(result.GetInfo().m_center);
+    if (!position)
+      continue;
+    result.SetRoutePosition(*position);
+    m_routeResults.push_back(std::move(result));
+  }
+  m_results.clear();
+  m_relaxedResults.clear();
+
+  if (!lastUpdate)
+    return;
+
+  m_results.swap(m_routeResults);
+  KeepUniqueResults();
+  FilterByOpeningHours();
+
+  std::vector<double> distancesAlongRoute;
+  std::vector<double> priorities;
+  distancesAlongRoute.reserve(m_results.size());
+  priorities.reserve(m_results.size());
+  for (auto const & result : m_results)
+  {
+    distancesAlongRoute.push_back(result.GetRoutePosition()->m_distanceAlongRouteM);
+    // Places with a smaller detour first.
+    priorities.push_back(result.GetRoutePosition()->m_distanceFromRouteM);
+  }
+
+  PreResultsContainerT selected;
+  for (size_t const i : SpreadAlongRoute(distancesAlongRoute, priorities, corridor.GetLengthM(), Limit()))
+    selected.push_back(std::move(m_results[i]));
+  LOG(LDEBUG, ("Along the route:", m_results.size(), "results in the corridor,", selected.size(), "selected."));
+  m_results.clear();
+
+  m_numSentResults += selected.size();
+  m_ranker.AddPreRankerResults(std::move(selected));
+  m_ranker.UpdateResults(true /* lastUpdate */);
+}
+
 void PreRanker::ClearCaches()
 {
   m_pivotFeatures.Clear();
@@ -346,7 +409,8 @@ void PreRanker::ClearCaches()
 
 void PreRanker::FilterByOpeningHours()
 {
-  if (m_params.m_openingHoursFilter == OpeningHoursFilter::Off)
+  bool const filterByOpeningHours = m_params.m_openingHoursFilter != OpeningHoursFilter::Off;
+  if (!filterByOpeningHours && !m_params.m_poiFilter)
     return;
 
   // Read features of one mwm in a row.
@@ -371,15 +435,31 @@ void PreRanker::FilterByOpeningHours()
     if (!ft)
       return false;
 
+    if (m_params.m_poiFilter && !m_params.m_poiFilter(*ft))
+      return true;
+    if (!filterByOpeningHours)
+      return false;
+
     string openingHours(ft->GetMetadata(feature::Metadata::FMD_OPEN_HOURS));
-    auto it = isOpenByOpeningHours.find(openingHours);
-    if (it == isOpenByOpeningHours.end())
+    osm::YesNoUnknown isOpen;
+    if (auto const & routePosition = result.GetRoutePosition())
     {
-      auto const status = GetOpeningHoursStatus(openingHours, m_params.m_openingHoursTime);
-      it = isOpenByOpeningHours.emplace(std::move(openingHours), status.m_isOpen).first;
+      // At the estimated arrival, which differs for each place.
+      auto const arrival =
+          m_params.m_openingHoursTime + static_cast<time_t>(std::lround(routePosition->GetTimeToPlaceSec()));
+      isOpen = GetOpeningHoursStatus(openingHours, arrival).m_isOpen;
+    }
+    else
+    {
+      auto it = isOpenByOpeningHours.find(openingHours);
+      if (it == isOpenByOpeningHours.end())
+      {
+        auto const status = GetOpeningHoursStatus(openingHours, m_params.m_openingHoursTime);
+        it = isOpenByOpeningHours.emplace(std::move(openingHours), status.m_isOpen).first;
+      }
+      isOpen = it->second;
     }
 
-    osm::YesNoUnknown const isOpen = it->second;
     if (PassesOpeningHoursFilter(m_params.m_openingHoursFilter, isOpen))
       return false;
 

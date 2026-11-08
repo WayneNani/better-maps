@@ -158,6 +158,11 @@ public class NavMenu
     // Bottom frame buttons.
     ShapeableImageView mSettings = bottomFrame.findViewById(R.id.settings);
     mSettings.setOnClickListener(v -> onSettingsClicked());
+    // better-maps: search along the route.
+    bottomFrame.findViewById(R.id.search_along_route).setOnClickListener(v -> {
+      collapseNavBottomSheet();
+      mNavMenuListener.onSearchAlongRouteClicked();
+    });
     mTts = bottomFrame.findViewById(R.id.tts_volume);
     mTts.setOnClickListener(v -> onTtsClicked());
     MaterialButton stop = bottomFrame.findViewById(R.id.stop);
@@ -564,6 +569,9 @@ public class NavMenu
     void onSettingsClicked();
 
     void onTrackRecordingClicked();
+
+    // better-maps: search along the route.
+    void onSearchAlongRouteClicked();
   }
 
 }

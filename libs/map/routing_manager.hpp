@@ -13,6 +13,8 @@
 #include "routing/routing_session.hpp"
 #include "routing/turns.hpp"
 
+#include "search/route_corridor.hpp"
+
 #include "storage/storage_defines.hpp"
 
 #include "drape_frontend/drape_engine_safe_ptr.hpp"
@@ -198,6 +200,11 @@ public:
   void GetRouteFollowingInfo(routing::FollowingInfo & info) const;
 
   TransitRouteInfo GetTransitRouteInfo() const;
+
+  /// \brief The corridor of |halfWidthM| around the current route, ahead of the current position, to search along
+  /// the route (search::Mode::Route).
+  /// \returns nullptr if there is no route or the router type is not suitable (ruler).
+  std::shared_ptr<search::RouteCorridor const> MakeSearchCorridor(double halfWidthM) const;
 
   m2::PointD GetRouteEndPoint() const { return m_routingSession.GetEndPoint(); }
   /// Returns the most situable router engine type.

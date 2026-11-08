@@ -38,6 +38,7 @@ import app.organicmaps.sdk.routing.RoutingInfo;
 import app.organicmaps.sdk.routing.TransitRouteInfo;
 import app.organicmaps.sdk.routing.TransitStepInfo;
 import app.organicmaps.sdk.util.Distance;
+import app.organicmaps.search.route.RouteSearchSettings;
 import app.organicmaps.transit.ui.OnlineTransitPanel;
 import app.organicmaps.util.Graphics;
 import app.organicmaps.util.ThemeUtils;
@@ -162,6 +163,8 @@ final class RoutingBottomMenuController implements View.OnClickListener
     MaterialButton directionsPreviewButton = altitudeChartFrame.findViewById(R.id.btn__directions_preview);
     directionsPreviewButton.setOnClickListener(this);
 
+    altitudeChartFrame.findViewById(R.id.btn__search_along_route).setOnClickListener(this);
+
     MaterialButton saveButton = altitudeChartFrame.findViewById(R.id.btn__save);
     saveButton.setOnClickListener(this);
 
@@ -214,6 +217,8 @@ final class RoutingBottomMenuController implements View.OnClickListener
       showRouteAltitudeChart();
     showRoutingDetails();
     UiUtils.show(mAltitudeChartFrame);
+    UiUtils.showIf(RouteSearchSettings.isSupported(RoutingController.get().getLastRouterType()),
+                   mAltitudeChartFrame.findViewById(R.id.btn__search_along_route));
     MaterialButton saveButton = mAltitudeChartFrame.findViewById(R.id.btn__save);
     saveButton.setContentDescription(mContext.getString(R.string.save));
     saveButton.setIcon(AppCompatResources.getDrawable(mContext, R.drawable.ic_bookmark_add));
@@ -529,6 +534,8 @@ final class RoutingBottomMenuController implements View.OnClickListener
       mListener.onManageRouteOpen();
     else if (id == R.id.btn__directions_preview)
       mListener.onDirectionsPreviewOpen();
+    else if (id == R.id.btn__search_along_route)
+      mListener.onSearchAlongRoute();
     else if (id == R.id.btn__save)
     {
       Framework.nativeSaveRoute();
