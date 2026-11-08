@@ -1360,6 +1360,12 @@ JNIEXPORT void JNICALL Java_app_organicmaps_sdk_Framework_nativeFollowRoute(JNIE
   frm()->GetRoutingManager().FollowRoute();
 }
 
+JNIEXPORT void JNICALL Java_app_organicmaps_sdk_Framework_nativeHoldMapPositionInRouting(JNIEnv * env, jclass,
+                                                                                         jboolean hold)
+{
+  frm()->HoldMapPositionInRouting(static_cast<bool>(hold));
+}
+
 JNIEXPORT void JNICALL Java_app_organicmaps_sdk_Framework_nativeDisableFollowing(JNIEnv * env, jclass)
 {
   frm()->GetRoutingManager().DisableFollowMode();

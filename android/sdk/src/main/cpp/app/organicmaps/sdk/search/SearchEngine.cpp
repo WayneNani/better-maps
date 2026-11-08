@@ -13,6 +13,7 @@
 #include "search/opening_hours_filter.hpp"
 #include "search/query_filters.hpp"
 #include "search/result.hpp"
+#include "search/route_corridor.hpp"
 
 #include "indexer/categories_holder.hpp"
 
@@ -21,6 +22,7 @@
 #include "platform/network_policy.hpp"
 
 #include "geometry/distance_on_sphere.hpp"
+#include "geometry/mercator.hpp"
 
 #include "base/assert.hpp"
 #include "base/logging.hpp"
@@ -414,9 +416,65 @@ JNIEXPORT jboolean JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeRu
   return searchStarted;
 }
 
-JNIEXPORT void JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeShowResultsOnMap(JNIEnv * env, jclass clazz)
+JNIEXPORT void JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeShowResultsOnMap(JNIEnv * env, jclass clazz,
+                                                                                           jintArray hiddenIndices)
 {
-  g_framework->NativeFramework()->FillSearchResultsMarks(true /* clear */, g_results);
+  auto & framework = *g_framework->NativeFramework();
+  std::vector<bool> hidden(g_results.GetCount(), false);
+  if (hiddenIndices != nullptr)
+  {
+    jsize const count = env->GetArrayLength(hiddenIndices);
+    jint * indices = env->GetIntArrayElements(hiddenIndices, nullptr);
+    for (jsize i = 0; i < count; ++i)
+      if (indices[i] >= 0 && static_cast<size_t>(indices[i]) < hidden.size())
+        hidden[indices[i]] = true;
+    env->ReleaseIntArrayElements(hiddenIndices, indices, JNI_ABORT);
+  }
+
+  framework.FillSearchResultsMarks(g_results.end(), g_results.end(), true /* clear */);
+  for (auto it = g_results.begin(); it != g_results.end(); ++it)
+    if (!hidden[std::distance(g_results.begin(), it)])
+      framework.FillSearchResultsMarks(it, std::next(it), false /* clear */);
+}
+
+JNIEXPORT void JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeClearResultsOnMap(JNIEnv * env, jclass clazz)
+{
+  g_framework->NativeFramework()->GetBookmarkManager().GetEditSession().ClearGroup(UserMark::Type::SEARCH);
+}
+
+JNIEXPORT void JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeShowAlongRoute(JNIEnv * env, jclass clazz,
+                                                                                         jdoubleArray latLons,
+                                                                                         jdouble distanceAlongRouteM,
+                                                                                         jboolean wholeRoute)
+{
+  auto & framework = *g_framework->NativeFramework();
+  m2::RectD rect;
+  // Only the route itself, the corridor width does not matter.
+  if (auto const corridor = framework.GetRoutingManager().MakeSearchCorridor(1.0 /* halfWidthM */);
+      corridor && !corridor->IsEmpty())
+  {
+    rect = corridor->GetRouteRect(wholeRoute ? corridor->GetLengthM() : distanceAlongRouteM);
+  }
+
+  if (latLons != nullptr)
+  {
+    jsize const count = env->GetArrayLength(latLons);
+    jdouble * values = env->GetDoubleArrayElements(latLons, nullptr);
+    for (jsize i = 0; i + 1 < count; i += 2)
+      rect.Add(mercator::FromLatLon(values[i], values[i + 1]));
+    env->ReleaseDoubleArrayElements(latLons, values, JNI_ABORT);
+  }
+  if (!rect.IsValid())
+    return;
+
+  // Some space around, and not too close for a single place.
+  double const minSize = mercator::MetersToMercator(500.0);
+  double const inflateX = std::max(rect.SizeX() * 0.1, (minSize - rect.SizeX()) / 2);
+  double const inflateY = std::max(rect.SizeY() * 0.1, (minSize - rect.SizeY()) / 2);
+  rect.Inflate(inflateX, inflateY);
+
+  framework.StopLocationFollow();
+  framework.ShowRect(rect, -1 /* maxScale */, true /* animation */, true /* useVisibleViewport */);
 }
 
 JNIEXPORT jobject JNICALL Java_app_organicmaps_sdk_search_SearchEngine_nativeDetectQueryFilter(JNIEnv * env,

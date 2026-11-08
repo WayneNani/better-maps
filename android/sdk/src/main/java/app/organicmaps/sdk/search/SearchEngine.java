@@ -200,7 +200,40 @@ public enum SearchEngine implements SearchListener, MapSearchListener,
   @MainThread
   public void showResultsOnMap()
   {
-    nativeShowResultsOnMap();
+    nativeShowResultsOnMap(new int[0]);
+  }
+
+  /**
+   * better-maps: shows the results of the last search on the map, except some of them, e.g. those that are already
+   * stops of the route.
+   *
+   * @param hiddenIndices indices of the results not to show.
+   */
+  @MainThread
+  public void showResultsOnMap(@NonNull int[] hiddenIndices)
+  {
+    nativeShowResultsOnMap(hiddenIndices);
+  }
+
+  /** better-maps: removes the marks of search results from the map. */
+  @MainThread
+  public void clearResultsOnMap()
+  {
+    nativeClearResultsOnMap();
+  }
+
+  /**
+   * better-maps: moves the map so that it shows the current route ahead and some places, in the visible part of the
+   * map (see Framework.nativeSetVisibleRect()). The map stops following the position.
+   *
+   * @param latLons latitude and longitude of each place, one after the other.
+   * @param distanceAlongRouteMeters how much of the route ahead to show, unless {@code wholeRoute}.
+   * @param wholeRoute show the whole route ahead.
+   */
+  @MainThread
+  public void showAlongRoute(@NonNull double[] latLons, double distanceAlongRouteMeters, boolean wholeRoute)
+  {
+    nativeShowAlongRoute(latLons, distanceAlongRouteMeters, wholeRoute);
   }
 
   @MainThread
@@ -331,7 +364,12 @@ public enum SearchEngine implements SearchListener, MapSearchListener,
                                                           long timestamp, double halfWidthMeters,
                                                           int openingHoursFilter, boolean showOnMap);
 
-  private static native void nativeShowResultsOnMap();
+  private static native void nativeShowResultsOnMap(@NonNull int[] hiddenIndices);
+
+  private static native void nativeClearResultsOnMap();
+
+  private static native void nativeShowAlongRoute(@NonNull double[] latLons, double distanceAlongRouteMeters,
+                                                  boolean wholeRoute);
 
   /**
    * @param bytes utf-8 formatted query bytes
