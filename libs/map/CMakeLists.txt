@@ -48,6 +48,7 @@ set(SRC
   power_management/power_manager.hpp
   power_management/power_management_schemas.cpp
   power_management/power_management_schemas.hpp
+  route_search_params.hpp
   routing_manager.cpp
   routing_manager.hpp
   routing_mark.cpp

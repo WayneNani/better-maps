@@ -12,6 +12,7 @@
 
 #include "map/bookmark_helpers.hpp"
 #include "map/bookmarks_search_params.hpp"
+#include "map/route_search_params.hpp"
 #include "map/search_api.hpp"
 #include "map/search_product_info.hpp"
 #include "map/viewport_search_params.hpp"
@@ -130,6 +131,59 @@ UNIT_CLASS_TEST(SearchAPITest, MultipleViewportsRequests)
   ++stage;
   m_api.OnViewportChanged(m2::RectD(9, 9, 11, 11));
   future1.wait();
+}
+
+// better-maps: search along a route goes to the engine with the corridor, results come ordered along the route.
+UNIT_CLASS_TEST(SearchAPITest, SearchAlongRoute)
+{
+  TestCafe ahead(m2::PointD(0.05, 0.002), "cafe ahead", "en");
+  TestCafe next(m2::PointD(0.02, -0.002), "cafe next", "en");
+  TestCafe aside(m2::PointD(0.03, 0.05), "cafe aside", "en");
+
+  auto const id = BuildCountry("Wonderland", [&](TestMwmBuilder & builder)
+  {
+    builder.Add(ahead);
+    builder.Add(next);
+    builder.Add(aside);
+  });
+
+  RouteCorridor::Params corridorParams;
+  corridorParams.m_points = {{0, 0}, {0.1, 0}};
+  corridorParams.m_halfWidthM = 1000;
+
+  promise<Results> promise;
+  auto future = promise.get_future();
+
+  RouteSearchParams params;
+  params.m_query = "cafe ";
+  params.m_inputLocale = "en";
+  params.m_isCategory = true;
+  params.m_corridor = make_shared<RouteCorridor const>(corridorParams);
+  params.m_onResults = [&](Results results)
+  {
+    if (results.IsEndMarker())
+      promise.set_value(std::move(results));
+  };
+
+  // Without a corridor there is nothing to search.
+  {
+    RouteSearchParams empty;
+    empty.m_query = "cafe ";
+    TEST(!m_api.SearchAlongRoute(std::move(empty)), ());
+  }
+
+  m_api.OnViewportChanged(m2::RectD(-1, -1, 1, 1));
+  TEST(m_api.SearchAlongRoute(std::move(params)), ());
+
+  auto const results = future.get();
+  TEST(results.IsEndedNormal(), ());
+  Rules const rules = {ExactMatch(id, next), ExactMatch(id, ahead)};
+  TEST(MatchResults(m_dataSource, rules, results), ());
+  TEST_EQUAL(results.GetCount(), 2, ());
+  TEST(results[0].GetRoutePosition(), ());
+  TEST(results[1].GetRoutePosition(), ());
+  TEST_LESS(results[0].GetRoutePosition()->m_distanceAlongRouteM, results[1].GetRoutePosition()->m_distanceAlongRouteM,
+            ());
 }
 
 UNIT_CLASS_TEST(SearchAPITest, Cancellation)

@@ -645,6 +645,31 @@ bool RoutingManager::ShowExternalTransitRoute(vector<ExternalTransitLeg> const &
   return true;
 }
 
+std::shared_ptr<search::RouteCorridor const> RoutingManager::MakeSearchCorridor(double halfWidthM) const
+{
+  // Rough speed on the way from the route to a place aside and back, see search::RoutePosition::m_detourSec.
+  double detourSpeedKmPH = 0.0;
+  switch (m_currentRouterType)
+  {
+  case RouterType::Vehicle: detourSpeedKmPH = 40.0; break;
+  case RouterType::Bicycle: detourSpeedKmPH = 15.0; break;
+  case RouterType::Pedestrian:
+  case RouterType::Transit: detourSpeedKmPH = 4.5; break;
+  case RouterType::Ruler:
+  case RouterType::Count: return nullptr;
+  }
+
+  search::RouteCorridor::Params params;
+  if (!m_routingSession.IsRouteValid() ||
+      !m_routingSession.GetRoutePolylineWithTimes(params.m_points, params.m_timesSec, params.m_passedDistanceM))
+  {
+    return nullptr;
+  }
+  params.m_halfWidthM = halfWidthM;
+  params.m_detourSpeedMps = detourSpeedKmPH / 3.6;
+  return std::make_shared<search::RouteCorridor const>(params);
+}
+
 void RoutingManager::CollectFeaturesAlongRoute(vector<RouteSegment> const & segments, m2::PointD const & startPt,
                                                uint32_t featureType,
                                                vector<std::pair<m2::PointD, FeatureID>> & outFeatures)
