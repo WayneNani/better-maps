@@ -53,6 +53,20 @@ public final class SearchUiHelpers
     return distance;
   }
 
+  /** better-maps: the distance along the route to a result of the search along the route. */
+  @NonNull
+  public static CharSequence getRouteDistanceText(@NonNull SearchResult searchResult)
+  {
+    if (searchResult.routePosition == null || !searchResult.routePosition.distanceAlongRoute.isValid())
+      return "";
+
+    final SpannableStringBuilder distance = new SpannableStringBuilder(" ");
+    distance.setSpan(DistanceSpan.create(RoutingHelpers.createDistance(searchResult.routePosition.distanceAlongRoute)),
+                     0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    distance.setSpan(ForegroundCarColorSpan.create(Colors.DISTANCE), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    return distance;
+  }
+
   @NonNull
   public static CharSequence getOpeningHoursText(@NonNull CarContext carContext, @NonNull SearchResult searchResult)
   {
