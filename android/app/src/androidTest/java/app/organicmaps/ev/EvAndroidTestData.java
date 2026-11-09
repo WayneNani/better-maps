@@ -49,6 +49,29 @@ final class EvAndroidTestData
       + "\"providers\":[{\"key\":\"enbw\",\"name\":\"EnBW\",\"stations\":20},{\"key\":\"ionity\",\"name\":\"Ionity\","
       + "\"stations\":13},{\"key\":\"tesla\",\"name\":\"Tesla\",\"stations\":15}]}";
 
+  /** Two stops, the second one only tops up: with 10 % more at the first one it is not needed (droppedStops). */
+  @NonNull
+  static String twoStopsPlan()
+  {
+    final String first = stop("Germany:1", "EnBW Aurach", 150, 5400, 1620, 20, 70)
+                             .replace("\"arrivalSocPct\":34}", "\"arrivalSocPct\":25,\"droppedStops\":[1]}");
+    final String second = stop("Germany:3", "Ionity Haidt", 300, 12000, 420, 62, 66);
+    return "{\"stops\":[" + first + "," + second + "],\"distanceM\":412000,\"driveTimeSec\":15660,"
+  + "\"stopTimeSec\":2040,\"totalTimeSec\":17700,\"arrivalSocPct\":21,\"minSocPct\":20,"
+  + "\"meetsMinimums\":true,\"priority\":\"fastest\",\"reason\":\"\"}";
+  }
+
+  static final String TWO_STOPS_RESULT_JSON =
+      "{\"status\":\"ok\",\"plan\":" + twoStopsPlan() + ",\"alternatives\":[],\"reachableUntilM\":0,"
+      + "\"gapEndM\":0,\"candidates\":147,\"usable\":120,\"providers\":[{\"key\":\"enbw\",\"name\":\"EnBW\","
+      + "\"stations\":20},{\"key\":\"ionity\",\"name\":\"Ionity\",\"stations\":13}]}";
+
+  /** The evaluation of the route with the first stop of {@link #twoStopsPlan} only, charging to 80 %: 4:56 h. */
+  static final String ONE_STOP_EVALUATED_JSON =
+      "{\"stops\":[" + stop("Germany:1", "EnBW Aurach", 150, 5400, 2160, 20, 80) + "],\"distanceM\":411000,"
+      + "\"driveTimeSec\":15600,\"stopTimeSec\":2160,\"totalTimeSec\":17760,\"arrivalSocPct\":25,"
+      + "\"minSocPct\":20,\"meetsMinimums\":true,\"priority\":\"fastest\",\"reason\":\"\"}";
+
   static final String UNREACHABLE_JSON =
       "{\"status\":\"unreachable\",\"plan\":{\"stops\":[]},\"alternatives\":[],\"reachableUntilM\":120000,"
       + "\"gapEndM\":380000,\"candidates\":3,\"usable\":1,\"providers\":[{\"key\":\"enbw\",\"name\":\"EnBW\","

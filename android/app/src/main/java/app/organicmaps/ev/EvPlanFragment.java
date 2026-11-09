@@ -553,7 +553,8 @@ public class EvPlanFragment extends Fragment implements EvPlanPresenter.View
     final TextView chargeValue = row(charge, mFormatter.charge(stop));
     chargeValue.setId(R.id.ev_detail_charge);
     chargeValue.setText(mFormatter.stopDuration(stop));
-    final String longer = mFormatter.longer(stop);
+    final EvPlanResult result = mPresenter.getResult();
+    final String longer = mFormatter.longer(stop, result == null ? null : result.plan);
     if (!longer.isEmpty())
     {
       final TextView longerText = muted(longer);

@@ -3,12 +3,14 @@ package app.organicmaps.ev;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
+import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
@@ -43,12 +45,14 @@ public class EvPlanPanelTest
   {
     final List<String> mOptions = new ArrayList<>();
     final List<String> mEvaluated = new ArrayList<>();
+    String mResult = EvAndroidTestData.RESULT_JSON;
+    String mEvaluation = EvAndroidTestData.EVALUATED_JSON;
 
     @Override
     public void plan(@NonNull String profileJson, @NonNull String optionsJson, @NonNull Callback callback)
     {
       mOptions.add(optionsJson);
-      callback.onResult(EvAndroidTestData.RESULT_JSON);
+      callback.onResult(mResult);
     }
 
     @Override
@@ -60,7 +64,7 @@ public class EvPlanPanelTest
     public String evaluate(@NonNull String profileJson, @NonNull String optionsJson, @NonNull String stopsJson)
     {
       mEvaluated.add(stopsJson);
-      return EvAndroidTestData.EVALUATED_JSON;
+      return mEvaluation;
     }
   }
 
@@ -201,6 +205,45 @@ public class EvPlanPanelTest
       onView(withId(R.id.ev_other_stop_button)).perform(scrollTo(), click());
       final String options = sEngine.mOptions.get(sEngine.mOptions.size() - 1);
       assertTrue(options, options.contains("\"excludedStations\":[\"Germany:1\"]"));
+    }
+  }
+
+  @Test
+  public void chargeLongerLeavesOutAStopNotNeeded()
+  {
+    sEngine.mResult = EvAndroidTestData.TWO_STOPS_RESULT_JSON;
+    sEngine.mEvaluation = EvAndroidTestData.twoStopsPlan();
+    try (ActivityScenario<FragmentTestHostActivity> scenario = launch())
+    {
+      plan();
+      onView(withText("Ionity Haidt")).perform(scrollTo()).check(matches(isDisplayed()));
+      assertEquals(2, sRoute.mAdded.get(sRoute.mAdded.size() - 1).size());
+
+      // The first stop: charging longer there makes the second one unnecessary.
+      onView(withText("EnBW Aurach")).perform(click());
+      onView(withId(R.id.ev_detail_longer))
+          .perform(scrollTo())
+          .check(matches(withText(containsString("Ionity Haidt"))))
+          .check(matches(withText(containsString("25 %"))));
+      sEngine.mEvaluation = EvAndroidTestData.ONE_STOP_EVALUATED_JSON;
+      final int evaluations = sEngine.mEvaluated.size();
+      onView(withId(R.id.ev_detail_longer)).perform(scrollTo(), click());
+
+      // The route is built again without the second stop and evaluated with 80 % at the first one.
+      final List<EvPlanResult.Stop> stops = sRoute.mAdded.get(sRoute.mAdded.size() - 1);
+      assertEquals(1, stops.size());
+      assertEquals("Germany:1", stops.get(0).key);
+      assertEquals(evaluations + 1, sEngine.mEvaluated.size());
+      final String evaluated = sEngine.mEvaluated.get(evaluations);
+      assertTrue(evaluated, evaluated.contains("\"departureSoc\":80.0"));
+      assertFalse(evaluated, evaluated.contains("Germany:3"));
+
+      // Back at the stop, then the plan with one stop and the time of the new route.
+      onView(withId(R.id.ev_plan_title)).check(matches(withText("EnBW Aurach")));
+      onView(withId(R.id.ev_detail_charge)).perform(scrollTo()).check(matches(withText("36 min")));
+      onView(withId(R.id.ev_keep_stop_button)).perform(scrollTo(), click());
+      onView(withId(R.id.ev_result_total)).check(matches(withText("4:56 h")));
+      onView(withText("Ionity Haidt")).check(doesNotExist());
     }
   }
 }

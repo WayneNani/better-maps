@@ -369,6 +369,52 @@ DpResult RunDpWithDetours(VehicleProfile const & profile, EnergyModel const & mo
   }
 }
 
+double constexpr kSocTolerancePct = 1e-6;
+
+// All stops and the destination reached with the minimums of the options (without the tolerance of
+// Plan::m_meetsMinimums: a stop is left out only if it is really not needed).
+bool ReachesWithMinimums(Plan const & plan, PlanOptions const & options)
+{
+  for (auto const & stop : plan.m_stops)
+    if (stop.m_arrivalSocPct < options.m_minStopSocPct - kSocTolerancePct)
+      return false;
+  return plan.m_arrivalSocPct >= options.m_minArrivalSocPct - kSocTolerancePct;
+}
+
+// Leaves out the stops after |first| that are not needed: stops that charge nothing (without them the car arrives
+// with as much or more, it saves their detour), and stops without which the following stops (with their departure
+// states of charge) and the destination are still reached with the minimums. The earliest first, each one with the
+// stops left out before. |targets| and |plan| (EvaluateStops() of |targets|) become those without the stops.
+// Returns the indices of the stops left out in the original |targets|.
+std::vector<size_t> DropUnneededStops(VehicleProfile const & profile, RouteEnergy const & route,
+                                      PlanOptions const & options, size_t first, std::vector<StopTarget> & targets,
+                                      Plan & plan)
+{
+  std::vector<size_t> originalIndices(targets.size());
+  for (size_t i = 0; i < targets.size(); ++i)
+    originalIndices[i] = i;
+  std::vector<size_t> dropped;
+  size_t j = first + 1;
+  while (j < targets.size())
+  {
+    auto const & stop = plan.m_stops[j];
+    bool const charges = stop.m_departureSocPct > stop.m_arrivalSocPct + kSocTolerancePct;
+    auto without = targets;
+    without.erase(without.begin() + j);
+    Plan withoutPlan = EvaluateStops(profile, route, without, options);
+    if (charges && !ReachesWithMinimums(withoutPlan, options))
+    {
+      ++j;
+      continue;
+    }
+    dropped.push_back(originalIndices[j]);
+    originalIndices.erase(originalIndices.begin() + j);
+    targets = std::move(without);
+    plan = std::move(withoutPlan);
+  }
+  return dropped;
+}
+
 void AddLongerVariantsImpl(VehicleProfile const & profile, RouteEnergy const & route, PlanOptions const & options,
                            Plan & plan)
 {
@@ -384,15 +430,23 @@ void AddLongerVariantsImpl(VehicleProfile const & profile, RouteEnergy const & r
       continue;
     auto longerTargets = targets;
     longerTargets[i].m_departureSocPct = std::min(maxSoc, stop.m_departureSocPct + kLongerChargePct);
-    Plan const longer = EvaluateStops(profile, route, longerTargets, options);
+    Plan longer = EvaluateStops(profile, route, longerTargets, options);
     ChargingStop::Longer variant;
+    variant.m_droppedStops = DropUnneededStops(profile, route, options, i, longerTargets, longer);
     variant.m_departureSocPct = longerTargets[i].m_departureSocPct;
     variant.m_extraStopTimeSec = longer.m_stops[i].m_stopTimeSec - stop.m_stopTimeSec;
     variant.m_extraTotalTimeSec = longer.m_totalTimeSec - plan.m_totalTimeSec;
+    // The stops of |longer| after i are those of the plan without the dropped ones.
+    size_t next = i + 1;
     for (size_t j = i + 1; j < plan.m_stops.size(); ++j)
-      variant.m_laterStopsSavedSec += plan.m_stops[j].m_stopTimeSec - longer.m_stops[j].m_stopTimeSec;
+    {
+      bool const isDropped =
+          std::find(variant.m_droppedStops.begin(), variant.m_droppedStops.end(), j) != variant.m_droppedStops.end();
+      double const remaining = isDropped ? 0.0 : longer.m_stops[next++].m_stopTimeSec;
+      variant.m_laterStopsSavedSec += plan.m_stops[j].m_stopTimeSec - remaining;
+    }
     variant.m_arrivalSocPct = longer.m_arrivalSocPct;
-    stop.m_longer = variant;
+    stop.m_longer = std::move(variant);
   }
 }
 

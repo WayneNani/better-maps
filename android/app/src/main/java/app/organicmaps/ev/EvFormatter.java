@@ -1,6 +1,7 @@
 package app.organicmaps.ev;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -122,14 +123,30 @@ public class EvFormatter
 
   /**
    * "Charge longer → 80 % (+9 min), arrival with 34 %", empty if not possible. With following stops, the extra charge
-   * makes them shorter: "Charge longer → 73 % (+5 min), later stops 3 min shorter, arrival with 23 %".
+   * makes them shorter: "Charge longer → 73 % (+5 min), later stops 3 min shorter, arrival with 23 %", or not needed
+   * any more: "Charge longer → 80 % (+9 min), stop at EnBW Aurach not needed, arrival with 25 %".
    */
   @NonNull
   public String longer(@NonNull EvPlanResult.Stop stop)
   {
+    return longer(stop, null);
+  }
+
+  /** See {@link #longer(EvPlanResult.Stop)}, |plan| (of the stop) gives the names of the stops not needed. */
+  @NonNull
+  public String longer(@NonNull EvPlanResult.Stop stop, @Nullable EvPlanResult.Plan plan)
+  {
     if (stop.longer == null)
       return "";
     final String extra = "+" + duration(stop.longer.extraStopTimeSec);
+    final List<Integer> dropped = stop.longer.droppedStops;
+    if (dropped != null && dropped.size() == 1 && plan != null && dropped.get(0) >= 0
+        && dropped.get(0) < plan.stops.size())
+      return mTexts.chargeLongerStopNotNeeded(soc(stop.longer.departureSocPct), extra,
+                                              plan.stops.get(dropped.get(0)).title, soc(stop.longer.arrivalSocPct));
+    if (dropped != null && !dropped.isEmpty())
+      return mTexts.chargeLongerStopsNotNeeded(soc(stop.longer.departureSocPct), extra, dropped.size(),
+                                               soc(stop.longer.arrivalSocPct));
     if (Math.round(stop.longer.laterStopsSavedSec / 60.0) > 0)
       return mTexts.chargeLongerLaterShorter(soc(stop.longer.departureSocPct), extra,
                                              duration(stop.longer.laterStopsSavedSec), soc(stop.longer.arrivalSocPct));

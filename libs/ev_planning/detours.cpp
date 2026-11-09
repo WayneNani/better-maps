@@ -146,10 +146,12 @@ ftypes::HighwayClass RouteLine::GetHighwayClassAt(double distanceM) const
   return m_highwayClasses[FindSegment(std::clamp(distanceM, 0.0, GetLengthM()))];
 }
 
-RouterDetours::RouterDetours(routing::IRouter & router, routing::RouterDelegate const & delegate, RouteLine line)
+RouterDetours::RouterDetours(routing::IRouter & router, routing::RouterDelegate const & delegate, RouteLine line,
+                             MotorwayServices * services)
   : m_router(router)
   , m_delegate(delegate)
   , m_line(std::move(line))
+  , m_services(services)
 {}
 
 std::optional<Detour> RouterDetours::GetDetour(ChargingStation const & station)
@@ -206,7 +208,14 @@ std::optional<double> RouterDetours::EstimateDetourSec(ChargingStation const & s
       leftHandTraffic = info->GetRegionData().Get(feature::RegionData::RD_DRIVING) == "l";
     // Stations right next to the motorway, e.g. at services, are on one side only.
     if (left != leftHandTraffic && station.m_distanceFromRouteM > kOnRouteM)
-      estimate += kOtherSideOfMotorwaySec;
+    {
+      if (!m_services)
+        estimate += kOtherSideOfMotorwaySec;
+      else if (m_services->IsAtMotorwayServices(station))
+        estimate += kOtherCarriagewayServicesSec;
+      else
+        estimate += kCrossMotorwaySec;
+    }
   }
   return estimate;
 }

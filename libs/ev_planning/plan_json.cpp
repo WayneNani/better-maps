@@ -53,6 +53,8 @@ struct LongerDto
   double extraTotalTimeSec = 0.0;
   double laterStopsSavedSec = 0.0;
   double arrivalSocPct = 0.0;
+  // Indices of the following stops that are not needed any more.
+  std::vector<uint32_t> droppedStops;
 };
 
 struct StopDto
@@ -195,7 +197,9 @@ StopDto MakeStop(ChargingStop const & stop)
   {
     auto const & longer = *stop.m_longer;
     dto.longer = LongerDto{longer.m_departureSocPct, longer.m_extraStopTimeSec, longer.m_extraTotalTimeSec,
-                           longer.m_laterStopsSavedSec, longer.m_arrivalSocPct};
+                           longer.m_laterStopsSavedSec, longer.m_arrivalSocPct, {}};
+    for (auto const index : longer.m_droppedStops)
+      dto.longer->droppedStops.push_back(static_cast<uint32_t>(index));
   }
   return dto;
 }

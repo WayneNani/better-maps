@@ -3,6 +3,7 @@
 #include "ev_planning/ev_planning_tests/test_helpers.hpp"
 
 #include "ev_planning/plan_json.hpp"
+#include "ev_planning/planner.hpp"
 
 #include <string>
 
@@ -94,5 +95,22 @@ UNIT_TEST(PlanJson_Result)
   {
     TEST(json.find(part) != std::string::npos, (part, json));
   }
+}
+
+UNIT_TEST(PlanJson_LongerDroppedStops)
+{
+  auto const & elroq = Elroq();
+  auto const route = MakeRoute(elroq, 600.0, 100.0);
+  PlanOptions options;
+  options.m_startSocPct = 80.0;
+  // The second stop only tops up, with 10 % more at the first one it is not needed.
+  Plan plan = EvaluateStops(elroq, route,
+                            {{MakeStation(1, 250.0, "type2_combo|4|300"), 90.0},
+                             {MakeStation(2, 350.0, "type2_combo|4|300"), 74.0}},
+                            options);
+  AddLongerVariants(elroq, route, options, plan);
+  auto const json = ToJson(plan);
+  TEST(json.find(R"("droppedStops":[1])") != std::string::npos, (json));
+  TEST(json.find(R"("droppedStops":[])") != std::string::npos, (json));
 }
 }  // namespace plan_json_tests

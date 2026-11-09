@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ev_planning/services.hpp"
 #include "ev_planning/station.hpp"
 
 #include "routing/route.hpp"
@@ -97,14 +98,24 @@ public:
   // way to the station suggests (slow link roads, deceleration). The router gives 2.5-3 min for motorway services
   // next to the route.
   static double constexpr kLeaveFastRoadSec = 150.0;
-  // A station on the other side of a motorway (left in right-hand traffic) is either at services of the other
-  // carriageway (20-25 min on the next junctions) or at an exit, across the motorway (5-10 min). A guess between,
-  // until the router knows.
+  // A station on the other side of a motorway (left in right-hand traffic) at motorway services of the other
+  // carriageway (see IsAtMotorwayServices()): on to the next junction, back, and the same after the stop. For 29 such
+  // services along Bonn -> Nuremberg, Cologne -> Munich and Frankfurt -> Berlin the router gives 2-45 min, median
+  // 12.5 min, mean 14 min: on top of kLeaveFastRoadSec and the way to the station this estimates about 14 min.
+  static double constexpr kOtherCarriagewayServicesSec = 11.0 * 60.0;
+  // Any other station on the other side of a motorway, e.g. at an "Autohof" or in a town at an exit: like a station on
+  // the own side, plus crossing the motorway at the junction (left turns, traffic lights). With 2 min the median error
+  // of these estimates along the three routes is below 1 min.
+  static double constexpr kCrossMotorwaySec = 2.0 * 60.0;
+  // A station on the other side of a motorway without MotorwayServices: either services of the other carriageway or
+  // at an exit, a guess between, until the router knows.
   static double constexpr kOtherSideOfMotorwaySec = 10.0 * 60.0;
   // Closer stations are on the route itself (no side).
   static double constexpr kOnRouteM = 30.0;
 
-  RouterDetours(routing::IRouter & router, routing::RouterDelegate const & delegate, RouteLine line);
+  // |services|: to tell motorway services of the other carriageway from other stations on the other side, optional.
+  RouterDetours(routing::IRouter & router, routing::RouterDelegate const & delegate, RouteLine line,
+                MotorwayServices * services = nullptr);
 
   std::optional<Detour> GetDetour(ChargingStation const & station) override;
   std::optional<double> EstimateDetourSec(ChargingStation const & station) override;
@@ -116,6 +127,7 @@ private:
   routing::IRouter & m_router;
   routing::RouterDelegate const & m_delegate;
   RouteLine m_line;
+  MotorwayServices * m_services = nullptr;
   size_t m_routesCount = 0;
   double m_routingSec = 0.0;
 };

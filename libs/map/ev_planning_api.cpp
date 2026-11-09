@@ -8,6 +8,7 @@
 #include "ev_planning/plan_json.hpp"
 #include "ev_planning/planner.hpp"
 #include "ev_planning/route_points.hpp"
+#include "ev_planning/services.hpp"
 #include "ev_planning/vehicle_profile.hpp"
 
 #include "search/engine.hpp"
@@ -221,13 +222,16 @@ void EvPlanningApi::Plan(std::string const & profileJson, std::string const & op
       }
       auto const energy = ev::ComputeRouteEnergy(ev::EnergyModel(profile), route->MakePoints(dataSource));
       ev::AmenityFinder finder(dataSource);
+      // Motorway services of the other carriageway for the estimates of the detours.
+      ev::ServicesFinder services(dataSource);
       // The real detours of the stations of the plans, with an own router (the one of the routing session builds the
       // routes of the app on its own thread).
       traffic::TrafficCache const noTraffic;
       auto const router = routingManager.CreateCarRouter(route->m_numMwmIds, noTraffic);
       detourDelegate->SetTimeout(kDetoursTimeoutSec);
       ev::RouterDetours detours(*router, *detourDelegate,
-                                ev::RouteLine::FromSegments(route->m_segments, route->m_passedM, route->m_startPoint));
+                                ev::RouteLine::FromSegments(route->m_segments, route->m_passedM, route->m_startPoint),
+                                &services);
       auto const result = ev::PlanChargingWithAmenities(profile, energy, stations, options, finder, &detours);
       LOG(LINFO, ("EV planning:", DebugPrint(result.m_status), result.m_plan.m_stops.size(), "stops,", stations.size(),
                   "stations, search", searchSec, "s,", detours.GetRoutesCount(), "detours", detours.GetRoutingSec(),

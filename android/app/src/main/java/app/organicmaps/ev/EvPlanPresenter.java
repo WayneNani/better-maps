@@ -447,8 +447,33 @@ public class EvPlanPresenter
     // The following stops keep their departure states of charge: they arrive with more and charge less, see
     // ev::ChargingStop::Longer.
     stop.departureSocPct = stop.longer.departureSocPct;
-    evaluate(plan);
+    final List<Integer> dropped = stop.longer.droppedStops;
+    if (dropped == null || dropped.isEmpty())
+    {
+      evaluate(plan);
+      render();
+      return;
+    }
+    // Following stops that are not needed any more: out of the plan and the route, which is built again (its time
+    // and the remaining charging time of the navigation come from the new route and plan).
+    final List<EvPlanResult.Stop> remaining = new ArrayList<>();
+    for (int i = 0; i < plan.stops.size(); ++i)
+      if (!dropped.contains(i))
+        remaining.add(plan.stops.get(i));
+    final List<EvPlanResult.Stop> applied = new ArrayList<>(mRouteStops.getStops());
+    plan.stops = remaining;
+    final int request = ++mRequest;
+    mScreen = Screen.PLANNING;
     render();
+    mRouteStops.clear();
+    mRoute.setChargingStops(applied, plan.stops, () -> {
+      if (request != mRequest)
+        return;
+      evaluate(plan);
+      mRouteStops.set(plan, mProfile.toJson(), mOptions.copy());
+      mScreen = Screen.DETAIL;
+      render();
+    });
   }
 
   /** "Choose another stop": plans again without the selected station. */

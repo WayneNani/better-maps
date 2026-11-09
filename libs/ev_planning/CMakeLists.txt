@@ -18,6 +18,8 @@ set(SRC
   planner.hpp
   route_points.cpp
   route_points.hpp
+  services.cpp
+  services.hpp
   station.cpp
   station.hpp
   vehicle_profile.cpp

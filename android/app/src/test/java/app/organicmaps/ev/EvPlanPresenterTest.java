@@ -324,6 +324,74 @@ public class EvPlanPresenterTest
   }
 
   @Test
+  public void chargeLongerDropsTheStopNotNeeded()
+  {
+    final String plan = EvTestData.twoStopsPlan(17700, 21);
+    mEngine.mEvaluation = plan;
+    mPresenter.start(null);
+    mPresenter.plan();
+    mEngine.answer("{\"status\":\"ok\",\"plan\":" + plan + ",\"alternatives\":[],\"providers\":[]}");
+    assertEquals(EvPlanPresenter.Screen.RESULT, mPresenter.getScreen());
+    final EvPlanResult result = mPresenter.getResult();
+    assertNotNull(result);
+    assertEquals(2, mRouteStops.getStops().size());
+
+    mPresenter.showStop(0);
+    final EvPlanResult.Stop stop = mPresenter.getSelectedStop();
+    assertNotNull(stop);
+    final EvFormatter formatter = new EvFormatter(new FakeEvTexts(), ZoneId.of("UTC"));
+    assertEquals("Charge longer → 80 % (+9 min), stop at Ionity Haidt not needed, arrival with 25 %",
+                 formatter.longer(stop, result.plan));
+
+    // Charge longer: the second stop goes out of the plan and the route, the route is built again and evaluated.
+    final String[] routePoints = {"Germany:1", "Germany:3"};
+    final int changes = mRoute.mAdded.size();
+    final int evaluations = mEngine.mEvaluatedStops.size();
+    mEngine.mEvaluation = EvTestData.ONE_STOP_EVALUATED_JSON;
+    mPresenter.chargeLonger();
+    assertEquals(changes + 1, mRoute.mAdded.size());
+    assertEquals(routePoints.length, mRoute.mRemoved.get(changes).size());
+    for (int i = 0; i < routePoints.length; ++i)
+      assertEquals(routePoints[i], mRoute.mRemoved.get(changes).get(i).key);
+    assertEquals(1, mRoute.mAdded.get(changes).size());
+    assertEquals("Germany:1", mRoute.mAdded.get(changes).get(0).key);
+    assertEquals(evaluations + 1, mEngine.mEvaluatedStops.size());
+    final String evaluated = mEngine.mEvaluatedStops.get(evaluations);
+    assertTrue(evaluated, evaluated.contains("\"departureSoc\":80.0"));
+    assertFalse(evaluated, evaluated.contains("Germany:3"));
+
+    // The plan of the route: one stop, the numbers of the new route, back at the stop.
+    assertSame(result.plan, mRouteStops.getPlan());
+    assertEquals(1, result.plan.stops.size());
+    assertEquals(1, mRouteStops.getStops().size());
+    assertEquals(80, result.plan.stops.get(0).departureSocPct, 1e-9);
+    assertEquals(25, result.plan.arrivalSocPct, 1e-9);
+    assertEquals(17760, result.plan.totalTimeSec, 1e-9);
+    assertEquals(EvPlanPresenter.Screen.DETAIL, mPresenter.getScreen());
+    assertSame(result.plan.stops.get(0), mPresenter.getSelectedStop());
+    // The navigation adds the charging time of the remaining stop only.
+    final RouteMarkData[] points = {mark(RouteMarkType.Start, 50.7, 7.1, false),
+                                    mark(RouteMarkType.Intermediate, stop.lat, stop.lon, false),
+                                    mark(RouteMarkType.Finish, 49.45, 11.07, false)};
+    assertEquals(2160, mRouteStops.getRemainingStopTimeSec(points), 1e-9);
+  }
+
+  @Test
+  public void chargeLongerKeepsTheRouteIfAllStopsAreNeeded()
+  {
+    mPresenter.start(null);
+    mPresenter.plan();
+    mEngine.answer(EvTestData.RESULT_JSON);
+    mPresenter.showStop(0);
+    final int changes = mRoute.mAdded.size();
+    mPresenter.chargeLonger();
+    // Evaluated again with the same route.
+    assertEquals(changes, mRoute.mAdded.size());
+    assertEquals(EvPlanPresenter.Screen.DETAIL, mPresenter.getScreen());
+    assertEquals(1, mRouteStops.getStops().size());
+  }
+
+  @Test
   public void stopDetail()
   {
     mPresenter.start(null);

@@ -105,6 +105,11 @@
   <string name="ev_charge">Laden %1$d %% → %2$d %%</string>
   <string name="ev_charge_longer">Länger laden → %1$d %% (%2$s), Ankunft mit %3$d %%</string>
   <string name="ev_charge_longer_later_shorter">Länger laden → %1$d %% (%2$s), spätere Stopps %3$s kürzer, Ankunft mit %4$d %%</string>
+  <string name="ev_charge_longer_stop_not_needed">Länger laden → %1$d %% (%2$s), Stopp bei %3$s nicht nötig, Ankunft mit %4$d %%</string>
+  <plurals name="ev_charge_longer_stops_not_needed">
+    <item quantity="one">Länger laden → %1$d %% (%2$s), %3$d späterer Stopp nicht nötig, Ankunft mit %4$d %%</item>
+    <item quantity="other">Länger laden → %1$d %% (%2$s), %3$d spätere Stopps nicht nötig, Ankunft mit %4$d %%</item>
+  </plurals>
   <string name="ev_other_stop">Anderen Stopp wählen</string>
   <string name="ev_keep_stop">Als Ladestopp behalten</string>
 

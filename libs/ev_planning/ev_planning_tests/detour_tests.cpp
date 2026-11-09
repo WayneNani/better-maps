@@ -4,6 +4,7 @@
 
 #include "ev_planning/detours.hpp"
 #include "ev_planning/planner.hpp"
+#include "ev_planning/services.hpp"
 
 #include "routing/checkpoints.hpp"
 #include "routing/route.hpp"
@@ -16,6 +17,7 @@
 
 #include <map>
 #include <optional>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -269,6 +271,32 @@ public:
   size_t m_calls = 0;
 };
 
+// Motorway services by station name.
+class FakeServices : public MotorwayServices
+{
+public:
+  bool IsAtMotorwayServices(ChargingStation const & station) override
+  {
+    ++m_calls;
+    return m_services.count(station.m_name) > 0;
+  }
+
+  std::set<std::string> m_services;
+  size_t m_calls = 0;
+};
+
+// A station 150 m off the motorway at km 5 of MakeLine(), on the right (south) or on the left.
+ChargingStation MakeStationBeside(bool left, std::string const & name)
+{
+  ChargingStation station;
+  station.m_name = name;
+  station.m_distanceAlongRouteM = 5000.0;
+  station.m_distanceFromRouteM = 150.0;
+  station.m_detourSec = 40.0;
+  station.m_point = mercator::FromLatLon(left ? 50.00135 : 49.99865, 7.0 + 5.0 / 71.5);
+  return station;
+}
+
 UNIT_TEST(RouterDetours_EstimateBySide)
 {
   NoRouter router;
@@ -276,16 +304,13 @@ UNIT_TEST(RouterDetours_EstimateBySide)
   RouterDetours detours(router, delegate, MakeLine());
 
   // 150 m off the motorway at km 5: on the right (south, services of the own carriageway) and on the left.
-  ChargingStation station;
-  station.m_distanceAlongRouteM = 5000.0;
-  station.m_distanceFromRouteM = 150.0;
-  station.m_detourSec = 40.0;
-  station.m_point = mercator::FromLatLon(49.99865, 7.0 + 5.0 / 71.5);
+  auto station = MakeStationBeside(false /* left */, "Station");
   auto const right = detours.EstimateDetourSec(station);
   TEST(right, ());
   TEST(AlmostEqualAbs(*right, 40.0 + RouterDetours::kLeaveFastRoadSec, 1e-9), ());
 
-  station.m_point = mercator::FromLatLon(50.00135, 7.0 + 5.0 / 71.5);
+  // Without MotorwayServices: one guess for services of the other carriageway and stations at an exit.
+  station = MakeStationBeside(true /* left */, "Station");
   auto const left = detours.EstimateDetourSec(station);
   TEST(left, ());
   TEST(AlmostEqualAbs(*left, 40.0 + RouterDetours::kLeaveFastRoadSec + RouterDetours::kOtherSideOfMotorwaySec, 1e-9),
@@ -299,5 +324,96 @@ UNIT_TEST(RouterDetours_EstimateBySide)
   // No route: the estimate stays too.
   TEST(!detours.GetDetour(station), ());
   TEST_EQUAL(router.m_calls, 1, ());
+}
+
+UNIT_TEST(RouterDetours_EstimateServicesOrExit)
+{
+  NoRouter router;
+  routing::RouterDelegate delegate;
+  FakeServices services;
+  services.m_services = {"Rasthof Nord", "Rasthof Süd"};
+  RouterDetours detours(router, delegate, MakeLine(), &services);
+  double const base = 40.0 + RouterDetours::kLeaveFastRoadSec;
+
+  // Services of the other carriageway: on to the next junction and back, twice.
+  auto const nord = detours.EstimateDetourSec(MakeStationBeside(true /* left */, "Rasthof Nord"));
+  TEST(nord, ());
+  TEST(AlmostEqualAbs(*nord, base + RouterDetours::kOtherCarriagewayServicesSec, 1e-9), ());
+  TEST_GREATER(*nord, 12.0 * 60.0, ());
+
+  // An Autohof at an exit on the left: like a station on the right, plus crossing the motorway.
+  auto const autohof = detours.EstimateDetourSec(MakeStationBeside(true /* left */, "Autohof"));
+  TEST(autohof, ());
+  TEST(AlmostEqualAbs(*autohof, base + RouterDetours::kCrossMotorwaySec, 1e-9), ());
+  TEST_LESS(*autohof, 6.0 * 60.0, ());
+
+  // Services on the right (the own carriageway) and an Autohof on the right: unchanged, the services are not looked up.
+  size_t const calls = services.m_calls;
+  auto const sued = detours.EstimateDetourSec(MakeStationBeside(false /* left */, "Rasthof Süd"));
+  auto const rightAutohof = detours.EstimateDetourSec(MakeStationBeside(false /* left */, "Autohof"));
+  TEST(sued && rightAutohof, ());
+  TEST(AlmostEqualAbs(*sued, base, 1e-9), ());
+  TEST(AlmostEqualAbs(*rightAutohof, base, 1e-9), ());
+  TEST_EQUAL(services.m_calls, calls, ());
+
+  // A station on the route itself (closer than kOnRouteM) has no side.
+  auto onRoute = MakeStationBeside(true /* left */, "Rasthof Nord");
+  onRoute.m_distanceFromRouteM = 20.0;
+  TEST(AlmostEqualAbs(*detours.EstimateDetourSec(onRoute), base, 1e-9), ());
+}
+
+// The services and rest areas around a station, see IsAtMotorwayServices().
+ServicesPlace Area(std::string const & name, double distanceM)
+{
+  return {name, distanceM, true /* isArea */};
+}
+
+ServicesPlace Point(std::string const & name, double distanceM)
+{
+  return {name, distanceM, false /* isArea */};
+}
+
+UNIT_TEST(IsAtMotorwayServices_AreaOrPoint)
+{
+  // Inside the area of the services (e.g. "Rasthof Spessart Nord", 150 m from the route), or just outside.
+  TEST(IsAtMotorwayServices({Area("Rasthof Spessart Nord", 0.0)}, 150.0), ());
+  TEST(IsAtMotorwayServices({Area("Rasthof Spessart Nord", 20.0)}, 150.0), ());
+  // A rest area ("Rastplatz") serves one direction too.
+  TEST(IsAtMotorwayServices({Area("Rastplatz Epgert", 0.0)}, 115.0), ());
+  // Services without a name.
+  TEST(IsAtMotorwayServices({Area("", 0.0)}, 170.0), ());
+  // Next to services, not in them (e.g. a Supercharger 230 m from "Autobahnraststätte Limburg-Ost").
+  TEST(!IsAtMotorwayServices({Area("Autobahnraststätte Limburg-Ost", 234.0)}, 252.0), ());
+  TEST(!IsAtMotorwayServices({Area("Rasthof", 60.0)}, 150.0), ());
+  // No services around.
+  TEST(!IsAtMotorwayServices({}, 150.0), ());
+
+  // Services mapped as a point only: the point is in the middle of the services.
+  TEST(IsAtMotorwayServices({Point("Rasthof Spessart Nord", 58.0)}, 150.0), ());
+  TEST(IsAtMotorwayServices({Point("Rasthof", kServicesPointRadiusM - 1.0)}, 150.0), ());
+  TEST(!IsAtMotorwayServices({Point("Rasthof", kServicesPointRadiusM + 1.0)}, 150.0), ());
+  // Area and point of the same services.
+  TEST(IsAtMotorwayServices({Area("Rasthof Spessart Süd", 133.0), Area("Rasthof Spessart Nord", 0.0),
+                             Point("Rasthof Spessart Nord", 58.0)},
+                            153.0),
+       ());
+}
+
+UNIT_TEST(IsAtMotorwayServices_AutohofOrFar)
+{
+  // An Autohof at an exit, often tagged as services too: reachable from both directions.
+  TEST(!IsAtMotorwayServices({Area("Autohof Dachsberg", 0.0)}, 104.0), ());
+  TEST(!IsAtMotorwayServices({Area("MAXI Autohof Wertheim", 0.0)}, 212.0), ());
+  TEST(!IsAtMotorwayServices({Area("TOTAL Truckstop", 0.0)}, 300.0), ());
+  TEST(!IsAtMotorwayServices({Area("Autohof24-Raststätte", 0.0)}, 150.0), ());
+  // An unnamed area with the named point of the Autohof in it.
+  TEST(!IsAtMotorwayServices({Area("", 0.0), Point("Autohof Kirchheim", 63.0)}, 306.0), ());
+  // Services far from the motorway are at an exit, whatever their name (e.g. "Aral Autohof Dettelbach" 960 m away,
+  // the services of a motel 500 m away).
+  TEST(!IsAtMotorwayServices({Area("Rasthof & Motel Hermsdorfer Kreuz", 0.0)}, 507.0), ());
+  TEST(!IsAtMotorwayServices({Area("Rasthof", 0.0)}, kMaxServicesFromRouteM + 1.0), ());
+  TEST(IsAtMotorwayServices({Area("Rasthof", 0.0)}, kMaxServicesFromRouteM - 1.0), ());
+  // An Autohof point farther away does not matter.
+  TEST(IsAtMotorwayServices({Area("Rasthof Nord", 0.0), Point("Autohof", kServicesPointRadiusM + 50.0)}, 150.0), ());
 }
 }  // namespace detour_tests

@@ -45,9 +45,14 @@ public class EvPlanResult
     public double departureSocPct;
     public double extraStopTimeSec;
     public double extraTotalTimeSec;
-    /** Charging time saved at the following stops, which arrive with more. */
+    /** Time saved at the following stops, which arrive with more: less charging, or the whole stop if dropped. */
     public double laterStopsSavedSec;
     public double arrivalSocPct;
+    /**
+     * Indices of the following stops (in the stops of the plan) that are not needed any more: the car reaches the
+     * next stop and the destination with the minimums without them.
+     */
+    public List<Integer> droppedStops = new ArrayList<>();
   }
 
   public static class Stop
@@ -98,6 +103,8 @@ public class EvPlanResult
         amenities = new ArrayList<>();
       if (title == null || title.isEmpty())
         title = provider == null || provider.isEmpty() ? name : provider;
+      if (longer != null && longer.droppedStops == null)
+        longer.droppedStops = new ArrayList<>();
       return this;
     }
 

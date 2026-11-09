@@ -96,16 +96,20 @@ struct ChargingStop
   // Charging up to kLongerChargePct more at this stop (empty if the stop already charges to the maximum). The extra
   // charge goes on: the following stops keep their departure states of charge, so they charge less (the next one
   // first, a stop that arrives with enough not at all), and what they don't need reaches the destination. Without a
-  // following stop, the arrival is higher by the extra charge.
+  // following stop, the arrival is higher by the extra charge. Following stops that are not needed any more are left
+  // out (m_droppedStops), the other values are those of the plan without them.
   struct Longer
   {
     double m_departureSocPct = 0.0;
     double m_extraStopTimeSec = 0.0;
-    // Change of the total time: the following stops need less charging.
+    // Change of the total time: the following stops need less charging, or are left out.
     double m_extraTotalTimeSec = 0.0;
-    // Charging time saved at the following stops.
+    // Time saved at the following stops: less charging, or the whole stop if it is left out.
     double m_laterStopsSavedSec = 0.0;
     double m_arrivalSocPct = 0.0;
+    // Indices of the following stops (in Plan::m_stops) that are not needed any more: without them the car still
+    // reaches the next stop and the destination with the minimums of the options. Ascending.
+    std::vector<size_t> m_droppedStops;
   };
   std::optional<Longer> m_longer;
 };

@@ -118,6 +118,13 @@
   <!-- %1$d battery level, %2$s extra time (+9 min), %3$d battery level at the destination. -->
   <string name="ev_charge_longer">Charge longer → %1$d %% (%2$s), arrival with %3$d %%</string>
   <string name="ev_charge_longer_later_shorter">Charge longer → %1$d %% (%2$s), later stops %3$s shorter, arrival with %4$d %%</string>
+  <!-- %3$s the name of the following charging stop that is not needed any more. -->
+  <string name="ev_charge_longer_stop_not_needed">Charge longer → %1$d %% (%2$s), stop at %3$s not needed, arrival with %4$d %%</string>
+  <!-- %3$d the number of following charging stops that are not needed any more. -->
+  <plurals name="ev_charge_longer_stops_not_needed">
+    <item quantity="one">Charge longer → %1$d %% (%2$s), %3$d later stop not needed, arrival with %4$d %%</item>
+    <item quantity="other">Charge longer → %1$d %% (%2$s), %3$d later stops not needed, arrival with %4$d %%</item>
+  </plurals>
   <string name="ev_other_stop">Choose another stop</string>
   <string name="ev_keep_stop">Keep as charging stop</string>
 
