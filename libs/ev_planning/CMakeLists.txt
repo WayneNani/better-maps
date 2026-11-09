@@ -2,6 +2,8 @@ project(ev_planning)
 
 # better-maps: charging planner for electric vehicles.
 set(SRC
+  candidates.cpp
+  candidates.hpp
   charger_status.cpp
   charger_status.hpp
   charging.cpp
@@ -12,6 +14,8 @@ set(SRC
   plan_json.hpp
   planner.cpp
   planner.hpp
+  route_points.cpp
+  route_points.hpp
   station.cpp
   station.hpp
   vehicle_profile.cpp
@@ -25,9 +29,11 @@ target_link_libraries(${PROJECT_NAME}
     base
     geometry
     indexer
+    routing
     search
   PRIVATE
     glaze::glaze
 )
 
 omim_add_test_subdirectory(ev_planning_tests)
+omim_add_test_subdirectory(ev_planning_integration_tests)
