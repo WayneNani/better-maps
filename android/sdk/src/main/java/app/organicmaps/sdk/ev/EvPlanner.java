@@ -44,6 +44,13 @@ public final class EvPlanner
     return nativeEvaluate(profileJson, optionsJson, stopsJson, fromCurrentPosition);
   }
 
+  /** Shows the whole route in the visible part of the map. */
+  @MainThread
+  public static void showRoute()
+  {
+    nativeShowRoute();
+  }
+
   /** JSON array of the vehicle templates. */
   @NonNull
   public static String getVehicleTemplates()
@@ -54,6 +61,7 @@ public final class EvPlanner
   private static native void nativePlan(@NonNull String profileJson, @NonNull String optionsJson,
                                         @NonNull Listener listener);
   private static native void nativeCancel();
+  private static native void nativeShowRoute();
   @NonNull
   private static native String nativeEvaluate(@NonNull String profileJson, @NonNull String optionsJson,
                                               @NonNull String stopsJson, boolean fromCurrentPosition);

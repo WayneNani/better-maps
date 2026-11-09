@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace
 {
@@ -45,6 +46,21 @@ JNIEXPORT jstring JNICALL Java_app_organicmaps_sdk_ev_EvPlanner_nativeEvaluate(J
   auto const json = GetApi().Evaluate(jni::ToNativeString(env, profileJson), jni::ToNativeString(env, optionsJson),
                                       jni::ToNativeString(env, stopsJson), static_cast<bool>(fromCurrentPosition));
   return jni::ToJavaString(env, json);
+}
+
+JNIEXPORT void JNICALL Java_app_organicmaps_sdk_ev_EvPlanner_nativeShowRoute(JNIEnv *, jclass)
+{
+  auto & session = frm()->GetRoutingManager().RoutingSession();
+  std::vector<m2::PointD> points;
+  std::vector<double> times;
+  double passedM = 0.0;
+  if (!session.IsRouteValid() || !session.GetRoutePolylineWithTimes(points, times, passedM) || points.empty())
+    return;
+  m2::RectD rect;
+  for (auto const & p : points)
+    rect.Add(p);
+  rect.Scale(1.1);
+  frm()->ShowRect(rect, -1 /* maxScale */, true /* animation */, true /* useVisibleViewport */);
 }
 
 JNIEXPORT jstring JNICALL Java_app_organicmaps_sdk_ev_EvPlanner_nativeGetVehicleTemplates(JNIEnv * env, jclass)
