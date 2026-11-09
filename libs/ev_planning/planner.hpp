@@ -54,9 +54,12 @@ struct CostWeights
   double m_chargingWeight = 1.0;
   // Extra cost per stop, in seconds of cost (not of time).
   double m_stopPenaltySec = 0.0;
-  double m_preferredProviderBonusSec = 0.0;
-  // For each preferred kind of amenity within kAmenityBonusRadiusM.
-  double m_amenityBonusSec = 0.0;
+  // Preferences make the charging time at a station count less: a share of the charging time for a preferred
+  // provider and for each preferred kind of amenity within kAmenityBonusRadiusM, at most kMaxChargingDiscount.
+  // As the discount is on the charging time, a stop is never attractive by itself, and splitting a charge into more
+  // stops still costs their overhead.
+  double m_preferredProviderDiscount = 0.0;
+  double m_amenityDiscount = 0.0;
 };
 
 CostWeights GetCostWeights(Priority priority);
@@ -65,6 +68,7 @@ CostWeights GetCostWeights(Priority priority);
 double constexpr kStopOverheadSec = 3.0 * 60.0;
 // Expected waiting time at a station that is occupied right now, see ChargerStatusProvider.
 double constexpr kOccupiedPenaltySec = 15.0 * 60.0;
+double constexpr kMaxChargingDiscount = 0.5;
 // Amenities farther from the station do not give a bonus (they are shown though).
 double constexpr kAmenityBonusRadiusM = 300.0;
 // "Charge longer" variant of a stop.

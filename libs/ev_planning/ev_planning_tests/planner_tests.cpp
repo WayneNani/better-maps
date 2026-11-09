@@ -248,6 +248,31 @@ UNIT_TEST(Planner_Providers)
   TEST_EQUAL(GetNames(result.m_plan), (std::vector<std::string>{"Station 2"}), ());
 }
 
+UNIT_TEST(Planner_BonusesDoNotSplitStops)
+{
+  auto const & elroq = Elroq();
+  auto const route = MakeRoute(elroq, 412.0, kSpeedKmh);
+  // Two stations of a preferred provider with amenities at the same services, and some others.
+  std::vector<ChargingStation> stations = {
+      MakeStation(1, 300.0, "type2_combo|1|350", "Ionity"), MakeStation(2, 300.01, "type2_combo|1|350", "Ionity"),
+      MakeStation(3, 150.0, "type2_combo|4|300", "EnBW"), MakeStation(4, 200.0, "type2_combo|4|300", "EnBW")};
+  for (auto & s : stations)
+    s.m_amenities = {MakeAmenity(AmenityType::Toilets, 30.0), MakeAmenity(AmenityType::Playground, 50.0)};
+
+  PlanOptions options;
+  options.m_startSocPct = 82.0;
+  options.m_preferredProviders = {"ionity", "enbw"};
+  options.m_preferredAmenities = {AmenityType::Toilets, AmenityType::Playground};
+  for (auto const priority : {Priority::Fastest, Priority::FewestStops, Priority::LongBreaks})
+  {
+    options.m_priority = priority;
+    auto const result = PlanCharging(elroq, route, stations, options);
+    TEST_EQUAL(result.m_status, PlanStatus::Ok, ());
+    // One stop is enough; bonuses make no second one at the same place or a needless one.
+    TEST_EQUAL(result.m_plan.m_stops.size(), 1, (priority, GetNames(result.m_plan)));
+  }
+}
+
 UNIT_TEST(Planner_UnsuitableStations)
 {
   auto const & elroq = Elroq();
@@ -271,7 +296,7 @@ UNIT_TEST(Planner_Amenities)
   auto const route = MakeRoute(elroq, 400.0, kSpeedKmh);
   std::vector<ChargingStation> stations = {MakeStation(1, 200.0, "type2_combo|4|150", "", 60.0),
                                            MakeStation(2, 201.0, "type2_combo|4|150", "", 150.0)};
-  stations[0].m_amenities = {MakeAmenity(AmenityType::Toilets, 50.0)};
+  stations[0].m_amenities = {MakeAmenity(AmenityType::Food, 50.0)};
   stations[1].m_amenities = {MakeAmenity(AmenityType::Playground, 80.0), MakeAmenity(AmenityType::Toilets, 60.0)};
 
   PlanOptions options;

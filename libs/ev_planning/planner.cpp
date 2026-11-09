@@ -20,8 +20,8 @@ double constexpr kStepPct = ChargingTimeTable::kStepPct;
 int constexpr kMaxLevel = static_cast<int>(100.0 / kStepPct);
 // Speed on the way from the route to a station and back, as in RoutingManager::MakeSearchCorridor().
 double constexpr kDetourSpeedKmh = 40.0;
-// A stop costs at least this much, so that bonuses never make a stop attractive by itself.
-double constexpr kMinStopCostSec = 60.0;
+// Two stops closer than this along the route make no sense (e.g. two charging stations at the same services).
+double constexpr kMinStopDistanceM = 5000.0;
 double constexpr kEps = 1e-9;
 
 int ToLevelFloor(double socPct)
@@ -76,8 +76,10 @@ struct Node
   double m_positionM = 0.0;
   double m_detourHalfSec = 0.0;
   double m_detourHalfKwh = 0.0;
-  // Cost of a stop apart from the charging time: overhead, penalties, bonuses.
+  // Cost of a stop apart from the charging time: overhead and penalties.
   double m_stopBaseCostSec = 0.0;
+  // Weight of the charging time with the preferences, see CostWeights.
+  double m_chargingWeight = 1.0;
   std::unique_ptr<ChargingTimeTable> m_chargingTimes;
 };
 
@@ -114,11 +116,12 @@ DpResult RunDp(VehicleProfile const & profile, EnergyModel const & model, RouteE
     node.m_positionM = std::clamp(s.m_distanceAlongRouteM, 0.0, route.GetLengthM());
     node.m_detourHalfSec = s.m_detourSec / 2.0;
     node.m_detourHalfKwh = GetDetourEnergyKwh(model, s) / 2.0;
-    double bonus = GetMatchedAmenities(s, options).size() * weights.m_amenityBonusSec;
+    double discount = GetMatchedAmenities(s, options).size() * weights.m_amenityDiscount;
     if (IsPreferredProvider(s, options))
-      bonus += weights.m_preferredProviderBonusSec;
+      discount += weights.m_preferredProviderDiscount;
+    node.m_chargingWeight = weights.m_chargingWeight * (1.0 - std::min(discount, kMaxChargingDiscount));
     double const occupied = s.m_status.m_availability == Availability::Occupied ? kOccupiedPenaltySec : 0.0;
-    node.m_stopBaseCostSec = kStopOverheadSec + weights.m_stopPenaltySec + occupied - bonus;
+    node.m_stopBaseCostSec = kStopOverheadSec + weights.m_stopPenaltySec + occupied;
     node.m_chargingTimes = std::make_unique<ChargingTimeTable>(profile, node.m_power);
   }
 
@@ -145,6 +148,8 @@ DpResult RunDp(VehicleProfile const & profile, EnergyModel const & model, RouteE
       if (departureLevels[p].empty())
         continue;
       auto const & from = nodes[p];
+      if (p > 0 && k != destination && to.m_positionM - from.m_positionM < kMinStopDistanceM)
+        continue;
       double const energy =
           route.GetEnergyKwh(from.m_positionM, to.m_positionM) + from.m_detourHalfKwh + to.m_detourHalfKwh;
       double const time = route.GetTimeSecAt(to.m_positionM) - route.GetTimeSecAt(from.m_positionM) +
@@ -175,7 +180,7 @@ DpResult RunDp(VehicleProfile const & profile, EnergyModel const & model, RouteE
       for (int d = a + 1; d <= maxChargeLevel; ++d)
       {
         double const charging = to.m_chargingTimes->GetTimeSec(ToSoc(a), ToSoc(d));
-        double const stopCost = std::max(kMinStopCostSec, weights.m_chargingWeight * charging + to.m_stopBaseCostSec);
+        double const stopCost = to.m_chargingWeight * charging + to.m_stopBaseCostSec;
         double const cost = arrivalCost + stopCost;
         auto & label = departures[k][d];
         if (cost < label.m_cost)
@@ -318,8 +323,8 @@ std::string_view ToString(PlanStatus status)
 CostWeights GetCostWeights(Priority priority)
 {
   CostWeights weights;
-  weights.m_preferredProviderBonusSec = 5.0 * 60.0;
-  weights.m_amenityBonusSec = 2.0 * 60.0;
+  weights.m_preferredProviderDiscount = 0.25;
+  weights.m_amenityDiscount = 0.1;
   switch (priority)
   {
   case Priority::Fastest: break;
@@ -330,7 +335,7 @@ CostWeights GetCostWeights(Priority priority)
   case Priority::LongBreaks:
     weights.m_chargingWeight = 0.5;
     weights.m_stopPenaltySec = 30.0 * 60.0;
-    weights.m_amenityBonusSec = 4.0 * 60.0;
+    weights.m_amenityDiscount = 0.2;
     break;
   }
   return weights;
