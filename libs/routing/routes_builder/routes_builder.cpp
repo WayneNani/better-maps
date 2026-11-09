@@ -326,6 +326,7 @@ RoutesBuilder::Result RoutesBuilder::Processor::operator()(Params const & params
   routeResult.m_eta = route.GetTotalTimeSec();
 
   routeResult.m_followedPolyline = route.GetFollowedPolyline();
+  routeResult.m_segments = route.GetRouteSegments();
 
   result.m_routes.emplace_back(std::move(routeResult));
 

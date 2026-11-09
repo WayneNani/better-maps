@@ -3,6 +3,7 @@
 #include "routing/routes_builder/data_source_storage.hpp"
 
 #include "routing/checkpoints.hpp"
+#include "routing/route.hpp"
 #include "routing/router_delegate.hpp"
 #include "routing/routing_callbacks.hpp"
 #include "routing/vehicle_mask.hpp"
@@ -74,6 +75,8 @@ public:
     double m_eta = 0.0;
     double m_distance = 0.0;
     FollowedPolyline m_followedPolyline;
+    // Segments of the route with times, road classes and altitudes (if loaded). Not dumped.
+    std::vector<RouteSegment> m_segments;
   };
 
   struct Result
@@ -95,6 +98,8 @@ public:
   };
 
   Result ProcessTask(Params const & params);
+  // Maps of RouteSegment::GetSegment().GetMwmId().
+  std::shared_ptr<NumMwmIds> GetNumMwmIds() const { return m_numMwmIds; }
   std::future<Result> ProcessTaskAsync(Params const & params);
 
 private:
