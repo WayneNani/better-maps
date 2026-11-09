@@ -8,6 +8,10 @@ set(SRC
   charging.hpp
   energy_model.cpp
   energy_model.hpp
+  plan_json.cpp
+  plan_json.hpp
+  planner.cpp
+  planner.hpp
   station.cpp
   station.hpp
   vehicle_profile.cpp
@@ -21,6 +25,7 @@ target_link_libraries(${PROJECT_NAME}
     base
     geometry
     indexer
+    search
   PRIVATE
     glaze::glaze
 )
