@@ -670,6 +670,20 @@ std::shared_ptr<search::RouteCorridor const> RoutingManager::MakeSearchCorridor(
   return std::make_shared<search::RouteCorridor const>(params);
 }
 
+std::unique_ptr<IRouter> RoutingManager::CreateCarRouter(std::shared_ptr<NumMwmIds> numMwmIds,
+                                                         traffic::TrafficCache const & trafficCache) const
+{
+  auto const & callbacks = m_callbacks;
+  auto const countryFileGetter = [&callbacks](m2::PointD const & p) -> string
+  { return callbacks.m_countryInfoGetter().GetRegionCountryId(p); };
+  auto const getMwmRectByName = [&callbacks](string const & countryId) -> m2::RectD
+  { return callbacks.m_countryInfoGetter().GetLimitRectForLeaf(countryId); };
+  auto numMwmTree = MakeNumMwmTree(*numMwmIds, m_callbacks.m_countryInfoGetter());
+  return make_unique<IndexRouter>(VehicleType::Car, false /* loadAltitudes */, m_callbacks.m_countryParentNameGetterFn,
+                                  countryFileGetter, getMwmRectByName, std::move(numMwmIds), std::move(numMwmTree),
+                                  trafficCache, m_callbacks.m_dataSourceGetter());
+}
+
 void RoutingManager::CollectFeaturesAlongRoute(vector<RouteSegment> const & segments, m2::PointD const & startPt,
                                                uint32_t featureType,
                                                vector<std::pair<m2::PointD, FeatureID>> & outFeatures)

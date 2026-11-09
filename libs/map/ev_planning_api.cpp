@@ -3,6 +3,7 @@
 #include "map/routing_manager.hpp"
 
 #include "ev_planning/candidates.hpp"
+#include "ev_planning/detours.hpp"
 #include "ev_planning/energy_model.hpp"
 #include "ev_planning/plan_json.hpp"
 #include "ev_planning/planner.hpp"
@@ -13,7 +14,12 @@
 #include "search/result.hpp"
 #include "search/route_corridor.hpp"
 
+#include "routing/router.hpp"
+#include "routing/router_delegate.hpp"
+
 #include "routing_common/num_mwm_id.hpp"
+
+#include "traffic/traffic_cache.hpp"
 
 #include "indexer/data_source.hpp"
 
@@ -38,6 +44,8 @@ std::string const kInvalidJson = R"({"status":"invalid_profile"})";
 auto constexpr kSearchTimeout = std::chrono::seconds(30);
 // A charging stop matches an intermediate point of the route within this distance.
 double constexpr kStopMatchM = 1000.0;
+// For the real detours of the stations of the plans (routes of a few km each); the estimates stay after that.
+uint32_t constexpr kDetoursTimeoutSec = 20;
 }  // namespace
 
 struct EvPlanningApi::Route
@@ -47,6 +55,7 @@ struct EvPlanningApi::Route
   std::vector<double> m_subrouteEndsM;
   std::vector<m2::PointD> m_subrouteEndPoints;
   double m_passedM = 0.0;
+  m2::PointD m_startPoint;
   std::shared_ptr<search::RouteCorridor const> m_corridor;
   std::shared_ptr<routing::NumMwmIds> m_numMwmIds;
 
@@ -120,6 +129,7 @@ std::shared_ptr<EvPlanningApi::Route> EvPlanningApi::GetRoute() const
     return nullptr;
   if (route->m_segments.empty())
     return nullptr;
+  route->m_startPoint = session.GetStartPoint();
 
   for (double const end : route->m_subrouteEndsM)
   {
@@ -145,6 +155,8 @@ void EvPlanningApi::Cancel()
   ++*m_currentRequest;
   if (auto handle = m_searchHandle.lock())
     handle->Cancel();
+  if (auto delegate = m_detourDelegate.lock())
+    delegate->Cancel();
 }
 
 void EvPlanningApi::Plan(std::string const & profileJson, std::string const & optionsJson, OnResult onResult)
@@ -174,7 +186,11 @@ void EvPlanningApi::Plan(std::string const & profileJson, std::string const & op
   auto current = m_currentRequest;
   auto statusProvider = m_statusProvider;
   auto & dataSource = m_dataSource;
-  params.m_onResults = [=, &dataSource, profile = *profile, options = *options](search::Results const & results)
+  auto & routingManager = m_routingManager;
+  auto detourDelegate = std::make_shared<routing::RouterDelegate>();
+  m_detourDelegate = detourDelegate;
+  params.m_onResults =
+      [=, &dataSource, &routingManager, profile = *profile, options = *options](search::Results const & results)
   {
     if (!results.IsEndMarker())
       return;
@@ -183,7 +199,7 @@ void EvPlanningApi::Plan(std::string const & profileJson, std::string const & op
 
     std::vector<search::Result> found(results.begin(), results.end());
     double const searchSec = timer->ElapsedSeconds();
-    GetPlatform().RunTask(Platform::Thread::Background, [=, &dataSource, found = std::move(found)]()
+    GetPlatform().RunTask(Platform::Thread::Background, [=, &dataSource, &routingManager, found = std::move(found)]()
     {
       if (*current != requestId)
         return;
@@ -205,9 +221,17 @@ void EvPlanningApi::Plan(std::string const & profileJson, std::string const & op
       }
       auto const energy = ev::ComputeRouteEnergy(ev::EnergyModel(profile), route->MakePoints(dataSource));
       ev::AmenityFinder finder(dataSource);
-      auto const result = ev::PlanChargingWithAmenities(profile, energy, stations, options, finder);
+      // The real detours of the stations of the plans, with an own router (the one of the routing session builds the
+      // routes of the app on its own thread).
+      traffic::TrafficCache const noTraffic;
+      auto const router = routingManager.CreateCarRouter(route->m_numMwmIds, noTraffic);
+      detourDelegate->SetTimeout(kDetoursTimeoutSec);
+      ev::RouterDetours detours(*router, *detourDelegate,
+                                ev::RouteLine::FromSegments(route->m_segments, route->m_passedM, route->m_startPoint));
+      auto const result = ev::PlanChargingWithAmenities(profile, energy, stations, options, finder, &detours);
       LOG(LINFO, ("EV planning:", DebugPrint(result.m_status), result.m_plan.m_stops.size(), "stops,", stations.size(),
-                  "stations, search", searchSec, "s, total", timer->ElapsedSeconds(), "s"));
+                  "stations, search", searchSec, "s,", detours.GetRoutesCount(), "detours", detours.GetRoutingSec(),
+                  "s, total", timer->ElapsedSeconds(), "s"));
       auto json = ev::ToJson(result);
       GetPlatform().RunTask(Platform::Thread::Gui, [=, json = std::move(json)]()
       {
