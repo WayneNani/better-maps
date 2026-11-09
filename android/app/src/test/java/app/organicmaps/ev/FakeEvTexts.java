@@ -71,6 +71,15 @@ class FakeEvTexts implements EvTexts
 
   @NonNull
   @Override
+  public String chargeLongerLaterShorter(int departureSoc, @NonNull String extraTime, @NonNull String savedTime,
+                                         int arrivalSoc)
+  {
+    return "Charge longer → " + departureSoc + " % (" + extraTime + "), later stops " + savedTime
+  + " shorter, arrival with " + arrivalSoc + " %";
+  }
+
+  @NonNull
+  @Override
   public String socketName(@NonNull String type)
   {
     return switch (type)

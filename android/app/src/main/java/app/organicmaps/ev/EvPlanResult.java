@@ -45,6 +45,8 @@ public class EvPlanResult
     public double departureSocPct;
     public double extraStopTimeSec;
     public double extraTotalTimeSec;
+    /** Charging time saved at the following stops, which arrive with more. */
+    public double laterStopsSavedSec;
     public double arrivalSocPct;
   }
 

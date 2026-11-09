@@ -120,14 +120,20 @@ public class EvFormatter
     return duration(stop.stopTimeSec);
   }
 
-  /** "Charge longer → 80 % (+9 min), arrival with 34 %", empty if not possible. */
+  /**
+   * "Charge longer → 80 % (+9 min), arrival with 34 %", empty if not possible. With following stops, the extra charge
+   * makes them shorter: "Charge longer → 73 % (+5 min), later stops 3 min shorter, arrival with 23 %".
+   */
   @NonNull
   public String longer(@NonNull EvPlanResult.Stop stop)
   {
     if (stop.longer == null)
       return "";
-    return mTexts.chargeLonger(soc(stop.longer.departureSocPct), "+" + duration(stop.longer.extraStopTimeSec),
-                               soc(stop.longer.arrivalSocPct));
+    final String extra = "+" + duration(stop.longer.extraStopTimeSec);
+    if (Math.round(stop.longer.laterStopsSavedSec / 60.0) > 0)
+      return mTexts.chargeLongerLaterShorter(soc(stop.longer.departureSocPct), extra,
+                                             duration(stop.longer.laterStopsSavedSec), soc(stop.longer.arrivalSocPct));
+    return mTexts.chargeLonger(soc(stop.longer.departureSocPct), extra, soc(stop.longer.arrivalSocPct));
   }
 
   /** "Playground 90 m". */
@@ -193,7 +199,8 @@ public class EvFormatter
     if (deltaMinutes < 0 && !bothEvaluated && !alternative.hasCheckedDetours())
       deltaMinutes = 0;
     return mTexts.alternativeStops(alternative.stops.size(), main.stops.size()) + ", "
-  + mTexts.alternativeArrival(deltaMinutes) + ", " + mTexts.alternativeSoc(soc(alternativeArrivalSoc(alternative, main)));
+  + mTexts.alternativeArrival(deltaMinutes) + ", "
+  + mTexts.alternativeSoc(soc(alternativeArrivalSoc(alternative, main)));
   }
 
   /** The arrival with |alternative|, with the correction of |main| by its evaluation if it is not evaluated itself. */

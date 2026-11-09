@@ -104,6 +104,7 @@
   <string name="ev_closed_on_arrival">bei Ankunft geschlossen</string>
   <string name="ev_charge">Laden %1$d %% → %2$d %%</string>
   <string name="ev_charge_longer">Länger laden → %1$d %% (%2$s), Ankunft mit %3$d %%</string>
+  <string name="ev_charge_longer_later_shorter">Länger laden → %1$d %% (%2$s), spätere Stopps %3$s kürzer, Ankunft mit %4$d %%</string>
   <string name="ev_other_stop">Anderen Stopp wählen</string>
   <string name="ev_keep_stop">Als Ladestopp behalten</string>
 

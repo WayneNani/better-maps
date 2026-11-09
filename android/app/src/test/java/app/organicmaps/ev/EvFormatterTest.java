@@ -78,6 +78,12 @@ public class EvFormatterTest
     assertEquals("food · open on arrival", mFormatter.amenityWithOpening(nearest.get(2)));
     assertEquals("shopping", mFormatter.amenityWithOpening(nearest.get(3)));
 
+    // With a following stop: it charges less.
+    stop.longer.laterStopsSavedSec = 190;
+    stop.longer.arrivalSocPct = 24;
+    assertEquals("Charge longer → 80 % (+9 min), later stops 3 min shorter, arrival with 24 %",
+                 mFormatter.longer(stop));
+
     stop.longer = null;
     assertEquals("", mFormatter.longer(stop));
   }
