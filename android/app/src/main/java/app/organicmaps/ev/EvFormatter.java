@@ -175,13 +175,33 @@ public class EvFormatter
     return mTexts.alternativeTitle(String.join(" + ", names));
   }
 
-  /** "2 shorter stops, arrival 4 min later, with 41 % on arrival". */
+  /**
+   * "2 shorter stops, arrival 4 min later, with 41 % on arrival".
+   * <p>
+   * The main plan is evaluated with the real route, the alternatives are not (only the one that was the main plan
+   * before). So both are compared on the same basis: the numbers of the planner, unless both were evaluated. The
+   * arrival with the alternative gets the correction of the main plan by its evaluation. An alternative is called
+   * earlier only if its numbers include the real detours to its stations.
+   */
   @NonNull
   public String alternativeDescription(@NonNull EvPlanResult.Plan alternative, @NonNull EvPlanResult.Plan main)
   {
-    final int deltaMinutes = (int) Math.round((alternative.totalTimeSec - main.totalTimeSec) / 60.0);
+    final boolean bothEvaluated = alternative.evaluated && main.evaluated;
+    final double alternativeTime = bothEvaluated ? alternative.totalTimeSec : alternative.plannedTotalTimeSec;
+    final double mainTime = bothEvaluated ? main.totalTimeSec : main.plannedTotalTimeSec;
+    int deltaMinutes = (int) Math.round((alternativeTime - mainTime) / 60.0);
+    if (deltaMinutes < 0 && !bothEvaluated && !alternative.hasCheckedDetours())
+      deltaMinutes = 0;
     return mTexts.alternativeStops(alternative.stops.size(), main.stops.size()) + ", "
-  + mTexts.alternativeArrival(deltaMinutes) + ", " + mTexts.alternativeSoc(soc(alternative.arrivalSocPct));
+  + mTexts.alternativeArrival(deltaMinutes) + ", " + mTexts.alternativeSoc(soc(alternativeArrivalSoc(alternative, main)));
+  }
+
+  /** The arrival with |alternative|, with the correction of |main| by its evaluation if it is not evaluated itself. */
+  static double alternativeArrivalSoc(@NonNull EvPlanResult.Plan alternative, @NonNull EvPlanResult.Plan main)
+  {
+    if (alternative.evaluated || !main.evaluated)
+      return alternative.arrivalSocPct;
+    return alternative.plannedArrivalSocPct + main.arrivalSocPct - main.plannedArrivalSocPct;
   }
 
   /** The error of a result that is not OK. */
