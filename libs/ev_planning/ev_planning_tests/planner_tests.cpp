@@ -437,18 +437,129 @@ UNIT_TEST(Planner_ChargeLongerPropagates)
   TEST_EQUAL(atB.m_laterStopsSavedSec, 0.0, ());
   TEST(AlmostEqualAbs(atB.m_extraTotalTimeSec, atB.m_extraStopTimeSec, 1e-6), ());
 
-  // More extra than the next stop needs: D only tops up 5.4 %, so it charges nothing then and the rest of the extra
-  // reaches the destination.
-  auto const shorter = MakeRoute(elroq, 600.0, kSpeedKmh);
+  // B is still needed after charging longer at A: without it the destination is out of reach.
+  TEST(atA.m_droppedStops.empty(), ());
+  TEST(atB.m_droppedStops.empty(), ());
+}
+
+// "Charge longer" leaves out the following stops that are not needed any more.
+UNIT_TEST(Planner_ChargeLongerDropsStops)
+{
+  auto const & elroq = Elroq();
+  PlanOptions options;
+  options.m_startSocPct = 80.0;
+
+  // More extra than the next stop needs: D only tops up 5.4 %, then it charges nothing and is not needed (C -> 100 %
+  // reaches the destination with 25 %).
+  auto const route = MakeRoute(elroq, 600.0, kSpeedKmh);
   auto const c = MakeStation(3, 250.0, "type2_combo|4|300", "", 0.0);
-  auto const d = MakeStation(4, 350.0, "type2_combo|4|300", "", 0.0);
-  Plan topUp = EvaluateStops(elroq, shorter, {{c, 90.0}, {d, 74.0}}, options);
+  auto const d = MakeStation(4, 350.0, "type2_combo|4|300", "", 60.0);
+  Plan topUp = EvaluateStops(elroq, route, {{c, 90.0}, {d, 74.0}}, options);
   TEST(topUp.m_meetsMinimums, (topUp.m_arrivalSocPct));
   TEST_GREATER(topUp.m_stops[1].m_chargingTimeSec, 0.0, ());
-  AddLongerVariants(elroq, shorter, options, topUp);
+  AddLongerVariants(elroq, route, options, topUp);
   auto const & atC = *topUp.m_stops[0].m_longer;
-  TEST(AlmostEqualAbs(atC.m_laterStopsSavedSec, topUp.m_stops[1].m_chargingTimeSec, 1e-6), ());
+  TEST_EQUAL(atC.m_droppedStops, (std::vector<size_t>{1}), ());
+  // The whole stop at D is saved (charging and overhead), and its detour.
+  TEST(AlmostEqualAbs(atC.m_laterStopsSavedSec, topUp.m_stops[1].m_stopTimeSec, 1e-6), ());
+  auto const withoutD = EvaluateStops(elroq, route, {{c, 100.0}}, options);
+  TEST(AlmostEqualAbs(atC.m_arrivalSocPct, withoutD.m_arrivalSocPct, 1e-6), ());
+  TEST(AlmostEqualAbs(atC.m_extraTotalTimeSec, withoutD.m_totalTimeSec - topUp.m_totalTimeSec, 1e-6), ());
+  TEST(AlmostEqualAbs(atC.m_extraTotalTimeSec,
+                      atC.m_extraStopTimeSec - atC.m_laterStopsSavedSec - d.m_detourSec, 1e-6),
+       ());
+  TEST_GREATER_OR_EQUAL(atC.m_arrivalSocPct, options.m_minArrivalSocPct, ());
   TEST_GREATER(atC.m_arrivalSocPct, topUp.m_arrivalSocPct + 4.0, ());
-  TEST_LESS(atC.m_arrivalSocPct, topUp.m_arrivalSocPct + 10.0, ());
+  TEST_LESS(atC.m_extraTotalTimeSec, atC.m_extraStopTimeSec, ());
+
+  // Two small top-ups after A (e.g. after an evaluation with the real route): both are not needed with 10 % more at A.
+  // A at km 150 to 80 %, B at km 200 to 72 %, C at km 250 to 64 %, arrival with 21 %.
+  auto const route450 = MakeRoute(elroq, 450.0, kSpeedKmh);
+  auto const a = MakeStation(1, 150.0, "type2_combo|4|300", "", 0.0);
+  auto const b = MakeStation(2, 200.0, "type2_combo|4|300", "", 0.0);
+  auto const c2 = MakeStation(3, 250.0, "type2_combo|4|300", "", 0.0);
+  Plan two = EvaluateStops(elroq, route450, {{a, 80.0}, {b, 72.0}, {c2, 64.0}}, options);
+  TEST(two.m_meetsMinimums, (two.m_arrivalSocPct));
+  TEST_GREATER(two.m_stops[1].m_chargingTimeSec, 0.0, ());
+  TEST_GREATER(two.m_stops[2].m_chargingTimeSec, 0.0, ());
+  AddLongerVariants(elroq, route450, options, two);
+  auto const & atA = *two.m_stops[0].m_longer;
+  TEST_EQUAL(atA.m_droppedStops, (std::vector<size_t>{1, 2}), ());
+  TEST(AlmostEqualAbs(atA.m_laterStopsSavedSec, two.m_stops[1].m_stopTimeSec + two.m_stops[2].m_stopTimeSec, 1e-6),
+       ());
+  auto const onlyA = EvaluateStops(elroq, route450, {{a, 90.0}}, options);
+  TEST(AlmostEqualAbs(atA.m_arrivalSocPct, onlyA.m_arrivalSocPct, 1e-6), ());
+  TEST(AlmostEqualAbs(atA.m_extraTotalTimeSec, onlyA.m_totalTimeSec - two.m_totalTimeSec, 1e-6), ());
+  TEST_GREATER_OR_EQUAL(atA.m_arrivalSocPct, options.m_minArrivalSocPct, ());
+
+  // Only the first of the two: B is not needed, C is (on a longer route A -> 90 % does not reach the destination).
+  auto const route500 = MakeRoute(elroq, 500.0, kSpeedKmh);
+  Plan first = EvaluateStops(elroq, route500, {{a, 80.0}, {b, 72.0}, {c2, 75.0}}, options);
+  TEST(first.m_meetsMinimums, (first.m_arrivalSocPct));
+  AddLongerVariants(elroq, route500, options, first);
+  auto const & firstA = *first.m_stops[0].m_longer;
+  TEST_EQUAL(firstA.m_droppedStops, (std::vector<size_t>{1}), ());
+  auto const withoutB = EvaluateStops(elroq, route500, {{a, 90.0}, {c2, 75.0}}, options);
+  TEST(AlmostEqualAbs(firstA.m_arrivalSocPct, withoutB.m_arrivalSocPct, 1e-6), ());
+  // C charges more (it arrives with less without B), but less than B and C before.
+  double const cBefore = first.m_stops[2].m_stopTimeSec;
+  TEST(AlmostEqualAbs(firstA.m_laterStopsSavedSec,
+                      first.m_stops[1].m_stopTimeSec + cBefore - withoutB.m_stops[1].m_stopTimeSec, 1e-6),
+       ());
+  TEST_GREATER(firstA.m_laterStopsSavedSec, 0.0, ());
+}
+
+// A following stop that charges nothing is left out even if the destination is reached just below the minimum (as
+// with the stop: a plan within the tolerance of Plan::m_meetsMinimums).
+UNIT_TEST(Planner_ChargeLongerDropsAStopWithoutCharging)
+{
+  auto const & elroq = Elroq();
+  PlanOptions options;
+  options.m_startSocPct = 80.0;
+  // D 20 km before the destination tops up exactly 10 %, the destination is reached with 0.2 % less than the minimum.
+  auto const route = MakeRoute(elroq, 630.0, kSpeedKmh);
+  auto const c = MakeStation(3, 250.0, "type2_combo|4|300", "", 0.0);
+  auto const d = MakeStation(4, 610.0, "type2_combo|4|300", "", 0.0);
+  double const dArrival = EvaluateStops(elroq, route, {{c, 90.0}, {d, 0.0}}, options).m_stops[1].m_arrivalSocPct;
+  Plan plan = EvaluateStops(elroq, route, {{c, 90.0}, {d, dArrival + kLongerChargePct}}, options);
+  options.m_minArrivalSocPct = plan.m_arrivalSocPct + 0.2;
+  plan = EvaluateStops(elroq, route, {{c, 90.0}, {d, dArrival + kLongerChargePct}}, options);
+  TEST(plan.m_meetsMinimums, (plan.m_arrivalSocPct));
+  AddLongerVariants(elroq, route, options, plan);
+  auto const & atC = *plan.m_stops[0].m_longer;
+  TEST_EQUAL(atC.m_droppedStops, (std::vector<size_t>{1}), ());
+  TEST_GREATER_OR_EQUAL(atC.m_arrivalSocPct, plan.m_arrivalSocPct - 1e-6, ());
+  TEST(AlmostEqualAbs(atC.m_laterStopsSavedSec, plan.m_stops[1].m_stopTimeSec, 1e-6), ());
+}
+
+// A following stop is kept when it is still needed, even if it charges less.
+UNIT_TEST(Planner_ChargeLongerKeepsNeededStops)
+{
+  auto const & elroq = Elroq();
+  PlanOptions options;
+  options.m_startSocPct = 80.0;
+  auto const route = MakeRoute(elroq, 600.0, kSpeedKmh);
+  auto const c = MakeStation(3, 250.0, "type2_combo|4|300", "", 0.0);
+  auto const d = MakeStation(4, 350.0, "type2_combo|4|300", "", 0.0);
+  // D charges 20 %: 10 % more at C is not enough to reach the destination without it.
+  Plan plan = EvaluateStops(elroq, route, {{c, 80.0}, {d, 74.0}}, options);
+  TEST(plan.m_meetsMinimums, (plan.m_arrivalSocPct));
+  AddLongerVariants(elroq, route, options, plan);
+  auto const & atC = *plan.m_stops[0].m_longer;
+  TEST(atC.m_droppedStops.empty(), ());
+  TEST(AlmostEqualAbs(atC.m_arrivalSocPct, plan.m_arrivalSocPct, 1e-6), ());
+  TEST(AlmostEqualAbs(atC.m_laterStopsSavedSec, plan.m_stops[1].m_chargingTimeSec -
+                                                    EvaluateStops(elroq, route, {{c, 90.0}, {d, 74.0}}, options)
+                                                        .m_stops[1]
+                                                        .m_chargingTimeSec,
+                      1e-6),
+       ());
+
+  // Just not enough: without D the destination would be reached with 25.1 % (minimum 25.4 %), D stays.
+  options.m_minArrivalSocPct = 25.4;
+  Plan tight = EvaluateStops(elroq, route, {{c, 90.0}, {d, 79.5}}, options);
+  TEST(tight.m_meetsMinimums, (tight.m_arrivalSocPct));
+  AddLongerVariants(elroq, route, options, tight);
+  TEST(tight.m_stops[0].m_longer->m_droppedStops.empty(), (tight.m_stops[0].m_longer->m_arrivalSocPct));
 }
 }  // namespace planner_tests

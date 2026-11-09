@@ -171,7 +171,10 @@ void PrintPlan(ev::Plan const & plan, string const & title)
     if (stop.m_longer)
     {
       cout << ", longer to " << stop.m_longer->m_departureSocPct << " %: +" << stop.m_longer->m_extraStopTimeSec / 60.0
-           << " min, arrival with " << stop.m_longer->m_arrivalSocPct << " %";
+           << " min";
+      for (auto const index : stop.m_longer->m_droppedStops)
+        cout << ", stop at " << plan.m_stops[index].m_station.GetTitle() << " not needed";
+      cout << ", arrival with " << stop.m_longer->m_arrivalSocPct << " %";
     }
     cout << endl;
     if (!s.m_amenities.empty())
