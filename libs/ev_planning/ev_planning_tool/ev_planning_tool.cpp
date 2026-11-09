@@ -7,6 +7,9 @@
 //
 // The steps are those of the app: the route (built here, the app has it already), its altitudes, the search for
 // charging stations along it, their amenities and the planner. Times are reported for each step.
+//
+// --detour_report compares the estimated detours of all stations next to a motorway with the router, e.g. to
+// calibrate RouterDetours::EstimateDetourSec().
 
 #include "ev_planning/candidates.hpp"
 #include "ev_planning/detours.hpp"
@@ -14,6 +17,7 @@
 #include "ev_planning/plan_json.hpp"
 #include "ev_planning/planner.hpp"
 #include "ev_planning/route_points.hpp"
+#include "ev_planning/services.hpp"
 #include "ev_planning/vehicle_profile.hpp"
 
 #include "search/search_quality/helpers.hpp"
@@ -37,6 +41,7 @@
 
 #include "indexer/classificator_loader.hpp"
 #include "indexer/data_source.hpp"
+#include "indexer/ftypes_matcher.hpp"
 
 #include "platform/helpers.hpp"
 #include "platform/local_country_file_utils.hpp"
@@ -52,10 +57,12 @@
 
 #include "defines.hpp"
 
+#include <cmath>
 #include <cstdio>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -82,6 +89,11 @@ DEFINE_string(excluded, "", "Excluded providers, e.g. \"tesla\"");
 DEFINE_string(amenities, "", "Preferred amenities, e.g. \"toilets,playground\"");
 DEFINE_int32(repeat, 3, "Number of times the planning (without the route) runs; the minimum and median are reported");
 DEFINE_string(json_out, "", "Write the result as JSON (like the app gets it) to this file");
+DEFINE_bool(detour_report, false,
+            "Compare the estimated detours of the stations next to a motorway with the router (calibration)");
+DEFINE_bool(services, true,
+            "Tell motorway services of the other carriageway from other stations on the other side of a motorway "
+            "(false: one estimate for both, as before)");
 DEFINE_bool(real_detours, true,
             "Real detours of the stations of the plans with the router, as the app does (false: only the estimates "
             "from the distance to the route)");
@@ -172,6 +184,72 @@ void PrintPlan(ev::Plan const & plan, string const & title)
       }
       cout << endl;
     }
+  }
+}
+
+double Median(vector<double> v)
+{
+  if (v.empty())
+    return 0.0;
+  sort(v.begin(), v.end());
+  return v.size() % 2 ? v[v.size() / 2] : (v[v.size() / 2 - 1] + v[v.size() / 2]) / 2.0;
+}
+
+// The estimated detours of the stations next to a motorway (before: one estimate for the other side, after: motorway
+// services of the other carriageway and other stations told apart) and the real ones from the router.
+void PrintDetourReport(DataSource const & dataSource, routing::routes_builder::RoutesBuilder::Route const & route,
+                       vector<ev::ChargingStation> const & stations, routing::IndexRouter && router)
+{
+  routing::RouterDelegate delegate;
+  auto const line =
+      ev::RouteLine::FromSegments(route.m_segments, 0.0 /* passedM */, route.m_followedPolyline.GetPolyline().Front());
+  ev::ServicesFinder servicesFinder(dataSource);
+  ev::RouterDetours before(router, delegate, line);
+  ev::RouterDetours after(router, delegate, line, &servicesFinder);
+  // Errors of the estimates (estimate - router) in minutes by group.
+  map<string, pair<vector<double>, vector<double>>> errors;
+  cout << endl
+       << "Detours of the stations next to a motorway, min (km, side R/L, off the route, kind, search, estimate "
+          "before, after, router):"
+       << endl;
+  for (auto const & s : stations)
+  {
+    double const position = clamp(s.m_distanceAlongRouteM, 0.0, line.GetLengthM());
+    if (line.GetHighwayClassAt(position) != ftypes::HighwayClass::Motorway)
+      continue;
+    bool const left = m2::CrossProduct(line.GetDirectionAt(position), s.m_point - line.GetPointAt(position)) > 0.0;
+    bool const atServices = servicesFinder.IsAtMotorwayServices(s);
+    string const kind = left && s.m_distanceFromRouteM > ev::RouterDetours::kOnRouteM
+                            ? (atServices ? "L services" : "L other")
+                            : (atServices ? "R services" : "R other");
+    auto const estimateBefore = before.EstimateDetourSec(s);
+    auto const estimateAfter = after.EstimateDetourSec(s);
+    auto const real = after.GetDetour(s);
+    cout << fixed << setprecision(1) << "km " << setw(5) << s.m_distanceAlongRouteM / 1000.0 << (left ? " L " : " R ")
+         << setw(4) << static_cast<int>(s.m_distanceFromRouteM) << " m " << setw(10) << kind << " | " << setw(4)
+         << s.m_detourSec / 60.0 << " | " << setw(4) << *estimateBefore / 60.0 << " | " << setw(4)
+         << *estimateAfter / 60.0 << " | " << setw(4) << (real ? real->m_timeSec / 60.0 : -1.0) << " | "
+         << s.GetTitle() << " |";
+    for (auto const & place : servicesFinder.Find(s.m_point))
+      cout << " [" << (place.m_isArea ? "area " : "point ") << static_cast<int>(place.m_distanceM) << " m \""
+           << place.m_name << "\"]";
+    cout << endl;
+    if (real)
+    {
+      errors[kind].first.push_back((*estimateBefore - real->m_timeSec) / 60.0);
+      errors[kind].second.push_back((*estimateAfter - real->m_timeSec) / 60.0);
+    }
+  }
+  cout << "Median error of the estimates (estimate - router), min:" << endl;
+  for (auto const & [kind, e] : errors)
+  {
+    vector<double> absBefore, absAfter;
+    for (double const x : e.first)
+      absBefore.push_back(fabs(x));
+    for (double const x : e.second)
+      absAfter.push_back(fabs(x));
+    cout << "  " << kind << " (" << e.first.size() << "): before " << Median(e.first) << " (abs " << Median(absBefore)
+         << "), after " << Median(e.second) << " (abs " << Median(absAfter) << ")" << endl;
   }
 }
 }  // namespace
@@ -294,6 +372,7 @@ int main(int argc, char * argv[])
     // A new finder and router in each run: the app keeps them only for one planning.
     step.Reset();
     ev::AmenityFinder finder(dataSource);
+    ev::ServicesFinder services(dataSource);
     routing::IndexRouter router(routing::VehicleType::Car, false /* loadAltitudes */, parentGetter,
                                 [&](m2::PointD const & p) { return infoGetter->GetRegionCountryId(p); },
                                 [&](string const & id) { return infoGetter->GetLimitRectForLeaf(id); }, detourMwmIds,
@@ -301,7 +380,8 @@ int main(int argc, char * argv[])
     routing::RouterDelegate delegate;
     ev::RouterDetours detours(router, delegate,
                               ev::RouteLine::FromSegments(route.m_segments, 0.0 /* passedM */,
-                                                          route.m_followedPolyline.GetPolyline().Front()));
+                                                          route.m_followedPolyline.GetPolyline().Front()),
+                              FLAGS_services ? &services : nullptr);
     result = ev::PlanChargingWithAmenities(profile, routeEnergy, stations, options, finder,
                                            FLAGS_real_detours ? &detours : nullptr);
     plannerMs.push_back(step.ElapsedMilliseconds());
@@ -361,6 +441,14 @@ int main(int argc, char * argv[])
       PrintPlan(alternative,
                 "Alternative (" + alternative.m_alternativeReason + ", " + DebugPrint(alternative.m_priority) + ")");
   }
+
+  if (FLAGS_detour_report)
+    PrintDetourReport(dataSource, route, stations,
+                      routing::IndexRouter(routing::VehicleType::Car, false /* loadAltitudes */, parentGetter,
+                                           [&](m2::PointD const & p) { return infoGetter->GetRegionCountryId(p); },
+                                           [&](string const & id) { return infoGetter->GetLimitRectForLeaf(id); },
+                                           detourMwmIds, routing::MakeNumMwmTree(*detourMwmIds, *infoGetter),
+                                           trafficCache, dataSource));
 
   if (!FLAGS_json_out.empty())
   {

@@ -5,6 +5,7 @@
 #include "ev_planning/energy_model.hpp"
 #include "ev_planning/planner.hpp"
 #include "ev_planning/route_points.hpp"
+#include "ev_planning/services.hpp"
 #include "ev_planning/vehicle_profile.hpp"
 
 #include "generator/generator_tests_support/test_generator.hpp"
@@ -32,6 +33,7 @@
 #include "geometry/tree4d.hpp"
 
 #include "base/file_name_utils.hpp"
+#include "base/logging.hpp"
 
 #include "defines.hpp"
 
@@ -108,9 +110,10 @@ private:
 };
 
 // A motorway of 40 km eastwards with two carriageways 40 m apart, junctions at km 5 and 35 (a primary road crosses on
-// a bridge, links to and from both carriageways) and services at km 20 on both sides:
+// a bridge, links to and from both carriageways), services at km 20 on both sides and an Autohof at J2:
 //
-//                         Nord (300 kW, 150 m from the route)
+//                                                   Autohof (300 kW, 330 m from the route, tagged as services too)
+//                         Nord (300 kW, 150 m from the route)   |
 //        J1                 _/‾‾‾\_                  J2
 //   <====|=================/=======\================|====  westbound
 //   ====>|=================\=======/================|====> eastbound (the route, km 1 -> km 39)
@@ -118,7 +121,9 @@ private:
 //                         Süd (150 kW, 220 m from the route)
 //
 // The search estimates a shorter detour to Nord, but only the westbound carriageway leads there: on to J2, back, and
-// after the stop again on to J1 and back, almost 60 km more.
+// after the stop again on to J1 and back, almost 60 km more. The Autohof is on the same side, but reachable from the
+// eastbound carriageway at J2 (across the bridge), a few minutes only. Nord is mapped as an area of services, Süd as
+// a point only.
 string MakeOsm()
 {
   OsmWriter osm;
@@ -150,11 +155,14 @@ string MakeOsm()
   osm.Way({east(40.0), osm.Node(40.3, 0.0), west(40.0)}, link);
   osm.Way({west(0.0), osm.Node(-0.3, 0.0), east(0.0)}, link);
 
-  // Junctions.
+  // Junctions. J2 is narrower, with an Autohof next to it.
+  map<double, uint64_t> junctionNorth;
   for (double const j : {5.0, 35.0})
   {
-    auto const south = osm.Node(j, -0.5);
-    auto const north = osm.Node(j, 0.5);
+    double const y = j < 10.0 ? 0.5 : 0.3;
+    auto const south = osm.Node(j, -y);
+    auto const north = osm.Node(j, y);
+    junctionNorth[j] = north;
     osm.Way({osm.Node(j, -2.0), south}, {{"highway", "primary"}});
     osm.Way({south, north}, {{"highway", "primary"}, {"bridge", "yes"}, {"layer", "1"}});
     osm.Way({north, osm.Node(j, 2.0)}, {{"highway", "primary"}});
@@ -175,6 +183,26 @@ string MakeOsm()
   osm.Way({west(20.6), n1}, link);
   osm.Way({n1, osm.Node(20.0, 0.18), n2}, service);
   osm.Way({n2, west(19.4)}, link);
+
+  // The services: Nord as an area, Süd as a point only.
+  auto const area = [&osm](double x0, double y0, double x1, double y1, OsmWriter::Tags const & tags)
+  {
+    auto const first = osm.Node(x0, y0);
+    osm.Way({first, osm.Node(x1, y0), osm.Node(x1, y1), osm.Node(x0, y1), first}, tags);
+  };
+  area(19.3, 0.05, 20.7, 0.3, {{"highway", "services"}, {"name", "Rasthof Nord"}});
+  osm.Node(20.0, -0.2, {{"highway", "services"}, {"name", "Rasthof Süd"}});
+
+  // The Autohof north of J2: a service road from the junction, an area tagged as services.
+  auto const autohofGate = osm.Node(35.1, 0.3);
+  osm.Way({junctionNorth.at(35.0), autohofGate, osm.Node(35.3, 0.3)}, {{"highway", "service"}});
+  area(34.95, 0.26, 35.4, 0.45, {{"highway", "services"}, {"name", "Autohof Ost"}});
+  osm.Node(35.15, 0.28,
+           {{"amenity", "charging_station"},
+            {"name", "Autohof Ost"},
+            {"operator", "Fastned"},
+            {"socket:type2_combo", "8"},
+            {"socket:type2_combo:output", "300"}});
 
   osm.Node(20.1, -0.24,
            {{"amenity", "charging_station"},
@@ -197,6 +225,29 @@ class RouterOnly : public ev::DetourProvider
 public:
   explicit RouterOnly(ev::RouterDetours & detours) : m_detours(detours) {}
   optional<ev::Detour> GetDetour(ev::ChargingStation const & station) override { return m_detours.GetDetour(station); }
+
+private:
+  ev::RouterDetours & m_detours;
+};
+
+// RouterDetours that records the stations whose real detour is computed, in order.
+class Recording : public ev::DetourProvider
+{
+public:
+  explicit Recording(ev::RouterDetours & detours) : m_detours(detours) {}
+
+  optional<ev::Detour> GetDetour(ev::ChargingStation const & station) override
+  {
+    m_checked.push_back(station.m_name);
+    return m_detours.GetDetour(station);
+  }
+
+  optional<double> EstimateDetourSec(ev::ChargingStation const & station) override
+  {
+    return m_detours.EstimateDetourSec(station);
+  }
+
+  vector<string> m_checked;
 
 private:
   ev::RouterDetours & m_detours;
@@ -318,7 +369,7 @@ UNIT_CLASS_TEST(DetoursTest, RealDetoursOfServicesOnBothSides)
   TEST_ALMOST_EQUAL_ABS(route.GetTotalDistanceMeters(), 38000.0, 500.0, ());
 
   auto const stations = FindStations(route);
-  TEST_EQUAL(stations.size(), 2, ());
+  TEST_EQUAL(stations.size(), 3, ());
   auto const nord = Get(stations, "Rasthof Nord");
   auto const sued = Get(stations, "Rasthof Süd");
   // Both next to the route at km 19 (from the start at km 1), Nord even closer: the search estimates a shorter
@@ -328,9 +379,11 @@ UNIT_CLASS_TEST(DetoursTest, RealDetoursOfServicesOnBothSides)
   TEST_LESS(nord.m_distanceFromRouteM, sued.m_distanceFromRouteM, ());
   TEST_LESS(nord.m_detourSec, sued.m_detourSec, ());
 
+  ev::ServicesFinder services(m_dataSource);
   ev::RouterDetours detours(*m_router, m_delegate,
                             ev::RouteLine::FromSegments(route.GetRouteSegments(), 0.0 /* passedM */,
-                                                        route.GetFollowedPolyline().GetPolyline().Front()));
+                                                        route.GetFollowedPolyline().GetPolyline().Front()),
+                            &services);
 
   // The real detour to Nord: via J2 (km 35) and J1 (km 5), almost 60 km and half an hour more.
   auto const toNord = detours.GetDetour(nord);
@@ -344,12 +397,128 @@ UNIT_CLASS_TEST(DetoursTest, RealDetoursOfServicesOnBothSides)
   TEST_LESS(toSued->m_timeSec, 5.0 * 60.0, ());
   TEST_EQUAL(detours.GetRoutesCount(), 2, ());
 
-  // The better estimate without the router: Nord is on the other side of the motorway.
+  // The better estimate without the router: Nord is at services on the other side of the motorway.
   auto const nordEstimate = detours.EstimateDetourSec(nord);
   auto const suedEstimate = detours.EstimateDetourSec(sued);
   TEST(nordEstimate && suedEstimate, ());
-  TEST_GREATER(*nordEstimate, *suedEstimate + ev::RouterDetours::kOtherSideOfMotorwaySec - 60.0, ());
+  TEST_GREATER(*nordEstimate, *suedEstimate + ev::RouterDetours::kOtherCarriagewayServicesSec - 60.0, ());
   TEST_LESS(*suedEstimate, 5.0 * 60.0, ());
+}
+
+UNIT_CLASS_TEST(DetoursTest, ServicesOnTheMap)
+{
+  auto const route = BuildRoute();
+  auto const stations = FindStations(route);
+  auto const nord = Get(stations, "Rasthof Nord");
+  auto const sued = Get(stations, "Rasthof Süd");
+  auto const autohof = Get(stations, "Autohof Ost");
+  // The Autohof is next to the motorway too, on the left.
+  TEST_ALMOST_EQUAL_ABS(autohof.m_distanceAlongRouteM, 34150.0, 300.0, ());
+  // Closer than the farthest motorway services: the name tells it from them.
+  TEST_GREATER(autohof.m_distanceFromRouteM, 250.0, ());
+  TEST_LESS(autohof.m_distanceFromRouteM, ev::kMaxServicesFromRouteM - 30.0, ());
+
+  ev::ServicesFinder services(m_dataSource);
+  // Nord lies in the area of its services.
+  auto const nordPlaces = services.Find(nord.m_point);
+  TEST_EQUAL(nordPlaces.size(), 1, ());
+  TEST_EQUAL(nordPlaces[0].m_name, "Rasthof Nord", ());
+  TEST(nordPlaces[0].m_isArea, ());
+  TEST_EQUAL(nordPlaces[0].m_distanceM, 0.0, ());
+  TEST(services.IsAtMotorwayServices(nord), ());
+  // Süd is next to the point of its services.
+  auto const suedPlaces = services.Find(sued.m_point);
+  TEST_EQUAL(suedPlaces.size(), 1, ());
+  TEST(!suedPlaces[0].m_isArea, ());
+  TEST_ALMOST_EQUAL_ABS(suedPlaces[0].m_distanceM, 108.0, 10.0, ());
+  TEST(services.IsAtMotorwayServices(sued), ());
+  // The Autohof is in an area of services, but an Autohof.
+  auto const autohofPlaces = services.Find(autohof.m_point);
+  TEST_EQUAL(autohofPlaces.size(), 1, ());
+  TEST_EQUAL(autohofPlaces[0].m_name, "Autohof Ost", ());
+  TEST_EQUAL(autohofPlaces[0].m_distanceM, 0.0, ());
+  TEST(!services.IsAtMotorwayServices(autohof), ());
+  // Without the name it would count as services of the other carriageway.
+  TEST(ev::IsAtMotorwayServices({{"", 0.0, true /* isArea */}}, autohof.m_distanceFromRouteM), ());
+}
+
+UNIT_CLASS_TEST(DetoursTest, AutohofOnTheOtherSide)
+{
+  auto const route = BuildRoute();
+  auto const stations = FindStations(route);
+  auto const nord = Get(stations, "Rasthof Nord");
+  auto const autohof = Get(stations, "Autohof Ost");
+  auto const line = ev::RouteLine::FromSegments(route.GetRouteSegments(), 0.0 /* passedM */,
+                                                route.GetFollowedPolyline().GetPolyline().Front());
+  ev::ServicesFinder services(m_dataSource);
+  ev::RouterDetours before(*m_router, m_delegate, line);
+  ev::RouterDetours after(*m_router, m_delegate, line, &services);
+
+  // The real detour to the Autohof: off at J2, across the bridge and back, a few minutes.
+  auto const real = after.GetDetour(autohof);
+  TEST(real, ());
+  TEST_LESS(real->m_timeSec, 6.0 * 60.0, ());
+  TEST_LESS(real->m_distanceM, 4000.0, ());
+
+  // The estimate was 10 min too long for any station on the other side, now it is close to the router.
+  auto const autohofBefore = before.EstimateDetourSec(autohof);
+  auto const autohofAfter = after.EstimateDetourSec(autohof);
+  TEST(autohofBefore && autohofAfter, ());
+  LOG(LINFO, ("Autohof: estimate", *autohofBefore, "s before,", *autohofAfter, "s now, router", real->m_timeSec, "s"));
+  TEST_GREATER(*autohofBefore, real->m_timeSec + 8.0 * 60.0, ());
+  TEST_LESS(fabs(*autohofAfter - real->m_timeSec), 4.0 * 60.0, (*autohofAfter, real->m_timeSec));
+  // Nord, the services of the other carriageway, keep a long estimate, longer than before.
+  auto const nordAfter = after.EstimateDetourSec(nord);
+  TEST(nordAfter, ());
+  TEST_GREATER(*nordAfter, *autohofAfter + 5.0 * 60.0, ());
+  TEST_GREATER_OR_EQUAL(*nordAfter, *before.EstimateDetourSec(nord), ());
+
+  // Only Nord and the Autohof have enough power (Süd has 150 kW): before, the planner chose Nord first (the shorter
+  // estimate), the router found its long detour, then the Autohof. Now the Autohof right away.
+  auto const & elroq = *ev::FindVehicleTemplate("skoda_elroq_85");
+  auto const energy = ev::ComputeRouteEnergy(ev::EnergyModel(elroq), ev::MakeRoutePoints(route.GetRouteSegments(), {}));
+  ev::PlanOptions options;
+  options.m_startSocPct = 25.0;
+  options.m_minPowerKw = 200.0;
+  {
+    ev::RouterDetours detours(*m_router, m_delegate, line);
+    Recording recording(detours);
+    auto const result = ev::PlanCharging(elroq, energy, stations, options, &recording);
+    TEST_EQUAL(result.m_status, ev::PlanStatus::Ok, ());
+    TEST_EQUAL(StopNames(result.m_plan), (vector<string>{"Autohof Ost"}), ());
+    TEST(!recording.m_checked.empty(), ());
+    TEST_EQUAL(recording.m_checked[0], "Rasthof Nord", ());
+  }
+  {
+    ev::RouterDetours detours(*m_router, m_delegate, line, &services);
+    Recording recording(detours);
+    auto const result = ev::PlanCharging(elroq, energy, stations, options, &recording);
+    TEST_EQUAL(result.m_status, ev::PlanStatus::Ok, ());
+    TEST_EQUAL(StopNames(result.m_plan), (vector<string>{"Autohof Ost"}), ());
+    TEST(result.m_plan.m_meetsMinimums, ());
+    TEST(!recording.m_checked.empty(), ());
+    TEST_EQUAL(recording.m_checked[0], "Autohof Ost", ());
+    auto const & stop = result.m_plan.m_stops[0].m_station;
+    TEST(stop.m_detourChecked, ());
+    TEST_LESS(stop.m_detourSec, 6.0 * 60.0, ());
+    // The alternative with Nord shows its real detour.
+    for (auto const & alternative : result.m_alternatives)
+    {
+      TEST_EQUAL(StopNames(alternative), (vector<string>{"Rasthof Nord"}), ());
+      TEST(alternative.m_stops[0].m_station.m_detourChecked, ());
+      TEST_GREATER(alternative.m_totalTimeSec, result.m_plan.m_totalTimeSec + 15.0 * 60.0, ());
+    }
+  }
+
+  // With Süd usable (150 kW): Süd on the own side, Nord still avoided.
+  options.m_minPowerKw = 50.0;
+  {
+    ev::RouterDetours detours(*m_router, m_delegate, line, &services);
+    auto const result = ev::PlanCharging(elroq, energy, stations, options, &detours);
+    TEST_EQUAL(StopNames(result.m_plan), (vector<string>{"Rasthof Süd"}), ());
+    for (auto const & alternative : result.m_alternatives)
+      TEST_NOT_EQUAL(StopNames(alternative), (vector<string>{"Rasthof Nord"}), ());
+  }
 }
 
 UNIT_CLASS_TEST(DetoursTest, PlanAvoidsTheServicesOfTheOtherCarriageway)
@@ -382,24 +551,21 @@ UNIT_CLASS_TEST(DetoursTest, PlanAvoidsTheServicesOfTheOtherCarriageway)
     auto const & stop = result.m_plan.m_stops[0].m_station;
     TEST(stop.m_detourChecked, ());
     TEST_LESS(stop.m_detourSec, 5.0 * 60.0, ());
-    TEST_EQUAL(result.m_detourChecks, 2, ());
-    // The alternative with Nord shows its real detour.
-    TEST_EQUAL(result.m_alternatives.size(), 1, ());
-    auto const & alternative = result.m_alternatives[0];
-    TEST_EQUAL(StopNames(alternative), (vector<string>{"Rasthof Nord"}), ());
-    TEST(alternative.m_stops[0].m_station.m_detourChecked, ());
-    TEST_GREATER(alternative.m_stops[0].m_station.m_detourDistanceM, 50000.0, ());
-    TEST_GREATER(alternative.m_totalTimeSec, result.m_plan.m_totalTimeSec + 15.0 * 60.0, ());
+    // The alternatives show their real detours (Nord was checked for them too: the Autohof beats it).
+    TEST(!result.m_alternatives.empty(), ());
+    for (auto const & alternative : result.m_alternatives)
+      TEST(alternative.m_stops[0].m_station.m_detourChecked, ());
+    TEST_EQUAL(StopNames(result.m_alternatives[0]), (vector<string>{"Autohof Ost"}), ());
   }
 
-  // As the app plans: the better estimates avoid Nord right away, only Süd needs the router (once more for the
-  // alternative).
+  // As the app plans: the better estimates avoid Nord right away, the router checks Süd and the alternatives.
   {
-    ev::RouterDetours detours(*m_router, m_delegate, line);
+    ev::ServicesFinder services(m_dataSource);
+    ev::RouterDetours detours(*m_router, m_delegate, line, &services);
     auto const result = ev::PlanCharging(elroq, energy, stations, options, &detours);
     TEST_EQUAL(StopNames(result.m_plan), (vector<string>{"Rasthof Süd"}), ());
     TEST(result.m_plan.m_stops[0].m_station.m_detourChecked, ());
-    TEST_LESS_OR_EQUAL(detours.GetRoutesCount(), 2, ());
+    TEST_LESS_OR_EQUAL(detours.GetRoutesCount(), 3, ());
     for (auto const & alternative : result.m_alternatives)
       for (auto const & stop : alternative.m_stops)
         TEST(stop.m_station.m_detourChecked, (stop.m_station.m_name));
