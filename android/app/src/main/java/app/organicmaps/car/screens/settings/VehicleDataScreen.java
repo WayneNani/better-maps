@@ -26,6 +26,7 @@ import androidx.lifecycle.LifecycleOwner;
 import app.organicmaps.R;
 import app.organicmaps.car.renderer.Renderer;
 import app.organicmaps.car.screens.base.BaseMapScreen;
+import app.organicmaps.car.util.EvCarEnergy;
 import app.organicmaps.car.util.UiHelpers;
 import app.organicmaps.sdk.util.log.Logger;
 import java.util.ArrayList;
@@ -241,6 +242,8 @@ public class VehicleDataScreen extends BaseMapScreen implements DefaultLifecycle
 
   private void onEnergyLevel(@NonNull EnergyLevel level)
   {
+    // better-maps: for the charging planner.
+    EvCarEnergy.onEnergyLevel(level);
     mEnergy = "Akku " + percent(level.getBatteryPercent()) + " · Tank " + percent(level.getFuelPercent())
             + " · niedrig " + value(level.getEnergyIsLow());
     final CarValue<Float> range = level.getRangeRemainingMeters();
