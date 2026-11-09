@@ -80,6 +80,23 @@ class FakeEvTexts implements EvTexts
 
   @NonNull
   @Override
+  public String chargeLongerStopNotNeeded(int departureSoc, @NonNull String extraTime, @NonNull String stop,
+                                          int arrivalSoc)
+  {
+    return "Charge longer → " + departureSoc + " % (" + extraTime + "), stop at " + stop + " not needed, arrival with "
+  + arrivalSoc + " %";
+  }
+
+  @NonNull
+  @Override
+  public String chargeLongerStopsNotNeeded(int departureSoc, @NonNull String extraTime, int stops, int arrivalSoc)
+  {
+    return "Charge longer → " + departureSoc + " % (" + extraTime + "), " + stops
+  + (stops == 1 ? " later stop" : " later stops") + " not needed, arrival with " + arrivalSoc + " %";
+  }
+
+  @NonNull
+  @Override
   public String socketName(@NonNull String type)
   {
     return switch (type)

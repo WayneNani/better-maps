@@ -54,6 +54,27 @@ final class EvTestData
       + "\"gapEndM\":380000,\"candidates\":3,\"usable\":1,\"providers\":[{\"key\":\"enbw\",\"name\":\"EnBW\","
       + "\"stations\":3}]}";
 
+  /**
+   * Two stops, the second one only tops up: with 10 % more at the first one it is not needed (droppedStops), see
+   * ev::ChargingStop::Longer.
+   */
+  @NonNull
+  static String twoStopsPlan(double totalTimeSec, int arrivalSoc)
+  {
+    final String first = stop("Germany:1", "EnBW Aurach", 150, 5400, 1620, 20, 70)
+                             .replace("\"arrivalSocPct\":34}", "\"arrivalSocPct\":25,\"droppedStops\":[1]}");
+    final String second = stop("Germany:3", "Ionity Haidt", 300, 12000, 420, 62, 66);
+    return "{\"stops\":[" + first + "," + second + "],\"distanceM\":412000,\"driveTimeSec\":15660,"
+  + "\"stopTimeSec\":2040,\"totalTimeSec\":" + totalTimeSec + ",\"arrivalSocPct\":" + arrivalSoc
+  + ",\"minSocPct\":20,\"meetsMinimums\":true,\"priority\":\"fastest\",\"reason\":\"\"}";
+  }
+
+  /** The evaluation of the route with the first stop of {@link #twoStopsPlan} only, charging to 80 %. */
+  static final String ONE_STOP_EVALUATED_JSON =
+      "{\"stops\":[" + stop("Germany:1", "EnBW Aurach", 150, 5400, 2160, 20, 80) + "],\"distanceM\":411000,"
+      + "\"driveTimeSec\":15600,\"stopTimeSec\":2160,\"totalTimeSec\":17760,\"arrivalSocPct\":25,"
+      + "\"minSocPct\":20,\"meetsMinimums\":true,\"priority\":\"fastest\",\"reason\":\"\"}";
+
   /** The evaluation with the real route: arrives with 18 % instead of 16 %. */
   static final String EVALUATED_JSON =
       "{\"stops\":[" + stop("Germany:1", "EnBW Aurach", 280, 10200, 1500, 18, 70) + "],\"distanceM\":415000,"

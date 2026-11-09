@@ -84,6 +84,20 @@ public class EvFormatterTest
     assertEquals("Charge longer → 80 % (+9 min), later stops 3 min shorter, arrival with 24 %",
                  mFormatter.longer(stop));
 
+    // The following stop is not needed any more.
+    final EvPlanResult.Plan alternative = mResult.alternatives.get(0);
+    final EvPlanResult.Stop first = alternative.stops.get(0);
+    first.longer.droppedStops.add(1);
+    first.longer.arrivalSocPct = 25;
+    assertEquals("Charge longer → 85 % (+9 min), stop at EnBW Aurach not needed, arrival with 25 %",
+                 mFormatter.longer(first, alternative));
+    // Without the plan the names are unknown.
+    assertEquals("Charge longer → 85 % (+9 min), 1 later stop not needed, arrival with 25 %",
+                 mFormatter.longer(first));
+    first.longer.droppedStops.add(2);
+    assertEquals("Charge longer → 85 % (+9 min), 2 later stops not needed, arrival with 25 %",
+                 mFormatter.longer(first, alternative));
+
     stop.longer = null;
     assertEquals("", mFormatter.longer(stop));
   }

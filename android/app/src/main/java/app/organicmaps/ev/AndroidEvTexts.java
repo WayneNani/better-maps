@@ -93,6 +93,22 @@ public class AndroidEvTexts implements EvTexts
 
   @NonNull
   @Override
+  public String chargeLongerStopNotNeeded(int departureSoc, @NonNull String extraTime, @NonNull String stop,
+                                          int arrivalSoc)
+  {
+    return mContext.getString(R.string.ev_charge_longer_stop_not_needed, departureSoc, extraTime, stop, arrivalSoc);
+  }
+
+  @NonNull
+  @Override
+  public String chargeLongerStopsNotNeeded(int departureSoc, @NonNull String extraTime, int stops, int arrivalSoc)
+  {
+    return mRes.getQuantityString(R.plurals.ev_charge_longer_stops_not_needed, stops, departureSoc, extraTime, stops,
+                                  arrivalSoc);
+  }
+
+  @NonNull
+  @Override
   public String socketName(@NonNull String type)
   {
     switch (type)
