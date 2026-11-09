@@ -263,7 +263,9 @@ std::string EvPlanningApi::Evaluate(std::string const & profileJson, std::string
   }
 
   auto const energy = ev::ComputeRouteEnergy(ev::EnergyModel(*profile), route->MakePoints(m_dataSource));
-  return ev::ToJson(ev::EvaluateStopsAdjusting(*profile, energy, std::move(stops), *options));
+  auto plan = ev::EvaluateStopsAdjusting(*profile, energy, std::move(stops), *options);
+  ev::AddLongerVariants(*profile, energy, *options, plan);
+  return ev::ToJson(plan);
 }
 
 // static

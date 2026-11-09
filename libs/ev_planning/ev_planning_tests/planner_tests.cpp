@@ -390,6 +390,12 @@ UNIT_TEST(Planner_ReevaluateWithRealRoute)
   TEST_GREATER(adjusted.m_stops[0].m_departureSocPct, departure, ());
   TEST_GREATER(adjusted.m_stops[0].m_chargingTimeSec, evaluated.m_stops[0].m_chargingTimeSec, ());
 
+  // "Charge longer" for the evaluated plan too.
+  auto withLonger = adjusted;
+  AddLongerVariants(elroq, real, options, withLonger);
+  TEST(withLonger.m_stops[0].m_longer, ());
+  TEST_GREATER(withLonger.m_stops[0].m_longer->m_arrivalSocPct, adjusted.m_arrivalSocPct, ());
+
   // Not reachable even with the stop: the leg before it is too long, a new plan is needed.
   auto const far = MakeRoute(elroq, 412.0, 160.0);
   station.m_distanceAlongRouteM = 300000.0;

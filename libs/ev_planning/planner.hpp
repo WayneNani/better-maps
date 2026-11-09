@@ -199,6 +199,10 @@ Plan EvaluateStops(VehicleProfile const & profile, RouteEnergy const & route, st
 Plan EvaluateStopsAdjusting(VehicleProfile const & profile, RouteEnergy const & route, std::vector<StopTarget> stops,
                             PlanOptions const & options);
 
+// Fills ChargingStop::m_longer of the stops of |plan| (made by EvaluateStops() with |route|).
+void AddLongerVariants(VehicleProfile const & profile, RouteEnergy const & route, PlanOptions const & options,
+                       Plan & plan);
+
 // Stations that the options allow, e.g. with enough power and not from an excluded provider.
 bool IsUsable(VehicleProfile const & profile, ChargingStation const & station, PlanOptions const & options);
 

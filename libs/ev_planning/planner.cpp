@@ -239,8 +239,8 @@ DpResult RunDp(VehicleProfile const & profile, EnergyModel const & model, RouteE
   return result;
 }
 
-void AddLongerVariants(VehicleProfile const & profile, RouteEnergy const & route, PlanOptions const & options,
-                       Plan & plan)
+void AddLongerVariantsImpl(VehicleProfile const & profile, RouteEnergy const & route, PlanOptions const & options,
+                           Plan & plan)
 {
   std::vector<StopTarget> targets;
   for (auto const & stop : plan.m_stops)
@@ -273,7 +273,7 @@ Plan MakePlan(VehicleProfile const & profile, RouteEnergy const & route, std::ve
     stop.m_matchedAmenities = GetMatchedAmenities(stop.m_station, options);
     stop.m_isPreferredProvider = IsPreferredProvider(stop.m_station, options);
   }
-  AddLongerVariants(profile, route, options, plan);
+  AddLongerVariantsImpl(profile, route, options, plan);
   plan.m_priority = options.m_priority;
   return plan;
 }
@@ -455,6 +455,12 @@ Plan EvaluateStops(VehicleProfile const & profile, RouteEnergy const & route, st
   plan.m_driveTimeSec = driveTime;
   plan.m_totalTimeSec = time;
   return plan;
+}
+
+void AddLongerVariants(VehicleProfile const & profile, RouteEnergy const & route, PlanOptions const & options,
+                       Plan & plan)
+{
+  AddLongerVariantsImpl(profile, route, options, plan);
 }
 
 Plan EvaluateStopsAdjusting(VehicleProfile const & profile, RouteEnergy const & route, std::vector<StopTarget> stops,
