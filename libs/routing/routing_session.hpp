@@ -186,6 +186,14 @@ public:
   bool GetRoutePolylineWithTimes(std::vector<m2::PointD> & points, std::vector<double> & timesSec,
                                  double & passedDistanceM) const;
 
+  /// \brief Copies the segments of the whole route to |segments| (with times, road classes and altitudes, if loaded),
+  /// the distance from the route beginning to the end of each subroute (i.e. to each intermediate point and the
+  /// finish) to |subrouteEndsM| and the distance already travelled to |passedDistanceM|, e.g. for the energy along the
+  /// route of an electric vehicle.
+  /// \returns true if there is valid route information. If the route is not valid returns false.
+  bool GetRouteSegments(std::vector<RouteSegment> & segments, std::vector<double> & subrouteEndsM,
+                        double & passedDistanceM) const;
+
   SessionState OnLocationPositionChanged(location::GpsInfo const & info);
   void GetRouteFollowingInfo(FollowingInfo & info) const;
   double GetDistanceToNextTurn() const;
