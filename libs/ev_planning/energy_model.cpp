@@ -119,10 +119,10 @@ RouteEnergy ComputeRouteEnergy(EnergyModel const & model, std::vector<RoutePoint
   for (size_t i = 1; i < points.size(); ++i)
   {
     auto const & p = points[i];
-    if (!std::isnan(p.m_altitudeM))
+    if (IsKnownAltitude(p.m_altitudeM))
     {
       lastAltitude = p.m_altitudeM;
-      if (std::isnan(stepStartAltitude))
+      if (!IsKnownAltitude(stepStartAltitude))
         stepStartAltitude = p.m_altitudeM;
     }
     if (p.m_roadKind == RoadKind::Minor)
@@ -134,7 +134,7 @@ RouteEnergy ComputeRouteEnergy(EnergyModel const & model, std::vector<RoutePoint
 
     double const durationSec = p.m_timeSec - points[stepStart].m_timeSec;
     double const climbM =
-        std::isnan(stepStartAltitude) || std::isnan(lastAltitude) ? 0.0 : lastAltitude - stepStartAltitude;
+        IsKnownAltitude(stepStartAltitude) && IsKnownAltitude(lastAltitude) ? lastAltitude - stepStartAltitude : 0.0;
     // Split the step into its minor and other parts, both at the average speed of the step.
     double const minorShare = stepM > 0.0 ? std::min(1.0, minorM / stepM) : 0.0;
     double const energy =

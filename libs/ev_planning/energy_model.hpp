@@ -23,13 +23,21 @@ enum class RoadKind : uint8_t
 
 std::string DebugPrint(RoadKind kind);
 
+// Altitude of a route point that is not known. Not NaN: the code is built with -ffast-math.
+double constexpr kUnknownAltitude = -1e6;
+
+inline bool IsKnownAltitude(double altitudeM)
+{
+  return altitudeM > kUnknownAltitude / 2.0;
+}
+
 // A point of a route with the distance and travel time from the route start.
 struct RoutePoint
 {
   double m_distanceM = 0.0;
   double m_timeSec = 0.0;
-  // NaN if unknown.
-  double m_altitudeM = std::numeric_limits<double>::quiet_NaN();
+  // kUnknownAltitude if unknown.
+  double m_altitudeM = kUnknownAltitude;
   // Kind of the road from the previous point to this one.
   RoadKind m_roadKind = RoadKind::Unknown;
 };

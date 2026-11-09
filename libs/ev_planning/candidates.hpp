@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ev_planning/planner.hpp"
 #include "ev_planning/station.hpp"
 #include "ev_planning/vehicle_profile.hpp"
 
@@ -66,6 +67,9 @@ public:
 
   static size_t constexpr kMaxPerType = 3;
 
+  // Fills the amenities of the stations of |plan| (copies of the stations), with the opening hours at the arrival.
+  void AddAmenities(Plan & plan, std::optional<time_t> departure);
+
 private:
   std::vector<Amenity> FindUncached(m2::PointD const & center);
 
@@ -73,4 +77,9 @@ private:
   std::mutex m_mutex;
   std::map<FeatureID, std::vector<Amenity>> m_cache;
 };
+// Plans with the amenities of the stations. They are needed for all stations only if the options prefer some
+// (they change the choice); otherwise only the stations of the plans get them, which is much faster.
+PlanResult PlanChargingWithAmenities(VehicleProfile const & profile, RouteEnergy const & route,
+                                     std::vector<ChargingStation> & stations, PlanOptions const & options,
+                                     AmenityFinder & finder);
 }  // namespace ev

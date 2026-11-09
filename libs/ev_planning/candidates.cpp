@@ -219,6 +219,19 @@ std::vector<Amenity> AmenityFinder::FindUncached(m2::PointD const & center)
 
   std::sort(amenities.begin(), amenities.end(),
             [](Amenity const & a, Amenity const & b) { return a.m_distanceM < b.m_distanceM; });
+  // The same place several times, e.g. motorway services mapped as a point and an area, or a shop and its building.
+  std::vector<Amenity> unique;
+  for (auto & a : amenities)
+  {
+    bool const duplicate = std::any_of(unique.begin(), unique.end(), [&a](Amenity const & u)
+    {
+      return u.m_type == a.m_type && u.m_kind == a.m_kind &&
+             (a.m_name.empty() ? mercator::DistanceOnEarth(u.m_point, a.m_point) < 30.0 : u.m_name == a.m_name);
+    });
+    if (!duplicate)
+      unique.push_back(std::move(a));
+  }
+  amenities = std::move(unique);
   // At most kMaxPerType of each type.
   std::array<size_t, 4> counts = {};
   base::EraseIf(amenities,
@@ -257,6 +270,35 @@ std::vector<Amenity> AmenityFinder::Find(ChargingStation const & station, std::o
     }
   }
   return amenities;
+}
+
+void AmenityFinder::AddAmenities(Plan & plan, std::optional<time_t> departure)
+{
+  for (auto & stop : plan.m_stops)
+  {
+    std::optional<time_t> arrival;
+    if (departure)
+      arrival = *departure + static_cast<time_t>(stop.m_arrivalTimeSec);
+    stop.m_station.m_amenities = Find(stop.m_station, arrival);
+  }
+}
+
+PlanResult PlanChargingWithAmenities(VehicleProfile const & profile, RouteEnergy const & route,
+                                     std::vector<ChargingStation> & stations, PlanOptions const & options,
+                                     AmenityFinder & finder)
+{
+  std::optional<time_t> const departure = options.m_departureTime ? *options.m_departureTime : time(nullptr);
+  if (!options.m_preferredAmenities.empty())
+  {
+    for (auto & s : stations)
+      if (IsUsable(profile, s, options))
+        s.m_amenities = finder.Find(s, *departure + static_cast<time_t>(s.m_timeAlongRouteSec + s.m_detourSec / 2.0));
+  }
+  auto result = PlanCharging(profile, route, stations, options);
+  finder.AddAmenities(result.m_plan, departure);
+  for (auto & alternative : result.m_alternatives)
+    finder.AddAmenities(alternative, departure);
+  return result;
 }
 
 void AmenityFinder::AddAmenities(std::vector<ChargingStation> & stations, std::optional<time_t> departure)

@@ -31,7 +31,7 @@ public:
   SegmentAltitudes(DataSource const & dataSource, MwmIdGetter mwmIdGetter);
   ~SegmentAltitudes();
 
-  // Altitude of the end of |segment| in meters, NaN if unknown.
+  // Altitude of the end of |segment| in meters, kUnknownAltitude if unknown.
   double GetEndAltitudeM(routing::Segment const & segment);
 
 private:
@@ -43,7 +43,7 @@ private:
   std::map<routing::NumMwmId, std::unique_ptr<Mwm>> m_mwms;
 };
 
-// Altitude of the end of a segment, NaN if unknown.
+// Altitude of the end of a segment, kUnknownAltitude if unknown.
 using AltitudeGetter = std::function<double(routing::RouteSegment const & segment)>;
 
 // Altitude of the junction of the segment, e.g. for routes built with altitudes.

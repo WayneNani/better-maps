@@ -127,7 +127,7 @@ UNIT_TEST(EnergyModel_RouteWithoutAltitudes)
 {
   auto points = MakeRoutePoints(10.0, 50.0);
   for (auto & p : points)
-    p.m_altitudeM = std::numeric_limits<double>::quiet_NaN();
+    p.m_altitudeM = kUnknownAltitude;
   auto const route = ComputeRouteEnergy(EnergyModel(Elroq()), points);
   TEST(AlmostEqualAbs(route.GetTotalEnergyKwh(), EnergyModel(Elroq()).GetLevelConsumptionKwhPerKm(50.0) * 10.0, 1e-6),
        ());

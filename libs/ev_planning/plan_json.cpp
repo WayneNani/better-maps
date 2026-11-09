@@ -58,6 +58,7 @@ struct StopDto
 {
   std::string key;
   std::string name;
+  std::string title;
   std::string provider;
   std::string operatorName;
   std::string brand;
@@ -138,6 +139,7 @@ StopDto MakeStop(ChargingStop const & stop)
   StopDto dto;
   dto.key = s.GetKey();
   dto.name = s.m_name;
+  dto.title = s.GetTitle();
   dto.provider = s.GetProviderName();
   dto.operatorName = s.m_operator;
   dto.brand = s.m_brand;

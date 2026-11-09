@@ -7,15 +7,9 @@
 #include "geometry/point_with_altitude.hpp"
 
 #include <cmath>
-#include <limits>
 
 namespace ev
 {
-namespace
-{
-double constexpr kNaN = std::numeric_limits<double>::quiet_NaN();
-}  // namespace
-
 struct SegmentAltitudes::Mwm
 {
   explicit Mwm(DataSource const & dataSource, MwmSet::MwmId const & id) : m_guard(dataSource, id)
@@ -52,9 +46,12 @@ SegmentAltitudes::Mwm * SegmentAltitudes::GetMwm(routing::NumMwmId numMwmId)
 
 double SegmentAltitudes::GetEndAltitudeM(routing::Segment const & segment)
 {
+  // Fake segments from the start or to the finish point.
+  if (!segment.IsRealSegment())
+    return kUnknownAltitude;
   auto * mwm = GetMwm(segment.GetMwmId());
   if (!mwm || !mwm->m_loader || !mwm->m_loader->HasAltitudes())
-    return kNaN;
+    return kUnknownAltitude;
 
   auto it = mwm->m_altitudes.find(segment.GetFeatureId());
   if (it == mwm->m_altitudes.end())
@@ -70,14 +67,14 @@ double SegmentAltitudes::GetEndAltitudeM(routing::Segment const & segment)
 
   uint32_t const pointId = segment.GetPointId(true /* front */);
   if (pointId >= it->second.size())
-    return kNaN;
+    return kUnknownAltitude;
   return it->second[pointId];
 }
 
 double GetJunctionAltitudeM(routing::RouteSegment const & segment)
 {
   auto const altitude = segment.GetJunction().GetAltitude();
-  return altitude == geometry::kInvalidAltitude ? kNaN : static_cast<double>(altitude);
+  return altitude == geometry::kInvalidAltitude ? kUnknownAltitude : static_cast<double>(altitude);
 }
 
 RoadKind GetRoadKind(ftypes::HighwayClass highwayClass)
@@ -105,7 +102,7 @@ std::vector<RoutePoint> MakeRoutePoints(std::vector<routing::RouteSegment> const
 
   // The start of the first segment: same altitude as its end is good enough.
   RoutePoint start;
-  start.m_altitudeM = getAltitude ? getAltitude(segments.front()) : kNaN;
+  start.m_altitudeM = getAltitude ? getAltitude(segments.front()) : kUnknownAltitude;
   points.push_back(start);
 
   RoadKind kind = RoadKind::Unknown;
@@ -119,7 +116,7 @@ std::vector<RoutePoint> MakeRoutePoints(std::vector<routing::RouteSegment> const
     RoutePoint p;
     p.m_distanceM = s.GetDistFromBeginningMeters();
     p.m_timeSec = s.GetTimeFromBeginningSec();
-    p.m_altitudeM = getAltitude ? getAltitude(s) : kNaN;
+    p.m_altitudeM = getAltitude ? getAltitude(s) : kUnknownAltitude;
     p.m_roadKind = kind;
     points.push_back(p);
   }

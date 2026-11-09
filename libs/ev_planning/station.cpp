@@ -141,6 +141,16 @@ std::string ChargingStation::GetProviderName() const
   return m_name;
 }
 
+std::string ChargingStation::GetTitle() const
+{
+  if (!m_name.empty())
+    return m_name;
+  for (auto const & a : m_amenities)
+    if (a.m_kind == "services" && !a.m_name.empty() && a.m_distanceM <= 300.0)
+      return a.m_name;
+  return GetProviderName();
+}
+
 bool ChargingStation::HasProvider(std::string_view key) const
 {
   return std::any_of(m_providers.begin(), m_providers.end(), [key](Provider const & p) { return p.m_key == key; });

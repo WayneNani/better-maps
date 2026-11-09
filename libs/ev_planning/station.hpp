@@ -93,6 +93,9 @@ struct ChargingStation
 
   // Display name of the first provider, or the name of the station.
   std::string GetProviderName() const;
+  // Name to show: the name of the station, or of the motorway services it belongs to (most stations have no name),
+  // or the provider.
+  std::string GetTitle() const;
   bool HasProvider(std::string_view key) const;
 };
 

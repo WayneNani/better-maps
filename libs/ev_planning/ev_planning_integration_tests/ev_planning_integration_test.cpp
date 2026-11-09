@@ -270,6 +270,17 @@ UNIT_CLASS_TEST(EvPlanningTest, PlanWithPreferences)
   result = ev::PlanCharging(elroq, route, stations, options);
   TEST_EQUAL(result.m_status, ev::PlanStatus::Unreachable, ());
 
+  // Amenities only for the stations of the plans when no amenities are preferred.
+  auto withoutAmenities = stations;
+  for (auto & s : withoutAmenities)
+    s.m_amenities.clear();
+  ev::AmenityFinder finder(m_dataSource);
+  options.m_excludedProviders = {"ionity"};
+  result = ev::PlanChargingWithAmenities(elroq, route, withoutAmenities, options, finder);
+  TEST_EQUAL(StopNames(result.m_plan), (vector<string>{"Alpha Laden"}), ());
+  TEST_EQUAL(result.m_plan.m_stops[0].m_station.m_amenities.size(), 1, ());
+  TEST(withoutAmenities[0].m_amenities.empty(), ());
+
   // The JSON for the app.
   options.m_excludedProviders.clear();
   auto const json = ev::ToJson(ev::PlanCharging(elroq, route, stations, options));
