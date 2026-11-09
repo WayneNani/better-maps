@@ -68,6 +68,8 @@ public class NavigationController implements TrafficManager.TrafficCallback, Nav
   // better-maps: search along the route.
   @Nullable
   private Runnable mOnSearchAlongRouteListener;
+  @Nullable
+  private Runnable mOnEvBatteryListener;
   private final SharedPreferences mSharedPreferences;
 
   private void addWindowsInsets(@NonNull View topFrame)
@@ -308,6 +310,19 @@ public class NavigationController implements TrafficManager.TrafficCallback, Nav
   {
     if (mOnSearchAlongRouteListener != null)
       mOnSearchAlongRouteListener.run();
+  }
+
+  /** better-maps: the battery button of the navigation menu (electric car with charging stops). */
+  public void setOnEvBatteryListener(@Nullable Runnable listener)
+  {
+    mOnEvBatteryListener = listener;
+  }
+
+  @Override
+  public void onEvBatteryClicked()
+  {
+    if (mOnEvBatteryListener != null)
+      mOnEvBatteryListener.run();
   }
   @Override
   public void onStopClicked()

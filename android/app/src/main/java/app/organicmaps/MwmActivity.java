@@ -61,6 +61,10 @@ import app.organicmaps.bookmarks.BookmarkCategoriesActivity;
 import app.organicmaps.downloader.DownloaderActivity;
 import app.organicmaps.downloader.DownloaderFragment;
 import app.organicmaps.downloader.OnmapDownloader;
+import app.organicmaps.ev.EvBatteryDialog;
+import app.organicmaps.ev.EvPlanFragment;
+import app.organicmaps.ev.EvRouteStops;
+import app.organicmaps.ev.EvSettings;
 import app.organicmaps.editor.EditorActivity;
 import app.organicmaps.editor.EditorHostFragment;
 import app.organicmaps.editor.FeatureCategoryActivity;
@@ -154,7 +158,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
                FloatingSearchToolbarController.SearchToolbarListener,
                MenuBottomSheetFragment.MenuBottomSheetInterfaceWithHeader,
                PlacePageController.PlacePageRouteSettingsListener, MapButtonsController.MapButtonClickListener,
-               DisplayChangedListener, RouteSearchFragment.Host
+               DisplayChangedListener, RouteSearchFragment.Host, EvPlanFragment.Host
 {
   private static final String TAG = MwmActivity.class.getSimpleName();
 
@@ -656,6 +660,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
     mNavigationController = new NavigationController(
         this, v -> onSettingsOptionSelected(), v -> onTrackRecordingOptionSelected(), this::updateBottomWidgetsOffset);
     mNavigationController.setOnSearchAlongRouteListener(() -> showRouteSearch(null, false));
+    mNavigationController.setOnEvBatteryListener(() -> EvBatteryDialog.show(this));
     // TrafficManager.INSTANCE.attach(mNavigationController);
 
     initMainMenu();
@@ -1445,7 +1450,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
   {
     final RoutingController routingController = RoutingController.get();
     if (!closeBottomSheet(MAIN_MENU_ID) && !closeBottomSheet(LAYERS_MENU_ID) && !collapseNavMenu() && !closePlacePage()
-        && !closeRouteSearch() && !closeSearchToolbar(true, true) && !closeSidePanel() && !closePositionChooser()
+        && !closeRouteSearch() && !backEvPlan() && !closeSearchToolbar(true, true) && !closeSidePanel() && !closePositionChooser()
         && !closeTransitConnectionDetails() && !routingController.resetToPlanningStateIfNavigating()
         && !routingController.cancel())
     {
@@ -1865,6 +1870,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
   public void onNavigationCancelled()
   {
     closeRouteSearch();
+    closeEvPlan();
     closeFloatingToolbarsAndPanels(true);
     ThemeSwitcher.INSTANCE.restart(mMapController.isRenderingActive());
     if (mRoutingPlanInplaceController == null)
@@ -1902,6 +1908,8 @@ public class MwmActivity extends BaseMwmFragmentActivity
   public void onPlanningCancelled()
   {
     closeRouteSearch();
+    closeEvPlan();
+    EvRouteStops.INSTANCE.clear();
     closeFloatingToolbarsAndPanels(true);
     mMapButtonsViewModel.setLayoutMode(MapButtonsController.LayoutMode.regular);
     refreshLightStatusBar();
@@ -2430,6 +2438,69 @@ public class MwmActivity extends BaseMwmFragmentActivity
     showRouteSearch(null, false);
   }
 
+  /** better-maps: the charging planner for electric cars, over the map in the route planner. */
+  @Override
+  public void onEvPlanning()
+  {
+    if (!EvSettings.from(this).isAvailable(RoutingController.get().getLastRouterType()))
+      return;
+    closeSearchToolbar(true, true);
+    closePlacePage();
+    closeRouteSearch();
+    getSupportFragmentManager()
+        .beginTransaction()
+        .setReorderingAllowed(true)
+        .replace(R.id.ev_plan_container, EvPlanFragment.class, null, EvPlanFragment.TAG)
+        .commitNow();
+    hideRoutingUiForRouteSearch();
+  }
+
+  @Nullable
+  private EvPlanFragment getEvPlan()
+  {
+    return (EvPlanFragment) getSupportFragmentManager().findFragmentByTag(EvPlanFragment.TAG);
+  }
+
+  private boolean isEvPlanShown()
+  {
+    final EvPlanFragment fragment = getEvPlan();
+    return fragment != null && !fragment.isRemoving();
+  }
+
+  /** @return true if the charging planner was open: one screen back or closed. */
+  private boolean backEvPlan()
+  {
+    final EvPlanFragment fragment = getEvPlan();
+    if (fragment == null || fragment.isRemoving())
+      return false;
+    fragment.onBackPressed();
+    return true;
+  }
+
+  private void closeEvPlan()
+  {
+    final EvPlanFragment fragment = getEvPlan();
+    if (fragment != null && !fragment.isRemoving())
+      fragment.closePlanner();
+  }
+
+  @Override
+  public void onEvPlanClosed()
+  {
+    final EvPlanFragment fragment = getEvPlan();
+    if (fragment != null && !getSupportFragmentManager().isStateSaved())
+      getSupportFragmentManager().beginTransaction().remove(fragment).commitNow();
+    else if (fragment != null)
+      getSupportFragmentManager().beginTransaction().remove(fragment).commitAllowingStateLoss();
+    onRouteSearchClosed();
+  }
+
+  @Override
+  public void onEvPlanStartNavigation()
+  {
+    onRoutingStart();
+  }
+
   /**
    * better-maps: search along the route, in the route planner and during the navigation.
    *
@@ -2508,7 +2579,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
    */
   private void hideRoutingUiForRouteSearch()
   {
-    if (!isRouteSearchShown())
+    if (!isRouteSearchShown() && !isEvPlanShown())
       return;
     for (int id : new int[] {R.id.routing_plan_frame, R.id.navigation_frame, R.id.menu_frame})
     {

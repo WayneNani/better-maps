@@ -25,6 +25,7 @@ import app.organicmaps.car.renderer.Renderer;
 import app.organicmaps.car.screens.base.BaseMapScreen;
 import app.organicmaps.car.screens.search.RouteSearchCategoriesScreen;
 import app.organicmaps.car.screens.settings.DrivingOptionsScreen;
+import app.organicmaps.car.util.EvCarEnergy;
 import app.organicmaps.car.util.Colors;
 import app.organicmaps.car.util.RoutingUtils;
 import app.organicmaps.car.util.ThemeUtils;
@@ -45,6 +46,8 @@ import java.util.Objects;
 
 public class NavigationScreen extends BaseMapScreen implements RoutingController.Container, NavigationManagerCallback
 {
+  // better-maps: battery level of the car for the charging planner.
+  private final EvCarEnergy mEvCarEnergy = new EvCarEnergy();
   private static final String TAG = NavigationScreen.class.getSimpleName();
 
   public static final String MARKER = NavigationScreen.class.getSimpleName();
@@ -147,6 +150,7 @@ public class NavigationScreen extends BaseMapScreen implements RoutingController
       NavigationService.startForegroundService(getCarContext(),
                                                CarAppService.getCarNotificationExtender(getCarContext()));
     updateTrip(/* location */ null);
+    mEvCarEnergy.start(getCarContext());
   }
 
   @Override
@@ -160,6 +164,7 @@ public class NavigationScreen extends BaseMapScreen implements RoutingController
   public void onDestroy(@NonNull LifecycleOwner owner)
   {
     super.onDestroy(owner);
+    mEvCarEnergy.stop();
     MwmApplication.from(getCarContext()).getLocationHelper().removeListener(mLocationListener);
 
     if (mRoutingController.isNavigating())
@@ -204,10 +209,11 @@ public class NavigationScreen extends BaseMapScreen implements RoutingController
       return null;
 
     List<TravelEstimate> travelEstimates = mTrip.getDestinationTravelEstimates();
-    if (travelEstimates.size() != 1)
-      throw new RuntimeException("TravelEstimates size must be 1");
+    if (travelEstimates.isEmpty())
+      throw new RuntimeException("TravelEstimates must not be empty");
 
-    return travelEstimates.get(0);
+    // better-maps: the final destination; a charging stop may come first.
+    return travelEstimates.get(travelEstimates.size() - 1);
   }
 
   @NonNull

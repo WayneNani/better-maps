@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: views of the charging planner that are built in the code. -->
+<resources>
+  <item name="ev_start_soc" type="id" />
+  <item name="ev_min_arrival_soc" type="id" />
+  <item name="ev_min_stop_soc" type="id" />
+  <item name="ev_priority_group" type="id" />
+  <item name="ev_providers_group" type="id" />
+  <item name="ev_excluded_group" type="id" />
+  <item name="ev_min_power_group" type="id" />
+  <item name="ev_amenities_group" type="id" />
+  <item name="ev_plan_button" type="id" />
+  <item name="ev_result_total" type="id" />
+  <item name="ev_result_summary" type="id" />
+  <item name="ev_result_bar" type="id" />
+  <item name="ev_stop_item" type="id" />
+  <item name="ev_alternative_item" type="id" />
+  <item name="ev_alternatives_button" type="id" />
+  <item name="ev_options_button" type="id" />
+  <item name="ev_start_button" type="id" />
+  <item name="ev_detail_charge" type="id" />
+  <item name="ev_detail_longer" type="id" />
+  <item name="ev_other_stop_button" type="id" />
+  <item name="ev_keep_stop_button" type="id" />
+  <item name="ev_error_text" type="id" />
+</resources>

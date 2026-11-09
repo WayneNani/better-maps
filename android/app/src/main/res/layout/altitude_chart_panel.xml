@@ -109,6 +109,19 @@
       android:layout_weight="1"
       android:layout_height="match_parent" />
 
+    <!-- better-maps: charging planner for electric cars. -->
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/btn__ev_planning"
+      style="@style/Widget.Material3.Button.IconButton"
+      android:layout_width="@dimen/nav_icon_size"
+      android:layout_height="@dimen/nav_icon_size"
+      android:layout_weight="0"
+      android:contentDescription="@string/ev_planning"
+      android:tooltipText="@string/ev_planning"
+      android:visibility="gone"
+      app:icon="@drawable/ic_ev_charging"
+      app:iconTint="?android:textColorPrimary" />
+
     <!-- better-maps: search along the route. -->
     <com.google.android.material.button.MaterialButton
       android:id="@+id/btn__search_along_route"

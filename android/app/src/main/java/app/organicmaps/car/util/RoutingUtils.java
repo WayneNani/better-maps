@@ -15,9 +15,16 @@ import androidx.car.app.navigation.model.Step;
 import androidx.car.app.navigation.model.TravelEstimate;
 import androidx.car.app.navigation.model.Trip;
 import androidx.core.graphics.drawable.IconCompat;
+import app.organicmaps.R;
+import app.organicmaps.ev.EvFormatter;
+import app.organicmaps.ev.EvPlanResult;
+import app.organicmaps.ev.EvRouteStops;
+import app.organicmaps.sdk.Framework;
 import app.organicmaps.sdk.bookmarks.data.MapObject;
 import app.organicmaps.sdk.routing.LaneInfo;
 import app.organicmaps.sdk.routing.LaneWay;
+import app.organicmaps.sdk.routing.RouteMarkData;
+import app.organicmaps.sdk.routing.RouteMarkType;
 import app.organicmaps.sdk.routing.RoutingInfo;
 import app.organicmaps.sdk.util.Distance;
 import app.organicmaps.sdk.widget.roadshield.RoadShieldDrawable;
@@ -55,14 +62,42 @@ public final class RoutingUtils
     else
       destinationBuilder.setName(" ");
 
+    // better-maps: the next charging stop of an electric car comes first, with the charging time; the final
+    // destination includes the charging time of all stops ahead.
+    final RouteMarkData[] points = Framework.nativeGetRoutePoints();
+    final EvPlanResult.Stop chargingStop =
+        info.indexOfNextStop > 0 ? EvRouteStops.INSTANCE.getNextStop(points) : null;
+    if (chargingStop != null && isNextIntermediatePoint(points, chargingStop))
+    {
+      final Destination stop =
+          new Destination.Builder()
+              .setName(context.getString(R.string.ev_car_stop, chargingStop.title))
+              .setAddress(context.getString(R.string.ev_nav_next_stop, chargingStop.provider,
+                                            EvFormatter.duration(chargingStop.stopTimeSec)))
+              .build();
+      builder.addDestination(stop, createTravelEstimate(info.distToNextStop, info.timeToNextStop));
+    }
+    final int chargingSec = (int) Math.round(EvRouteStops.INSTANCE.getRemainingStopTimeSec(points));
     builder.addDestination(destinationBuilder.build(),
-                           createTravelEstimate(info.distToTarget, info.totalTimeInSeconds));
+                           createTravelEstimate(info.distToTarget, info.totalTimeInSeconds + chargingSec));
 
     // TODO (AndrewShkrob): Use real distance and time estimates
     builder.addStep(createCurrentStep(context, info), createTravelEstimate(info.distToTurn, 0));
     if (!TextUtils.isEmpty(info.nextStreet))
       builder.addStep(createNextStep(context, info), createTravelEstimate(Distance.EMPTY, 0));
     return builder.build();
+  }
+
+  /** True if |stop| is the first intermediate point not passed yet. */
+  private static boolean isNextIntermediatePoint(@NonNull RouteMarkData[] points, @NonNull EvPlanResult.Stop stop)
+  {
+    for (RouteMarkData point : points)
+    {
+      if (point.mPointType != RouteMarkType.Intermediate || point.mIsPassed)
+        continue;
+      return EvRouteStops.findStop(java.util.List.of(stop), point.mLat, point.mLon) != null;
+    }
+    return false;
   }
 
   @NonNull

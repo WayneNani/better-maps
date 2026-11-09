@@ -24,6 +24,14 @@
     app:icon="@drawable/ic_transit_bus"
     android:summary="@string/transit_settings_summary" />
 
+  <!-- better-maps: vehicle profile of the charging planner for electric cars. -->
+  <PreferenceScreen
+    android:key="pref_screen_ev_vehicle"
+    android:title="@string/ev_my_vehicle"
+    app:fragment="app.organicmaps.ev.EvVehicleFragment"
+    app:icon="@drawable/ic_ev_charging"
+    android:summary="@string/ev_my_vehicle_summary" />
+
   <PreferenceScreen
     android:key="pref_screen_online_search"
     android:title="@string/online_search_settings_title"

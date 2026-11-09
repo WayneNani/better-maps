@@ -445,6 +445,7 @@ Framework::~Framework()
 {
   GetPowerManager().UnsubscribeAll();
 
+  m_evPlanningApi.reset();
   m_threadRunner.reset();
 
   osm::Editor & editor = osm::Editor::Instance();
@@ -1388,6 +1389,17 @@ SearchAPI & Framework::GetSearchAPI()
 {
   ASSERT(m_searchAPI != nullptr, ("Search API is not initialized."));
   return *m_searchAPI;
+}
+
+EvPlanningApi & Framework::GetEvPlanningApi()
+{
+  if (!m_evPlanningApi)
+  {
+    m_evPlanningApi = std::make_unique<EvPlanningApi>(
+        m_featuresFetcher.GetDataSource(), GetSearchAPI().GetEngine(), m_routingManager,
+        [this](std::shared_ptr<routing::NumMwmIds> ids) { RegisterCountryFilesOnRoute(std::move(ids)); });
+  }
+  return *m_evPlanningApi;
 }
 
 SearchAPI const & Framework::GetSearchAPI() const

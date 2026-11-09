@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><title>Better Maps – Ladeplanung (Mockup)</title>
+<style>
+:root{--surface:#fff;--page:#eef2f1;--border:#d6dbda;--text:#1b1f1e;--muted:#5b6563;--teal:#0F766E;--amber:#F59E0B;--okbg:#dcf2ec;--ok:#0b5d55}
+body{margin:0;background:var(--page);font-family:"Noto Sans","DejaVu Sans",sans-serif;color:var(--text)}
+h1{font-size:20px;font-weight:600;margin:18px 22px 4px}
+.sub{margin:0 22px 14px;color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(2,330px);gap:18px;padding:0 22px 22px}
+.cap{font-size:12px;color:var(--muted);margin:0 0 6px 4px}
+.ph{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;font-size:13px}
+.bar{background:var(--teal);color:#fff;padding:10px 12px;font-weight:600}
+.sec{padding:9px 12px;border-bottom:1px solid var(--border)}
+.lbl{color:var(--muted);font-size:12px;margin-bottom:4px}
+.chip{display:inline-block;border:1px solid #b9c2c0;border-radius:16px;padding:2px 9px;margin:2px 3px 2px 0;font-size:12px}
+.on{background:var(--okbg);color:var(--ok);border-color:#8fd3c6}
+.off{text-decoration:line-through;color:#9aa3a1}
+.row{display:flex;justify-content:space-between;align-items:center;margin:3px 0;gap:8px}
+.mu{color:var(--muted);font-size:12px}
+.stop{padding:8px 12px;border-bottom:1px solid var(--border)}
+.am{font-size:12px;color:var(--muted);margin-right:8px}
+.slider{height:6px;background:#d6dbda;border-radius:3px;position:relative;margin:6px 0 8px}
+.slider i{position:absolute;left:0;top:0;bottom:0;width:82%;background:var(--teal);border-radius:3px}
+</style></head><body>
+<h1>Better Maps – Ladeplanung (Mockup)</h1>
+<p class="sub">Beispiel: Škoda Elroq 85, Bonn → Nürnberg. Werte sind Platzhalter.</p>
+<div class="grid">
+
+<div><div class="cap">1 · Fahrzeugprofil</div><div class="ph">
+<div class="bar">← Mein Fahrzeug</div>
+<div class="sec"><div class="lbl">Vorlage</div><div class="row"><span>Škoda Elroq 85</span><span>▾</span></div></div>
+<div class="sec"><div class="row"><span>Nutzbarer Akku</span><b>≈ 77 kWh</b></div><div class="row"><span>Verbrauch Autobahn 130</span><b>≈ 21 kWh/100 km</b></div><div class="row"><span>Verbrauch Land</span><b>≈ 15 kWh/100 km</b></div><div class="row"><span>Max. Ladeleistung DC</span><b>≈ 175 kW</b></div></div>
+<div class="sec"><div class="lbl">Stecker</div><span class="chip on">CCS</span><span class="chip on">Typ 2</span><span class="chip">CHAdeMO</span></div>
+<div class="sec"><div class="lbl">Ladekurve (aus Vorlage)</div>
+<svg viewBox="0 0 290 62" width="100%" height="62"><line x1="0" y1="54" x2="290" y2="54" stroke="#d6dbda"/><polyline points="0,8 110,8 160,20 220,38 290,50" fill="none" stroke="#0F766E" stroke-width="2.5"/><text x="0" y="62" font-size="10" fill="#5b6563">0 %</text><text x="262" y="62" font-size="10" fill="#5b6563">100 %</text><text x="4" y="20" font-size="10" fill="#5b6563">175 kW</text></svg>
+<div class="mu">Höhenprofil der Route wird mitgerechnet</div></div>
+<div class="sec"><div class="row"><span>Akkustand aus Android Auto übernehmen</span><span class="chip on">an</span></div><div class="mu">nur, wenn das Auto ihn liefert</div></div>
+</div></div>
+
+<div><div class="cap">2 · Ladeoptionen im Routenplaner</div><div class="ph">
+<div class="bar">⚡ Ladeplanung</div>
+<div class="sec"><div class="row"><span>Akku jetzt</span><b>82 %</b></div><div class="slider"><i></i></div><div class="row"><span>Bei Ankunft mindestens</span><b>20 %</b></div><div class="row"><span>An Ladestopps mindestens</span><b>10 %</b></div></div>
+<div class="sec"><div class="lbl">Priorität</div><span class="chip on">Schnellste Ankunft</span><span class="chip">Wenig Stopps</span><span class="chip">Lange Pausen ok</span></div>
+<div class="sec"><div class="lbl">Bevorzugte Anbieter</div><span class="chip on">Ionity</span><span class="chip on">EnBW</span><span class="chip">Aral pulse</span><span class="chip">Tesla</span><span class="chip">EWE Go</span><div class="lbl" style="margin-top:6px">Ausschließen</div><span class="chip off">Anbieter X</span></div>
+<div class="sec"><div class="lbl">Mindestleistung</div><span class="chip">50 kW</span><span class="chip on">150 kW</span><span class="chip">300 kW</span></div>
+<div class="sec"><div class="lbl">An Stopps bevorzugen</div><span class="chip on">Toilette</span><span class="chip on">Spielplatz</span><span class="chip">Essen</span><span class="chip">Einkaufen</span></div>
+</div></div>
+
+<div><div class="cap">3 · Route mit Ladestopps (Ladezeit eingerechnet)</div><div class="ph">
+<div class="bar">← Bonn → Nürnberg</div>
+<div class="sec"><div class="row"><span style="font-size:19px;font-weight:600">4:58 h</span><span class="mu">412 km · 1 Ladestopp</span></div><div class="mu">4:21 h Fahrt · 37 min Laden · Ankunft 15:28 mit 24 %</div>
+<div style="display:flex;height:16px;gap:2px;margin-top:8px"><div style="flex:170;background:#0F766E;border-radius:3px"></div><div style="flex:37;background:#F59E0B;border-radius:3px"></div><div style="flex:91;background:#0F766E;border-radius:3px"></div></div>
+<div class="mu" style="margin-top:4px"><span style="color:#0F766E">■</span> Fahrt &nbsp; <span style="color:#F59E0B">■</span> Laden</div></div>
+<div class="stop"><div class="row"><b>EnBW Aurach</b><span class="mu">in 278 km</span></div><div class="mu">CCS bis 300 kW · 8 Ladepunkte · EnBW</div><div class="row"><span><b>ankommen 16 % → 70 %</b></span><span>27 min</span></div><span class="am">🛝 Spielplatz 90 m</span><span class="am">🚻 Toilette</span><span class="am">🍽 Restaurant</span></div>
+<div class="stop"><div class="row"><span class="mu">Alternative: Ionity Montabaur + EnBW Aurach</span></div><div class="mu">2 kürzere Stopps, Ankunft 4 min später, dafür mit 41 %</div></div>
+<div class="sec" style="border-bottom:none"><span class="chip">Alternativen</span><span class="chip">Optionen</span><span class="chip on">Start</span></div>
+</div></div>
+
+<div><div class="cap">4 · Ladestopp im Detail</div><div class="ph">
+<div class="bar">← EnBW Aurach</div>
+<div class="sec"><div class="mu">Ladestation · EnBW · 24/7</div><div class="row" style="margin-top:6px"><span>CCS</span><b>4 × 300 kW</b></div><div class="row"><span>CCS</span><b>4 × 150 kW</b></div><div class="row"><span>Typ 2</span><b>2 × 22 kW</b></div><div class="mu" style="margin-top:4px">Belegung: noch keine Echtzeitdaten</div></div>
+<div class="sec"><div class="lbl">In der Nähe (zu Fuß)</div>
+<div class="row"><span>🛝 Spielplatz</span><span class="mu">90 m</span></div>
+<div class="row"><span>🚻 Toilette (Raststätte)</span><span class="mu">60 m</span></div>
+<div class="row"><span>🍽 Restaurant · bei Ankunft geöffnet</span><span class="mu">120 m</span></div>
+<div class="row"><span>🛒 Supermarkt</span><span class="mu">450 m</span></div></div>
+<div class="sec"><div class="row"><span>Laden 16 % → 70 %</span><b>27 min</b></div><div class="mu">Länger laden → 80 % (+9 min), Ankunft mit 34 %</div></div>
+<div class="sec" style="border-bottom:none"><span class="chip">Anderen Stopp wählen</span><span class="chip on">Als Ladestopp behalten</span></div>
+</div></div>
+
+</div></body></html>

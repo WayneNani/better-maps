@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ev_planning">Ladeplanung</string>
+  <string name="ev_my_vehicle">Mein Fahrzeug</string>
+  <string name="ev_my_vehicle_summary">E-Auto: Ladestopps im Routenplaner</string>
+  <string name="ev_enable">Ladestopps für Autorouten planen</string>
+  <string name="ev_template">Vorlage</string>
+  <string name="ev_template_custom">Eigenes Fahrzeug</string>
+  <string name="ev_name">Name</string>
+  <string name="ev_usable_capacity">Nutzbarer Akku</string>
+  <string name="ev_consumption_motorway">Verbrauch Autobahn 130</string>
+  <string name="ev_consumption_country">Verbrauch Land</string>
+  <string name="ev_max_dc">Max. Ladeleistung DC</string>
+  <string name="ev_max_ac">Max. Ladeleistung AC</string>
+  <string name="ev_mass">Gewicht mit Zuladung</string>
+  <string name="ev_consumption_factor">Verbrauchszuschlag</string>
+  <string name="ev_sockets">Stecker</string>
+  <string name="ev_socket_ccs">CCS</string>
+  <string name="ev_socket_type2">Typ 2</string>
+  <string name="ev_socket_chademo">CHAdeMO</string>
+  <string name="ev_charge_curve">Ladekurve (aus Vorlage)</string>
+  <string name="ev_elevation_hint">Höhenprofil der Route wird mitgerechnet</string>
+  <string name="ev_car_soc">Akkustand aus Android Auto übernehmen</string>
+  <string name="ev_car_soc_hint">nur, wenn das Auto ihn liefert</string>
+  <string name="ev_source">Werte: %s</string>
+  <string name="ev_profile_invalid">Bitte die Werte prüfen: Akku, Verbrauch (Autobahn höher als Land) und mindestens ein Stecker.</string>
+  <string name="ev_unit_kwh">%s kWh</string>
+  <string name="ev_unit_kwh_100km">%s kWh/100 km</string>
+  <string name="ev_unit_kw">%s kW</string>
+  <string name="ev_unit_kg">%s kg</string>
+  <string name="ev_unit_percent">%s %%</string>
+
+  <string name="ev_battery_now">Akku jetzt</string>
+  <string name="ev_battery_now_from_car">Akku jetzt (vom Auto)</string>
+  <string name="ev_min_arrival">Bei Ankunft mindestens</string>
+  <string name="ev_min_stop">An Ladestopps mindestens</string>
+  <string name="ev_priority">Priorität</string>
+  <string name="ev_priority_fastest">Schnellste Ankunft</string>
+  <string name="ev_priority_fewest_stops">Wenig Stopps</string>
+  <string name="ev_priority_long_breaks">Lange Pausen ok</string>
+  <string name="ev_preferred_providers">Bevorzugte Anbieter</string>
+  <string name="ev_providers_hint">Tippen: bevorzugen, nochmal tippen: ausschließen</string>
+  <string name="ev_providers_loading">Anbieter entlang der Route werden gesucht …</string>
+  <string name="ev_providers_none">Noch keine Ladestationen entlang der Route</string>
+  <string name="ev_excluded_providers">Ausschließen</string>
+  <string name="ev_min_power">Mindestleistung</string>
+  <string name="ev_prefer_at_stops">An Stopps bevorzugen</string>
+  <string name="ev_amenity_toilets">Toilette</string>
+  <string name="ev_amenity_playground">Spielplatz</string>
+  <string name="ev_amenity_food">Essen</string>
+  <string name="ev_amenity_shopping">Einkaufen</string>
+  <string name="ev_plan_button">Ladestopps planen</string>
+  <string name="ev_planning_progress">Ladestopps werden geplant …</string>
+
+  <string name="ev_summary">%1$s Fahrt · %2$s Laden · Ankunft %3$s mit %4$d %%</string>
+  <plurals name="ev_distance_and_stops">
+    <item quantity="one">%1$s · %2$d Ladestopp</item>
+    <item quantity="other">%1$s · %2$d Ladestopps</item>
+  </plurals>
+  <string name="ev_no_stop_needed">%s · kein Ladestopp nötig</string>
+  <string name="ev_legend_drive">Fahrt</string>
+  <string name="ev_legend_charge">Laden</string>
+  <string name="ev_in_distance">in %s</string>
+  <plurals name="ev_charging_points">
+    <item quantity="one">%d Ladepunkt</item>
+    <item quantity="other">%d Ladepunkte</item>
+  </plurals>
+  <string name="ev_up_to_power">bis %d kW</string>
+  <string name="ev_arrive_and_charge">ankommen %1$d %% → %2$d %%</string>
+  <string name="ev_alternative">Alternative: %s</string>
+  <plurals name="ev_alternative_more_stops">
+    <item quantity="one">%d kürzerer Stopp</item>
+    <item quantity="other">%d kürzere Stopps</item>
+  </plurals>
+  <plurals name="ev_alternative_fewer_stops">
+    <item quantity="one">%d längerer Stopp</item>
+    <item quantity="other">%d längere Stopps</item>
+  </plurals>
+  <plurals name="ev_alternative_same_stops">
+    <item quantity="one">%d anderer Stopp</item>
+    <item quantity="other">%d andere Stopps</item>
+  </plurals>
+  <string name="ev_alternative_later">Ankunft %d min später</string>
+  <string name="ev_alternative_earlier">Ankunft %d min früher</string>
+  <string name="ev_alternative_same_time">gleiche Ankunft</string>
+  <string name="ev_alternative_soc">dafür mit %d %%</string>
+  <string name="ev_alternatives">Alternativen</string>
+  <string name="ev_options">Optionen</string>
+  <string name="ev_start">Start</string>
+  <string name="ev_below_minimum">Mit dieser Route fällt der Akku unter den Mindestwert. Neu planen?</string>
+  <string name="ev_unreachable">Ziel nicht erreichbar: zwischen %1$s und %2$s entlang der Route gibt es keine passende Ladestation. Mindestleistung senken oder mehr Anbieter zulassen.</string>
+  <string name="ev_no_route">Es gibt keine Autoroute für die Ladeplanung.</string>
+  <string name="ev_error">Die Ladeplanung ist fehlgeschlagen.</string>
+  <string name="ev_stop_subtitle">Ladestopp</string>
+
+  <string name="ev_station">Ladestation</string>
+  <string name="ev_availability_unknown">Belegung: noch keine Echtzeitdaten</string>
+  <string name="ev_availability_available">Belegung: Ladepunkte frei</string>
+  <string name="ev_availability_occupied">Belegung: alle Ladepunkte belegt</string>
+  <string name="ev_nearby">In der Nähe (zu Fuß)</string>
+  <string name="ev_nearby_none">Nichts in der Nähe bekannt</string>
+  <string name="ev_services">Raststätte</string>
+  <string name="ev_open_on_arrival">bei Ankunft geöffnet</string>
+  <string name="ev_closed_on_arrival">bei Ankunft geschlossen</string>
+  <string name="ev_charge">Laden %1$d %% → %2$d %%</string>
+  <string name="ev_charge_longer">Länger laden → %1$d %% (%2$s), Ankunft mit %3$d %%</string>
+  <string name="ev_other_stop">Anderen Stopp wählen</string>
+  <string name="ev_keep_stop">Als Ladestopp behalten</string>
+
+  <string name="ev_nav_battery">Akku</string>
+  <string name="ev_nav_battery_title">Akkustand jetzt</string>
+  <string name="ev_nav_battery_ok">Nächster Ladestopp mit %1$d %%, Ziel mit %2$d %%.</string>
+  <string name="ev_nav_battery_destination">Ziel mit %d %%.</string>
+  <string name="ev_nav_battery_low">Der Akku fällt unterwegs unter den Mindestwert.</string>
+  <string name="ev_nav_replan">Neu planen</string>
+  <string name="ev_nav_next_stop">⚡ %1$s · %2$s Laden</string>
+  <string name="ev_car_stop">Ladestopp: %s</string>
+  <string name="ev_kind_restaurant">Restaurant</string>
+  <string name="ev_kind_fast_food">Imbiss</string>
+  <string name="ev_kind_cafe">Café</string>
+  <string name="ev_kind_supermarket">Supermarkt</string>
+  <string name="ev_kind_convenience">Laden</string>
+  <string name="ev_kind_bakery">Bäckerei</string>
+  <string name="ev_including_charging">inkl. %s Laden</string>
+</resources>

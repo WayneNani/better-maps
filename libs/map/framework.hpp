@@ -2,6 +2,7 @@
 
 #include "map/api_mark_point.hpp"
 #include "map/bookmark_manager.hpp"
+#include "map/ev_planning_api.hpp"
 #include "map/features_fetcher.hpp"
 #include "map/isolines_manager.hpp"
 #include "map/mwm_url.hpp"
@@ -209,6 +210,7 @@ protected:
   std::unique_ptr<storage::CountryInfoGetter> m_infoGetter;
 
   std::unique_ptr<SearchAPI> m_searchAPI;
+  std::unique_ptr<EvPlanningApi> m_evPlanningApi;
 
   ScreenBase m_currentModelView;
   m2::RectD m_visibleViewport;
@@ -399,6 +401,9 @@ public:
 
   SearchAPI & GetSearchAPI();
   SearchAPI const & GetSearchAPI() const;
+
+  // better-maps: charging planner for electric vehicles along the current route.
+  EvPlanningApi & GetEvPlanningApi();
 
   /// @name Bookmarks, Tracks and other UserMarks
   /// Scans and loads all kml files with bookmarks in WritableDir.

@@ -994,6 +994,27 @@ bool RoutingSession::GetRouteJunctionPoints(std::vector<geometry::PointWithAltit
   return true;
 }
 
+bool RoutingSession::GetRouteSegments(std::vector<RouteSegment> & segments, std::vector<double> & subrouteEndsM,
+                                      double & passedDistanceM) const
+{
+  CHECK_THREAD_CHECKER(m_threadChecker, ());
+  ASSERT(m_route, ());
+
+  if (!m_route->IsValid())
+    return false;
+
+  segments = m_route->GetRouteSegments();
+  passedDistanceM = m_route->GetCurrentDistanceFromBeginMeters();
+  subrouteEndsM.clear();
+  for (size_t i = 0; i < m_route->GetSubrouteCount(); ++i)
+  {
+    size_t const end = m_route->GetSubrouteAttrs(i).GetEndSegmentIdx();
+    if (end > 0 && end <= segments.size())
+      subrouteEndsM.push_back(segments[end - 1].GetDistFromBeginningMeters());
+  }
+  return true;
+}
+
 bool RoutingSession::GetRoutePolylineWithTimes(std::vector<m2::PointD> & points, std::vector<double> & timesSec,
                                                double & passedDistanceM) const
 {

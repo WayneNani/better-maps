@@ -533,6 +533,41 @@ public class RoutingController
       mContainer.onAddedStop();
   }
 
+  /**
+   * better-maps: replaces intermediate points, e.g. the charging stops of an electric vehicle plan, and builds the
+   * route again. The new points go where they fit best into the route. During the navigation, the navigation goes on
+   * with the new route.
+   *
+   * @param remove intermediate points to remove.
+   * @param add    intermediate points to add.
+   */
+  public void replaceIntermediatePoints(@NonNull java.util.function.Predicate<RouteMarkData> remove,
+                                        @NonNull List<RouteMarkData> add)
+  {
+    final boolean navigating = isNavigating();
+    if (navigating)
+      Framework.nativeRemoveRoute();
+
+    // From the last one: removing a point changes the indices of the following ones.
+    final RouteMarkData[] points = Framework.nativeGetRoutePoints();
+    final java.util.ArrayList<RouteMarkData> removed = new java.util.ArrayList<>();
+    for (RouteMarkData point : points)
+      if (point.mPointType == RouteMarkType.Intermediate && remove.test(point))
+        removed.add(point);
+    removed.sort((a, b) -> Integer.compare(b.mIntermediateIndex, a.mIntermediateIndex));
+    if (!removed.isEmpty())
+      applyRemovingIntermediatePointsTransaction();
+    for (RouteMarkData point : removed)
+      Framework.nativeRemoveRoutePoint(RouteMarkType.Intermediate, point.mIntermediateIndex);
+
+    for (RouteMarkData point : add)
+      Framework.addRoutePoint(point, true /* reorderIntermediatePoints */);
+
+    if (navigating)
+      mFollowAfterBuild = true;
+    build();
+  }
+
   public void removeStop(@NonNull MapObject mapObject)
   {
     RoutePointInfo info = mapObject.getRoutePointInfo();

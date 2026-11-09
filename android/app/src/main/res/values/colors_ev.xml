@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: charging planner, see docs/mockups/ladeplanung.png. -->
+<resources>
+  <color name="ev_header">#0F766E</color>
+  <color name="ev_drive">#0F766E</color>
+  <color name="ev_charge">#F59E0B</color>
+</resources>

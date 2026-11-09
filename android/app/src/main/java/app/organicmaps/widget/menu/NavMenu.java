@@ -21,6 +21,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 import app.organicmaps.R;
+import app.organicmaps.ev.EvRouteStops;
 import app.organicmaps.maplayer.MapButtonsViewModel;
 import app.organicmaps.sdk.Framework;
 import app.organicmaps.sdk.routing.RoutingInfo;
@@ -48,6 +49,7 @@ public class NavMenu
   private final View mHeaderFrame;
 
   private final ShapeableImageView mTts;
+  private View mEvBattery;
   private final ShapeableImageView mTrackRecording;
   private final View mEtaViewContainer;
   private final MaterialTextView mEtaValue;
@@ -162,6 +164,12 @@ public class NavMenu
     bottomFrame.findViewById(R.id.search_along_route).setOnClickListener(v -> {
       collapseNavBottomSheet();
       mNavMenuListener.onSearchAlongRouteClicked();
+    });
+    // better-maps: correct the battery level of an electric car with charging stops.
+    mEvBattery = bottomFrame.findViewById(R.id.ev_battery);
+    mEvBattery.setOnClickListener(v -> {
+      collapseNavBottomSheet();
+      mNavMenuListener.onEvBatteryClicked();
     });
     mTts = bottomFrame.findViewById(R.id.tts_volume);
     mTts.setOnClickListener(v -> onTtsClicked());
@@ -411,7 +419,9 @@ public class NavMenu
       destinationText = mActivity.getString(R.string.destination);
       iconId = R.drawable.route_finish;
       distance = mRoutingInfo.distToTarget;
-      timeInSeconds = mRoutingInfo.totalTimeInSeconds;
+      // better-maps: with the charging time at the charging stops ahead.
+      timeInSeconds = mRoutingInfo.totalTimeInSeconds
+                    + (int) Math.round(EvRouteStops.INSTANCE.getRemainingStopTimeSec(Framework.nativeGetRoutePoints()));
     }
     else
     {
@@ -454,6 +464,7 @@ public class NavMenu
   {
     // Save a copy of the routing info.
     mRoutingInfo = info;
+    UiUtils.showIf(EvRouteStops.INSTANCE.hasStops(), mEvBattery);
 
     // Update controls.
     updateControls();
@@ -572,6 +583,9 @@ public class NavMenu
 
     // better-maps: search along the route.
     void onSearchAlongRouteClicked();
+
+    // better-maps: correct the battery level of an electric car.
+    void onEvBatteryClicked();
   }
 
 }

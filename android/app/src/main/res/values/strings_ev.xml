@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: charging planner for electric vehicles (route planner, navigation, settings). -->
+<resources>
+  <!-- Button in the route planner and title of the charging planner. -->
+  <string name="ev_planning">Charging plan</string>
+  <!-- Settings entry and title of the vehicle profile screen. -->
+  <string name="ev_my_vehicle">My vehicle</string>
+  <!-- Summary of the settings entry. -->
+  <string name="ev_my_vehicle_summary">Electric car: charging stops in the route planner</string>
+  <!-- Switch in the vehicle settings: the charging planner in the route planner (car only). -->
+  <string name="ev_enable">Plan charging stops for car routes</string>
+  <string name="ev_template">Template</string>
+  <string name="ev_template_custom">Own vehicle</string>
+  <string name="ev_name">Name</string>
+  <string name="ev_usable_capacity">Usable battery</string>
+  <string name="ev_consumption_motorway">Consumption motorway 130</string>
+  <string name="ev_consumption_country">Consumption country road</string>
+  <string name="ev_max_dc">Max. charging power DC</string>
+  <string name="ev_max_ac">Max. charging power AC</string>
+  <string name="ev_mass">Weight with load</string>
+  <!-- Extra consumption, e.g. in winter or with a roof box. -->
+  <string name="ev_consumption_factor">Consumption surcharge</string>
+  <string name="ev_sockets">Sockets</string>
+  <string name="ev_socket_ccs">CCS</string>
+  <string name="ev_socket_type2">Type 2</string>
+  <string name="ev_socket_chademo">CHAdeMO</string>
+  <string name="ev_charge_curve">Charging curve (from the template)</string>
+  <string name="ev_elevation_hint">The elevation profile of the route is taken into account</string>
+  <string name="ev_car_soc">Take the battery level from Android Auto</string>
+  <string name="ev_car_soc_hint">only if the car provides it</string>
+  <!-- Source of the values of a template. -->
+  <string name="ev_source">Values: %s</string>
+  <string name="ev_profile_invalid">Please check the values: battery, consumption (motorway higher than country road) and at least one socket.</string>
+  <string name="ev_unit_kwh">%s kWh</string>
+  <string name="ev_unit_kwh_100km">%s kWh/100 km</string>
+  <string name="ev_unit_kw">%s kW</string>
+  <string name="ev_unit_kg">%s kg</string>
+  <string name="ev_unit_percent">%s %%</string>
+
+  <!-- Options of the charging planner in the route planner. -->
+  <string name="ev_battery_now">Battery now</string>
+  <string name="ev_battery_now_from_car">Battery now (from the car)</string>
+  <string name="ev_min_arrival">At the destination at least</string>
+  <string name="ev_min_stop">At charging stops at least</string>
+  <string name="ev_priority">Priority</string>
+  <string name="ev_priority_fastest">Fastest arrival</string>
+  <string name="ev_priority_fewest_stops">Few stops</string>
+  <string name="ev_priority_long_breaks">Long breaks are fine</string>
+  <string name="ev_preferred_providers">Preferred providers</string>
+  <string name="ev_providers_hint">Tap: prefer, tap again: exclude</string>
+  <string name="ev_providers_loading">Looking for providers along the route…</string>
+  <string name="ev_providers_none">No charging stations along the route yet</string>
+  <string name="ev_excluded_providers">Exclude</string>
+  <string name="ev_min_power">Minimum power</string>
+  <string name="ev_prefer_at_stops">Prefer at stops</string>
+  <string name="ev_amenity_toilets">Toilet</string>
+  <string name="ev_amenity_playground">Playground</string>
+  <string name="ev_amenity_food">Food</string>
+  <string name="ev_amenity_shopping">Shopping</string>
+  <string name="ev_plan_button">Plan charging stops</string>
+  <string name="ev_planning_progress">Planning charging stops…</string>
+
+  <!-- The plan. -->
+  <!-- %1$s driving time, %2$s charging time, %3$s arrival time (15:28), %4$d battery level at the arrival. -->
+  <string name="ev_summary">%1$s driving · %2$s charging · arrival %3$s with %4$d %%</string>
+  <plurals name="ev_distance_and_stops">
+    <item quantity="one">%1$s · %2$d charging stop</item>
+    <item quantity="other">%1$s · %2$d charging stops</item>
+  </plurals>
+  <string name="ev_no_stop_needed">%s · no charging stop needed</string>
+  <string name="ev_legend_drive">Driving</string>
+  <string name="ev_legend_charge">Charging</string>
+  <string name="ev_in_distance">in %s</string>
+  <plurals name="ev_charging_points">
+    <item quantity="one">%d charging point</item>
+    <item quantity="other">%d charging points</item>
+  </plurals>
+  <string name="ev_up_to_power">up to %d kW</string>
+  <string name="ev_arrive_and_charge">arrive %1$d %% → %2$d %%</string>
+  <string name="ev_alternative">Alternative: %s</string>
+  <plurals name="ev_alternative_more_stops">
+    <item quantity="one">%d shorter stop</item>
+    <item quantity="other">%d shorter stops</item>
+  </plurals>
+  <plurals name="ev_alternative_fewer_stops">
+    <item quantity="one">%d longer stop</item>
+    <item quantity="other">%d longer stops</item>
+  </plurals>
+  <plurals name="ev_alternative_same_stops">
+    <item quantity="one">%d other stop</item>
+    <item quantity="other">%d other stops</item>
+  </plurals>
+  <string name="ev_alternative_later">arrival %d min later</string>
+  <string name="ev_alternative_earlier">arrival %d min earlier</string>
+  <string name="ev_alternative_same_time">same arrival</string>
+  <string name="ev_alternative_soc">with %d %% on arrival</string>
+  <string name="ev_alternatives">Alternatives</string>
+  <string name="ev_options">Options</string>
+  <string name="ev_start">Start</string>
+  <string name="ev_below_minimum">With this route the battery falls below the minimum. Plan again?</string>
+  <string name="ev_unreachable">The destination can\'t be reached: no suitable charging station between %1$s and %2$s along the route. Try a lower minimum power or allow more providers.</string>
+  <string name="ev_no_route">There is no car route to plan charging stops for.</string>
+  <string name="ev_error">The charging plan failed.</string>
+  <!-- Subtitle of a charging stop in the list of route points. -->
+  <string name="ev_stop_subtitle">Charging stop</string>
+
+  <!-- A charging stop in detail. -->
+  <string name="ev_station">Charging station</string>
+  <string name="ev_availability_unknown">Occupancy: no real-time data yet</string>
+  <string name="ev_availability_available">Occupancy: free charging points</string>
+  <string name="ev_availability_occupied">Occupancy: all charging points in use</string>
+  <string name="ev_nearby">Nearby (on foot)</string>
+  <string name="ev_nearby_none">Nothing known nearby</string>
+  <string name="ev_services">motorway services</string>
+  <string name="ev_open_on_arrival">open on arrival</string>
+  <string name="ev_closed_on_arrival">closed on arrival</string>
+  <string name="ev_charge">Charge %1$d %% → %2$d %%</string>
+  <!-- %1$d battery level, %2$s extra time (+9 min), %3$d battery level at the destination. -->
+  <string name="ev_charge_longer">Charge longer → %1$d %% (%2$s), arrival with %3$d %%</string>
+  <string name="ev_other_stop">Choose another stop</string>
+  <string name="ev_keep_stop">Keep as charging stop</string>
+
+  <!-- Navigation. -->
+  <string name="ev_nav_battery">Battery</string>
+  <string name="ev_nav_battery_title">Battery level now</string>
+  <string name="ev_nav_battery_ok">Next charging stop with %1$d %%, destination with %2$d %%.</string>
+  <string name="ev_nav_battery_destination">Destination with %d %%.</string>
+  <string name="ev_nav_battery_low">The battery falls below the minimum on the way.</string>
+  <string name="ev_nav_replan">Plan again</string>
+  <!-- Next charging stop during the navigation: name, charging time. -->
+  <string name="ev_nav_next_stop">⚡ %1$s · %2$s charging</string>
+  <!-- Android Auto: destination of a charging stop. -->
+  <string name="ev_car_stop">Charging stop: %s</string>
+  <string name="ev_kind_restaurant">Restaurant</string>
+  <string name="ev_kind_fast_food">Fast food</string>
+  <string name="ev_kind_cafe">Café</string>
+  <string name="ev_kind_supermarket">Supermarket</string>
+  <string name="ev_kind_convenience">Shop</string>
+  <string name="ev_kind_bakery">Bakery</string>
+  <!-- Route planner: the travel time includes the charging stops. -->
+  <string name="ev_including_charging">incl. %s charging</string>
+</resources>

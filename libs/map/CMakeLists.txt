@@ -20,6 +20,8 @@ set(SRC
   elevation_info.hpp
   everywhere_search_callback.cpp
   everywhere_search_callback.hpp
+  ev_planning_api.cpp
+  ev_planning_api.hpp
   everywhere_search_params.hpp
   extrapolation/extrapolator.cpp
   extrapolation/extrapolator.hpp
@@ -97,6 +99,7 @@ target_link_libraries(${PROJECT_NAME}
     drape
     drape_frontend
     editor
+    ev_planning
     geometry
     i18n
     indexer

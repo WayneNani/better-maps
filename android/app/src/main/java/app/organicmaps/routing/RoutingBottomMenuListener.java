@@ -12,4 +12,6 @@ public interface RoutingBottomMenuListener
   void onDirectionsPreviewOpen();
   // better-maps: search along the route.
   void onSearchAlongRoute();
+  // better-maps: charging planner for electric cars.
+  void onEvPlanning();
 }

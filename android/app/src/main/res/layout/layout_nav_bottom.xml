@@ -54,6 +54,20 @@
       app:srcCompat="@drawable/ic_search"
       app:tint="?iconTint" />
 
+    <!-- better-maps: battery level of an electric car with charging stops. -->
+    <com.google.android.material.imageview.ShapeableImageView
+      android:id="@+id/ev_battery"
+      android:layout_width="0dp"
+      android:layout_height="@dimen/nav_icon_size"
+      android:layout_weight="0.2"
+      android:background="?selectableItemBackgroundBorderless"
+      android:scaleType="center"
+      android:contentDescription="@string/ev_nav_battery"
+      android:tooltipText="@string/ev_nav_battery"
+      android:visibility="gone"
+      app:srcCompat="@drawable/ic_ev_charging"
+      app:tint="?iconTint" />
+
     <com.google.android.material.imageview.ShapeableImageView
       android:id="@+id/tts_volume"
       android:layout_width="0dp"

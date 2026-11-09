@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: charging planner over the map in the route planner, see docs/mockups/ladeplanung.png (2-4). -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+  <!-- The map shows the route between this (the status bar) and the sheet. -->
+  <View
+    android:id="@+id/ev_plan_top"
+    android:layout_width="match_parent"
+    android:layout_height="1dp"
+    android:layout_gravity="top" />
+
+  <LinearLayout
+    android:id="@+id/ev_plan_sheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:background="?appBackground"
+    android:clickable="true"
+    android:elevation="8dp"
+    android:focusable="true"
+    android:orientation="vertical">
+
+    <LinearLayout
+      android:id="@+id/ev_plan_header"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="@color/ev_header"
+      android:gravity="center_vertical"
+      android:minHeight="48dp"
+      android:orientation="horizontal">
+
+      <ImageButton
+        android:id="@+id/ev_plan_back"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?selectableItemBackgroundBorderless"
+        android:contentDescription="@string/back"
+        android:src="@drawable/ic_ev_back" />
+
+      <TextView
+        android:id="@+id/ev_plan_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingEnd="16dp"
+        android:text="@string/ev_planning"
+        android:textAppearance="@style/MwmTextAppearance.Body1"
+        android:textColor="@android:color/white"
+        android:textStyle="bold" />
+    </LinearLayout>
+
+    <app.organicmaps.ev.EvMaxHeightScrollView
+      android:id="@+id/ev_plan_scroll"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
+
+      <LinearLayout
+        android:id="@+id/ev_plan_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="8dp" />
+    </app.organicmaps.ev.EvMaxHeightScrollView>
+  </LinearLayout>
+</FrameLayout>

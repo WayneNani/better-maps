@@ -29,6 +29,9 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import app.organicmaps.MwmApplication;
 import app.organicmaps.R;
+import app.organicmaps.ev.EvFormatter;
+import app.organicmaps.ev.EvRouteStops;
+import app.organicmaps.ev.EvSettings;
 import app.organicmaps.sdk.Framework;
 import app.organicmaps.sdk.bookmarks.data.DistanceAndAzimut;
 import app.organicmaps.sdk.routing.RouteMarkData;
@@ -164,6 +167,7 @@ final class RoutingBottomMenuController implements View.OnClickListener
     directionsPreviewButton.setOnClickListener(this);
 
     altitudeChartFrame.findViewById(R.id.btn__search_along_route).setOnClickListener(this);
+    altitudeChartFrame.findViewById(R.id.btn__ev_planning).setOnClickListener(this);
 
     MaterialButton saveButton = altitudeChartFrame.findViewById(R.id.btn__save);
     saveButton.setOnClickListener(this);
@@ -219,6 +223,8 @@ final class RoutingBottomMenuController implements View.OnClickListener
     UiUtils.show(mAltitudeChartFrame);
     UiUtils.showIf(RouteSearchSettings.isSupported(RoutingController.get().getLastRouterType()),
                    mAltitudeChartFrame.findViewById(R.id.btn__search_along_route));
+    UiUtils.showIf(EvSettings.from(mContext).isAvailable(RoutingController.get().getLastRouterType()),
+                   mAltitudeChartFrame.findViewById(R.id.btn__ev_planning));
     MaterialButton saveButton = mAltitudeChartFrame.findViewById(R.id.btn__save);
     saveButton.setContentDescription(mContext.getString(R.string.save));
     saveButton.setIcon(AppCompatResources.getDrawable(mContext, R.drawable.ic_bookmark_add));
@@ -431,7 +437,12 @@ final class RoutingBottomMenuController implements View.OnClickListener
       return;
     }
 
-    Spanned spanned = makeSpannedRoutingDetails(mContext, rinfo);
+    // better-maps: the time at the charging stops of the route is part of the travel time.
+    final int chargingSec = RoutingController.get().isVehicleRouterType()
+                              ? (int) Math.round(EvRouteStops.INSTANCE.getRemainingStopTimeSec(
+                                    Framework.nativeGetRoutePoints()))
+                              : 0;
+    Spanned spanned = makeSpannedRoutingDetails(mContext, rinfo, chargingSec);
     if (RoutingController.get().isVehicleRouterType())
     {
       UiUtils.show(mTimeVehicle);
@@ -445,7 +456,7 @@ final class RoutingBottomMenuController implements View.OnClickListener
 
     if (mArrival != null)
     {
-      String arrivalTime = Utils.formatArrivalTime(rinfo.totalTimeInSeconds);
+      String arrivalTime = Utils.formatArrivalTime(rinfo.totalTimeInSeconds + chargingSec);
       mArrival.setText(arrivalTime);
     }
   }
@@ -459,11 +470,12 @@ final class RoutingBottomMenuController implements View.OnClickListener
   }
 
   @NonNull
-  private static Spanned makeSpannedRoutingDetails(@NonNull Context context, @NonNull RoutingInfo routingInfo)
+  private static Spanned makeSpannedRoutingDetails(@NonNull Context context, @NonNull RoutingInfo routingInfo,
+                                                   int chargingSec)
 
   {
-    CharSequence time =
-        Utils.formatRoutingTime(context, routingInfo.totalTimeInSeconds, R.dimen.text_size_routing_number);
+    CharSequence time = Utils.formatRoutingTime(context, routingInfo.totalTimeInSeconds + chargingSec,
+                                                R.dimen.text_size_routing_number);
 
     SpannableStringBuilder builder = new SpannableStringBuilder();
     initTimeBuilderSequence(context, time, builder);
@@ -472,6 +484,9 @@ final class RoutingBottomMenuController implements View.OnClickListener
     initDotBuilderSequence(context, dot, builder);
 
     initDistanceBuilderSequence(context, routingInfo.distToTarget.toString(context), builder);
+    if (chargingSec > 0)
+      builder.append(" · ").append(context.getString(R.string.ev_including_charging,
+                                                      EvFormatter.duration(chargingSec)));
 
     return builder;
   }
@@ -536,6 +551,8 @@ final class RoutingBottomMenuController implements View.OnClickListener
       mListener.onDirectionsPreviewOpen();
     else if (id == R.id.btn__search_along_route)
       mListener.onSearchAlongRoute();
+    else if (id == R.id.btn__ev_planning)
+      mListener.onEvPlanning();
     else if (id == R.id.btn__save)
     {
       Framework.nativeSaveRoute();

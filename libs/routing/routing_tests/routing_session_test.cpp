@@ -89,6 +89,26 @@ UNIT_TEST(RoutePolylineWithTimes)
   TEST_EQUAL(passedM, 0.0, ());
 }
 
+// better-maps: the route segments with the ends of the subroutes, for the energy of electric vehicles.
+UNIT_TEST(RouteSegmentsWithSubrouteEnds)
+{
+  RoutingSession session;
+  vector<RouteSegment> segments;
+  vector<double> subrouteEnds;
+  double passedM = -1;
+  TEST(!session.GetRouteSegments(segments, subrouteEnds, passedM), ());
+
+  auto route = make_shared<Route>("dummy", kTestRoute.begin(), kTestRoute.end(), 0 /* route id */);
+  FillSubroutesInfo(*route);
+  session.AssignRouteForTesting(std::move(route), RouterResultCode::NoError);
+
+  TEST(session.GetRouteSegments(segments, subrouteEnds, passedM), ());
+  TEST_EQUAL(segments.size(), kTestSegments.size(), ());
+  TEST_EQUAL(subrouteEnds.size(), 1, ());
+  TEST_EQUAL(subrouteEnds.back(), segments.back().GetDistFromBeginningMeters(), ());
+  TEST_EQUAL(passedM, 0.0, ());
+}
+
 // Simple router. It returns route given to him on creation.
 class DummyRouter : public IRouter
 {
