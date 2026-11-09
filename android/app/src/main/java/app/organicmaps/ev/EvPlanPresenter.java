@@ -95,7 +95,7 @@ public class EvPlanPresenter
 
   /** A stop that makes the real route longer by more than this is avoided, e.g. motorway services on the other side. */
   static final double MAX_DETOUR_M = 8000;
-  static final int MAX_DETOUR_RETRIES = 2;
+  static final int MAX_DETOUR_RETRIES = 3;
 
   public EvPlanPresenter(@NonNull EvSettings settings, @NonNull EvVehicleProfile profile, @NonNull Engine engine,
                          @NonNull Route route, @NonNull EvRouteStops routeStops)
@@ -342,14 +342,15 @@ public class EvPlanPresenter
     mRoute.setChargingStops(applied, plan.stops, () -> {
       if (request != mRequest)
         return;
-      final String detourStop = evaluate(plan);
-      if (detourStop != null && mDetourRetries < MAX_DETOUR_RETRIES)
+      final List<String> detourStops = evaluate(plan);
+      if (!detourStops.isEmpty() && mDetourRetries < MAX_DETOUR_RETRIES)
       {
         // The station is next to the route, but the real route to it is long, e.g. services on the other side of
         // the motorway: plan again without it.
         ++mDetourRetries;
-        if (!mOptions.excludedStations.contains(detourStop))
-          mOptions.excludedStations.add(detourStop);
+        for (String key : detourStops)
+          if (!mOptions.excludedStations.contains(key))
+            mOptions.excludedStations.add(key);
         mRouteStops.set(plan, mProfile.toJson(), mOptions.copy());
         planAgain();
         return;
@@ -363,32 +364,34 @@ public class EvPlanPresenter
   /**
    * Evaluates |plan| with the current route, in which its stops are.
    *
-   * @return the key of a stop that needs a detour of more than {@link #MAX_DETOUR_M} on the real route, if any.
+   * @return the keys of the stops that need a long detour on the real route, see {@link #findDetourStops}.
    */
-  @Nullable
-  private String evaluate(@NonNull EvPlanResult.Plan plan)
+  @NonNull
+  private List<String> evaluate(@NonNull EvPlanResult.Plan plan)
   {
     if (plan.stops.isEmpty())
-      return null;
+      return Collections.emptyList();
     final String json = mEngine.evaluate(mProfile.toJson(), optionsJson(), EvJson.stopsToJson(plan.stops));
     final EvPlanResult.Plan evaluated = EvJson.parsePlan(json);
     if (evaluated == null)
-      return null;
-    final String detourStop = findDetourStop(plan, evaluated);
+      return Collections.emptyList();
+    final List<String> detourStops = findDetourStops(plan, evaluated);
     plan.takeEvaluation(evaluated);
-    return detourStop;
+    return detourStops;
   }
 
   /**
-   * The stop with the longest detour on the real route, if longer than {@link #MAX_DETOUR_M}: the legs to it and from
-   * it are longer than planned.
+   * Stops with a long detour on the real route: the legs to them and from them are both longer than planned (e.g.
+   * services on the other side of the motorway: one has to turn at the next exit and again after the stop), or
+   * together by far.
    */
-  @Nullable
-  static String findDetourStop(@NonNull EvPlanResult.Plan planned, @NonNull EvPlanResult.Plan real)
+  @NonNull
+  static List<String> findDetourStops(@NonNull EvPlanResult.Plan planned, @NonNull EvPlanResult.Plan real)
   {
+    final List<String> stops = new ArrayList<>();
     final int n = planned.stops.size();
     if (real.stops.size() != n || n == 0)
-      return null;
+      return stops;
     // Extra length of each leg: to stop 0, ..., to stop n - 1, to the destination.
     final double[] extra = new double[n + 1];
     double plannedPrev = 0;
@@ -401,18 +404,14 @@ public class EvPlanPresenter
       plannedPrev = plannedPos;
       realPrev = realPos;
     }
-    String worst = null;
-    double worstDetour = MAX_DETOUR_M;
     for (int i = 0; i < n; ++i)
     {
-      final double detour = extra[i] + extra[i + 1];
-      if (detour > worstDetour)
-      {
-        worstDetour = detour;
-        worst = planned.stops.get(i).key;
-      }
+      final boolean bothLegs = Math.min(extra[i], extra[i + 1]) > MAX_DETOUR_M / 2;
+      final boolean together = extra[i] + extra[i + 1] > 3 * MAX_DETOUR_M;
+      if (bothLegs || together)
+        stops.add(planned.stops.get(i).key);
     }
-    return worst;
+    return stops;
   }
 
   public void chooseAlternative(int index)

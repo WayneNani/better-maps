@@ -411,10 +411,14 @@ public class EvPlanPresenterTest
     final EvPlanResult.Plan real = EvJson.parsePlan(EvTestData.EVALUATED_JSON);
     assertNotNull(real);
     // 2 km longer: fine.
-    assertNull(EvPlanPresenter.findDetourStop(planned.plan, real));
+    assertTrue(EvPlanPresenter.findDetourStops(planned.plan, real).isEmpty());
+    // Only the way to the stop is longer, e.g. a station a bit off the motorway: fine.
     real.stops.get(0).distanceAlongRouteM += 10000;
     real.distanceM += 10000;
-    assertEquals("Germany:1", EvPlanPresenter.findDetourStop(planned.plan, real));
+    assertTrue(EvPlanPresenter.findDetourStops(planned.plan, real).isEmpty());
+    // The way to it and from it: services on the other side of the motorway.
+    real.distanceM += 10000;
+    assertEquals(List.of("Germany:1"), EvPlanPresenter.findDetourStops(planned.plan, real));
   }
 
   @Test
