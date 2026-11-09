@@ -93,13 +93,18 @@ struct ChargingStop
   std::vector<AmenityType> m_matchedAmenities;
   bool m_isPreferredProvider = false;
 
-  // Charging up to kLongerChargePct more at this stop (empty if the stop already charges to the maximum).
+  // Charging up to kLongerChargePct more at this stop (empty if the stop already charges to the maximum). The extra
+  // charge goes on: the following stops keep their departure states of charge, so they charge less (the next one
+  // first, a stop that arrives with enough not at all), and what they don't need reaches the destination. Without a
+  // following stop, the arrival is higher by the extra charge.
   struct Longer
   {
     double m_departureSocPct = 0.0;
     double m_extraStopTimeSec = 0.0;
-    // Change of the total time: the next stop needs less charging.
+    // Change of the total time: the following stops need less charging.
     double m_extraTotalTimeSec = 0.0;
+    // Charging time saved at the following stops.
+    double m_laterStopsSavedSec = 0.0;
     double m_arrivalSocPct = 0.0;
   };
   std::optional<Longer> m_longer;

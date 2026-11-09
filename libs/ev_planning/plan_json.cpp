@@ -51,6 +51,7 @@ struct LongerDto
   double departureSocPct = 0.0;
   double extraStopTimeSec = 0.0;
   double extraTotalTimeSec = 0.0;
+  double laterStopsSavedSec = 0.0;
   double arrivalSocPct = 0.0;
 };
 
@@ -192,8 +193,9 @@ StopDto MakeStop(ChargingStop const & stop)
   }
   if (stop.m_longer)
   {
-    dto.longer = LongerDto{stop.m_longer->m_departureSocPct, stop.m_longer->m_extraStopTimeSec,
-                           stop.m_longer->m_extraTotalTimeSec, stop.m_longer->m_arrivalSocPct};
+    auto const & longer = *stop.m_longer;
+    dto.longer = LongerDto{longer.m_departureSocPct, longer.m_extraStopTimeSec, longer.m_extraTotalTimeSec,
+                           longer.m_laterStopsSavedSec, longer.m_arrivalSocPct};
   }
   return dto;
 }

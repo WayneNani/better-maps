@@ -389,6 +389,8 @@ void AddLongerVariantsImpl(VehicleProfile const & profile, RouteEnergy const & r
     variant.m_departureSocPct = longerTargets[i].m_departureSocPct;
     variant.m_extraStopTimeSec = longer.m_stops[i].m_stopTimeSec - stop.m_stopTimeSec;
     variant.m_extraTotalTimeSec = longer.m_totalTimeSec - plan.m_totalTimeSec;
+    for (size_t j = i + 1; j < plan.m_stops.size(); ++j)
+      variant.m_laterStopsSavedSec += plan.m_stops[j].m_stopTimeSec - longer.m_stops[j].m_stopTimeSec;
     variant.m_arrivalSocPct = longer.m_arrivalSocPct;
     stop.m_longer = variant;
   }

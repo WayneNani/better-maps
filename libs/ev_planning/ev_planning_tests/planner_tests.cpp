@@ -403,4 +403,52 @@ UNIT_TEST(Planner_ReevaluateWithRealRoute)
   TEST(!tooFar.m_meetsMinimums, ());
   TEST_LESS(tooFar.m_stops[0].m_arrivalSocPct, options.m_minStopSocPct, ());
 }
+
+// "Charge longer" goes on to the following stops and the destination.
+UNIT_TEST(Planner_ChargeLongerPropagates)
+{
+  auto const & elroq = Elroq();
+  auto const route = MakeRoute(elroq, 750.0, kSpeedKmh);
+  auto const a = MakeStation(1, 250.0, "type2_combo|4|300", "", 0.0);
+  auto const b = MakeStation(2, 500.0, "type2_combo|4|300", "", 0.0);
+  PlanOptions options;
+  options.m_startSocPct = 80.0;
+  // 250 km need 53.5 %: A 26.5 -> 70 %, B 16.5 -> 74 %, arrival with 20.5 %.
+  Plan plan = EvaluateStops(elroq, route, {{a, 70.0}, {b, 74.0}}, options);
+  TEST(plan.m_meetsMinimums, (plan.m_arrivalSocPct));
+  AddLongerVariants(elroq, route, options, plan);
+
+  // Longer at A: B arrives with 10 % more and charges 10 % less (shorter), the arrival stays.
+  auto const & atA = *plan.m_stops[0].m_longer;
+  TEST(AlmostEqualAbs(atA.m_departureSocPct, 80.0, 1e-6), ());
+  TEST(AlmostEqualAbs(atA.m_arrivalSocPct, plan.m_arrivalSocPct, 1e-6), ());
+  TEST_GREATER(atA.m_extraStopTimeSec, 0.0, ());
+  TEST_GREATER(atA.m_laterStopsSavedSec, 0.0, ());
+  TEST(AlmostEqualAbs(atA.m_extraTotalTimeSec, atA.m_extraStopTimeSec - atA.m_laterStopsSavedSec, 1e-6), ());
+  auto const longerAtA = EvaluateStops(elroq, route, {{a, atA.m_departureSocPct}, {b, 74.0}}, options);
+  TEST(AlmostEqualAbs(longerAtA.m_stops[1].m_arrivalSocPct, plan.m_stops[1].m_arrivalSocPct + 10.0, 1e-6), ());
+  TEST(AlmostEqualAbs(plan.m_stops[1].m_chargingTimeSec - longerAtA.m_stops[1].m_chargingTimeSec,
+                      atA.m_laterStopsSavedSec, 1e-6),
+       ());
+
+  // Longer at B (the last stop): the arrival is 10 % higher.
+  auto const & atB = *plan.m_stops[1].m_longer;
+  TEST(AlmostEqualAbs(atB.m_arrivalSocPct, plan.m_arrivalSocPct + 10.0, 1e-6), ());
+  TEST_EQUAL(atB.m_laterStopsSavedSec, 0.0, ());
+  TEST(AlmostEqualAbs(atB.m_extraTotalTimeSec, atB.m_extraStopTimeSec, 1e-6), ());
+
+  // More extra than the next stop needs: D only tops up 5.4 %, so it charges nothing then and the rest of the extra
+  // reaches the destination.
+  auto const shorter = MakeRoute(elroq, 600.0, kSpeedKmh);
+  auto const c = MakeStation(3, 250.0, "type2_combo|4|300", "", 0.0);
+  auto const d = MakeStation(4, 350.0, "type2_combo|4|300", "", 0.0);
+  Plan topUp = EvaluateStops(elroq, shorter, {{c, 90.0}, {d, 74.0}}, options);
+  TEST(topUp.m_meetsMinimums, (topUp.m_arrivalSocPct));
+  TEST_GREATER(topUp.m_stops[1].m_chargingTimeSec, 0.0, ());
+  AddLongerVariants(elroq, shorter, options, topUp);
+  auto const & atC = *topUp.m_stops[0].m_longer;
+  TEST(AlmostEqualAbs(atC.m_laterStopsSavedSec, topUp.m_stops[1].m_chargingTimeSec, 1e-6), ());
+  TEST_GREATER(atC.m_arrivalSocPct, topUp.m_arrivalSocPct + 4.0, ());
+  TEST_LESS(atC.m_arrivalSocPct, topUp.m_arrivalSocPct + 10.0, ());
+}
 }  // namespace planner_tests
