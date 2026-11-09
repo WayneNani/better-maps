@@ -117,6 +117,7 @@
   <string name="ev_charge">Charge %1$d %% → %2$d %%</string>
   <!-- %1$d battery level, %2$s extra time (+9 min), %3$d battery level at the destination. -->
   <string name="ev_charge_longer">Charge longer → %1$d %% (%2$s), arrival with %3$d %%</string>
+  <string name="ev_charge_longer_later_shorter">Charge longer → %1$d %% (%2$s), later stops %3$s shorter, arrival with %4$d %%</string>
   <string name="ev_other_stop">Choose another stop</string>
   <string name="ev_keep_stop">Keep as charging stop</string>
 

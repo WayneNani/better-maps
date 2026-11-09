@@ -45,6 +45,8 @@ public class EvPlanResult
     public double departureSocPct;
     public double extraStopTimeSec;
     public double extraTotalTimeSec;
+    /** Charging time saved at the following stops, which arrive with more. */
+    public double laterStopsSavedSec;
     public double arrivalSocPct;
   }
 
@@ -61,7 +63,10 @@ public class EvPlanResult
     public double lon;
     public double distanceAlongRouteM;
     public double distanceFromRouteM;
+    /** An estimate from the distance to the route, or the real detour (from the router) if {@link #detourChecked}. */
     public double detourSec;
+    public boolean detourChecked;
+    public double detourDistanceM;
     public double powerKw;
     public boolean powerKnown = true;
     public boolean dc = true;
@@ -124,6 +129,15 @@ public class EvPlanResult
     /** For alternatives: "priority" or "other_station". */
     public String reason = "";
 
+    /**
+     * The numbers of the planner, which stay after an evaluation with the real route ({@link #takeEvaluation}), so
+     * that plans can be compared on the same basis: the alternatives are not evaluated.
+     */
+    public double plannedTotalTimeSec;
+    public double plannedArrivalSocPct;
+    /** Evaluated with the real route, in which its stops are. */
+    public boolean evaluated;
+
     @NonNull
     Plan normalize()
     {
@@ -131,7 +145,21 @@ public class EvPlanResult
         stops = new ArrayList<>();
       for (Stop s : stops)
         s.normalize();
+      if (!evaluated)
+      {
+        plannedTotalTimeSec = totalTimeSec;
+        plannedArrivalSocPct = arrivalSocPct;
+      }
       return this;
+    }
+
+    /** All stops with the real detour from the router, so that the times of the planner hold. */
+    public boolean hasCheckedDetours()
+    {
+      for (Stop s : stops)
+        if (!s.detourChecked)
+          return false;
+      return true;
     }
 
     /**
@@ -150,6 +178,7 @@ public class EvPlanResult
       arrivalSocPct = evaluated.arrivalSocPct;
       minSocPct = evaluated.minSocPct;
       meetsMinimums = evaluated.meetsMinimums;
+      this.evaluated = true;
     }
 
     public boolean hasSameStations(@NonNull Plan other)

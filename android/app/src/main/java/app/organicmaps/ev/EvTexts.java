@@ -41,6 +41,11 @@ public interface EvTexts
   @NonNull
   String chargeLonger(int departureSoc, @NonNull String extraTime, int arrivalSoc);
 
+  /** E.g. "Charge longer → 73 % (+5 min), later stops 3 min shorter, arrival with 23 %". */
+  @NonNull
+  String chargeLongerLaterShorter(int departureSoc, @NonNull String extraTime, @NonNull String savedTime,
+                                  int arrivalSoc);
+
   /** Name of an OSM socket type, e.g. "CCS" for type2_combo. */
   @NonNull
   String socketName(@NonNull String type);

@@ -85,6 +85,14 @@ public class AndroidEvTexts implements EvTexts
 
   @NonNull
   @Override
+  public String chargeLongerLaterShorter(int departureSoc, @NonNull String extraTime, @NonNull String savedTime,
+                                         int arrivalSoc)
+  {
+    return mContext.getString(R.string.ev_charge_longer_later_shorter, departureSoc, extraTime, savedTime, arrivalSoc);
+  }
+
+  @NonNull
+  @Override
   public String socketName(@NonNull String type)
   {
     switch (type)

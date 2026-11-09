@@ -1,6 +1,10 @@
 #include "ev_planning/planner.hpp"
 
+#include "ev_planning/detours.hpp"
+
 #include "search/opening_hours_filter.hpp"
+
+#include "geometry/mercator.hpp"
 
 #include "base/assert.hpp"
 #include "base/logging.hpp"
@@ -9,6 +13,9 @@
 #include <cmath>
 #include <limits>
 #include <map>
+#include <optional>
+#include <set>
+#include <utility>
 
 namespace ev
 {
@@ -36,6 +43,14 @@ double ToSoc(int level)
 
 double GetDetourEnergyKwh(EnergyModel const & model, ChargingStation const & station)
 {
+  if (station.m_detourChecked && station.m_detourDistanceM > 0.0 && station.m_detourSec > 0.0)
+  {
+    // The real detour, e.g. on the motorway to the next junction and back.
+    double const km = station.m_detourDistanceM / 1000.0;
+    double const speedKmh = std::clamp(km / (station.m_detourSec / 3600.0), kDetourSpeedKmh / 2.0, 130.0);
+    double const factor = speedKmh < 60.0 ? EnergyModel::kMinorRoadFactor : 1.0;
+    return model.GetLevelConsumptionKwhPerKm(speedKmh) * km * factor;
+  }
   double const detourKm = station.m_detourSec / 3600.0 * kDetourSpeedKmh;
   return model.GetLevelConsumptionKwhPerKm(kDetourSpeedKmh) * detourKm * EnergyModel::kMinorRoadFactor;
 }
@@ -95,6 +110,8 @@ struct DpResult
 {
   bool m_found = false;
   std::vector<StopTarget> m_stops;
+  // Indices of the stations of m_stops in the stations of RunDp().
+  std::vector<size_t> m_stationIndices;
   double m_reachableUntilM = 0.0;
   double m_gapEndM = 0.0;
 };
@@ -232,11 +249,124 @@ DpResult RunDp(VehicleProfile const & profile, EnergyModel const & model, RouteE
     if (prevNode == 0)
       break;
     result.m_stops.push_back({*nodes[prevNode].m_station, ToSoc(prevDepartureLevel)});
+    result.m_stationIndices.push_back(static_cast<size_t>(prevNode - 1));
     node = prevNode;
     level = departures[prevNode][prevDepartureLevel].m_fromLevel;
   }
   std::reverse(result.m_stops.begin(), result.m_stops.end());
+  std::reverse(result.m_stationIndices.begin(), result.m_stationIndices.end());
   return result;
+}
+
+// Several stations at one place, e.g. of several providers at the same services, or a station mapped twice.
+double constexpr kSamePlaceM = 50.0;
+
+bool IsSamePlace(ChargingStation const & a, ChargingStation const & b)
+{
+  return mercator::DistanceOnEarth(a.m_point, b.m_point) < kSamePlaceM;
+}
+
+bool HasSamePlaces(Plan const & a, Plan const & b)
+{
+  if (a.m_stops.size() != b.m_stops.size())
+    return false;
+  for (size_t i = 0; i < a.m_stops.size(); ++i)
+    if (!IsSamePlace(a.m_stops[i].m_station, b.m_stops[i].m_station))
+      return false;
+  return true;
+}
+
+// Excludes the stations at the same place as an excluded one too: "choose another stop" means another place.
+void ExcludeSamePlaces(std::vector<ChargingStation> const & stations, PlanOptions & options)
+{
+  auto & excluded = options.m_excludedStations;
+  std::vector<ChargingStation const *> places;
+  for (auto const & s : stations)
+    if (std::find(excluded.begin(), excluded.end(), s.GetKey()) != excluded.end())
+      places.push_back(&s);
+  for (auto const & s : stations)
+  {
+    bool const atPlace = std::any_of(places.begin(), places.end(), [&s](auto const * p) { return IsSamePlace(*p, s); });
+    if (atPlace && std::find(excluded.begin(), excluded.end(), s.GetKey()) == excluded.end())
+      excluded.push_back(s.GetKey());
+  }
+}
+
+// Real detours of stations with a DetourProvider, at most kMaxDetourChecks.
+class DetourChecker
+{
+public:
+  explicit DetourChecker(DetourProvider * provider) : m_provider(provider) {}
+
+  bool CanCheck() const { return m_provider && m_checks < kMaxDetourChecks; }
+  size_t GetChecksCount() const { return m_checks; }
+
+  // Better estimates of the provider for all stations.
+  void Estimate(std::vector<ChargingStation> & stations) const
+  {
+    if (!m_provider)
+      return;
+    for (auto & s : stations)
+      if (!s.m_detourChecked)
+        if (auto const estimate = m_provider->EstimateDetourSec(s))
+          s.m_detourSec = *estimate;
+  }
+
+  // False if the station was tried before, or no check is left.
+  bool Check(ChargingStation & station)
+  {
+    if (station.m_detourChecked || !CanCheck() || !m_tried.insert(&station).second)
+      return false;
+    // Several stations at one place have the same detour.
+    auto const samePlace = std::find_if(m_detours.begin(), m_detours.end(), [&station](auto const & known)
+    { return mercator::DistanceOnEarth(known.first, station.m_point) < kSamePlaceM; });
+    std::optional<Detour> detour;
+    if (samePlace != m_detours.end())
+    {
+      detour = samePlace->second;
+    }
+    else
+    {
+      ++m_checks;
+      detour = m_provider->GetDetour(station);
+      if (!detour)
+        return true;  // The estimate stays.
+      m_detours.emplace_back(station.m_point, *detour);
+    }
+    LOG(LDEBUG, ("Detour of", station.GetTitle(), "at km", station.m_distanceAlongRouteM / 1000.0, ":",
+                 station.m_detourSec, "s estimated,", detour->m_timeSec, "s and", detour->m_distanceM, "m real"));
+    station.m_detourSec = detour->m_timeSec;
+    station.m_detourDistanceM = detour->m_distanceM;
+    station.m_detourChecked = true;
+    return true;
+  }
+
+private:
+  DetourProvider * m_provider;
+  size_t m_checks = 0;
+  std::set<ChargingStation const *> m_tried;
+  std::vector<std::pair<m2::PointD, Detour>> m_detours;
+};
+
+// RunDp() until all stations of the plan have their real detour: a station with a longer real detour than estimated
+// may drop out of the plan, then the next plan is checked. Ends after a few rounds: each one checks at least one more
+// station.
+DpResult RunDpWithDetours(VehicleProfile const & profile, EnergyModel const & model, RouteEnergy const & route,
+                          std::vector<ChargingStation *> const & stations, PlanOptions const & options,
+                          DetourChecker & checker)
+{
+  std::vector<ChargingStation const *> const constStations(stations.begin(), stations.end());
+  while (true)
+  {
+    DpResult dp = RunDp(profile, model, route, constStations, options);
+    if (!dp.m_found || !checker.CanCheck())
+      return dp;
+    bool checked = false;
+    for (size_t const index : dp.m_stationIndices)
+      checked |= checker.Check(*stations[index]);
+    if (!checked)
+      return dp;
+  }
 }
 
 void AddLongerVariantsImpl(VehicleProfile const & profile, RouteEnergy const & route, PlanOptions const & options,
@@ -259,6 +389,8 @@ void AddLongerVariantsImpl(VehicleProfile const & profile, RouteEnergy const & r
     variant.m_departureSocPct = longerTargets[i].m_departureSocPct;
     variant.m_extraStopTimeSec = longer.m_stops[i].m_stopTimeSec - stop.m_stopTimeSec;
     variant.m_extraTotalTimeSec = longer.m_totalTimeSec - plan.m_totalTimeSec;
+    for (size_t j = i + 1; j < plan.m_stops.size(); ++j)
+      variant.m_laterStopsSavedSec += plan.m_stops[j].m_stopTimeSec - longer.m_stops[j].m_stopTimeSec;
     variant.m_arrivalSocPct = longer.m_arrivalSocPct;
     stop.m_longer = variant;
   }
@@ -494,9 +626,15 @@ Plan EvaluateStopsAdjusting(VehicleProfile const & profile, RouteEnergy const & 
   return plan;
 }
 
-PlanResult PlanCharging(VehicleProfile const & profile, RouteEnergy const & route,
-                        std::vector<ChargingStation> const & stations, PlanOptions const & options)
+namespace
 {
+PlanResult PlanChargingImpl(VehicleProfile const & profile, RouteEnergy const & route,
+                            std::vector<ChargingStation> const & allStations, PlanOptions const & requestedOptions,
+                            DetourChecker & checker)
+{
+  PlanOptions options = requestedOptions;
+  ExcludeSamePlaces(allStations, options);
+
   PlanResult result;
   if (!profile.IsValid())
   {
@@ -509,14 +647,18 @@ PlanResult PlanCharging(VehicleProfile const & profile, RouteEnergy const & rout
     return result;
   }
 
-  result.m_candidatesCount = stations.size();
-  result.m_providers = CountProviders(stations);
+  result.m_candidatesCount = allStations.size();
+  result.m_providers = CountProviders(allStations);
+
+  // A copy for the real detours, which all plans share.
+  std::vector<ChargingStation> stations = allStations;
+  checker.Estimate(stations);
 
   EnergyModel const model(profile);
   auto const usableStations = [&](PlanOptions const & opts)
   {
-    std::vector<ChargingStation const *> usable;
-    for (auto const & s : stations)
+    std::vector<ChargingStation *> usable;
+    for (auto & s : stations)
       if (IsUsable(profile, s, opts))
         usable.push_back(&s);
     std::stable_sort(usable.begin(), usable.end(), [](ChargingStation const * a, ChargingStation const * b)
@@ -527,7 +669,7 @@ PlanResult PlanCharging(VehicleProfile const & profile, RouteEnergy const & rout
   auto const usable = usableStations(options);
   result.m_usableCount = usable.size();
 
-  DpResult const best = RunDp(profile, model, route, usable, options);
+  DpResult const best = RunDpWithDetours(profile, model, route, usable, options, checker);
   if (!best.m_found)
   {
     result.m_status = PlanStatus::Unreachable;
@@ -548,7 +690,7 @@ PlanResult PlanCharging(VehicleProfile const & profile, RouteEnergy const & rout
       continue;
     PlanOptions other = options;
     other.m_priority = priority;
-    auto const dp = RunDp(profile, model, route, usable, other);
+    auto const dp = RunDpWithDetours(profile, model, route, usable, other, checker);
     if (!dp.m_found)
       continue;
     Plan plan = MakePlan(profile, route, dp.m_stops, other);
@@ -559,7 +701,8 @@ PlanResult PlanCharging(VehicleProfile const & profile, RouteEnergy const & rout
   {
     PlanOptions other = options;
     other.m_excludedStations.push_back(stop.m_station.GetKey());
-    auto const dp = RunDp(profile, model, route, usableStations(other), other);
+    ExcludeSamePlaces(stations, other);
+    auto const dp = RunDpWithDetours(profile, model, route, usableStations(other), other, checker);
     if (!dp.m_found)
       continue;
     Plan plan = MakePlan(profile, route, dp.m_stops, options);
@@ -570,9 +713,9 @@ PlanResult PlanCharging(VehicleProfile const & profile, RouteEnergy const & rout
   // Variety first: the best plan with another number of stops (fewest stops first), then the fastest of the rest.
   auto const isNew = [&result](Plan const & plan)
   {
-    return !plan.m_stops.empty() && !plan.HasSameStations(result.m_plan) &&
+    return !plan.m_stops.empty() && !HasSamePlaces(plan, result.m_plan) &&
            std::none_of(result.m_alternatives.begin(), result.m_alternatives.end(),
-                        [&plan](Plan const & p) { return p.HasSameStations(plan); });
+                        [&plan](Plan const & p) { return HasSamePlaces(p, plan); });
   };
   std::stable_sort(candidates.begin(), candidates.end(), [](Plan const & a, Plan const & b)
   {
@@ -599,6 +742,17 @@ PlanResult PlanCharging(VehicleProfile const & profile, RouteEnergy const & rout
   }
   std::stable_sort(result.m_alternatives.begin(), result.m_alternatives.end(),
                    [](Plan const & a, Plan const & b) { return a.m_totalTimeSec < b.m_totalTimeSec; });
+  return result;
+}
+}  // namespace
+
+PlanResult PlanCharging(VehicleProfile const & profile, RouteEnergy const & route,
+                        std::vector<ChargingStation> const & candidates, PlanOptions const & options,
+                        DetourProvider * detours)
+{
+  DetourChecker checker(detours);
+  auto result = PlanChargingImpl(profile, route, candidates, options, checker);
+  result.m_detourChecks = checker.GetChecksCount();
   return result;
 }
 }  // namespace ev

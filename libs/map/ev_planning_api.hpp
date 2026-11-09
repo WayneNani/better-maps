@@ -19,7 +19,8 @@ class RoutingManager;
 namespace routing
 {
 class NumMwmIds;
-}
+class RouterDelegate;
+}  // namespace routing
 
 namespace search
 {
@@ -76,4 +77,6 @@ private:
   // Identifies the current Plan() call, tasks of earlier calls stop.
   std::shared_ptr<std::atomic<uint64_t>> m_currentRequest;
   std::weak_ptr<search::ProcessorHandle> m_searchHandle;
+  // Of the real detours of the current Plan() call.
+  std::weak_ptr<routing::RouterDelegate> m_detourDelegate;
 };

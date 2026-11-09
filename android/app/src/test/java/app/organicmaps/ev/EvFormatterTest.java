@@ -1,6 +1,7 @@
 package app.organicmaps.ev;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -77,6 +78,12 @@ public class EvFormatterTest
     assertEquals("food · open on arrival", mFormatter.amenityWithOpening(nearest.get(2)));
     assertEquals("shopping", mFormatter.amenityWithOpening(nearest.get(3)));
 
+    // With a following stop: it charges less.
+    stop.longer.laterStopsSavedSec = 190;
+    stop.longer.arrivalSocPct = 24;
+    assertEquals("Charge longer → 80 % (+9 min), later stops 3 min shorter, arrival with 24 %",
+                 mFormatter.longer(stop));
+
     stop.longer = null;
     assertEquals("", mFormatter.longer(stop));
   }
@@ -88,6 +95,61 @@ public class EvFormatterTest
     assertEquals("Alternative: Ionity Montabaur + EnBW Aurach", mFormatter.alternativeTitle(alternative));
     assertEquals("2 shorter stops, arrival 4 min later, with 41 %",
                  mFormatter.alternativeDescription(alternative, mResult.plan));
+  }
+
+  @Test
+  public void alternativeOfAnEvaluatedPlan()
+  {
+    // The main plan on the real route takes 20 min longer and arrives with 1 % less (e.g. a longer detour than
+    // planned). The alternative is compared with the planned numbers: 4 min later, not 16 min earlier.
+    final EvPlanResult.Plan main = mResult.plan;
+    final EvPlanResult.Plan evaluated = EvJson.parsePlan(EvTestData.EVALUATED_JSON);
+    assertNotNull(evaluated);
+    evaluated.totalTimeSec = main.totalTimeSec + 20 * 60;
+    main.takeEvaluation(evaluated);
+    assertTrue(main.evaluated);
+    assertEquals(17280, main.plannedTotalTimeSec, 1e-9);
+    assertEquals(24, main.plannedArrivalSocPct, 1e-9);
+    final EvPlanResult.Plan alternative = mResult.alternatives.get(0);
+    assertEquals("2 shorter stops, arrival 4 min later, with 40 %",
+                 mFormatter.alternativeDescription(alternative, main));
+  }
+
+  @Test
+  public void earlierOnlyWithRealDetours()
+  {
+    // The planner says 10 min earlier.
+    final EvPlanResult.Plan main = mResult.plan;
+    final EvPlanResult.Plan alternative = mResult.alternatives.get(0);
+    alternative.plannedTotalTimeSec = main.plannedTotalTimeSec - 600;
+    alternative.totalTimeSec = alternative.plannedTotalTimeSec;
+    // With estimated detours that may be wrong (e.g. services on the other side of the motorway): not earlier.
+    assertFalse(alternative.hasCheckedDetours());
+    assertEquals("2 shorter stops, same arrival, with 41 %", mFormatter.alternativeDescription(alternative, main));
+    // With the real detours from the router: earlier.
+    for (EvPlanResult.Stop stop : alternative.stops)
+      stop.detourChecked = true;
+    assertTrue(alternative.hasCheckedDetours());
+    assertEquals("2 shorter stops, arrival 10 min earlier, with 41 %",
+                 mFormatter.alternativeDescription(alternative, main));
+  }
+
+  @Test
+  public void alternativeThatWasEvaluated()
+  {
+    // The user chose the alternative and back: both evaluated with the real route, their real numbers count.
+    final EvPlanResult.Plan main = mResult.plan;
+    final EvPlanResult.Plan alternative = mResult.alternatives.get(0);
+    final EvPlanResult.Plan mainReal = EvJson.parsePlan(EvTestData.EVALUATED_JSON);
+    assertNotNull(mainReal);
+    main.takeEvaluation(mainReal);
+    final EvPlanResult.Plan alternativeReal = EvJson.parsePlan(EvTestData.EVALUATED_JSON);
+    assertNotNull(alternativeReal);
+    alternativeReal.totalTimeSec = mainReal.totalTimeSec - 7 * 60;
+    alternativeReal.arrivalSocPct = 33;
+    alternative.takeEvaluation(alternativeReal);
+    assertEquals("2 shorter stops, arrival 7 min earlier, with 33 %",
+                 mFormatter.alternativeDescription(alternative, main));
   }
 
   @Test

@@ -2,6 +2,7 @@ project(ev_planning_tests)
 
 set(SRC
   charging_tests.cpp
+  detour_tests.cpp
   energy_model_tests.cpp
   plan_json_tests.cpp
   planner_tests.cpp
@@ -20,4 +21,5 @@ target_link_libraries(${PROJECT_NAME}
     geometry
     indexer
     platform
+    routing
 )

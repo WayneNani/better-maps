@@ -439,8 +439,15 @@ public class EvPlanPresenter
     final EvPlanResult.Stop stop = getSelectedStop();
     if (mResult == null || stop == null || stop.longer == null)
       return;
+    // The planned numbers change by the same amount, so that the alternatives stay comparable (see
+    // EvFormatter.alternativeDescription()): the user's choice is no difference of the real route.
+    final EvPlanResult.Plan plan = mResult.plan;
+    plan.plannedTotalTimeSec += stop.longer.extraTotalTimeSec;
+    plan.plannedArrivalSocPct += stop.longer.arrivalSocPct - plan.arrivalSocPct;
+    // The following stops keep their departure states of charge: they arrive with more and charge less, see
+    // ev::ChargingStop::Longer.
     stop.departureSocPct = stop.longer.departureSocPct;
-    evaluate(mResult.plan);
+    evaluate(plan);
     render();
   }
 

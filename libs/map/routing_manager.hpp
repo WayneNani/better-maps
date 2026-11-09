@@ -206,6 +206,12 @@ public:
   /// \returns nullptr if there is no route or the router type is not suitable (ruler).
   std::shared_ptr<search::RouteCorridor const> MakeSearchCorridor(double halfWidthM) const;
 
+  /// \brief better-maps: a new car router, independent of the routing session, e.g. for the short routes to charging
+  /// stations of the charging planner on a background thread. |numMwmIds| come from
+  /// Delegate::RegisterCountryFilesOnRoute() (GUI thread). |trafficCache| must outlive the router.
+  std::unique_ptr<routing::IRouter> CreateCarRouter(std::shared_ptr<routing::NumMwmIds> numMwmIds,
+                                                    traffic::TrafficCache const & trafficCache) const;
+
   m2::PointD GetRouteEndPoint() const { return m_routingSession.GetEndPoint(); }
   /// Returns the most situable router engine type.
   routing::RouterType GetBestRouter(m2::PointD const & startPoint, m2::PointD const & finalPoint) const;

@@ -285,7 +285,7 @@ void AmenityFinder::AddAmenities(Plan & plan, std::optional<time_t> departure)
 
 PlanResult PlanChargingWithAmenities(VehicleProfile const & profile, RouteEnergy const & route,
                                      std::vector<ChargingStation> & stations, PlanOptions const & options,
-                                     AmenityFinder & finder)
+                                     AmenityFinder & finder, DetourProvider * detours)
 {
   std::optional<time_t> const departure = options.m_departureTime ? *options.m_departureTime : time(nullptr);
   if (!options.m_preferredAmenities.empty())
@@ -294,7 +294,7 @@ PlanResult PlanChargingWithAmenities(VehicleProfile const & profile, RouteEnergy
       if (IsUsable(profile, s, options))
         s.m_amenities = finder.Find(s, *departure + static_cast<time_t>(s.m_timeAlongRouteSec + s.m_detourSec / 2.0));
   }
-  auto result = PlanCharging(profile, route, stations, options);
+  auto result = PlanCharging(profile, route, stations, options, detours);
   finder.AddAmenities(result.m_plan, departure);
   for (auto & alternative : result.m_alternatives)
     finder.AddAmenities(alternative, departure);

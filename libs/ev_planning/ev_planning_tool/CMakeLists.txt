@@ -16,5 +16,7 @@ target_link_libraries(${PROJECT_NAME}
     search
     search_quality
     search_tests_support
+    storage
+    traffic
     gflags::gflags
 )

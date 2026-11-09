@@ -51,6 +51,7 @@ struct LongerDto
   double departureSocPct = 0.0;
   double extraStopTimeSec = 0.0;
   double extraTotalTimeSec = 0.0;
+  double laterStopsSavedSec = 0.0;
   double arrivalSocPct = 0.0;
 };
 
@@ -68,6 +69,9 @@ struct StopDto
   double distanceAlongRouteM = 0.0;
   double distanceFromRouteM = 0.0;
   double detourSec = 0.0;
+  // The real detour (from the router) instead of an estimate.
+  bool detourChecked = false;
+  double detourDistanceM = 0.0;
   double powerKw = 0.0;
   bool powerKnown = true;
   bool dc = false;
@@ -161,6 +165,8 @@ StopDto MakeStop(ChargingStop const & stop)
   dto.distanceAlongRouteM = s.m_distanceAlongRouteM;
   dto.distanceFromRouteM = s.m_distanceFromRouteM;
   dto.detourSec = s.m_detourSec;
+  dto.detourChecked = s.m_detourChecked;
+  dto.detourDistanceM = s.m_detourDistanceM;
   dto.powerKw = stop.m_power.m_powerKw;
   dto.powerKnown = stop.m_power.m_isPowerKnown;
   dto.dc = stop.m_power.m_isDc;
@@ -187,8 +193,9 @@ StopDto MakeStop(ChargingStop const & stop)
   }
   if (stop.m_longer)
   {
-    dto.longer = LongerDto{stop.m_longer->m_departureSocPct, stop.m_longer->m_extraStopTimeSec,
-                           stop.m_longer->m_extraTotalTimeSec, stop.m_longer->m_arrivalSocPct};
+    auto const & longer = *stop.m_longer;
+    dto.longer = LongerDto{longer.m_departureSocPct, longer.m_extraStopTimeSec, longer.m_extraTotalTimeSec,
+                           longer.m_laterStopsSavedSec, longer.m_arrivalSocPct};
   }
   return dto;
 }
