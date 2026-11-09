@@ -14,7 +14,8 @@ namespace ev
 {
 namespace
 {
-double constexpr kInf = std::numeric_limits<double>::infinity();
+// Not infinity: the code is built with -ffast-math.
+double constexpr kInf = std::numeric_limits<double>::max();
 double constexpr kStepPct = ChargingTimeTable::kStepPct;
 int constexpr kMaxLevel = static_cast<int>(100.0 / kStepPct);
 // Speed on the way from the route to a station and back, as in RoutingManager::MakeSearchCorridor().

@@ -176,9 +176,10 @@ std::vector<VehicleProfile> MakeTemplates()
   return templates;
 }
 
+// Not std::isfinite(): the code is built with -ffast-math.
 bool IsPositiveFinite(double value)
 {
-  return std::isfinite(value) && value > 0.0;
+  return value > 0.0 && value < 1e9;
 }
 }  // namespace
 
