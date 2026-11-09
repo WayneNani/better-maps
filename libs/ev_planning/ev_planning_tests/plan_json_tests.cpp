@@ -44,6 +44,27 @@ UNIT_TEST(PlanJson_Options)
   TEST(!PlanOptionsFromJson("[1,2"), ());
 }
 
+UNIT_TEST(PlanJson_StopInputs)
+{
+  auto const stops = StopInputsFromJson(
+      R"([{"key":"Germany:12","title":"Ionity Spessart","lat":50.0,"lon":9.3,"powerKw":350,"dc":true,)"
+      R"("departureSoc":60,"other":1},{"key":"Germany:13","lat":49.5,"lon":10.5,"powerKw":22,"dc":false,)"
+      R"("departureSoc":80}])");
+  TEST(stops, ());
+  TEST_EQUAL(stops->size(), 2, ());
+  auto const & first = (*stops)[0];
+  TEST_EQUAL(first.m_station.GetKey(), "Germany:12", ());
+  TEST_EQUAL(first.m_station.GetTitle(), "Ionity Spessart", ());
+  TEST_EQUAL(first.m_departureSocPct, 60.0, ());
+  auto const power = GetBestChargingPower(Elroq(), first.m_station.m_sockets);
+  TEST(power.m_isDc, ());
+  TEST_EQUAL(power.m_powerKw, 350.0, ());
+  auto const ac = GetBestChargingPower(Elroq(), (*stops)[1].m_station.m_sockets);
+  TEST(!ac.m_isDc, ());
+  TEST_EQUAL(ac.m_powerKw, 22.0, ());
+  TEST(!StopInputsFromJson("{"), ());
+}
+
 UNIT_TEST(PlanJson_Result)
 {
   auto const & elroq = Elroq();

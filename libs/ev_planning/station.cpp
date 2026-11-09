@@ -128,6 +128,8 @@ Provider NormalizeProvider(std::string_view name)
 
 std::string ChargingStation::GetKey() const
 {
+  if (!m_key.empty())
+    return m_key;
   std::string map;
   if (auto const info = m_featureId.m_mwmId.GetInfo())
     map = info->GetCountryName();

@@ -62,6 +62,8 @@ Provider NormalizeProvider(std::string_view name);
 struct ChargingStation
 {
   FeatureID m_featureId;
+  // See GetKey(). Set for stations that do not come from the map data directly, e.g. stops of a stored plan.
+  std::string m_key;
   m2::PointD m_point;
   std::string m_name;
   // operator, brand, network as in OSM.

@@ -109,6 +109,17 @@ struct ProviderDto
   uint32_t stations = 0;
 };
 
+struct StopInputDto
+{
+  std::string key;
+  std::string title;
+  double lat = 0.0;
+  double lon = 0.0;
+  double powerKw = 0.0;
+  bool dc = true;
+  double departureSoc = 0.0;
+};
+
 struct PlanResultDto
 {
   std::string status;
@@ -234,6 +245,29 @@ std::optional<PlanOptions> PlanOptionsFromJson(std::string_view json)
   if (dto.departureTime > 0)
     options.m_departureTime = static_cast<time_t>(dto.departureTime);
   return options;
+}
+
+std::optional<std::vector<StopInput>> StopInputsFromJson(std::string_view json)
+{
+  std::vector<json::StopInputDto> dtos;
+  if (auto const error = glz::read<glz::opts{.error_on_unknown_keys = false}>(dtos, json))
+  {
+    LOG(LWARNING, ("Can't read stops:", glz::format_error(error, json)));
+    return {};
+  }
+  std::vector<StopInput> stops;
+  for (auto const & dto : dtos)
+  {
+    StopInput stop;
+    stop.m_station.m_key = dto.key;
+    stop.m_station.m_name = dto.title;
+    stop.m_station.m_point = mercator::FromLatLon(dto.lat, dto.lon);
+    // The socket that the plan used.
+    stop.m_station.m_sockets = {{dto.dc ? "type2_combo" : "type2", 1, dto.powerKw}};
+    stop.m_departureSocPct = dto.departureSoc;
+    stops.push_back(std::move(stop));
+  }
+  return stops;
 }
 
 std::string ToJson(PlanOptions const & options)
