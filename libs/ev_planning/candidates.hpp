@@ -79,7 +79,8 @@ private:
 };
 // Plans with the amenities of the stations. They are needed for all stations only if the options prefer some
 // (they change the choice); otherwise only the stations of the plans get them, which is much faster.
+// |detours|: see PlanCharging().
 PlanResult PlanChargingWithAmenities(VehicleProfile const & profile, RouteEnergy const & route,
                                      std::vector<ChargingStation> & stations, PlanOptions const & options,
-                                     AmenityFinder & finder);
+                                     AmenityFinder & finder, DetourProvider * detours = nullptr);
 }  // namespace ev

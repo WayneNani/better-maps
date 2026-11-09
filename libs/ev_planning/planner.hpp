@@ -12,6 +12,8 @@
 
 namespace ev
 {
+class DetourProvider;
+
 enum class Priority : uint8_t
 {
   // Shortest total time: driving, detours and charging.
@@ -160,6 +162,8 @@ struct PlanResult
   size_t m_usableCount = 0;
   // Providers of all candidate stations (before the provider filters), most stations first.
   std::vector<ProviderCount> m_providers;
+  // Real detours computed with the DetourProvider (including failed ones).
+  size_t m_detourChecks = 0;
 };
 
 size_t constexpr kMaxAlternatives = 2;
@@ -177,9 +181,18 @@ size_t constexpr kMaxAlternatives = 2;
 // The plan is then evaluated exactly (EvaluateStops()). Effort: O(n^2 * s + n * s^2) for n stations and s steps,
 // i.e. a few million steps for 200 stations.
 //
+// Real detours: the detours of the search are estimates from the distance to the route. With a |detours| provider,
+// the stations of a plan get their real detour (e.g. from the router), and the dynamic programming runs again until
+// all stations of the plan have one (at most kMaxDetourChecks in all, shared by the plan and its alternatives).
+// Stations whose real detour is much longer than estimated, e.g. motorway services on the other carriageway, drop
+// out of the plan this way, and the times of the plans include the real detours.
+//
 // |stations| need m_distanceAlongRouteM, m_detourSec, sockets and providers, see CandidateStations().
 PlanResult PlanCharging(VehicleProfile const & profile, RouteEnergy const & route,
-                        std::vector<ChargingStation> const & stations, PlanOptions const & options);
+                        std::vector<ChargingStation> const & stations, PlanOptions const & options,
+                        DetourProvider * detours = nullptr);
+
+size_t constexpr kMaxDetourChecks = 40;
 
 // A planned stop for EvaluateStops(): the station (with its position along the route) and the state of charge to
 // charge to.

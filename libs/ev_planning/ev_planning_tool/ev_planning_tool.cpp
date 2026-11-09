@@ -9,6 +9,7 @@
 // charging stations along it, their amenities and the planner. Times are reported for each step.
 
 #include "ev_planning/candidates.hpp"
+#include "ev_planning/detours.hpp"
 #include "ev_planning/energy_model.hpp"
 #include "ev_planning/plan_json.hpp"
 #include "ev_planning/planner.hpp"
@@ -20,8 +21,19 @@
 #include "search/search_tests_support/test_search_engine.hpp"
 #include "search/search_tests_support/test_search_request.hpp"
 
+#include "routing/index_router.hpp"
+#include "routing/router_delegate.hpp"
 #include "routing/routes_builder/routes_builder.hpp"
 #include "routing/vehicle_mask.hpp"
+
+#include "routing_common/num_mwm_id.hpp"
+
+#include "storage/country_info_getter.hpp"
+#include "storage/country_parent_getter.hpp"
+#include "storage/routing_helpers.hpp"
+#include "storage/storage.hpp"
+
+#include "traffic/traffic_cache.hpp"
 
 #include "indexer/classificator_loader.hpp"
 #include "indexer/data_source.hpp"
@@ -37,6 +49,8 @@
 #include "base/logging.hpp"
 #include "base/string_utils.hpp"
 #include "base/timer.hpp"
+
+#include "defines.hpp"
 
 #include <cstdio>
 #include <fstream>
@@ -68,6 +82,9 @@ DEFINE_string(excluded, "", "Excluded providers, e.g. \"tesla\"");
 DEFINE_string(amenities, "", "Preferred amenities, e.g. \"toilets,playground\"");
 DEFINE_int32(repeat, 3, "Number of times the planning (without the route) runs; the minimum and median are reported");
 DEFINE_string(json_out, "", "Write the result as JSON (like the app gets it) to this file");
+DEFINE_bool(real_detours, true,
+            "Real detours of the stations of the plans with the router, as the app does (false: only the estimates "
+            "from the distance to the route)");
 
 namespace
 {
@@ -132,6 +149,10 @@ void PrintPlan(ev::Plan const & plan, string const & title)
     cout << "  km " << setprecision(0) << s.m_distanceAlongRouteM / 1000.0 << ": " << s.GetTitle() << " ("
          << s.GetProviderName() << "), " << stop.m_power.m_powerKw << " kW " << (stop.m_power.m_isDc ? "DC" : "AC")
          << (stop.m_power.m_isPowerKnown ? "" : " (assumed)") << ", " << s.m_distanceFromRouteM << " m off the route"
+         << endl
+         << "    detour " << s.m_detourSec / 60.0 << " min"
+         << (s.m_detourChecked ? ", " + to_string(static_cast<int>(s.m_detourDistanceM)) + " m (router)"
+                               : " (estimate)")
          << endl
          << "    arrive " << stop.m_arrivalSocPct << " % -> " << stop.m_departureSocPct << " %, charging "
          << stop.m_chargingTimeSec / 60.0 << " min (avg " << stop.m_averagePowerKw << " kW)";
@@ -215,7 +236,25 @@ int main(int argc, char * argv[])
     if (auto const type = ev::AmenityTypeFromString(a))
       options.m_preferredAmenities.push_back(*type);
 
-  vector<double> altitudesMs, searchMs, candidatesMs, plannerMs, totalMs;
+  // The router for the real detours, on the maps of the search (the app has one router for all maps too).
+  auto const infoGetter = storage::CountryInfoReader::CreateCountryInfoGetter(GetPlatform());
+  storage::CountryParentGetter const parentGetter;
+  auto detourMwmIds = make_shared<routing::NumMwmIds>();
+  {
+    vector<shared_ptr<MwmInfo>> infos;
+    dataSource.GetMwmsInfo(infos);
+    for (auto const & info : infos)
+    {
+      auto const & file = info->GetLocalFile().GetCountryFile();
+      if (file.GetName() != WORLD_FILE_NAME && file.GetName() != WORLD_COASTS_FILE_NAME &&
+          parentGetter.GetStorageForTesting().IsLeaf(file.GetName()))
+        detourMwmIds->RegisterFile(file);
+    }
+  }
+  traffic::TrafficCache const trafficCache;
+
+  vector<double> altitudesMs, searchMs, candidatesMs, plannerMs, totalMs, detourMs;
+  vector<size_t> detourRoutes;
   ev::PlanResult result;
   vector<ev::ChargingStation> stations;
   for (int run = 0; run < max(FLAGS_repeat, 1); ++run)
@@ -252,11 +291,22 @@ int main(int argc, char * argv[])
     stations = ev::MakeCandidates(dataSource, request.Results());
     candidatesMs.push_back(step.ElapsedMilliseconds());
 
-    // A new finder in each run: the app keeps it only for one route.
+    // A new finder and router in each run: the app keeps them only for one planning.
     step.Reset();
     ev::AmenityFinder finder(dataSource);
-    result = ev::PlanChargingWithAmenities(profile, routeEnergy, stations, options, finder);
+    routing::IndexRouter router(routing::VehicleType::Car, false /* loadAltitudes */, parentGetter,
+                                [&](m2::PointD const & p) { return infoGetter->GetRegionCountryId(p); },
+                                [&](string const & id) { return infoGetter->GetLimitRectForLeaf(id); }, detourMwmIds,
+                                routing::MakeNumMwmTree(*detourMwmIds, *infoGetter), trafficCache, dataSource);
+    routing::RouterDelegate delegate;
+    ev::RouterDetours detours(router, delegate,
+                              ev::RouteLine::FromSegments(route.m_segments, 0.0 /* passedM */,
+                                                          route.m_followedPolyline.GetPolyline().Front()));
+    result = ev::PlanChargingWithAmenities(profile, routeEnergy, stations, options, finder,
+                                           FLAGS_real_detours ? &detours : nullptr);
     plannerMs.push_back(step.ElapsedMilliseconds());
+    detourMs.push_back(detours.GetRoutingSec() * 1000.0);
+    detourRoutes.push_back(detours.GetRoutesCount());
     totalMs.push_back(total.ElapsedMilliseconds());
 
     if (run == 0)
@@ -286,6 +336,8 @@ int main(int argc, char * argv[])
   stats("search for stations", searchMs);
   stats("station data", candidatesMs);
   stats("planner with alternatives and amenities", plannerMs);
+  stats("  of it real detours (router)", detourMs);
+  cout << "  real detours: " << detourRoutes.front() << " routes" << endl;
   stats("total", totalMs);
   cout << "  first run total: " << totalMs.front() << " ms" << endl;
 

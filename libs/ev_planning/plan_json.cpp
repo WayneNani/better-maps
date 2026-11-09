@@ -68,6 +68,9 @@ struct StopDto
   double distanceAlongRouteM = 0.0;
   double distanceFromRouteM = 0.0;
   double detourSec = 0.0;
+  // The real detour (from the router) instead of an estimate.
+  bool detourChecked = false;
+  double detourDistanceM = 0.0;
   double powerKw = 0.0;
   bool powerKnown = true;
   bool dc = false;
@@ -161,6 +164,8 @@ StopDto MakeStop(ChargingStop const & stop)
   dto.distanceAlongRouteM = s.m_distanceAlongRouteM;
   dto.distanceFromRouteM = s.m_distanceFromRouteM;
   dto.detourSec = s.m_detourSec;
+  dto.detourChecked = s.m_detourChecked;
+  dto.detourDistanceM = s.m_detourDistanceM;
   dto.powerKw = stop.m_power.m_powerKw;
   dto.powerKnown = stop.m_power.m_isPowerKnown;
   dto.dc = stop.m_power.m_isDc;

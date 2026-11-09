@@ -1,6 +1,7 @@
 project(ev_planning_integration_tests)
 
 set(SRC
+  detours_integration_test.cpp
   ev_planning_integration_test.cpp
 )
 
@@ -17,7 +18,10 @@ target_link_libraries(${PROJECT_NAME}
     indexer
     platform
     platform_tests_support
+    routing
+    routing_common
     search
     search_tests_support
     storage
+    traffic
 )

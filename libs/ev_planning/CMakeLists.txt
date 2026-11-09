@@ -8,6 +8,8 @@ set(SRC
   charger_status.hpp
   charging.cpp
   charging.hpp
+  detours.cpp
+  detours.hpp
   energy_model.cpp
   energy_model.hpp
   plan_json.cpp

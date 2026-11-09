@@ -83,8 +83,12 @@ struct ChargingStation
   double m_distanceAlongRouteM = 0.0;
   double m_timeAlongRouteSec = 0.0;
   double m_distanceFromRouteM = 0.0;
-  // Extra travel time to leave the route, reach the station and come back.
+  // Extra travel time to leave the route, reach the station and come back: an estimate from the distance to the
+  // route, or the real detour if m_detourChecked (see DetourProvider).
   double m_detourSec = 0.0;
+  // Extra length of the real detour, if m_detourChecked.
+  double m_detourDistanceM = 0.0;
+  bool m_detourChecked = false;
 
   std::vector<Amenity> m_amenities;
   // Real-time status, see ChargerStatusProvider.
