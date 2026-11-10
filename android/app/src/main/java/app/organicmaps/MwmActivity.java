@@ -63,8 +63,10 @@ import app.organicmaps.downloader.DownloaderFragment;
 import app.organicmaps.downloader.OnmapDownloader;
 import app.organicmaps.ev.EvBatteryDialog;
 import app.organicmaps.ev.EvPlanFragment;
+import app.organicmaps.ev.EvPlannerEntry;
 import app.organicmaps.ev.EvRouteStops;
 import app.organicmaps.ev.EvSettings;
+import app.organicmaps.ev.EvVehicleActivity;
 import app.organicmaps.editor.EditorActivity;
 import app.organicmaps.editor.EditorHostFragment;
 import app.organicmaps.editor.FeatureCategoryActivity;
@@ -254,6 +256,10 @@ public class MwmActivity extends BaseMwmFragmentActivity
   private ActivityResultLauncher<Intent> mPowerSaveSettings;
   @NonNull
   private ActivityResultLauncher<Intent> mSettingsLauncher;
+  /** better-maps: "My vehicle" from the charging planner button, before the planner is set up. */
+  @SuppressWarnings("NotNullFieldNotInitialized")
+  @NonNull
+  private ActivityResultLauncher<Intent> mEvSetupLauncher;
   @NonNull
   private boolean mPowerSaveDisclaimerShown = false;
 
@@ -558,6 +564,8 @@ public class MwmActivity extends BaseMwmFragmentActivity
 
     mSettingsLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::onSettingsResult);
+    mEvSetupLauncher =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::onEvSetupResult);
 
     mShareLauncher = SharingUtils.RegisterLauncher(this);
 
@@ -2438,12 +2446,31 @@ public class MwmActivity extends BaseMwmFragmentActivity
     showRouteSearch(null, false);
   }
 
-  /** better-maps: the charging planner for electric cars, over the map in the route planner. */
+  /**
+   * better-maps: the charging planner for electric cars, over the map in the route planner. Before it is set up the
+   * button opens "My vehicle"; once a vehicle is chosen there, the planner opens on the way back.
+   */
   @Override
   public void onEvPlanning()
   {
-    if (!EvSettings.from(this).isAvailable(RoutingController.get().getLastRouterType()))
-      return;
+    switch (EvPlannerEntry.onButton(EvSettings.from(this), RoutingController.get().getLastRouterType()))
+    {
+    case PLANNER -> showEvPlanner();
+    case SETUP -> mEvSetupLauncher.launch(EvVehicleActivity.fromRoute(this));
+    case NONE -> {}
+    }
+  }
+
+  /** Back from "My vehicle": the planner if it was set up there, else just the route. */
+  private void onEvSetupResult(@NonNull ActivityResult result)
+  {
+    final RoutingController routing = RoutingController.get();
+    if (EvPlannerEntry.openPlannerAfterSetup(EvSettings.from(this), routing.getLastRouterType(), routing.isPlanning()))
+      showEvPlanner();
+  }
+
+  private void showEvPlanner()
+  {
     closeSearchToolbar(true, true);
     closePlacePage();
     closeRouteSearch();
