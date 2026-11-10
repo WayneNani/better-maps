@@ -4,6 +4,8 @@
   <string name="ev_my_vehicle">Mein Fahrzeug</string>
   <string name="ev_my_vehicle_summary">E-Auto: Ladestopps im Routenplaner</string>
   <string name="ev_enable">Ladestopps für Autorouten planen</string>
+  <string name="ev_setup_hint">Auto wählen, um Ladestopps zu planen</string>
+  <string name="ev_setup_done">Ladestopps mit diesem Auto planen</string>
   <string name="ev_template">Vorlage</string>
   <string name="ev_template_custom">Eigenes Fahrzeug</string>
   <string name="ev_name">Name</string>

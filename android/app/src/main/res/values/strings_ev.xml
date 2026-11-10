@@ -9,6 +9,10 @@
   <string name="ev_my_vehicle_summary">Electric car: charging stops in the route planner</string>
   <!-- Switch in the vehicle settings: the charging planner in the route planner (car only). -->
   <string name="ev_enable">Plan charging stops for car routes</string>
+  <!-- "My vehicle" opened from the charging plan button of a car route, before the planner is set up. -->
+  <string name="ev_setup_hint">Choose your car to plan charging stops</string>
+  <!-- Button below the template in that case: turns the planner on and opens it for the route. -->
+  <string name="ev_setup_done">Plan charging stops with this car</string>
   <string name="ev_template">Template</string>
   <string name="ev_template_custom">Own vehicle</string>
   <string name="ev_name">Name</string>

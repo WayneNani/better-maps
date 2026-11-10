@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment;
 import app.organicmaps.R;
 import app.organicmaps.sdk.ev.EvPlanner;
 import app.organicmaps.util.ThemeUtils;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.materialswitch.MaterialSwitch;
@@ -42,8 +43,11 @@ public class EvVehicleFragment extends Fragment
 {
   /** The owner's car: the template that is chosen when there is no profile yet. */
   static final String DEFAULT_TEMPLATE = "skoda_elroq_85";
+  /** Opened from the charging planner button of a car route (see {@link EvVehicleActivity#fromRoute}). */
+  static final String ARG_FROM_ROUTE = "ev_from_route";
 
   private EvSettings mSettings;
+  private MaterialSwitch mEnabled;
   private EvVehicleProfile mProfile;
   private List<EvVehicleProfile> mTemplates = new ArrayList<>();
   private LinearLayout mContent;
@@ -102,17 +106,27 @@ public class EvVehicleFragment extends Fragment
   private void build()
   {
     final Context context = requireContext();
+    final boolean fromRoute = isFromRoute();
 
     final LinearLayout enable = section();
-    final MaterialSwitch enabled = new MaterialSwitch(context);
-    enabled.setText(R.string.ev_enable);
-    enabled.setChecked(mSettings.isEnabled());
-    enabled.setOnCheckedChangeListener((b, checked) -> mSettings.setEnabled(checked));
-    enable.addView(enabled);
+    if (fromRoute)
+    {
+      final TextView hint = text(getString(R.string.ev_setup_hint));
+      hint.setId(R.id.ev_vehicle_hint);
+      hint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+      enable.addView(hint);
+    }
+    mEnabled = new MaterialSwitch(context);
+    mEnabled.setId(R.id.ev_vehicle_enabled);
+    mEnabled.setText(R.string.ev_enable);
+    mEnabled.setChecked(mSettings.isEnabled());
+    mEnabled.setOnCheckedChangeListener((b, checked) -> mSettings.setEnabled(checked));
+    enable.addView(mEnabled);
 
     final LinearLayout template = section();
     template.addView(label(R.string.ev_template));
     final Spinner spinner = new Spinner(context);
+    spinner.setId(R.id.ev_vehicle_template);
     final List<String> names = new ArrayList<>();
     for (EvVehicleProfile t : mTemplates)
       names.add(t.name);
@@ -136,6 +150,8 @@ public class EvVehicleFragment extends Fragment
           mProfile.source = "";
         }
         onProfileChanged(true);
+        // Choosing the car is the setup: the planner is on with it.
+        mEnabled.setChecked(true);
       }
 
       @Override
@@ -143,6 +159,21 @@ public class EvVehicleFragment extends Fragment
       {}
     });
     template.addView(spinner);
+    if (fromRoute)
+    {
+      // One tap for the preselected car: on, and back to the route, where the planner opens.
+      final MaterialButton done = new MaterialButton(context);
+      done.setId(R.id.ev_vehicle_plan_button);
+      done.setText(R.string.ev_setup_done);
+      done.setOnClickListener(v -> {
+        mEnabled.setChecked(true);
+        // Values that cannot be planned with stay here, with the hint below them.
+        if (mProfile.isValid())
+          requireActivity().finish();
+      });
+      template.addView(done, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                                           ViewGroup.LayoutParams.WRAP_CONTENT));
+    }
 
     mValues = section();
 
@@ -176,6 +207,12 @@ public class EvVehicleFragment extends Fragment
     source.addView(mSource);
 
     onProfileChanged(false);
+  }
+
+  private boolean isFromRoute()
+  {
+    final Bundle args = getArguments();
+    return args != null && args.getBoolean(ARG_FROM_ROUTE, false);
   }
 
   private int templateIndex()

@@ -23,4 +23,8 @@
   <item name="ev_other_stop_button" type="id" />
   <item name="ev_keep_stop_button" type="id" />
   <item name="ev_error_text" type="id" />
+  <item name="ev_vehicle_enabled" type="id" />
+  <item name="ev_vehicle_template" type="id" />
+  <item name="ev_vehicle_hint" type="id" />
+  <item name="ev_vehicle_plan_button" type="id" />
 </resources>

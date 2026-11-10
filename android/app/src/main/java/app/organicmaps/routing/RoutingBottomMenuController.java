@@ -31,7 +31,7 @@ import app.organicmaps.MwmApplication;
 import app.organicmaps.R;
 import app.organicmaps.ev.EvFormatter;
 import app.organicmaps.ev.EvRouteStops;
-import app.organicmaps.ev.EvSettings;
+import app.organicmaps.ev.EvPlannerEntry;
 import app.organicmaps.sdk.Framework;
 import app.organicmaps.sdk.bookmarks.data.DistanceAndAzimut;
 import app.organicmaps.sdk.routing.RouteMarkData;
@@ -223,7 +223,8 @@ final class RoutingBottomMenuController implements View.OnClickListener
     UiUtils.show(mAltitudeChartFrame);
     UiUtils.showIf(RouteSearchSettings.isSupported(RoutingController.get().getLastRouterType()),
                    mAltitudeChartFrame.findViewById(R.id.btn__search_along_route));
-    UiUtils.showIf(EvSettings.from(mContext).isAvailable(RoutingController.get().getLastRouterType()),
+    // On every car route, also before the planner is set up: the button leads to the vehicle setup then.
+    UiUtils.showIf(EvPlannerEntry.isButtonShown(RoutingController.get().getLastRouterType()),
                    mAltitudeChartFrame.findViewById(R.id.btn__ev_planning));
     MaterialButton saveButton = mAltitudeChartFrame.findViewById(R.id.btn__save);
     saveButton.setContentDescription(mContext.getString(R.string.save));
