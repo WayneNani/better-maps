@@ -111,6 +111,9 @@ public:
   virtual SpeedInUnits GetSpeedLimit(Segment const & segment);
 
   virtual IndexGraph & GetIndexGraph(NumMwmId numMwmId) = 0;
+  /// Loads the index graphs of |numMwmIds| now (in parallel if possible), instead of one after the other when
+  /// they are needed.
+  virtual void LoadIndexGraphs(std::vector<NumMwmId> const & /* numMwmIds */) {}
   virtual CrossMwmGraph & GetCrossMwmGraph();
   virtual void GetTwinsInner(Segment const & segment, bool isOutgoing, std::vector<Segment> & twins) = 0;
 

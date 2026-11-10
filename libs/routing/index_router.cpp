@@ -1005,6 +1005,16 @@ RouterResultCode IndexRouter::CalculateSubrouteLeapsOnlyMode(Checkpoints const &
   if (bestC == nullptr)
     return RouterResultCode::RouteNotFound;
 
+  // The routing sections of the mwms along the best candidate are loaded in parallel; otherwise each one is loaded
+  // when the route through it is refined.
+  {
+    vector<NumMwmId> mwmIds;
+    for (auto const & s : bestC->m_path)
+      if (s.GetMwmId() != kFakeNumMwmId && !base::IsExist(mwmIds, s.GetMwmId()))
+        mwmIds.push_back(s.GetMwmId());
+    starter.GetGraph().LoadIndexGraphs(mwmIds);
+  }
+
   // Calculate route for the best candidate.
   RoutingResultT result;
   ProcessLeapsJoints(bestC->m_path, starter, progress, calculator, result);
