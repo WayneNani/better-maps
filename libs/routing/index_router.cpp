@@ -1436,6 +1436,11 @@ IndexRouter::RoutingResultT const * IndexRouter::RoutesCalculator::Calc(Segment 
     JointsStarter jointStarter(m_starter);
     jointStarter.Init(beg, end);
 
+    // The waves of a single mwm search can't meet if the first joints of |beg| and |end| are in different mwms.
+    // Don't explore both mwms completely for nothing (several seconds for big mwms).
+    bool const mayConnect =
+        m_starter.GetGraph().GetMode() != WorldGraphMode::JointSingleMwm || jointStarter.MayConnectInSingleMwm();
+
     using Vertex = JointsStarter::Vertex;
     using Edge = JointsStarter::Edge;
     using Weight = JointsStarter::Weight;
@@ -1448,7 +1453,7 @@ IndexRouter::RoutingResultT const * IndexRouter::RoutesCalculator::Calc(Segment 
     RoutingResult<JointSegment, RouteWeight> route;
     using AlgoT = AStarAlgorithm<Vertex, Edge, Weight>;
 
-    if (AlgoT().FindPathBidirectional(params, route) == AlgoT::Result::OK)
+    if (mayConnect && AlgoT().FindPathBidirectional(params, route) == AlgoT::Result::OK)
     {
       LOG(LDEBUG, ("Sub-route weight:", route.m_distance));
 
