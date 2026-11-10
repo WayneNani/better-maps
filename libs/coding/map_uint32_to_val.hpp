@@ -25,8 +25,10 @@
 #endif
 
 #include <algorithm>
+#include <bit>
 #include <cstdint>
 #include <functional>
+#include <limits>
 #include <memory>
 #include <type_traits>
 #include <vector>
@@ -123,6 +125,66 @@ public:
 
     value = entry[offset];
     return true;
+  }
+
+  /// Calls |fn(id)| for each id in [|begin|, |end|) that has a value, in increasing order of ids, without
+  /// decoding the values.
+  template <typename Fn>
+  void ForEachIdInRange(uint32_t begin, uint32_t end, Fn && fn) const
+  {
+    uint64_t const last = std::min<uint64_t>(end, m_ids.size());
+    for (uint64_t pos = begin; pos < last; pos += 64)
+    {
+      uint64_t word = m_ids.get_word(pos);
+      if (last - pos < 64)
+        word &= (uint64_t{1} << (last - pos)) - 1;
+
+      while (word != 0)
+      {
+        fn(static_cast<uint32_t>(pos + static_cast<uint64_t>(std::countr_zero(word))));
+        word &= word - 1;
+      }
+    }
+  }
+
+  /// Calls |fn(id, value)| for each id in [|begin|, |end|) that has a value, in increasing order of ids.
+  /// Faster than Get() for each id when most ids have no value: only the stored ones are visited and
+  /// the rank is computed once. Caches the decoded blocks like Get().
+  template <typename Fn>
+  void ForEachInRange(uint32_t begin, uint32_t end, Fn && fn)
+  {
+    uint64_t const last = std::min<uint64_t>(end, m_ids.size());
+    if (begin >= last)
+      return;
+
+    uint64_t rank = m_ids.rank(begin);
+    uint64_t cachedBase = std::numeric_limits<uint64_t>::max();
+    std::vector<Value> const * entry = nullptr;
+    for (uint64_t pos = begin; pos < last; pos += 64)
+    {
+      uint64_t word = m_ids.get_word(pos);
+      if (last - pos < 64)
+        word &= (uint64_t{1} << (last - pos)) - 1;
+
+      while (word != 0)
+      {
+        uint64_t const id = pos + static_cast<uint64_t>(std::countr_zero(word));
+        word &= word - 1;
+
+        uint64_t const base = rank / m_header.m_blockSize;
+        if (base != cachedBase)
+        {
+          auto & e = m_cache[static_cast<uint32_t>(base)];
+          if (e.empty())
+            e = GetImpl(static_cast<uint32_t>(rank), m_header.m_blockSize);
+          entry = &e;
+          cachedBase = base;
+        }
+
+        fn(static_cast<uint32_t>(id), (*entry)[rank % m_header.m_blockSize]);
+        ++rank;
+      }
+    }
   }
 
   [[nodiscard]] bool GetThreadsafe(uint32_t id, Value & value) const

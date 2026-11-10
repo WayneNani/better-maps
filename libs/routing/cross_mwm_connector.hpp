@@ -13,7 +13,10 @@
 #include "base/assert.hpp"
 #include "base/checked_cast.hpp"
 
+#include <algorithm>
+#include <limits>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "3party/ankerl/unordered_dense.h"
@@ -146,6 +149,25 @@ public:
   void GetOutgoingEdgeList(Segment const & segment, EdgeListT & edges) const
   {
     auto const enterIdx = GetTransition(segment).m_enterIdx;
+    if (m_weights.m_version >= 2 && m_weights.m_v2 && m_exitsCount > 0 && PrepareExitsOrder())
+    {
+      // Only a few percent of the weights of a row are stored: visit them only, but add the edges in the order
+      // of ForEachExit() like below, the order matters for A* (equal weights).
+      auto & row = m_rowScratch;
+      row.clear();
+      uint32_t const begin = GetWeightIndex(enterIdx, 0);
+      m_weights.m_v2->ForEachInRange(begin, begin + m_exitsCount, [&](uint32_t id, WeightT weight)
+      {
+        uint32_t const position = m_exitPositions[id - begin];
+        if (weight != connector::kNoRouteStored && position != kNoPosition)
+          row.emplace_back(position, weight);
+      });
+      std::sort(row.begin(), row.end());
+      for (auto const & [position, weight] : row)
+        edges.emplace_back(m_exits[position], RouteWeight::FromCrossMwmWeight(weight));
+      return;
+    }
+
     ForEachExit([enterIdx, this, &edges](uint32_t exitIdx, Segment const & s)
     { AddEdge(s, enterIdx, exitIdx, edges); });
   }
@@ -153,6 +175,18 @@ public:
   void GetIngoingEdgeList(Segment const & segment, EdgeListT & edges) const
   {
     auto const exitIdx = GetTransition(segment).m_exitIdx;
+    if (m_weights.m_version >= 2 && m_weights.m_v2 && m_exitsCount > 0 && PrepareColumns())
+    {
+      // The weights of a column are far apart in the matrix (rows of exits): visit only the stored ones, in the
+      // order of ForEachEnter() like below.
+      for (uint32_t i = m_columnOffsets[exitIdx]; i < m_columnOffsets[exitIdx + 1]; ++i)
+      {
+        uint32_t const position = m_columnEnterPositions[i];
+        AddEdge(m_enters[position], m_enterIndices[position], exitIdx, edges);
+      }
+      return;
+    }
+
     ForEachEnter([exitIdx, this, &edges](uint32_t enterIdx, Segment const & s)
     { AddEdge(s, enterIdx, exitIdx, edges); });
   }
@@ -247,6 +281,82 @@ private:
     bool m_forwardIsEnter : 1;
   };
 
+  /// Fills |m_exits| (in the order of ForEachExit()) and |m_exitPositions| once.
+  /// \returns false if an exit index is used twice (then the rows are read like before).
+  bool PrepareExitsOrder() const
+  {
+    if (m_exitsOrderState == ExitsOrderState::Unknown)
+    {
+      m_exitPositions.assign(m_exitsCount, kNoPosition);
+      m_exits.clear();
+      m_exitsOrderState = ExitsOrderState::Ready;
+      ForEachExit([this](uint32_t exitIdx, Segment const & s)
+      {
+        if (exitIdx >= m_exitsCount || m_exitPositions[exitIdx] != kNoPosition)
+        {
+          m_exitsOrderState = ExitsOrderState::NotUnique;
+          return;
+        }
+        m_exitPositions[exitIdx] = static_cast<uint32_t>(m_exits.size());
+        m_exits.push_back(s);
+      });
+    }
+    return m_exitsOrderState == ExitsOrderState::Ready;
+  }
+
+  /// Fills |m_enters| and |m_enterIndices| (in the order of ForEachEnter()) and for each exit the positions there of
+  /// the enters with a stored weight to this exit, once.
+  /// \returns false if an enter index is used twice or there are too many enters (then the columns are read like
+  /// before).
+  bool PrepareColumns() const
+  {
+    if (m_columnsState != ColumnsState::Unknown)
+      return m_columnsState == ColumnsState::Ready;
+
+    m_columnsState = ColumnsState::NotSupported;
+    std::vector<bool> used(m_entersCount, false);
+    bool unique = true;
+    ForEachEnter([&](uint32_t enterIdx, Segment const & s)
+    {
+      if (enterIdx >= m_entersCount || used[enterIdx])
+      {
+        unique = false;
+        return;
+      }
+      used[enterIdx] = true;
+      m_enters.push_back(s);
+      m_enterIndices.push_back(enterIdx);
+    });
+    if (!unique || m_enters.size() > std::numeric_limits<uint16_t>::max())
+    {
+      m_enters = {};
+      m_enterIndices = {};
+      return false;
+    }
+
+    auto const forEachStored = [this](auto && fn)
+    {
+      for (size_t position = 0; position < m_enterIndices.size(); ++position)
+      {
+        uint32_t const begin = GetWeightIndex(m_enterIndices[position], 0);
+        m_weights.m_v2->ForEachIdInRange(begin, begin + m_exitsCount,
+                                         [&](uint32_t id) { fn(static_cast<uint16_t>(position), id - begin); });
+      }
+    };
+
+    m_columnOffsets.assign(m_exitsCount + 1, 0);
+    forEachStored([this](uint16_t, uint32_t exitIdx) { ++m_columnOffsets[exitIdx + 1]; });
+    for (uint32_t i = 0; i < m_exitsCount; ++i)
+      m_columnOffsets[i + 1] += m_columnOffsets[i];
+
+    m_columnEnterPositions.resize(m_columnOffsets.back());
+    std::vector<uint32_t> next(m_columnOffsets.begin(), m_columnOffsets.end() - 1);
+    forEachStored([&](uint16_t position, uint32_t exitIdx) { m_columnEnterPositions[next[exitIdx]++] = position; });
+
+    m_columnsState = ColumnsState::Ready;
+    return true;
+  }
+
   void AddEdge(Segment const & segment, uint32_t enterIdx, uint32_t exitIdx, EdgeListT & edges) const
   {
     auto const weight = GetWeight(enterIdx, exitIdx);
@@ -285,6 +395,33 @@ private:
 
   using MwmID2FeatureIDMapT = ankerl::unordered_dense::map<CrossMwmId, uint32_t, connector::HashKey>;
   MwmID2FeatureIDMapT m_crossMwmIdToFeatureId;
+
+  // Exits in the order of ForEachExit() and the position of each exit index there, for GetOutgoingEdgeList().
+  static uint32_t constexpr kNoPosition = std::numeric_limits<uint32_t>::max();
+  enum class ExitsOrderState : uint8_t
+  {
+    Unknown,
+    Ready,
+    NotUnique
+  };
+  mutable ExitsOrderState m_exitsOrderState = ExitsOrderState::Unknown;
+  mutable std::vector<Segment> m_exits;
+  mutable std::vector<uint32_t> m_exitPositions;
+  mutable std::vector<std::pair<uint32_t, WeightT>> m_rowScratch;
+
+  // Enters in the order of ForEachEnter() and, for each exit, the positions of the enters with a stored weight to it
+  // (|m_columnOffsets[exitIdx]| till |m_columnOffsets[exitIdx + 1]|), for GetIngoingEdgeList().
+  enum class ColumnsState : uint8_t
+  {
+    Unknown,
+    Ready,
+    NotSupported
+  };
+  mutable ColumnsState m_columnsState = ColumnsState::Unknown;
+  mutable std::vector<Segment> m_enters;
+  mutable std::vector<uint32_t> m_enterIndices;
+  mutable std::vector<uint32_t> m_columnOffsets;
+  mutable std::vector<uint16_t> m_columnEnterPositions;
 
   // Weight is the time required for the route to pass edge, measured in seconds rounded upwards.
   struct Weights
