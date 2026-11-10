@@ -38,9 +38,16 @@ void LeapsGraph::GetIngoingEdgesList(astar::VertexData<Vertex, Weight> const & v
 RouteWeight LeapsGraph::HeuristicCostEstimate(Segment const & from, Segment const & to)
 {
   ASSERT(to == m_startSegment || to == m_finishSegment, ());
-  bool const toFinish = to == m_finishSegment;
-  auto const & toPoint = toFinish ? m_finishPoint : m_startPoint;
-  return m_starter.HeuristicCostEstimate(from, toPoint);
+  auto [it, inserted] = m_heuristics.try_emplace(from);
+  if (inserted)
+  {
+    RouteWeight const toFinish = m_starter.HeuristicCostEstimate(from, m_finishPoint);
+    RouteWeight const toStart = m_starter.HeuristicCostEstimate(from, m_startPoint);
+    ASSERT_EQUAL(toFinish, RouteWeight(toFinish.GetWeight()), ());
+    ASSERT_EQUAL(toStart, RouteWeight(toStart.GetWeight()), ());
+    it->second = {toFinish.GetWeight(), toStart.GetWeight()};
+  }
+  return RouteWeight(to == m_finishSegment ? it->second.first : it->second.second);
 }
 
 void LeapsGraph::GetEdgesList(Segment const & segment, bool isOutgoing, EdgeListT & edges)

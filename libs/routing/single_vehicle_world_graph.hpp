@@ -66,6 +66,7 @@ public:
   SpeedInUnits GetSpeedLimit(Segment const & segment) override;
 
   IndexGraph & GetIndexGraph(NumMwmId numMwmId) override { return m_loader->GetIndexGraph(numMwmId); }
+  void LoadIndexGraphs(std::vector<NumMwmId> const & numMwmIds) override { m_loader->LoadIndexGraphs(numMwmIds); }
 
   void SetAStarParents(bool forward, Parents<Segment> & parents) override;
   void SetAStarParents(bool forward, Parents<JointSegment> & parents) override;

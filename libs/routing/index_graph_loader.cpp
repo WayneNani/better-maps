@@ -26,7 +26,9 @@
 #include "defines.hpp"
 
 #include <algorithm>
+#include <atomic>
 #include <map>
+#include <thread>
 #include <unordered_map>
 
 #include "3party/ankerl/unordered_dense.h"
@@ -37,8 +39,15 @@ namespace
 {
 using namespace std;
 
+// Loading routing sections is mostly decoding (CPU), on a phone ~0.15-0.4 s per mwm. Bonn - Nuremberg on desktop:
+// 6 sections in 0.50 s with 1 thread, 0.33 s with 2, 0.21 s with 4 (but glibc keeps ~40/~80 MB more RSS in the
+// arenas of the threads).
+size_t constexpr kMaxLoadingThreads = 4;
+
 class IndexGraphLoaderImpl final : public IndexGraphLoader
 {
+  using VehicleModelPtrT = GeometryLoader::VehicleModelPtrT;
+
 public:
   IndexGraphLoaderImpl(VehicleType vehicleType, bool loadAltitudes,
                        shared_ptr<VehicleModelFactoryInterface> vehicleModelFactory,
@@ -61,6 +70,7 @@ public:
   // IndexGraphLoader overrides:
   IndexGraph & GetIndexGraph(NumMwmId numMwmId) override;
   Geometry & GetGeometry(NumMwmId numMwmId) override;
+  void LoadIndexGraphs(vector<NumMwmId> const & numMwmIds) override;
   vector<RouteSegment::SpeedCamera> GetSpeedCameraInfo(Segment const & segment) override;
   void Clear() override;
 
@@ -69,6 +79,10 @@ private:
   GeometryPtrT CreateGeometry(NumMwmId numMwmId);
   using GraphPtrT = unique_ptr<IndexGraph>;
   GraphPtrT CreateIndexGraph(NumMwmId numMwmId, GeometryPtrT & geometry);
+  /// Reads only the mwm of |handle|, so graphs of different mwms may be created in parallel.
+  /// |vehicleModel| is needed if |geometry| is not created yet.
+  GraphPtrT CreateIndexGraph(MwmSet::MwmHandle const & handle, VehicleModelPtrT const & vehicleModel,
+                             GeometryPtrT & geometry) const;
 
   VehicleType m_vehicleType;
   bool m_loadAltitudes;
@@ -105,7 +119,7 @@ IndexGraph & IndexGraphLoaderImpl::GetIndexGraph(NumMwmId numMwmId)
 Geometry & IndexGraphLoaderImpl::GetGeometry(NumMwmId numMwmId)
 {
   auto res = m_graphs.try_emplace(numMwmId, GraphAttrs());
-  if (res.second)
+  if (res.second || !res.first->second.m_geometry)
   {
     // Create geometry only, graph stays nullptr.
     res.first->second.m_geometry = CreateGeometry(numMwmId);
@@ -143,6 +157,16 @@ vector<RouteSegment::SpeedCamera> IndexGraphLoaderImpl::GetSpeedCameraInfo(Segme
 IndexGraphLoaderImpl::GraphPtrT IndexGraphLoaderImpl::CreateIndexGraph(NumMwmId numMwmId, GeometryPtrT & geometry)
 {
   MwmSet::MwmHandle const & handle = m_dataSource.GetHandle(numMwmId);
+  VehicleModelPtrT vehicleModel;
+  if (!geometry)
+    vehicleModel = m_vehicleModelFactory->GetVehicleModelForCountry(handle.GetValue()->GetCountryFileName());
+  return CreateIndexGraph(handle, vehicleModel, geometry);
+}
+
+IndexGraphLoaderImpl::GraphPtrT IndexGraphLoaderImpl::CreateIndexGraph(MwmSet::MwmHandle const & handle,
+                                                                       VehicleModelPtrT const & vehicleModel,
+                                                                       GeometryPtrT & geometry) const
+{
   MwmValue const * value = handle.GetValue();
 
   try
@@ -150,10 +174,7 @@ IndexGraphLoaderImpl::GraphPtrT IndexGraphLoaderImpl::CreateIndexGraph(NumMwmId 
     base::Timer timer;
 
     if (!geometry)
-    {
-      auto vehicleModel = m_vehicleModelFactory->GetVehicleModelForCountry(value->GetCountryFileName());
-      geometry = make_shared<Geometry>(GeometryLoader::Create(handle, std::move(vehicleModel), m_loadAltitudes));
-    }
+      geometry = make_shared<Geometry>(GeometryLoader::Create(handle, vehicleModel, m_loadAltitudes));
 
     auto graph = make_unique<IndexGraph>(geometry, m_estimator, m_avoidRoutingOptions, &value->GetRegionData());
     graph->SetCurrentTimeGetter(m_currentTimeGetter);
@@ -168,6 +189,76 @@ IndexGraphLoaderImpl::GraphPtrT IndexGraphLoaderImpl::CreateIndexGraph(NumMwmId 
     LOG(LERROR, ("Error reading graph for", value->m_file));
     throw;
   }
+}
+
+void IndexGraphLoaderImpl::LoadIndexGraphs(vector<NumMwmId> const & numMwmIds)
+{
+  // The handles, the vehicle models and the slots of the graphs are taken on this thread. Each task reads only its
+  // own mwm (the readers of an mwm share a cache), and this thread waits for all of them.
+  struct Task
+  {
+    MwmSet::MwmHandle const * m_handle = nullptr;
+    VehicleModelPtrT m_vehicleModel;
+    GraphAttrs * m_attrs = nullptr;
+  };
+  vector<Task> tasks;
+  for (NumMwmId const id : numMwmIds)
+  {
+    if (auto const it = m_graphs.find(id); it != m_graphs.end() && it->second.m_graph)
+      continue;
+
+    Task task;
+    try
+    {
+      task.m_handle = &m_dataSource.GetHandle(id);
+    }
+    catch (RootException const &)
+    {
+      // GetIndexGraph() throws when the graph is needed.
+      continue;
+    }
+
+    auto & attrs = m_graphs[id];
+    if (!attrs.m_geometry)
+    {
+      task.m_vehicleModel =
+          m_vehicleModelFactory->GetVehicleModelForCountry(task.m_handle->GetValue()->GetCountryFileName());
+    }
+    task.m_attrs = &attrs;
+    tasks.push_back(std::move(task));
+  }
+
+  if (tasks.empty())
+    return;
+
+  base::Timer timer;
+  atomic<size_t> next = 0;
+  auto const work = [&]()
+  {
+    for (size_t i = next++; i < tasks.size(); i = next++)
+    {
+      auto & task = tasks[i];
+      try
+      {
+        task.m_attrs->m_graph = CreateIndexGraph(*task.m_handle, task.m_vehicleModel, task.m_attrs->m_geometry);
+      }
+      catch (RootException const &)
+      {
+        // GetIndexGraph() tries again and throws when the graph is needed.
+      }
+    }
+  };
+
+  size_t const threadsCount = min({tasks.size(), kMaxLoadingThreads, max<size_t>(thread::hardware_concurrency(), 1)});
+  vector<thread> threads;
+  for (size_t i = 1; i < threadsCount; ++i)
+    threads.emplace_back(work);
+  work();
+  for (auto & t : threads)
+    t.join();
+
+  LOG(LINFO,
+      (tasks.size(), "routing sections loaded with", threadsCount, "threads in", timer.ElapsedSeconds(), "seconds"));
 }
 
 IndexGraphLoaderImpl::GeometryPtrT IndexGraphLoaderImpl::CreateGeometry(NumMwmId numMwmId)

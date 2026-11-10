@@ -7,7 +7,10 @@
 
 #include "geometry/latlon.hpp"
 
+#include <utility>
 #include <vector>
+
+#include "3party/ankerl/unordered_dense.h"
 
 namespace routing
 {
@@ -48,5 +51,21 @@ private:
   IndexGraphStarter & m_starter;
 
   MwmHierarchyHandler m_hierarchyHandler;
+
+  // Heuristics of the vertices to the finish and to the start. A* asks for both for each relaxed edge and a
+  // transition segment is reached by many edges; computing them takes the geometry of the segment and the
+  // distance on the sphere, about half of the time of the search.
+  struct SegmentHash
+  {
+    using is_avalanching = void;
+    uint64_t operator()(Segment const & s) const noexcept
+    {
+      return ankerl::unordered_dense::detail::wyhash::mix(
+          (uint64_t{s.GetFeatureId()} << 32) | s.GetSegmentIdx(),
+          ((uint64_t{s.GetMwmId()} << 1) | static_cast<uint64_t>(s.IsForward())) ^ 0x9E3779B97F4A7C15ULL);
+    }
+  };
+  // RouteWeight::GetWeight() to the finish and to the start (the heuristics have no other parts).
+  ankerl::unordered_dense::map<Segment, std::pair<double, double>, SegmentHash> m_heuristics;
 };
 }  // namespace routing

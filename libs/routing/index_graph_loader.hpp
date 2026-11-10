@@ -25,6 +25,14 @@ public:
   virtual IndexGraph & GetIndexGraph(NumMwmId mwmId) = 0;
   virtual Geometry & GetGeometry(NumMwmId numMwmId) = 0;
 
+  /// Loads the graphs of |numMwmIds| now, e.g. those along a route before it is refined.
+  /// The default implementation loads them one after the other.
+  virtual void LoadIndexGraphs(std::vector<NumMwmId> const & numMwmIds)
+  {
+    for (NumMwmId const id : numMwmIds)
+      GetIndexGraph(id);
+  }
+
   // Because several cameras can lie on one segment we return vector of them.
   virtual std::vector<RouteSegment::SpeedCamera> GetSpeedCameraInfo(Segment const & segment) = 0;
   virtual void Clear() = 0;

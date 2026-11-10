@@ -9,6 +9,8 @@
 #include "geometry/latlon.hpp"
 
 #include "base/assert.hpp"
+#include "base/buffer_vector.hpp"
+#include "base/stl_helpers.hpp"
 
 #include <algorithm>
 #include <map>
@@ -39,6 +41,12 @@ public:
   }
   JointSegment const & GetStartJoint() const { return m_startJoint; }
   JointSegment const & GetFinishJoint() const { return m_endJoint; }
+
+  /// \returns false if a route from the start to the finish can't be found when the waves don't leave the mwms of
+  /// the first joints of the start and of the finish (WorldGraphMode::JointSingleMwm): these mwms differ, e.g. when
+  /// the finish is a transition segment and its first joints are in the neighbouring mwm.
+  /// A* would explore both mwms completely before giving up.
+  bool MayConnectInSingleMwm() const;
 
   // AStarGraph overridings
   // @{
@@ -260,6 +268,50 @@ void IndexGraphStarterJoints<Graph>::InitEnding(Segment const & ending, bool sta
     for (auto const & edge : m_endOutEdges)
       m_savedWeight[edge.GetTarget()] = edge.GetWeight();
   }
+}
+
+template <typename Graph>
+bool IndexGraphStarterJoints<Graph>::MayConnectInSingleMwm() const
+{
+  CHECK(m_init, ());
+
+  auto const toReal = [this](Segment s)
+  {
+    if (!IsRealSegment(s))
+      m_graph.ConvertToReal(s);
+    return s;
+  };
+  Segment const startReal = toReal(m_startSegment);
+  Segment const endReal = toReal(m_endSegment);
+
+  // Mwms of the real segments of the fake joints from the start (their ends) and to the finish (their starts).
+  buffer_vector<NumMwmId, 4> startMwms;
+  for (auto const & edge : m_startOutEdges)
+  {
+    auto const & target = edge.GetTarget();
+    if (!target.IsFake())
+      return true;
+    Segment const & s = GetFakeSegmentSure(target).GetSegment(false /* start */);
+    // The start is connected with the finish directly, without joints.
+    if (s == m_endSegment || s == endReal || s.GetMwmId() == kFakeNumMwmId)
+      return true;
+    startMwms.push_back(s.GetMwmId());
+  }
+
+  for (auto const & edge : m_endOutEdges)
+  {
+    auto const & target = edge.GetTarget();
+    if (!target.IsFake())
+      return true;
+    Segment const & s = GetFakeSegmentSure(target).GetSegment(true /* start */);
+    if (s == m_startSegment || s == startReal || s.GetMwmId() == kFakeNumMwmId ||
+        base::IsExist(startMwms, s.GetMwmId()))
+    {
+      return true;
+    }
+  }
+
+  return m_startOutEdges.empty() || m_endOutEdges.empty();
 }
 
 template <typename Graph>

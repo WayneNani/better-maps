@@ -1005,6 +1005,16 @@ RouterResultCode IndexRouter::CalculateSubrouteLeapsOnlyMode(Checkpoints const &
   if (bestC == nullptr)
     return RouterResultCode::RouteNotFound;
 
+  // The routing sections of the mwms along the best candidate are loaded in parallel; otherwise each one is loaded
+  // when the route through it is refined.
+  {
+    vector<NumMwmId> mwmIds;
+    for (auto const & s : bestC->m_path)
+      if (s.GetMwmId() != kFakeNumMwmId && !base::IsExist(mwmIds, s.GetMwmId()))
+        mwmIds.push_back(s.GetMwmId());
+    starter.GetGraph().LoadIndexGraphs(mwmIds);
+  }
+
   // Calculate route for the best candidate.
   RoutingResultT result;
   ProcessLeapsJoints(bestC->m_path, starter, progress, calculator, result);
@@ -1436,6 +1446,11 @@ IndexRouter::RoutingResultT const * IndexRouter::RoutesCalculator::Calc(Segment 
     JointsStarter jointStarter(m_starter);
     jointStarter.Init(beg, end);
 
+    // The waves of a single mwm search can't meet if the first joints of |beg| and |end| are in different mwms.
+    // Don't explore both mwms completely for nothing (several seconds for big mwms).
+    bool const mayConnect =
+        m_starter.GetGraph().GetMode() != WorldGraphMode::JointSingleMwm || jointStarter.MayConnectInSingleMwm();
+
     using Vertex = JointsStarter::Vertex;
     using Edge = JointsStarter::Edge;
     using Weight = JointsStarter::Weight;
@@ -1448,7 +1463,7 @@ IndexRouter::RoutingResultT const * IndexRouter::RoutesCalculator::Calc(Segment 
     RoutingResult<JointSegment, RouteWeight> route;
     using AlgoT = AStarAlgorithm<Vertex, Edge, Weight>;
 
-    if (AlgoT().FindPathBidirectional(params, route) == AlgoT::Result::OK)
+    if (mayConnect && AlgoT().FindPathBidirectional(params, route) == AlgoT::Result::OK)
     {
       LOG(LDEBUG, ("Sub-route weight:", route.m_distance));
 

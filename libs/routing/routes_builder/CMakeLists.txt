@@ -24,3 +24,4 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 omim_add_tool_subdirectory(routes_builder_tool)
+omim_add_tool_subdirectory(routing_perf_tool)
