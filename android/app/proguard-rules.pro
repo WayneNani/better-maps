@@ -37,3 +37,14 @@
 # Bouncy Castle (HPKE for the anonymous congestion reports) references JNDI classes that are not
 # available on Android and not used by the lightweight API.
 -dontwarn javax.naming.**
+
+# better-maps: the charging planner reads and writes its vehicle profile, options and plans with Gson by reflection.
+# R8 would drop the generic types (List<CurvePoint>) and fields Gson needs: Gson then fills the lists with maps
+# and the app crashes with a ClassCastException, in release builds only.
+-keepattributes Signature,InnerClasses,EnclosingMethod
+-keep class app.organicmaps.ev.EvVehicleProfile { <fields>; <init>(); }
+-keep class app.organicmaps.ev.EvVehicleProfile$* { <fields>; <init>(); }
+-keep class app.organicmaps.ev.EvPlanOptions { <fields>; <init>(); }
+-keep class app.organicmaps.ev.EvPlanOptions$* { <fields>; <init>(); }
+-keep class app.organicmaps.ev.EvPlanResult { <fields>; <init>(); }
+-keep class app.organicmaps.ev.EvPlanResult$* { <fields>; <init>(); }
