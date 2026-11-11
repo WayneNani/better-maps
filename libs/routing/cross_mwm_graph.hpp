@@ -97,6 +97,15 @@ public:
     return m_crossMwmIndexGraph.ForEachTransition(numMwmId, isEnter, fn);
   }
 
+  /// \brief Calls |fn(segmentIdx)| for the transition segments of feature |featureId| of |numMwmId| until it returns
+  /// true. Nothing for an mwm without cross-mwm section.
+  template <class FnT>
+  void ForEachTransitSegmentId(NumMwmId numMwmId, uint32_t featureId, FnT && fn)
+  {
+    if (CrossMwmSectionExists(numMwmId))
+      m_crossMwmIndexGraph.ForEachTransitSegmentId(numMwmId, featureId, fn);
+  }
+
   /// \brief Checks whether feature where |segment| is placed is a cross mwm connector.
   ///        If yes twin-segments are saved to |twins|.
   void GetTwinFeature(Segment const & segment, bool isOutgoing, std::vector<Segment> & twins);

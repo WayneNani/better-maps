@@ -103,6 +103,13 @@ public:
     m_dataSource.ForEachInRect(fn, rect, scales::GetUpperScale());
   }
 
+  /// Ids of the features in |rect| (of all mwms), without reading the features.
+  template <class FnT>
+  void ForEachFeatureIDInRect(FnT && fn, m2::RectD const & rect)
+  {
+    m_dataSource.ForEachFeatureIDInRect(fn, rect, scales::GetUpperScale());
+  }
+
   MwmSet::MwmHandle const & GetHandle(MwmSet::MwmId const & mwmId)
   {
     if (m_numMwmIDs)

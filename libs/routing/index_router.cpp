@@ -24,6 +24,8 @@
 #include "routing/router_delegate.hpp"
 #include "routing/routing_helpers.hpp"
 #include "routing/routing_options.hpp"
+#include "routing/server_route.hpp"
+#include "routing/server_route_matcher.hpp"
 #include "routing/single_vehicle_world_graph.hpp"
 #include "routing/speed_camera_prohibition.hpp"
 #include "routing/traffic_stash.hpp"
@@ -735,6 +737,28 @@ RouterResultCode IndexRouter::CalculateSubroute(Checkpoints const & checkpoints,
   LOG(LINFO, ("Routing in mode:", mode));
 
   base::ScopedTimerWithLog timer("Route build");
+
+  if (UseServerRoute(starter))
+  {
+    ++m_serverStats.m_attempts;
+    string failure;
+    auto const code =
+        CalculateSubrouteServerAssisted(checkpoints, subrouteIdx, starter, delegate, progress, subroute, failure);
+    if (code == RouterResultCode::NoError)
+    {
+      ++m_serverStats.m_used;
+      return code;
+    }
+    if (code == RouterResultCode::Cancelled)
+      return code;
+
+    ++m_serverStats.m_fallbacks;
+    m_serverStats.m_lastFallback = failure;
+    LOG(LWARNING, ("Server-assisted routing not possible:", failure, "- searching the route locally"));
+    subroute.clear();
+    starter.GetGraph().SetMode(mode);
+  }
+
   switch (mode)
   {
   case WorldGraphMode::Joints: return CalculateSubrouteJointsMode(starter, delegate, progress, subroute);
@@ -804,6 +828,84 @@ RouterResultCode IndexRouter::CalculateSubrouteNoLeapsMode(IndexGraphStarter & s
 
 namespace
 {
+// Server-assisted routing: the refined route may differ this much in length from the server's route (the ends are
+// snapped differently, the server's data is newer or older), else it is not used.
+double constexpr kServerRouteLengthTolerance = 0.1;
+double constexpr kServerRouteMinLengthDiffM = 3000.0;
+// The server's route must start and end this close to the checkpoints (else the server lacks data there).
+double constexpr kServerRouteMaxEndDistanceM = 2000.0;
+// Joints mode (start and finish closer than 300 km) asks the server from this distance between them on.
+double constexpr kServerRouteMinJointsDistanceM = 80000.0;
+
+// The routing graph for ServerRouteMatcher.
+class MatcherGraph final : public ServerRouteMatcher::Graph
+{
+public:
+  MatcherGraph(TCountryFileFn const & countryFileFn, NumMwmIds const & numMwmIds, MwmDataSource & dataSource,
+               WorldGraph & graph)
+    : m_countryFileFn(countryFileFn)
+    , m_numMwmIds(numMwmIds)
+    , m_dataSource(dataSource)
+    , m_graph(graph)
+  {}
+
+  NumMwmId GetMwmId(m2::PointD const & point) override
+  {
+    auto const name = m_countryFileFn(point);
+    if (name.empty())
+      return ServerRouteMatcher::kUnknownMwmId;
+    platform::CountryFile const file(name);
+    if (!m_numMwmIds.ContainsFile(file) || !m_dataSource.IsLoaded(file))
+      return kFakeNumMwmId;
+    return m_numMwmIds.GetId(file);
+  }
+
+  void ForEachExit(NumMwmId mwmId, vector<m2::RectD> const & rects, function<void(Segment const &)> const & fn) override
+  {
+    auto const mwmHandleId = m_dataSource.GetMwmId(mwmId);
+    set<uint32_t> features;
+    for (auto const & rect : rects)
+    {
+      m_dataSource.ForEachFeatureIDInRect([&](FeatureID const & id)
+      {
+        if (id.m_mwmId == mwmHandleId)
+          features.insert(id.m_index);
+      }, rect);
+    }
+
+    auto & crossMwmGraph = m_graph.GetCrossMwmGraph();
+    for (uint32_t const featureId : features)
+    {
+      crossMwmGraph.ForEachTransitSegmentId(mwmId, featureId, [&](uint32_t segmentIdx)
+      {
+        for (bool const forward : {true, false})
+        {
+          Segment const segment(mwmId, featureId, segmentIdx, forward);
+          if (crossMwmGraph.IsTransition(segment, true /* isOutgoing */))
+            fn(segment);
+        }
+        return false;
+      });
+    }
+  }
+
+  m2::PointD GetPoint(Segment const & segment, bool front) override
+  {
+    return mercator::FromLatLon(m_graph.GetPoint(segment, front));
+  }
+
+  void GetTwins(Segment const & exit, vector<Segment> & twins) override
+  {
+    m_graph.GetTwinsInner(exit, true /* isOutgoing */, twins);
+  }
+
+private:
+  TCountryFileFn const & m_countryFileFn;
+  NumMwmIds const & m_numMwmIds;
+  MwmDataSource & m_dataSource;
+  WorldGraph & m_graph;
+};
+
 void CollapseForward_ReverseLoops(std::vector<Segment> & path)
 {
   for (size_t i = 1; i < path.size() - 2;)
@@ -1031,6 +1133,153 @@ RouterResultCode IndexRouter::CalculateSubrouteLeapsOnlyMode(Checkpoints const &
   //  subroute = leapsPostProcessor.GetProcessedPath();
   subroute = std::move(result.m_path);
 
+  return RouterResultCode::NoError;
+}
+
+bool IndexRouter::UseServerRoute(IndexGraphStarter const & starter)
+{
+  if (!m_serverRouteSource || m_vehicleType != VehicleType::Car || GetMode() != Mode::Navigation ||
+      m_guides.IsAttached() || GetRoutingOptions().GetOptions() != 0)
+  {
+    return false;
+  }
+
+  // LeapsOnly routes, and long Joints routes across mwm borders (100-300 km, they take even longer on a phone):
+  // never the short ones, e.g. the detours of the charging planner.
+  auto const mode = starter.GetGraph().GetMode();
+  if (mode == WorldGraphMode::Joints)
+  {
+    if (ms::DistanceOnEarth(starter.GetStartJunction().GetLatLon(), starter.GetFinishJunction().GetLatLon()) <
+        kServerRouteMinJointsDistanceM)
+    {
+      return false;
+    }
+    for (auto const mwmId : starter.GetStartMwms())
+      if (starter.GetFinishMwms().count(mwmId) != 0)
+        return false;
+  }
+  else if (mode != WorldGraphMode::LeapsOnly)
+  {
+    return false;
+  }
+  return m_serverRouteSource->IsEnabled();
+}
+
+RouterResultCode IndexRouter::CalculateSubrouteServerAssisted(Checkpoints const & checkpoints, size_t subrouteIdx,
+                                                              IndexGraphStarter & starter,
+                                                              RouterDelegate const & delegate,
+                                                              shared_ptr<AStarProgress> const & progress,
+                                                              vector<Segment> & subroute, string & failure)
+{
+  auto & stats = m_serverStats;
+  stats.m_requestSec = stats.m_matchSec = stats.m_refineSec = 0.0;
+  stats.m_serverDistanceM = stats.m_serverDurationSec = 0.0;
+  auto const & cancellable = delegate.GetCancellable();
+
+  base::Timer timer;
+  auto const serverRoute =
+      m_serverRouteSource->GetRoute({mercator::ToLatLon(checkpoints.GetPoint(subrouteIdx)),
+                                     mercator::ToLatLon(checkpoints.GetPoint(subrouteIdx + 1))},
+                                    cancellable);
+  stats.m_requestSec = timer.ElapsedSeconds();
+  if (cancellable.IsCancelled())
+    return RouterResultCode::Cancelled;
+  if (!serverRoute)
+  {
+    failure = "no route from the server";
+    return RouterResultCode::RouteNotFound;
+  }
+  stats.m_serverDistanceM = serverRoute->m_distanceM;
+  stats.m_serverDurationSec = serverRoute->m_durationSec;
+  if (ms::DistanceOnEarth(serverRoute->m_polyline.front(), mercator::ToLatLon(checkpoints.GetPoint(subrouteIdx))) >
+          kServerRouteMaxEndDistanceM ||
+      ms::DistanceOnEarth(serverRoute->m_polyline.back(), mercator::ToLatLon(checkpoints.GetPoint(subrouteIdx + 1))) >
+          kServerRouteMaxEndDistanceM)
+  {
+    failure = "the server's route starts or ends far from the route points (no data there?)";
+    return RouterResultCode::RouteNotFound;
+  }
+
+  // The transitions where the server's route crosses the mwm borders.
+  timer.Reset();
+  vector<m2::PointD> polyline;
+  polyline.reserve(serverRoute->m_polyline.size());
+  for (auto const & p : serverRoute->m_polyline)
+    polyline.push_back(mercator::FromLatLon(p));
+  MatcherGraph matcherGraph(m_countryFileFn, *m_numMwmIds, m_dataSource, starter.GetGraph());
+  vector<ServerRouteMatcher::Crossing> crossings;
+  auto const matchResult = ServerRouteMatcher::Match(polyline, matcherGraph, crossings);
+  stats.m_matchSec = timer.ElapsedSeconds();
+  if (matchResult != ServerRouteMatcher::Result::Ok)
+  {
+    failure = "matching the mwm borders: " + DebugPrint(matchResult);
+    return RouterResultCode::RouteNotFound;
+  }
+  if (crossings.empty())
+  {
+    failure = "the server's route crosses no mwm border";
+    return RouterResultCode::RouteNotFound;
+  }
+  if (starter.GetStartMwms().count(crossings.front().m_exit.GetMwmId()) == 0 ||
+      starter.GetFinishMwms().count(crossings.back().m_enter.GetMwmId()) == 0)
+  {
+    failure = "the server's route starts in " + m_numMwmIds->GetFile(crossings.front().m_exit.GetMwmId()).GetName() +
+              " or ends in " + m_numMwmIds->GetFile(crossings.back().m_enter.GetMwmId()).GetName() +
+              ", not in the mwms of the route points";
+    return RouterResultCode::RouteNotFound;
+  }
+
+  // The leaps path like the one of the LeapsOnly search: start, exit, enter, ..., exit, enter, finish.
+  vector<Segment> leaps;
+  leaps.reserve(2 * crossings.size() + 2);
+  leaps.push_back(starter.GetStartSegment());
+  for (auto const & c : crossings)
+  {
+    leaps.push_back(c.m_exit);
+    leaps.push_back(c.m_enter);
+  }
+  leaps.push_back(starter.GetFinishSegment());
+  LOG(LINFO, ("Server route:", crossings.size(), "mwm borders matched in", stats.m_matchSec, "s"));
+
+  timer.Reset();
+  SCOPE_GUARD(progressGuard, [&progress]() { progress->PushAndDropLastSubProgress(); });
+  progress->AppendSubProgress(AStarSubProgress(1.0));
+  {
+    vector<NumMwmId> mwmIds;
+    for (auto const & s : leaps)
+      if (s.GetMwmId() != kFakeNumMwmId && !base::IsExist(mwmIds, s.GetMwmId()))
+        mwmIds.push_back(s.GetMwmId());
+    starter.GetGraph().LoadIndexGraphs(mwmIds);
+  }
+  RoutesCalculator calculator(starter, delegate);
+  RoutingResultT result;
+  auto const code = ProcessLeapsJoints(leaps, starter, progress, calculator, result);
+  stats.m_refineSec = timer.ElapsedSeconds();
+  if (cancellable.IsCancelled())
+    return RouterResultCode::Cancelled;
+  if (code != RouterResultCode::NoError || result.Empty())
+  {
+    failure = "refining the server's route failed";
+    return RouterResultCode::RouteNotFound;
+  }
+
+  // Plausibility against the server's route: a wrongly matched transition makes a detour.
+  double lengthM = 0.0;
+  for (auto const & s : result.m_path)
+    lengthM += ms::DistanceOnEarth(starter.GetPoint(s, false /* front */), starter.GetPoint(s, true /* front */));
+  // (The weight is no ETA: it has other speeds and penalties, so it can't be compared with the server's duration.)
+  double const maxDiffM = max(kServerRouteMinLengthDiffM, kServerRouteLengthTolerance * serverRoute->m_distanceM);
+  if (fabs(lengthM - serverRoute->m_distanceM) > maxDiffM)
+  {
+    failure = "implausible result: " + to_string(static_cast<int>(lengthM)) + " m for a server route of " +
+              to_string(static_cast<int>(serverRoute->m_distanceM)) + " m";
+    return RouterResultCode::RouteNotFound;
+  }
+
+  LOG(LINFO, ("Server-assisted route:", lengthM, "m (server:", serverRoute->m_distanceM, "m,",
+              serverRoute->m_durationSec, "s); request", stats.m_requestSec, "s, match", stats.m_matchSec,
+              "s, refinement", stats.m_refineSec, "s"));
+  subroute = std::move(result.m_path);
   return RouterResultCode::NoError;
 }
 
