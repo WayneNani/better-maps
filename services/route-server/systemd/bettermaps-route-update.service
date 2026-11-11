@@ -1,0 +1,14 @@
+# Weekly OSRM data update (user service). Install, see README "Wöchentliches Update".
+[Unit]
+Description=better-maps route server: fetch the OSM extract and re-import
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+# Adjust the path to your checkout. Environment variables from scripts/common.sh can be set here.
+Environment=OSRM_EXTRACT=europe/germany
+Environment=ROUTE_PORT=18100
+ExecStart=%h/Projects/better-maps/services/route-server/scripts/update.sh
+Nice=10
+IOSchedulingClass=idle

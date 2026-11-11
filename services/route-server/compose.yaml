@@ -1,0 +1,127 @@
+# Self-hosted car routing for the app's server-assisted routing (OSRM behind a small Go gateway).
+#
+# Normally driven by the scripts in scripts/ (they set the variables below). Direct use:
+#   export OSRM_CACHE=$HOME/.cache/bettermaps-osrm OSRM_REGION=germany
+#   podman-compose -p bettermaps-route run --rm import   # once / after new data
+#   podman-compose -p bettermaps-route up -d osrm gateway
+#
+# Only the gateway is published (on ROUTE_BIND:ROUTE_PORT, 127.0.0.1 by default, put a TLS reverse proxy in front).
+# OSRM sits on an internal network without published ports and without internet access; it is reachable only by the
+# gateway, which forwards nothing but single car routes (no table/trip/match/nearest/tile).
+#
+# Rootless Podman: the OSRM containers run as root inside the user namespace (= your host user), so the files in
+# $OSRM_CACHE stay owned by you. ":z" relabels the volumes for SELinux.
+
+x-osrm: &osrm
+  image: ghcr.io/project-osrm/osrm-backend:${OSRM_VERSION:-v6.0.0}
+  user: "0:0"
+
+networks:
+  # OSRM <-> gateway. internal: no published ports, no route to the outside.
+  backend:
+    internal: true
+  # Gateway <-> host (published port).
+  frontend: {}
+
+services:
+  # Step 1 of the preprocessing: keeps only what the car profile reads (roads, ferries, turn restrictions and the
+  # nodes of those ways with their tags, e.g. barriers and traffic signals). Germany: 4.6 GB -> ~1 GB, so that
+  # osrm-extract fits into the memory limit. Writes /work/$OSRM_IMPORT_DIR/$OSRM_REGION.osm.pbf.
+  filter:
+    image: localhost/bettermaps-osmium:latest
+    build:
+      context: .
+      dockerfile: osmium.Containerfile
+    profiles: ["import"]
+    network_mode: none
+    user: "0:0"
+    mem_limit: ${OSRM_IMPORT_MEMORY:-12g}
+    memswap_limit: ${OSRM_IMPORT_MEMORY:-12g}
+    cpus: ${OSRM_THREADS:-6}
+    environment:
+      OSRM_REGION: ${OSRM_REGION:-germany}
+      OSRM_IMPORT_DIR: ${OSRM_IMPORT_DIR:-data.next}
+    volumes:
+      - ${OSRM_CACHE:?set OSRM_CACHE}/input:/input:ro,z
+      - ${OSRM_CACHE}/${OSRM_REGION:-germany}:/work:z
+    entrypoint: ["sh", "-c"]
+    command:
+      - >-
+        mkdir -p "/work/$$OSRM_IMPORT_DIR" &&
+        nice -n 15 osmium tags-filter --overwrite --no-progress
+        "/input/$$OSRM_REGION-latest.osm.pbf"
+        w/highway w/route=ferry w/bridge=movable r/type=restriction
+        -o "/work/$$OSRM_IMPORT_DIR/$$OSRM_REGION.osm.pbf"
+
+  # Step 2: osrm-extract, osrm-partition, osrm-customize (MLD) of /work/$OSRM_IMPORT_DIR/$OSRM_REGION.osm.pbf (the
+  # filtered extract; the unfiltered one from /input if there is none). Prints duration and peak memory (cgroup
+  # memory.peak) at the end.
+  import:
+    <<: *osrm
+    profiles: ["import"]
+    network_mode: none
+    mem_limit: ${OSRM_IMPORT_MEMORY:-12g}
+    memswap_limit: ${OSRM_IMPORT_MEMORY:-12g}
+    cpus: ${OSRM_THREADS:-6}
+    environment:
+      OSRM_REGION: ${OSRM_REGION:-germany}
+      OSRM_IMPORT_DIR: ${OSRM_IMPORT_DIR:-data.next}
+      OSRM_THREADS: ${OSRM_THREADS:-6}
+    volumes:
+      - ${OSRM_CACHE:?set OSRM_CACHE}/input:/input:ro,z
+      - ${OSRM_CACHE}/${OSRM_REGION:-germany}:/work:z
+    command:
+      - sh
+      - -c
+      - >-
+        start=$$(date +%s);
+        d="/work/$$OSRM_IMPORT_DIR"; mkdir -p "$$d";
+        [ -s "$$d/$$OSRM_REGION.osm.pbf" ] || ln -sf "/input/$$OSRM_REGION-latest.osm.pbf" "$$d/$$OSRM_REGION.osm.pbf";
+        rc=0;
+        nice -n 15 osrm-extract -p /opt/car.lua -t "$$OSRM_THREADS" --data_version osmosis "$$d/$$OSRM_REGION.osm.pbf" &&
+        nice -n 15 osrm-partition -t "$$OSRM_THREADS" "$$d/$$OSRM_REGION.osrm" &&
+        nice -n 15 osrm-customize -t "$$OSRM_THREADS" "$$d/$$OSRM_REGION.osrm" || rc=$$?;
+        rm -f "$$d/$$OSRM_REGION.osm.pbf";
+        echo "import-stats: exit=$$rc seconds=$$(( $$(date +%s) - start ))
+        memory_peak_bytes=$$(cat /sys/fs/cgroup/memory.peak 2>/dev/null || echo unknown)";
+        exit $$rc
+
+  # Routing engine. Internal only: no ports.
+  osrm:
+    <<: *osrm
+    restart: unless-stopped
+    mem_limit: ${OSRM_MEMORY:-6g}
+    memswap_limit: ${OSRM_MEMORY:-6g}
+    cpus: ${OSRM_CPUS:-2}
+    networks: [backend]
+    volumes:
+      - ${OSRM_CACHE:?set OSRM_CACHE}/${OSRM_REGION:-germany}/data:/data:ro,z
+    # --max-viaroute-size: the gateway allows few points anyway; keep OSRM's own limit small as well.
+    command: ["osrm-routed", "--algorithm", "mld", "--max-viaroute-size", "${ROUTE_MAX_POINTS:-25}",
+              "--max-table-size", "1", "--max-trip-size", "1", "--max-matching-size", "1",
+              "--max-nearest-size", "1", "--threads", "${OSRM_CPUS:-2}", "/data/${OSRM_REGION:-germany}.osrm"]
+
+  # Authenticating gateway (services/route-server/Containerfile), the only published service.
+  gateway:
+    image: localhost/bettermaps-route-gateway:latest
+    build:
+      context: .
+      dockerfile: Containerfile
+    restart: unless-stopped
+    mem_limit: 128m
+    memswap_limit: 128m
+    cpus: 1
+    depends_on: [osrm]
+    networks: [backend, frontend]
+    ports:
+      - "${ROUTE_BIND:-127.0.0.1}:${ROUTE_PORT:-18100}:8080"
+    environment:
+      ROUTE_LISTEN: ":8080"
+      ROUTE_OSRM_URL: "http://osrm:5000"
+      ROUTE_TOKENS_FILE: /config/tokens
+      ROUTE_MAX_POINTS: ${ROUTE_MAX_POINTS:-25}
+      ROUTE_RATE_PER_MINUTE: ${ROUTE_RATE_PER_MINUTE:-30}
+      ROUTE_RATE_BURST: ${ROUTE_RATE_BURST:-60}
+      ROUTE_LOG_LEVEL: ${ROUTE_LOG_LEVEL:-info}
+    volumes:
+      - ${ROUTE_TOKENS_FILE:?set ROUTE_TOKENS_FILE}:/config/tokens:ro,z
