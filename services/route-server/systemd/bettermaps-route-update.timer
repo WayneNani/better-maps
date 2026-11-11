@@ -1,0 +1,11 @@
+[Unit]
+Description=Weekly better-maps route server data update
+
+[Timer]
+# Tuesday night (Geofabrik publishes daily; once a week is plenty for routing).
+OnCalendar=Tue *-*-* 03:30
+RandomizedDelaySec=30min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

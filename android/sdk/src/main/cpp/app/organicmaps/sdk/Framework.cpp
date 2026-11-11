@@ -1237,6 +1237,13 @@ JNIEXPORT jboolean JNICALL Java_app_organicmaps_sdk_Framework_nativeAutoReroute(
   return static_cast<jboolean>(frm()->GetRoutingManager().AutoReroute());
 }
 
+// better-maps: server-assisted car routing. The token is not logged.
+JNIEXPORT void JNICALL Java_app_organicmaps_sdk_Framework_nativeSetRoutingServer(JNIEnv * env, jclass, jstring url,
+                                                                                 jstring token)
+{
+  frm()->GetRoutingManager().SetRoutingServer(jni::ToNativeString(env, url), jni::ToNativeString(env, token));
+}
+
 JNIEXPORT jstring JNICALL Java_app_organicmaps_sdk_Framework_nativeGetBookmarkDir(JNIEnv * env, jclass)
 {
   return jni::ToJavaString(env, GetPlatform().SettingsDir().c_str());

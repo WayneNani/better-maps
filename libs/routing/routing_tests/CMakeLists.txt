@@ -38,6 +38,7 @@ set(SRC
   routing_helpers_tests.cpp
   routing_options_tests.cpp
   routing_session_test.cpp
+  server_route_tests.cpp
   speed_cameras_tests.cpp
   tools.cpp
   tools.hpp

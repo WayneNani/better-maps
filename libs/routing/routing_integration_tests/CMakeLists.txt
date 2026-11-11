@@ -22,6 +22,7 @@ set(SRC
   route_test.cpp
   routing_test_tools.cpp
   routing_test_tools.hpp
+  server_route_test.cpp
   small_routes.cpp
   speed_camera_notifications_tests.cpp
   street_names_test.cpp

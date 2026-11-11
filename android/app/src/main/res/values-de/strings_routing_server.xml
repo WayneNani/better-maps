@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: serverunterstütztes Auto-Routing (Einstellungen). -->
+<resources>
+  <string name="routing_server_title">Routing-Server</string>
+  <string name="routing_server_info">Lange Autorouten lassen sich mit einem eigenen Routing-Server (services/route-server) viel schneller berechnen: Der Server schlägt den Weg vor, die App baut die Route wie gewohnt aus deinen Karten. Start, Ziel und Zwischenziele werden an den Server gesendet. Ohne Server oder bei Fehlern rechnet die App selbst.</string>
+  <string name="routing_server_enabled">Routing-Server verwenden</string>
+  <string name="routing_server_url">Server-Adresse</string>
+  <string name="routing_server_url_hint">z. B. https://route.example.org</string>
+  <string name="routing_server_token">Zugangs-Token</string>
+  <string name="routing_server_token_hint">Das Token dieses Geräts aus scripts/new-token.sh. Leer lassen, um das gespeicherte Token zu behalten.</string>
+  <string name="routing_server_token_set">Gesetzt</string>
+  <string name="routing_server_not_set">Nicht gesetzt</string>
+  <string name="routing_server_url_invalid">Keine gültige Server-Adresse (https://…)</string>
+  <string name="routing_server_url_insecure">Bitte https:// verwenden (http:// nur im lokalen Netz)</string>
+  <string name="routing_server_needs_url_and_token">Bitte auch Server-Adresse und Zugangs-Token eintragen</string>
+</resources>

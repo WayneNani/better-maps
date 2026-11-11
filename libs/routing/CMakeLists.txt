@@ -155,6 +155,10 @@ set(SRC
   segment.hpp
   segmented_route.cpp
   segmented_route.hpp
+  server_route.cpp
+  server_route.hpp
+  server_route_matcher.cpp
+  server_route_matcher.hpp
   single_vehicle_world_graph.cpp
   single_vehicle_world_graph.hpp
   speed_camera.cpp
@@ -214,6 +218,8 @@ target_link_libraries(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
   PUBLIC
     opening_hours
+  PRIVATE
+    glaze::glaze
 )
 
 if (PLATFORM_DESKTOP)

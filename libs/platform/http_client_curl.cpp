@@ -36,6 +36,7 @@
 #include <boost/uuid/uuid_io.hpp>
 
 #include <array>
+#include <filesystem>
 #include <fstream>
 #include <iterator>
 #include <sstream>
@@ -137,6 +138,30 @@ HeadersVector ParseHeaders(std::string const & raw)
   return headers;
 }
 
+// Like WriteToFile(), but the file is created readable and writable only by the owner.
+bool WriteToPrivateFile(std::string const & fileName, std::string const & data)
+{
+  {
+    std::ofstream ofs(fileName);
+    if (!ofs.is_open())
+    {
+      LOG(LERROR, ("Failed to create a temporary file."));
+      return false;
+    }
+  }
+  std::error_code ec;
+  std::filesystem::permissions(fileName, std::filesystem::perms::owner_read | std::filesystem::perms::owner_write,
+                               std::filesystem::perm_options::replace, ec);
+  if (ec)
+  {
+    LOG(LERROR, ("Failed to restrict a temporary file."));
+    return false;
+  }
+  std::ofstream ofs(fileName, std::ios::trunc);
+  ofs << data;
+  return ofs.good();
+}
+
 bool WriteToFile(std::string const & fileName, std::string const & data)
 {
   std::ofstream ofs(fileName);
@@ -197,8 +222,19 @@ bool HttpClient::RunHttpRequest()
   else
     cmd += "-X " + m_httpMethod + " ";
 
-  for (auto const & header : m_headers)
-    cmd += "-H \"" + header.first + ": " + header.second + "\" ";
+  // Headers go through a file readable only by us: on the command line, credentials (e.g. Authorization) would be
+  // visible to other processes and in the debug log below.
+  ScopedRemoveFile headers_in_deleter;
+  if (!m_headers.empty())
+  {
+    std::string headers;
+    for (auto const & header : m_headers)
+      headers += header.first + ": " + header.second + "\n";
+    headers_in_deleter.m_fileName = GetTmpFileName();
+    if (!WriteToPrivateFile(headers_in_deleter.m_fileName, headers))
+      return false;
+    cmd += "-H \"@" + headers_in_deleter.m_fileName + "\" ";
+  }
 
   if (!m_cookies.empty())
     cmd += "-b \"" + m_cookies + "\" ";

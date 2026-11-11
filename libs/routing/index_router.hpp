@@ -36,6 +36,7 @@ class FakeEdgesContainer;
 class IndexGraph;
 class IndexGraphStarter;
 class RouteWeight;
+class ServerRouteSource;
 class TrafficStash;
 class WorldGraph;
 
@@ -131,6 +132,29 @@ public:
     m_currentTimeGetter = std::forward<T>(getter);
   }
 
+  /// \brief Server-assisted car routing: with an enabled |source|, a long car route (LeapsOnly mode, or Joints mode
+  /// across mwm borders from 80 km on) follows the way across the mwms of the server's route instead of searching
+  /// the leaps and choosing among candidates (or searching all mwms between); the route itself is still built
+  /// (refined) locally. On any failure (no answer, a border crossing without matching
+  /// transition, refinement failed, result implausible) the route is computed locally as without a source.
+  /// Not used with avoid-routing options (the server doesn't know them). nullptr (default): local routing only.
+  void SetServerRouteSource(std::shared_ptr<ServerRouteSource> source) { m_serverRouteSource = std::move(source); }
+
+  struct ServerRoutingStats
+  {
+    uint32_t m_attempts = 0;   // Subroutes for which the server was asked.
+    uint32_t m_used = 0;       // Subroutes built along the server's route.
+    uint32_t m_fallbacks = 0;  // Subroutes computed locally after a failure.
+    std::string m_lastFallback;
+    // Of the last attempt.
+    double m_requestSec = 0.0;
+    double m_matchSec = 0.0;
+    double m_refineSec = 0.0;
+    double m_serverDistanceM = 0.0;
+    double m_serverDurationSec = 0.0;
+  };
+  ServerRoutingStats const & GetServerRoutingStats() const { return m_serverStats; }
+
 protected:
   /**
    * @brief Creates a new `IndexRouter` instance.
@@ -212,6 +236,13 @@ private:
                                                   IndexGraphStarter & starter, RouterDelegate const & delegate,
                                                   std::shared_ptr<AStarProgress> const & progress,
                                                   std::vector<Segment> & subroute);
+  /// Builds the subroute along the route of m_serverRouteSource. Any code but NoError and Cancelled is a failure
+  /// described by |failure|; the subroute is then computed locally.
+  RouterResultCode CalculateSubrouteServerAssisted(Checkpoints const & checkpoints, size_t subrouteIdx,
+                                                   IndexGraphStarter & starter, RouterDelegate const & delegate,
+                                                   std::shared_ptr<AStarProgress> const & progress,
+                                                   std::vector<Segment> & subroute, std::string & failure);
+  bool UseServerRoute(IndexGraphStarter const & starter);
 
   RouterResultCode DoCalculateRoute(Checkpoints const & checkpoints, m2::PointD const & startDirection,
                                     RouterDelegate const & delegate, Route & route);
@@ -395,5 +426,8 @@ private:
   CountryParentNameGetterFn m_countryParentNameGetterFn;
 
   TimeGetterT m_currentTimeGetter;
+
+  std::shared_ptr<ServerRouteSource> m_serverRouteSource;
+  ServerRoutingStats m_serverStats;
 };
 }  // namespace routing
