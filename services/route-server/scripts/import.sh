@@ -61,8 +61,13 @@ cp "$OSRM_PBF.sha256" "$next/inputs.sha256" 2>/dev/null || sha256sum "$OSRM_PBF"
 } | tee "$OSRM_REGION_DIR/import-stats.txt" >&2
 { tr '\n' ' ' <"$OSRM_REGION_DIR/import-stats.txt"; echo; } >>"$OSRM_REGION_DIR/import-history.txt"
 
+# Restart the server only if it currently serves this region.
 was_running=false
-[[ -n "$(podman_cmd ps -q --filter name=bettermaps-route_osrm)" ]] && was_running=true
+for c in $(podman_cmd ps --filter name=bettermaps-route_osrm --format '{{.Names}}'); do
+  if podman_cmd inspect "$c" --format '{{range .Mounts}}{{.Source}} {{end}}' | grep -qF "$OSRM_REGION_DIR/data "; then
+    was_running=true
+  fi
+done
 rm -rf "$OSRM_REGION_DIR/data.prev"
 [[ -d "$OSRM_REGION_DIR/data" ]] && mv "$OSRM_REGION_DIR/data" "$OSRM_REGION_DIR/data.prev"
 mv "$next" "$OSRM_REGION_DIR/data"
