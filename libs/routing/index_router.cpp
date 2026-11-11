@@ -856,7 +856,10 @@ public:
       return ServerRouteMatcher::kUnknownMwmId;
     platform::CountryFile const file(name);
     if (!m_numMwmIds.ContainsFile(file) || !m_dataSource.IsLoaded(file))
+    {
+      m_missingMwm = name;
       return kFakeNumMwmId;
+    }
     return m_numMwmIds.GetId(file);
   }
 
@@ -904,6 +907,10 @@ private:
   NumMwmIds const & m_numMwmIds;
   MwmDataSource & m_dataSource;
   WorldGraph & m_graph;
+
+public:
+  // The last mwm of the server's route that isn't available.
+  std::string m_missingMwm;
 };
 
 void CollapseForward_ReverseLoops(std::vector<Segment> & path)
@@ -1213,6 +1220,8 @@ RouterResultCode IndexRouter::CalculateSubrouteServerAssisted(Checkpoints const 
   if (matchResult != ServerRouteMatcher::Result::Ok)
   {
     failure = "matching the mwm borders: " + DebugPrint(matchResult);
+    if (!matcherGraph.m_missingMwm.empty())
+      failure += " (" + matcherGraph.m_missingMwm + " is not downloaded)";
     return RouterResultCode::RouteNotFound;
   }
   if (crossings.empty())
