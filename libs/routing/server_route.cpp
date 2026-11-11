@@ -14,7 +14,8 @@
 
 namespace routing
 {
-namespace
+// Not in an anonymous namespace: glaze's reflection needs a type with linkage (clang).
+namespace server_route_json
 {
 struct ResponseDto
 {
@@ -24,7 +25,10 @@ struct ResponseDto
   double duration_s = 0.0;
   std::string data_timestamp;
 };
+}  // namespace server_route_json
 
+namespace
+{
 // Reads one value of an encoded polyline at |pos|.
 bool DecodeValue(std::string_view s, size_t & pos, int64_t & value)
 {
@@ -119,7 +123,7 @@ std::string HttpServerRouteSource::MakeRequestBody(std::vector<ms::LatLon> const
 
 std::optional<ServerRoute> HttpServerRouteSource::ParseResponse(std::string const & json)
 {
-  ResponseDto dto;
+  server_route_json::ResponseDto dto;
   if (auto const error = glz::read<glz::opts{.error_on_unknown_keys = false}>(dto, json))
   {
     LOG(LWARNING, ("Routing server: invalid response"));
