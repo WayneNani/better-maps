@@ -11,6 +11,7 @@
 #include "routing/routing_callbacks.hpp"
 #include "routing/routing_options.hpp"
 #include "routing/routing_session.hpp"
+#include "routing/server_route.hpp"
 #include "routing/turns.hpp"
 
 #include "search/route_corridor.hpp"
@@ -211,6 +212,11 @@ public:
   /// Delegate::RegisterCountryFilesOnRoute() (GUI thread). |trafficCache| must outlive the router.
   std::unique_ptr<routing::IRouter> CreateCarRouter(std::shared_ptr<routing::NumMwmIds> numMwmIds,
                                                     traffic::TrafficCache const & trafficCache) const;
+
+  /// \brief better-maps: server-assisted car routing (services/route-server). With a server, long car routes follow
+  /// the way across the maps of the server's route and are only refined locally; any failure falls back to local
+  /// routing. Empty |url| or |token| (default) turns it off. Any thread. The token is kept in memory only.
+  void SetRoutingServer(std::string const & url, std::string const & token);
 
   m2::PointD GetRouteEndPoint() const { return m_routingSession.GetEndPoint(); }
   /// Returns the most situable router engine type.
@@ -424,6 +430,8 @@ private:
   extrapolation::Extrapolator m_extrapolator;
   // Anonymous congestion reports (opt-in, car navigation only).
   std::unique_ptr<CrowdTrafficRecorder> m_crowdTraffic;
+  // Shared by all car routers (session and charging planner); off until SetRoutingServer().
+  std::shared_ptr<routing::HttpServerRouteSource> m_serverRouteSource;
 
   std::vector<dp::DrapeID> m_drapeSubroutes;
   mutable std::mutex m_drapeSubroutesMutex;

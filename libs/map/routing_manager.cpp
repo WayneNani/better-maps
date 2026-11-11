@@ -333,6 +333,7 @@ RoutingManager::RoutingManager(Callbacks && callbacks, Delegate & delegate)
   , m_delegate(delegate)
   , m_extrapolator([this](location::GpsInfo const & gpsInfo) { this->OnExtrapolatedLocationUpdate(gpsInfo); })
   , m_crowdTraffic(std::make_unique<CrowdTrafficRecorder>(GetPlatform().WritablePathForFile("crowd_traffic_limits.bin")))
+  , m_serverRouteSource(std::make_shared<routing::HttpServerRouteSource>())
 {
   m_extrapolator.Enable(true);  // Keeps smooth arrow movement whether routing or not
   m_routingSession.Init(
@@ -554,9 +555,14 @@ void RoutingManager::SetRouterImpl(RouterType type)
   if (type == RouterType::Ruler)
     router = make_unique<RulerRouter>();
   else
-    router = make_unique<IndexRouter>(
+  {
+    auto indexRouter = make_unique<IndexRouter>(
         vehicleType, m_loadAltitudes, m_callbacks.m_countryParentNameGetterFn, countryFileGetter, getMwmRectByName,
         numMwmIds, MakeNumMwmTree(*numMwmIds, m_callbacks.m_countryInfoGetter()), m_routingSession, dataSource);
+    // Used for car routes only, see IndexRouter::SetServerRouteSource().
+    indexRouter->SetServerRouteSource(m_serverRouteSource);
+    router = std::move(indexRouter);
+  }
 
   m_routingSession.SetRoutingSettings(GetRoutingSettings(vehicleType));
   m_routingSession.SetRouter(std::move(router), std::move(regionsFinder));
@@ -679,9 +685,19 @@ std::unique_ptr<IRouter> RoutingManager::CreateCarRouter(std::shared_ptr<NumMwmI
   auto const getMwmRectByName = [&callbacks](string const & countryId) -> m2::RectD
   { return callbacks.m_countryInfoGetter().GetLimitRectForLeaf(countryId); };
   auto numMwmTree = MakeNumMwmTree(*numMwmIds, m_callbacks.m_countryInfoGetter());
-  return make_unique<IndexRouter>(VehicleType::Car, false /* loadAltitudes */, m_callbacks.m_countryParentNameGetterFn,
-                                  countryFileGetter, getMwmRectByName, std::move(numMwmIds), std::move(numMwmTree),
-                                  trafficCache, m_callbacks.m_dataSourceGetter());
+  auto router = make_unique<IndexRouter>(VehicleType::Car, false /* loadAltitudes */,
+                                         m_callbacks.m_countryParentNameGetterFn, countryFileGetter, getMwmRectByName,
+                                         std::move(numMwmIds), std::move(numMwmTree), trafficCache,
+                                         m_callbacks.m_dataSourceGetter());
+  // The detours of the charging planner are short (Joints mode, no server request); a long route would benefit.
+  router->SetServerRouteSource(m_serverRouteSource);
+  return router;
+}
+
+void RoutingManager::SetRoutingServer(std::string const & url, std::string const & token)
+{
+  m_serverRouteSource->SetServer(url, token);
+  LOG(LINFO, ("Server-assisted car routing", m_serverRouteSource->IsEnabled() ? "on" : "off"));
 }
 
 void RoutingManager::CollectFeaturesAlongRoute(vector<RouteSegment> const & segments, m2::PointD const & startPt,
