@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: server-assisted car routing. Keys and values: app.organicmaps.settings.RoutingServerSettings. -->
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <Preference
+    android:key="routing_server_info"
+    android:persistent="false"
+    android:selectable="false"
+    android:summary="@string/routing_server_info"
+    app:iconSpaceReserved="false"
+    app:singleLineTitle="false" />
+
+  <SwitchPreferenceCompat
+    android:key="routing_server_enabled"
+    android:defaultValue="false"
+    android:title="@string/routing_server_enabled"
+    android:widgetLayout="@layout/preference_switch"
+    app:iconSpaceReserved="false"
+    app:singleLineTitle="false" />
+
+  <EditTextPreference
+    android:key="routing_server_url"
+    android:title="@string/routing_server_url"
+    android:dialogMessage="@string/routing_server_url_hint"
+    app:iconSpaceReserved="false"
+    app:singleLineTitle="false" />
+
+  <EditTextPreference
+    android:key="routing_server_token"
+    android:persistent="false"
+    android:title="@string/routing_server_token"
+    android:dialogMessage="@string/routing_server_token_hint"
+    app:iconSpaceReserved="false"
+    app:singleLineTitle="false" />
+
+</androidx.preference.PreferenceScreen>

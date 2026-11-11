@@ -43,6 +43,13 @@ public class NavigationSettingsFragment extends BaseXmlSettingsFragment
     super.onResume();
     updateVoiceInstructionsPrefsSummary();
     updateRoutingSettingsPrefsSummary();
+    updateRoutingServerPrefsSummary();
+  }
+
+  private void updateRoutingServerPrefsSummary()
+  {
+    final Preference pref = getPreference("routing_server_screen");
+    pref.setSummary(RoutingServerSettings.get(requireContext()).isActive() ? R.string.on : R.string.off);
   }
 
   @Override

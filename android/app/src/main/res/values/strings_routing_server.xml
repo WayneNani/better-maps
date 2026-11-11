@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: server-assisted car routing (settings). -->
+<resources>
+  <string name="routing_server_title">Routing server</string>
+  <string name="routing_server_info">Long car routes can be calculated much faster with your own routing server (services/route-server): the server suggests the way, the app builds the route from your maps as usual. Start, destination and intermediate points are sent to the server. Without a server or if it fails, the app calculates on its own.</string>
+  <string name="routing_server_enabled">Use routing server</string>
+  <string name="routing_server_url">Server address</string>
+  <string name="routing_server_url_hint">e.g. https://route.example.org</string>
+  <string name="routing_server_token">Access token</string>
+  <string name="routing_server_token_hint">The token of this device from scripts/new-token.sh. Leave empty to keep the stored token.</string>
+  <string name="routing_server_token_set">Set</string>
+  <string name="routing_server_not_set">Not set</string>
+  <string name="routing_server_url_invalid">Not a valid server address (https://…)</string>
+  <string name="routing_server_url_insecure">Use https:// (http:// only in the local network)</string>
+  <string name="routing_server_needs_url_and_token">Enter the server address and the access token as well</string>
+</resources>

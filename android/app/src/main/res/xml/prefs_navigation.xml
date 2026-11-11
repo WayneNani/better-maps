@@ -50,6 +50,12 @@
     android:key="@string/pref_android_auto_support"
     android:persistent="false"
     android:title="@string/pref_aa_support_title" />
+  <Preference
+    android:key="routing_server_screen"
+    android:persistent="false"
+    android:title="@string/routing_server_title"
+    android:fragment="app.organicmaps.settings.RoutingServerSettingsFragment"
+    app:singleLineTitle="false" />
   <SwitchPreferenceCompat
     android:defaultValue="true"
     android:key="@string/pref_enable_auto_reroute"

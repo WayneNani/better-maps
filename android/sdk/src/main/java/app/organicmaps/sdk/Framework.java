@@ -405,6 +405,12 @@ public class Framework
   public static native void nativeSetAutoReroute(boolean autoReroute);
   public static native boolean nativeAutoReroute();
 
+  /**
+   * better-maps: server-assisted car routing (services/route-server). Empty url or token turns it off. The token is
+   * kept in memory by the core only.
+   */
+  public static native void nativeSetRoutingServer(@NonNull String url, @NonNull String token);
+
   public static native void nativeSetCustomMapDownloadUrl(String url);
 
   public static void applyCustomMapDownloadUrl(@NonNull Context context, @Nullable String url)
