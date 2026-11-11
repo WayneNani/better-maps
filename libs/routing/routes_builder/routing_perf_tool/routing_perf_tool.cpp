@@ -9,11 +9,17 @@
 // number of geometry points, a hash of the geometry and the memory (RSS) of the process are printed.
 //
 // --evict_page_cache drops the maps from the page cache of the OS first (posix_fadvise), like after a reboot.
+//
+// --route_server_url=http://127.0.0.1:18100 uses server-assisted routing (services/route-server) with the token from
+// the environment variable BM_ROUTE_SERVER_TOKEN (not a flag: the process list would show it). For each route it
+// prints whether the server's route was used or why the router fell back, and the times of request, matching and
+// refinement.
 
 #include "routing/checkpoints.hpp"
 #include "routing/index_router.hpp"
 #include "routing/route.hpp"
 #include "routing/router_delegate.hpp"
+#include "routing/server_route.hpp"
 
 #include "routing_common/num_mwm_id.hpp"
 
@@ -46,6 +52,7 @@
 #include <unistd.h>
 
 #include <cstdio>
+#include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -65,6 +72,10 @@ DEFINE_string(read_sections, "",
               "Read these sections (e.g. \"cross_mwm,routing\") of all maps before the first route, after "
               "--evict_page_cache, to see what reading them ahead would save");
 DEFINE_bool(verbose, false, "Log the router (LINFO), otherwise only warnings");
+DEFINE_string(route_server_url, "",
+              "Server-assisted routing with this server (token from the environment variable BM_ROUTE_SERVER_TOKEN)");
+DEFINE_double(route_server_timeout, routing::HttpServerRouteSource::kDefaultTimeoutSec,
+              "Timeout of a request to the routing server, s");
 
 namespace
 {
@@ -216,6 +227,15 @@ int main(int argc, char ** argv)
                               [&](m2::PointD const & p) { return infoGetter->GetRegionCountryId(p); },
                               [&](string const & id) { return infoGetter->GetLimitRectForLeaf(id); }, numMwmIds,
                               routing::MakeNumMwmTree(*numMwmIds, *infoGetter), trafficCache, dataSource);
+  if (!FLAGS_route_server_url.empty())
+  {
+    char const * token = getenv("BM_ROUTE_SERVER_TOKEN");
+    CHECK(token && *token, ("Set BM_ROUTE_SERVER_TOKEN for --route_server_url"));
+    auto source = make_shared<routing::HttpServerRouteSource>();
+    source->SetServer(FLAGS_route_server_url, token);
+    source->SetTimeout(FLAGS_route_server_timeout);
+    router.SetServerRouteSource(source);
+  }
   auto [rss0, hwm0] = GetRssMb();
   cout << fixed << setprecision(3) << "setup " << setupTimer.ElapsedSeconds() << " s, " << maps.size()
        << " maps, RSS " << rss0 << " MB" << endl;
@@ -226,6 +246,7 @@ int main(int argc, char ** argv)
     for (size_t i = 0; i < routes.size(); ++i)
     {
       routing::Route route("" /* router */, 0 /* routeId */);
+      auto const statsBefore = router.GetServerRoutingStats();
       base::Timer timer;
       auto const code = router.CalculateRoute(routing::Checkpoints(vector<m2::PointD>(routes[i])),
                                               m2::PointD::Zero(), false /* adjustToPrevRoute */, delegate, route);
@@ -236,6 +257,15 @@ int main(int argc, char ** argv)
            << DebugPrint(code) << ", " << setprecision(1) << route.GetTotalDistanceMeters() << " m, "
            << route.GetTotalTimeSec() << " s ETA, " << points.size() << " points, hash " << hex
            << HashPoints(points) << dec << ", RSS " << rss << " MB (peak " << hwm << " MB)" << endl;
+      auto const & stats = router.GetServerRoutingStats();
+      if (stats.m_attempts != statsBefore.m_attempts)
+      {
+        cout << "  server: "
+             << (stats.m_used != statsBefore.m_used ? string("used") : "fallback (" + stats.m_lastFallback + ")")
+             << setprecision(3) << ", request " << stats.m_requestSec << " s, match " << stats.m_matchSec
+             << " s, refine " << stats.m_refineSec << " s; server route " << setprecision(1) << stats.m_serverDistanceM
+             << " m, " << stats.m_serverDurationSec << " s" << endl;
+      }
     }
   }
   return 0;
