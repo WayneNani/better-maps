@@ -41,17 +41,23 @@ services:
     environment:
       OSRM_REGION: ${OSRM_REGION:-germany}
       OSRM_IMPORT_DIR: ${OSRM_IMPORT_DIR:-data.next}
+      # Optional: only this part of the extract, "minlon,minlat,maxlon,maxlat".
+      OSRM_BBOX: ${OSRM_BBOX:-}
     volumes:
       - ${OSRM_CACHE:?set OSRM_CACHE}/input:/input:ro,z
       - ${OSRM_CACHE}/${OSRM_REGION:-germany}:/work:z
     entrypoint: ["sh", "-c"]
     command:
       - >-
-        mkdir -p "/work/$$OSRM_IMPORT_DIR" &&
-        nice -n 15 osmium tags-filter --overwrite --no-progress
+        d="/work/$$OSRM_IMPORT_DIR" && mkdir -p "$$d" &&
+        nice -n 15 osmium tags-filter --overwrite --no-progress --output-header=osmosis_replication_timestamp!
         "/input/$$OSRM_REGION-latest.osm.pbf"
         w/highway w/route=ferry w/bridge=movable r/type=restriction
-        -o "/work/$$OSRM_IMPORT_DIR/$$OSRM_REGION.osm.pbf"
+        -o "$$d/roads.osm.pbf" &&
+        if [ -n "$$OSRM_BBOX" ]; then
+        nice -n 15 osmium extract --overwrite --no-progress --output-header=osmosis_replication_timestamp! -s complete_ways -b "$$OSRM_BBOX"
+        -o "$$d/$$OSRM_REGION.osm.pbf" "$$d/roads.osm.pbf" && rm "$$d/roads.osm.pbf";
+        else mv "$$d/roads.osm.pbf" "$$d/$$OSRM_REGION.osm.pbf"; fi
 
   # Step 2: osrm-extract, osrm-partition, osrm-customize (MLD) of /work/$OSRM_IMPORT_DIR/$OSRM_REGION.osm.pbf (the
   # filtered extract; the unfiltered one from /input if there is none). Prints duration and peak memory (cgroup
@@ -96,9 +102,9 @@ services:
     networks: [backend]
     volumes:
       - ${OSRM_CACHE:?set OSRM_CACHE}/${OSRM_REGION:-germany}/data:/data:ro,z
-    # --max-viaroute-size: the gateway allows few points anyway; keep OSRM's own limit small as well.
+    # --max-viaroute-size: the gateway allows few points anyway; keep OSRM's own limit small as well. (The other
+    # services are never forwarded by the gateway; osrm-routed refuses to start with very small limits for them.)
     command: ["osrm-routed", "--algorithm", "mld", "--max-viaroute-size", "${ROUTE_MAX_POINTS:-25}",
-              "--max-table-size", "1", "--max-trip-size", "1", "--max-matching-size", "1",
               "--max-nearest-size", "1", "--threads", "${OSRM_CPUS:-2}", "/data/${OSRM_REGION:-germany}.osrm"]
 
   # Authenticating gateway (services/route-server/Containerfile), the only published service.
@@ -108,6 +114,12 @@ services:
       context: .
       dockerfile: Containerfile
     restart: unless-stopped
+    # Rootless Podman: uid 0 in the container is your host user, which can read the token file (mode 600). The
+    # container gets no capabilities and a read-only file system.
+    user: "0:0"
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges"]
+    read_only: true
     mem_limit: 128m
     memswap_limit: 128m
     cpus: 1
