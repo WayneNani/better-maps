@@ -88,6 +88,7 @@ Skripte (`scripts/common.sh`, alles über Umgebungsvariablen):
 | `OSRM_IMPORT_MEMORY` | `12g` | Speicherlimit des Imports (Container) |
 | `OSRM_THREADS` | `6` | Threads des Imports |
 | `OSRM_PREFILTER` | `1` | Extrakt vorher mit osmium auf Straßen/Fähren/Abbiegeverbote filtern |
+| `OSRM_BBOX` | leer | Nur diesen Ausschnitt importieren, `minLon,minLat,maxLon,maxLat` (braucht `OSRM_PREFILTER=1`) |
 | `OSRM_MEMORY` / `OSRM_CPUS` | `6g` / `2` | Limits von `osrm-routed` |
 | `ROUTE_BIND` / `ROUTE_PORT` | `127.0.0.1` / `18100` | Veröffentlichter Port des Gateways |
 | `ROUTE_TOKENS_FILE` | `~/.config/bettermaps-route/tokens` | Token-Hashes |
@@ -127,22 +128,41 @@ ohne Informationen).
 
 ## Wie die App die Serverroute nutzt
 
-`libs/routing` (`IndexRouter`, Modus LeapsOnly, nur Auto, nur ohne „Vermeiden“-Optionen):
+`libs/routing` (`IndexRouter`, nur Auto, nur ohne „Vermeiden“-Optionen; Modus LeapsOnly sowie Joints-Routen über
+Kartengrenzen ab 80 km Luftlinie):
 
 1. Anfrage an den Server (Zeitlimit 2 s; unter Android Verbindungs- und Lese-Timeout je 2 s).
-2. `ServerRouteMatcher`: Wo die Polylinie laut Länderpolygonen eine Kartengrenze überquert, wird im Umkreis von
+2. Die Serverroute muss höchstens 2 km neben Start und Ziel beginnen und enden.
+3. `ServerRouteMatcher`: Wo die Polylinie laut Länderpolygonen eine Kartengrenze überquert, wird im Umkreis von
    600 m das Übergangssegment (cross-mwm transition) gesucht, dessen beide Enden höchstens 10 m neben der Polylinie
    liegen, das in Fahrtrichtung zeigt und dessen Zwilling in der nächsten Karte liegt.
-3. Daraus entsteht der Leaps-Pfad Start → Übergänge → Ziel, der wie bisher verfeinert wird
+4. Daraus entsteht der Leaps-Pfad Start → Übergänge → Ziel, der wie bisher verfeinert wird
    (`ProcessLeapsJoints`).
-4. Plausibilitätsprüfung (Länge ±10 % bzw. ±3 km, Zeit Faktor 2). Bei jedem Fehler rechnet die App wie bisher
-   lokal. Ohne Server ist das Verhalten unverändert.
+5. Plausibilitätsprüfung: Länge ±10 % (mindestens ±3 km) der Serverroute. Bei jedem Fehler rechnet die App wie
+   bisher lokal. Ohne Server ist das Verhalten unverändert.
+
+Desktop (Release), lokal → mit Server: Bonn–Nürnberg 2,7–4,1 s → 0,72–0,78 s (gleiche Route), Köln–München
+4,9–5,5 s → 1,0 s, Köln–Stuttgart (Joints) 31 s → 1,1 s.
 
 ## Ressourcenbedarf
 
-Siehe `<region>/import-stats.txt` und `import-history.txt` im Cache.
+Siehe `<region>/import-stats.txt` und `import-history.txt` im Cache. Gemessen am 11.11.2026 (OSRM v6.0.0,
+Geofabrik-Stand 08.11.2026, Rechner mit 16 Threads / 31 GB):
 
-<!-- RESOURCES -->
+| | Deutschland komplett | West-/Süddeutschland (`OSRM_BBOX=5.9,47.8,12.3,51.4`) |
+|---|---|---|
+| Download (`input/`) | 4,6 GB | (derselbe) |
+| nach dem Filtern (osmium, 70–100 s) | 1,2 GB | 0,65 GB |
+| `osrm-extract` Spitze | **> 12 GB**: zweimal am Limit von 12 GB abgebrochen (6 und 2 Threads) | 10,8 GB (OSRM), 12,2 GB cgroup inkl. Seitencache |
+| Import gesamt (6 Threads) | – | 6 min |
+| Daten (`<region>/data`) | geschätzt 7–8 GB | 4,0 GB |
+| `osrm-routed` im Betrieb | geschätzt 5–6 GB | 2,8 GB nach ~30 Routen (memory-mapped) |
+| Gateway | 8 MB | 8 MB |
+| Antwortzeit (Gateway + OSRM) | | 15–30 ms für 300–600 km |
+
+Für ganz Deutschland also auf dem Server `OSRM_IMPORT_MEMORY=20g` setzen (und ~20 GB frei haben, alte und neue Daten
+liegen beim Update nebeneinander); mit weniger RAM einen Ausschnitt mit `OSRM_BBOX` importieren. Routen, deren Start
+oder Ziel außerhalb des Ausschnitts liegt, rechnet die App lokal (die Serverroute endet dann weit vom Ziel).
 
 ## Wöchentliches Update
 
