@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: colours of the indoor map UI, dark theme. -->
+<resources>
+  <color name="indoor_attribution_background">#B3202020</color>
+</resources>

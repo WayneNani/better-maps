@@ -50,6 +50,15 @@
       android:visibility="gone"
       tools:text="Geobasis NRW, dl-de/zero-2-0"
       tools:visibility="visible" />
+    <!-- better-maps: level switcher and attribution of the indoor map (IndoorController). -->
+    <include
+      layout="@layout/indoor_level_switcher"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentTop="true"
+      android:layout_alignParentEnd="true"
+      android:layout_marginTop="@dimen/indoor_panel_margin_top"
+      android:layout_marginEnd="@dimen/nav_frame_padding" />
     <include
       android:id="@+id/position_chooser"
       layout="@layout/position_chooser" />

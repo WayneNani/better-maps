@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: indoor maps of airports, stations and malls (settings, level switcher, details). -->
+<resources>
+  <string name="indoor_maps_server_title">Indoor maps server</string>
+  <string name="indoor_maps_info">Indoor maps show rooms, shops, gates, toilets and other places on the different levels of large airports, stations and malls, from OpenStreetMap data on your own indoor server (services/indoor-server). When you zoom in on such a place (zoom 16 and closer), the venues around the visible area are requested from the server; they are cached on the device.</string>
+  <string name="indoor_maps_enabled">Show indoor maps</string>
+  <string name="indoor_maps_url">Server address</string>
+  <string name="indoor_maps_url_hint">e.g. https://indoor.example.org</string>
+  <string name="indoor_maps_token">Access token</string>
+  <string name="indoor_maps_token_hint">The token of this device from scripts/new-token.sh. Leave empty to keep the stored token.</string>
+  <string name="indoor_maps_needs_server">Enter the server address and the access token as well</string>
+  <string name="indoor_maps_off">Off</string>
+  <!-- Level switcher on the map. -->
+  <string name="indoor_levels_of">Levels of %s</string>
+  <string name="indoor_levels">Levels</string>
+  <string name="indoor_level">Level %s</string>
+  <string name="indoor_level_shown">shown</string>
+  <string name="indoor_attribution">© OpenStreetMap contributors</string>
+  <!-- Details of a tapped room or place. -->
+  <string name="indoor_ref">No. %s</string>
+  <string name="indoor_gate">Gate %s</string>
+  <string name="indoor_opening_hours">Opening hours: %s</string>
+  <string name="indoor_cuisine">Cuisine: %s</string>
+  <string name="indoor_operator">Operator: %s</string>
+  <string name="indoor_wheelchair_yes">Wheelchair accessible</string>
+  <string name="indoor_wheelchair_limited">Partly wheelchair accessible</string>
+  <string name="indoor_wheelchair_no">Not wheelchair accessible</string>
+  <string name="indoor_fee_yes">Fee</string>
+  <string name="indoor_fee_no">Free of charge</string>
+  <string name="indoor_kind_level">Floor</string>
+  <string name="indoor_kind_corridor">Corridor</string>
+  <string name="indoor_kind_room">Room</string>
+  <string name="indoor_kind_area">Area</string>
+  <string name="indoor_kind_shop">Shop</string>
+  <string name="indoor_kind_food">Food and drink</string>
+  <string name="indoor_kind_toilets">Toilets</string>
+  <string name="indoor_kind_stairs">Stairs</string>
+  <string name="indoor_kind_elevator">Elevator</string>
+  <string name="indoor_kind_escalator">Escalator</string>
+  <string name="indoor_kind_gate">Gate</string>
+  <string name="indoor_kind_service">Service</string>
+  <string name="indoor_kind_platform">Platform</string>
+  <string name="indoor_kind_restricted">No public access</string>
+  <string name="indoor_kind_door">Door</string>
+  <string name="indoor_kind_entrance">Entrance</string>
+  <string name="indoor_kind_info">Information</string>
+  <string name="indoor_kind_atm">ATM</string>
+  <string name="indoor_kind_pharmacy">Pharmacy</string>
+  <string name="indoor_kind_luggage">Luggage</string>
+  <string name="indoor_kind_ticket">Tickets</string>
+  <string name="indoor_kind_poi">Place</string>
+</resources>

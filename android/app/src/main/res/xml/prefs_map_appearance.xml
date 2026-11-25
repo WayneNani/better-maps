@@ -52,5 +52,12 @@
     android:title="@string/aerial_imagery_server_title"
     android:fragment="app.organicmaps.settings.AerialImagerySettingsFragment"
     app:singleLineTitle="false" />
+  <!-- better-maps: indoor maps of airports, stations and malls from the own indoor server. -->
+  <Preference
+    android:key="indoor_maps_screen"
+    android:persistent="false"
+    android:title="@string/indoor_maps_server_title"
+    android:fragment="app.organicmaps.settings.IndoorMapsSettingsFragment"
+    app:singleLineTitle="false" />
 
 </androidx.preference.PreferenceScreen>
