@@ -1,13 +1,17 @@
 package app.organicmaps.transit.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import app.organicmaps.R;
 import app.organicmaps.transit.AlternativesItem;
@@ -161,6 +165,9 @@ final class ConnectionsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private final View mChange;
     private final TextView mChangeText;
     private final View mUndo;
+    // Where the finger came down on the card, for a long press on the first ride.
+    private float mDownX = Float.NaN;
+    private float mDownY = Float.NaN;
 
     ItemHolder(@NonNull View view)
     {
@@ -188,10 +195,13 @@ final class ConnectionsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     /**
-     * The first ride's other departures: a tap on it in the bar or on "Departures" shows them in the card.
+     * The first ride's other departures: holding it in the bar (a long press, haptic) or a tap on "Departures" shows
+     * them in the card. A tap anywhere else on the card, the bar included, opens the connection; so does a long press
+     * beside the first ride, when the finger is lifted (the usual Android behavior without a long click).
      *
      * @param alternatives the open ride's departures if they belong to this card.
      */
+    @SuppressLint("ClickableViewAccessibility") // The touch listener only records where the finger came down.
     void bindAlternatives(int index, @NonNull ItineraryItem item, @Nullable AlternativesItem alternatives,
                           boolean canChoose, @NonNull TransitConnectionsPresenter presenter)
     {
@@ -201,8 +211,47 @@ final class ConnectionsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       UiUtils.showIf(possible, mAlternativesButton);
       mAlternativesButton.setIconResource(open ? R.drawable.ic_expand_less : R.drawable.ic_expand_more);
       mAlternativesButton.setOnClickListener(possible ? v -> presenter.toggleAlternatives(index, firstRide) : null);
-      mBar.setRideClickListener(possible ? legIndex -> presenter.toggleAlternatives(index, legIndex) : null,
-                                firstRide, open);
+      mBar.setRide(possible ? firstRide : -1, open);
+      if (possible)
+      {
+        itemView.setOnTouchListener((v, event) -> {
+          if (event.getActionMasked() == MotionEvent.ACTION_DOWN)
+          {
+            mDownX = event.getX();
+            mDownY = event.getY();
+          }
+          else if (event.getActionMasked() == MotionEvent.ACTION_UP
+                   || event.getActionMasked() == MotionEvent.ACTION_CANCEL)
+          {
+            // E.g. a long press of a key later is not on the ride.
+            mDownX = Float.NaN;
+            mDownY = Float.NaN;
+          }
+          return false;
+        });
+        // View.performLongClick gives the haptic long press when this returns true.
+        itemView.setOnLongClickListener(v -> {
+          if (!isOnBarRide(mDownX, mDownY))
+            return false;
+          presenter.toggleAlternatives(index, firstRide);
+          return true;
+        });
+      }
+      else
+      {
+        itemView.setOnTouchListener(null);
+        itemView.setOnLongClickListener(null);
+        itemView.setLongClickable(false);
+      }
+      // Screen readers: the card's long click shows or hides the departures (the touch point does not matter).
+      ViewCompat.replaceAccessibilityAction(
+          itemView, AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_LONG_CLICK,
+          possible ? itemView.getContext().getString(open ? R.string.transit_alt_hide : R.string.transit_alt_show)
+                   : null,
+          possible ? (view, arguments) -> {
+            presenter.toggleAlternatives(index, firstRide);
+            return true;
+          } : null);
 
       final ChangeItem change = item.getChange();
       final Context context = itemView.getContext();
@@ -227,6 +276,21 @@ final class ConnectionsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                                                  : AlternativesViews.changed(context, change));
         mUndo.setOnClickListener(v -> presenter.undoChange(index));
       }
+    }
+
+    /** True if a point in the card's coordinates is on the first ride in the bar. */
+    private boolean isOnBarRide(float x, float y)
+    {
+      float left = 0;
+      float top = 0;
+      for (View view = mBar; view != itemView; view = (View) view.getParent())
+      {
+        if (Float.isNaN(x) || !(view.getParent() instanceof View))
+          return false;
+        left += view.getLeft() - ((View) view.getParent()).getScrollX();
+        top += view.getTop() - ((View) view.getParent()).getScrollY();
+      }
+      return mBar.isOnRide(x - left, y - top);
     }
 
     /** Leg index of the first ride, -1 without rides. */

@@ -74,8 +74,8 @@
       tools:text="17 min · Direct" />
   </LinearLayout>
 
-  <!-- The whole connection: rides in line colors, walks dotted, waits empty. A tap on the first ride shows its
-       other departures; the padding makes it easier to hit. -->
+  <!-- The whole connection: rides in line colors, walks dotted, waits empty. A tap opens the connection like
+       anywhere on the card; holding the first ride shows its other departures (the padding makes it easier to hit). -->
   <app.organicmaps.transit.ui.JourneyBarView
     android:id="@+id/bar"
     android:layout_width="match_parent"
