@@ -104,8 +104,10 @@ services:
       - ${OSRM_CACHE:?set OSRM_CACHE}/${OSRM_REGION:-germany}/data:/data:ro,z
     # --max-viaroute-size: the gateway allows few points anyway; keep OSRM's own limit small as well. (The other
     # services are never forwarded by the gateway; osrm-routed refuses to start with very small limits for them.)
+    # --verbosity WARNING: at INFO osrm-routed logs every request with its URL, i.e. the route's coordinates.
     command: ["osrm-routed", "--algorithm", "mld", "--max-viaroute-size", "${ROUTE_MAX_POINTS:-25}",
-              "--max-nearest-size", "1", "--threads", "${OSRM_CPUS:-2}", "/data/${OSRM_REGION:-germany}.osrm"]
+              "--max-nearest-size", "1", "--threads", "${OSRM_CPUS:-2}", "--verbosity", "WARNING",
+              "/data/${OSRM_REGION:-germany}.osrm"]
 
   # Authenticating gateway (services/route-server/Containerfile), the only published service.
   gateway:

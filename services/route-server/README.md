@@ -29,7 +29,9 @@ Der Server läuft im Heimnetz, ist aber von außen erreichbar. Deshalb:
 - **Grenzen**: höchstens 25 Punkte pro Route, Anfrage höchstens 4 KB, nur `application/json`, Zeitlimits für
   Header (5 s), Anfrage (10 s) und OSRM (10 s), höchstens 8 gleichzeitige Anfragen an OSRM (sonst `503`).
 - **Logs**: nur Methode, Status, Dauer, Bytes und das **Label** des Tokens (z. B. `device=pixel`). Nie das Token, nie
-  Koordinaten, nie Client-Adressen (auch die Fehlermeldungen von `net/http` werden bereinigt).
+  Koordinaten, nie Client-Adressen (auch die Fehlermeldungen von `net/http` werden bereinigt). `osrm-routed` läuft
+  mit `--verbosity WARNING`: auf der Standardstufe `INFO` schreibt es jede Anfrage samt URL, also die Koordinaten der
+  Route, ins Container-Log (geprüft am 25.11.2026: mit `WARNING` keine einzige Zeile).
 - **TLS** macht der Reverse Proxy. Das Gateway lauscht standardmäßig nur auf `127.0.0.1:18100`. Die App akzeptiert
   `http://` nur für lokale Adressen (Emulator, LAN), sonst nur `https://`.
 - In der App bleibt das Token in den app-privaten Einstellungen (nicht im Backup), wird nie geloggt und nie in die

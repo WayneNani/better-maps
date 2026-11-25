@@ -19,8 +19,9 @@ compose up -d --force-recreate osrm gateway >&2
 base="http://127.0.0.1:$ROUTE_PORT"
 [[ "$ROUTE_BIND" != 0.0.0.0 ]] && base="http://$ROUTE_BIND:$ROUTE_PORT"
 for _ in $(seq 1 "${ROUTE_START_TIMEOUT:-180}"); do
+  # osrm-routed opens its port only after loading the data (and logs nothing at --verbosity WARNING).
   if curl -fsS -o /dev/null "$base/healthz" 2>/dev/null &&
-     compose logs osrm 2>/dev/null | grep -q "running and waiting for requests"; then
+     compose exec -T osrm nc -z 127.0.0.1 5000 >/dev/null 2>&1; then
     log "server ready: $base (Android emulator: http://10.0.2.2:$ROUTE_PORT)"
     exit 0
   fi
