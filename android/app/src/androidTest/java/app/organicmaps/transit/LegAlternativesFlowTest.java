@@ -22,6 +22,9 @@ import static org.junit.Assert.fail;
 
 import android.content.Context;
 import android.os.SystemClock;
+import android.view.InputDevice;
+import android.view.MotionEvent;
+import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.testing.FragmentScenario;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,6 +36,7 @@ import app.organicmaps.sdk.transit.TransitItinerary;
 import app.organicmaps.sdk.transit.TransitLocation;
 import app.organicmaps.sdk.transit.TransitServiceConfig;
 import app.organicmaps.sdk.transit.provider.TransitousProvider;
+import app.organicmaps.transit.ui.TimeGridView;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -208,6 +212,201 @@ public class LegAlternativesFlowTest
     onView(withText("S+U Berlin Hauptbahnhof")).perform(click());
     assertNull(onMain(() -> presenter.getState().getAlternatives()));
     assertEquals(3, mServer.getRequestCount());
+  }
+
+  /**
+   * The same connection in the time grid: holding the S5 lifts it and loads its other departures, dragging snaps it
+   * to them with the hint card telling what each one means, lifting the finger uses the departure. A cancelled drag
+   * and a drag back to the start change nothing; a departure that misses the U2 searches the rest again.
+   */
+  @Test
+  public void dragTheFirstRideInTheTimeGrid() throws Exception
+  {
+    mServer.enqueue(json("plan_two_rides.json"));
+    mServer.enqueue(json("plan_first_ride_alternatives.json"));
+    mServer.enqueue(json("plan_rest_alexanderplatz.json"));
+    final FragmentScenario<OnlineTransitFlowTest.PanelHostFragment> scenario = FragmentScenario.launchInContainer(
+        OnlineTransitFlowTest.PanelHostFragment.class, null, R.style.MwmTheme);
+    final TransitConnectionsPresenter presenter = onMain(() -> mServices.getConnectionsPresenter());
+    onMain(() -> {
+      presenter.search(HBF, KLOSTER);
+      return null;
+    });
+    waitFor(() -> onMain(() -> presenter.getState().getItems().size() == 1));
+    mServer.takeRequest();
+    onMain(() -> {
+      presenter.setViewMode(ConnectionsState.ViewMode.GRID);
+      return null;
+    });
+    final AtomicReference<TimeGridView> gridRef = new AtomicReference<>();
+    final AtomicReference<View> scrollRef = new AtomicReference<>();
+    scenario.onFragment(fragment -> {
+      gridRef.set(fragment.requireView().findViewById(R.id.transit_grid));
+      scrollRef.set(fragment.requireView().findViewById(R.id.transit_grid_scroll));
+    });
+    final TimeGridView grid = gridRef.get();
+    // Walk, S5, walk, U2, walk: the S5 is leg 1.
+    waitFor(() -> onMain(() -> grid.isShown() && grid.getRideCenter(0, 1) != null));
+    final int sheetHeight = onMain(() -> scrollRef.get().getHeight());
+
+    // Hold the S5: it is lifted and its departures are searched (one request), nothing is chosen yet.
+    final Finger finger = Finger.hold(grid, 0, 1);
+    waitFor(() -> onMain(grid::isDragging));
+    waitFor(() -> onMain(() -> {
+      final AlternativesItem alternatives = presenter.getState().getAlternatives();
+      return alternatives != null && !alternatives.isLoading() && grid.getAlternativeCenter(0) != null;
+    }));
+    assertEquals(2, mServer.getRequestCount());
+    mServer.takeRequest();
+    final List<String> lines = onMain(() -> {
+      final List<String> result = new ArrayList<>();
+      for (AlternativesItem.Chip chip : presenter.getState().getAlternatives().getChips())
+        result.add(chip.getBadge().getText());
+      return result;
+    });
+    // The S5 itself, the S3 that still reaches the U2, the S9 and the S7 that miss it.
+    assertEquals(List.of("S5", "S3", "S9", "S7"), lines);
+    final AlternativesItem.Chip s3 = onMain(() -> presenter.getState().getAlternatives().getChips().get(1));
+
+    // Over the S3: the hint card tells about it; cancelled: nothing changes.
+    finger.moveToPill(1, 0);
+    assertTrue(onMain(grid::isDragging));
+    onView(withId(R.id.transit_grid_hint_title)).check(matches(withText(containsString("S3"))));
+    onView(withId(R.id.transit_grid_hint_title)).check(matches(withText(containsString(s3.getDeparture()))));
+    finger.cancel();
+    assertFalse(onMain(grid::isDragging));
+    assertNull(onMain(() -> presenter.getState().getItems().get(0).getChange()));
+    onView(withId(R.id.transit_grid_hint_title)).check(matches(withText(containsString("S5"))));
+    // The sheet stayed as it was.
+    assertEquals(sheetHeight, (int) onMain(() -> scrollRef.get().getHeight()));
+
+    // Down to the S9 (it misses the U2) and back to the S5: nothing changes.
+    final Finger again = Finger.hold(grid, 0, 1);
+    waitFor(() -> onMain(grid::isDragging));
+    again.moveToPill(2, 0);
+    onView(withId(R.id.transit_grid_hint_text))
+        .check(matches(withText(mContext.getString(R.string.transit_alt_hint_drag_missed, "U2"))));
+    again.moveToPill(0, 0);
+    again.lift();
+    assertFalse(onMain(grid::isDragging));
+    assertNull(onMain(() -> presenter.getState().getItems().get(0).getChange()));
+
+    // Onto the S3 and let go: the S3 is used, nothing is requested.
+    final Finger s3Drag = Finger.hold(grid, 0, 1);
+    waitFor(() -> onMain(grid::isDragging));
+    s3Drag.moveToPill(1, 0);
+    s3Drag.lift();
+    waitFor(() -> onMain(() -> presenter.getState().getItems().get(0).getChange() != null));
+    assertFalse(onMain(() -> presenter.getState().getItems().get(0).getChange().isReplanned()));
+    assertTrue(onMain(() -> presenter.getState().getAlternatives().getChips().get(1).isSelected()));
+    assertEquals(2, mServer.getRequestCount());
+
+    // The S3 (now at the S3's place) onto the S9: the rest is searched again from Alexanderplatz.
+    waitFor(() -> onMain(() -> grid.getRideCenter(0, 1) != null && grid.getAlternativeCenter(2) != null));
+    final Finger s9Drag = Finger.hold(grid, 0, 1);
+    waitFor(() -> onMain(grid::isDragging));
+    s9Drag.moveToPill(2, 1);
+    s9Drag.lift();
+    waitFor(() -> onMain(() -> {
+      final ChangeItem change = presenter.getState().getItems().get(0).getChange();
+      return change != null && change.isReplanned();
+    }));
+    assertEquals(3, mServer.getRequestCount());
+    assertEquals(ALEX_S, mServer.takeRequest().getRequestUrl().queryParameter("fromPlace"));
+    final ChangeItem change = onMain(() -> presenter.getState().getItems().get(0).getChange());
+    assertEquals("U2", change.getMissedLine());
+    onView(withId(R.id.transit_grid_hint_text))
+        .check(matches(withText(mContext.getString(R.string.transit_alt_hint_missed, "U2", change.getArrival()))));
+
+    // Undo: the connection as found.
+    onMain(() -> {
+      presenter.undoChange(0);
+      return null;
+    });
+    assertNull(onMain(() -> presenter.getState().getItems().get(0).getChange()));
+    assertEquals(sheetHeight, (int) onMain(() -> scrollRef.get().getHeight()));
+  }
+
+  /** A finger on the time grid, injected as motion events in screen coordinates. */
+  private static final class Finger
+  {
+    private final TimeGridView mGrid;
+    private final long mDownTime;
+    private final float mScreenX;
+    private final float mDownScreenY;
+    private float mScreenY;
+
+    private Finger(@NonNull TimeGridView grid, long downTime, float screenX, float screenY)
+    {
+      mGrid = grid;
+      mDownTime = downTime;
+      mScreenX = screenX;
+      mDownScreenY = screenY;
+      mScreenY = screenY;
+    }
+
+    /** Puts the finger on a ride and holds it there long enough to lift it. */
+    @NonNull
+    static Finger hold(@NonNull TimeGridView grid, int connection, int legIndex) throws Exception
+    {
+      final float[] point = onMain(() -> {
+        final float[] center = grid.getRideCenter(connection, legIndex);
+        final int[] location = new int[2];
+        grid.getLocationOnScreen(location);
+        return new float[] {location[0] + center[0], location[1] + center[1]};
+      });
+      final long now = SystemClock.uptimeMillis();
+      final Finger finger = new Finger(grid, now, point[0], point[1]);
+      finger.send(MotionEvent.ACTION_DOWN);
+      SystemClock.sleep(TimeGridView.HOLD_MS + 200);
+      return finger;
+    }
+
+    /**
+     * Moves the finger in small steps by the distance between two pills, i.e. from the departure {@code from} that
+     * the ride was at when the finger came down to the departure {@code to}.
+     */
+    void moveToPill(int to, int from) throws Exception
+    {
+      final float distance = onMain(() -> mGrid.getAlternativeCenter(to)[1] - mGrid.getAlternativeCenter(from)[1]);
+      final float target = mDownScreenY + distance;
+      final int steps = 12;
+      final float start = mScreenY;
+      for (int i = 1; i <= steps; ++i)
+      {
+        mScreenY = start + (target - start) * i / steps;
+        send(MotionEvent.ACTION_MOVE);
+        SystemClock.sleep(16);
+      }
+      InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+    }
+
+    void lift()
+    {
+      send(MotionEvent.ACTION_UP);
+      InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+    }
+
+    void cancel()
+    {
+      send(MotionEvent.ACTION_CANCEL);
+      InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+    }
+
+    private void send(int action)
+    {
+      final MotionEvent event =
+          MotionEvent.obtain(mDownTime, SystemClock.uptimeMillis(), action, mScreenX, mScreenY, 0);
+      event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+      try
+      {
+        InstrumentationRegistry.getInstrumentation().sendPointerSync(event);
+      }
+      finally
+      {
+        event.recycle();
+      }
+    }
   }
 
   @NonNull
