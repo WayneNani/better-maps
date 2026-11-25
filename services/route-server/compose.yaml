@@ -16,6 +16,13 @@ x-osrm: &osrm
   image: ghcr.io/project-osrm/osrm-backend:${OSRM_VERSION:-v6.0.0}
   user: "0:0"
 
+# Import containers: no network, no capabilities (they only read the extract and write into their work directory).
+x-import: &import
+  profiles: ["import"]
+  network_mode: none
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges"]
+
 networks:
   # OSRM <-> gateway. internal: no published ports, no route to the outside.
   backend:
@@ -28,12 +35,11 @@ services:
   # nodes of those ways with their tags, e.g. barriers and traffic signals). Germany: 4.6 GB -> ~1 GB, so that
   # osrm-extract fits into the memory limit. Writes /work/$OSRM_IMPORT_DIR/$OSRM_REGION.osm.pbf.
   filter:
+    <<: *import
     image: localhost/bettermaps-osmium:latest
     build:
       context: .
       dockerfile: osmium.Containerfile
-    profiles: ["import"]
-    network_mode: none
     user: "0:0"
     mem_limit: ${OSRM_IMPORT_MEMORY:-12g}
     memswap_limit: ${OSRM_IMPORT_MEMORY:-12g}
@@ -63,9 +69,7 @@ services:
   # filtered extract; the unfiltered one from /input if there is none). Prints duration and peak memory (cgroup
   # memory.peak) at the end.
   import:
-    <<: *osrm
-    profiles: ["import"]
-    network_mode: none
+    <<: [*osrm, *import]
     mem_limit: ${OSRM_IMPORT_MEMORY:-12g}
     memswap_limit: ${OSRM_IMPORT_MEMORY:-12g}
     cpus: ${OSRM_THREADS:-6}
