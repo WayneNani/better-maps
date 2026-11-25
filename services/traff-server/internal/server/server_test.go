@@ -399,9 +399,9 @@ func TestHTTPLevel(t *testing.T) {
 		t.Errorf("big request = %d", code)
 	}
 
-	// Health check.
+	// Status.
 	e.traff(subscribeReq(bboxHamburg))
-	resp, err = http.Get(e.http.URL + "/healthz")
+	resp, err = http.Get(e.http.URL + "/status")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -418,16 +418,18 @@ func TestHTTPLevel(t *testing.T) {
 	if health.Status != "ok" || health.Messages != 3 || health.Subscriptions != 1 || len(health.Sources) != 1 {
 		t.Errorf("health = %+v", health)
 	}
-	resp, _ = http.Post(e.http.URL+"/healthz", "text/plain", nil)
-	resp.Body.Close()
-	if resp.StatusCode != http.StatusMethodNotAllowed {
-		t.Errorf("POST /healthz = %d", resp.StatusCode)
+	for _, path := range []string{"/healthz", "/status"} {
+		resp, _ = http.Post(e.http.URL+path, "text/plain", nil)
+		resp.Body.Close()
+		if resp.StatusCode != http.StatusMethodNotAllowed {
+			t.Errorf("POST %s = %d", path, resp.StatusCode)
+		}
 	}
 	e.srv.Status = nil
-	resp, _ = http.Get(e.http.URL + "/healthz")
+	resp, _ = http.Get(e.http.URL + "/status")
 	resp.Body.Close()
 	if resp.StatusCode != 200 {
-		t.Errorf("health without status func = %d", resp.StatusCode)
+		t.Errorf("status without status func = %d", resp.StatusCode)
 	}
 }
 

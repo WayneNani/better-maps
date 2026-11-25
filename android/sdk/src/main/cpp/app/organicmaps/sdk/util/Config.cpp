@@ -159,6 +159,20 @@ Java_app_organicmaps_sdk_util_Config_nativeSetTrafficHttpUrl(JNIEnv * env, jclas
   frm()->SetTrafficHttpUrl(jni::ToNativeString(env, value));
 }
 
+// better-maps: device token of the TraFF server, kept in memory only (never saved to settings.ini, never logged).
+JNIEXPORT void JNICALL
+Java_app_organicmaps_sdk_util_Config_nativeSetTrafficHttpToken(JNIEnv * env, jclass thiz,
+                                                               jstring value)
+{
+  frm()->SetTrafficHttpToken(jni::ToNativeString(env, value));
+}
+
+JNIEXPORT jstring JNICALL
+Java_app_organicmaps_sdk_util_Config_nativeGetTrafficHttpUrlDefault(JNIEnv * env, jclass thiz)
+{
+  return jni::ToJavaString(env, ::Framework::GetTrafficHttpUrlDefault());
+}
+
 JNIEXPORT void JNICALL
 Java_app_organicmaps_sdk_util_Config_applyTrafficLegacyEnabled(JNIEnv * env, jclass thiz,
                                                                jboolean value)

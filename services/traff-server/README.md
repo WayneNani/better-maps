@@ -10,15 +10,128 @@ Gegenstelle ist die HTTP-TraFF-Quelle der App (`libs/traffxml/traff_source.cpp`,
 
 - Nur Standardbibliothek, keine externen Abhängigkeiten.
 - Alles im Arbeitsspeicher: keine Datenbank, keine Dateien, Abos verschwinden beim Neustart.
+- Zugang nur mit **Token pro Gerät** (`Authorization: Bearer …`), wie beim Routing-, Luftbild- und
+  Innenraumkarten-Server; siehe [Sicherheit und Datenschutz](#sicherheit-und-datenschutz).
 - Quellen docken über das `Source`-Interface an (`internal/source`): Autobahn-API (`internal/source/autobahn`),
   DATEX II (`internal/source/datex2`), Crowd-Staus (`internal/source/crowd`). Jede Quelle kann ein eigenes
   Abrufintervall haben (`IntervalSource`); Quellen mit verschiedenen Intervallen laufen nebenläufig.
 
-## Starten
+## Sicherheit und Datenschutz
 
-Lokal mit Go 1.24:
+Der Server läuft auf dem Heimserver hinter Cloudflare und einem Caddy-Edge und ist damit von außen erreichbar.
+Deshalb wie beim Routing-, Luftbild- und Innenraumkarten-Server:
+
+- **Token pro Gerät**: Jede Anfrage außer `/healthz` braucht `Authorization: Bearer <token>` – TraFF-Anfragen
+  (`POST /`, `/traff`), der Infotext (`GET /`), `/status` und auch unbekannte Pfade. Der Server kennt nur
+  SHA-256-Hashes (`TRAFF_TOKENS_FILE`, z. B. `~/.config/bettermaps-traff/tokens`, Rechte 600), vergleicht in
+  konstanter Zeit und antwortet ohne gültiges Token mit `401` und dem Text `unauthorized` – ohne Details und ohne den
+  Rumpf der Anfrage zu lesen. Sperren durch Löschen der Zeile (wird nach ≤ 30 s bzw. bei `SIGHUP` neu gelesen; eine
+  kaputte Datei ersetzt nie den bisherigen Stand).
+- **Ohne Token-Datei startet der Server nicht.** Nur für lokale Entwicklung und Tests gibt es
+  `TRAFF_INSECURE_NO_AUTH=1` (nur als Umgebungsvariable, kein Flag): Dann ist alles offen, und der Server warnt beim
+  Start im Log. Beides zugleich ist ein Fehler.
+- **Ratenlimit pro Token**: im Mittel 60 Anfragen/Minute, bis zu 30 auf einmal; darüber `429` mit `Retry-After`.
+  Die App braucht weit weniger: ein `SUBSCRIBE` beim Start, ein `POLL` alle 5 Minuten (bzw. nach der halben
+  Abo-Zeit) und ein `SUBSCRIPTION_CHANGE`, wenn sich die Karten um Ansicht, Position oder Route ändern.
+  Fehlversuche mit falschem Token global ≤ 5/s (Anfragen ganz ohne Token zählen nicht, bekommen aber nie mehr als
+  `401`).
+- **`/healthz`** (ohne Token) antwortet nur `ok` – für Monitoring, ohne Zahlen. Den ausführlichen Zustand
+  (Meldungen, Abos, Quellen, Fehler) gibt es unter **`/status`**, nur mit Token.
+- **Logs**: pro Anfrage Methode, Pfadklasse (`traff`, `status`, `other`), Status, Dauer, **Label** des Tokens und
+  ggf. der Ablehnungsgrund (`auth`, `rate_limit`, `unauthorized_flood`); mit `-log-level debug` zusätzlich
+  TraFF-Operation, Status und Zahl der Meldungen. Nie das Token, nie Filter/bbox oder andere Koordinaten der
+  Anfrage, nie Subscription-IDs, User-Agents oder Client-Adressen (auch die Fehlermeldungen von `net/http` werden
+  bereinigt, `internal/logging`). `/healthz` wird nicht protokolliert.
+- Abos liegen nur im Arbeitsspeicher und verfallen nach Inaktivität (`subscription-ttl`). Die Subscription-ID ist
+  zufällig und nicht erratbar; sie wirkt nur zusammen mit einem gültigen Token.
+- **Container**: ohne Capabilities, `no-new-privileges`, schreibgeschütztes Dateisystem, Speicher- und CPU-Limit
+  (`compose.yaml`). Das Image (distroless, ohne Shell) sieht nur die Token-Datei, die Env-Datei und das
+  Secrets-Verzeichnis (nur lesend). Ausgehendes Netz braucht es für die Quellen.
+- **TLS** macht der Reverse Proxy; der Server lauscht über `compose.yaml` nur auf `127.0.0.1:18400`
+  (`TRAFF_BIND`/`TRAFF_PORT`), ohne Container mit `TRAFF_LISTEN=127.0.0.1:18400`.
+
+### Reverse Proxy (Beispiel Caddy)
+
+```caddyfile
+traff.example.org {
+	# Die TraFF-Schnittstelle und der Zustand; /healthz nur intern (Monitoring direkt auf 127.0.0.1:18400).
+	@traff path / /traff /status
+	handle @traff {
+		reverse_proxy 127.0.0.1:18400
+	}
+	handle {
+		respond 404
+	}
+	# Caddy schreibt Zugriffslogs nur mit "log"; auch dann maskiert es den Authorization-Header
+	# (log_credentials ist aus). Koordinaten stehen nur im Body (XML), nie in der URL.
+}
+```
+
+## Schnellstart (Betrieb mit Podman)
+
+Voraussetzung: Podman mit `podman-compose` (in einer Distrobox wird der Host über `distrobox-host-exec`
+angesprochen; Go wird nur für `new-token.sh` und die Tests gebraucht).
 
 ```sh
+cd services/traff-server
+scripts/new-token.sh pixel            # Token für ein Gerät anlegen, wird einmal angezeigt
+scripts/run.sh                        # Image bauen (beim ersten Mal) und starten, wartet auf /healthz
+curl -s -H "Authorization: Bearer $TOKEN" http://127.0.0.1:18400/status
+scripts/stop.sh                       # Container stoppen, Konfiguration bleibt
+```
+
+Die Skripte (`scripts/common.sh`) lesen diese Umgebungsvariablen:
+
+| Variable | Standard | Bedeutung |
+|----------|----------|-----------|
+| `TRAFF_BIND` / `TRAFF_PORT` | `127.0.0.1` / `18400` | Veröffentlichter Port (im Emulator: `http://10.0.2.2:18400`) |
+| `TRAFF_TOKENS_FILE` | `~/.config/bettermaps-traff/tokens` | Token-Hashes (`scripts/new-token.sh` hängt Zeilen an) |
+| `TRAFF_ENV_FILE` | `~/.config/bettermaps-traff/traff.env` | Quellen und Zugangsdaten als `KEY=value`-Zeilen (`env_file` des Containers); wird leer angelegt = nur Autobahn-API |
+| `TRAFF_SECRETS_DIR` | `~/.config/bettermaps-traff/secrets` | Client-Zertifikate, Schlüssel, Passwortdateien; im Container nur lesend unter `/secrets` |
+| `TRAFF_MEMORY` | `256m` | Speicherlimit |
+| `TRAFF_RATE_PER_MINUTE` / `TRAFF_RATE_BURST` | `60` / `30` | Ratenlimit pro Token |
+| `TRAFF_LOG_LEVEL` | `info` | `debug`, `info`, `warn`, `error` |
+
+Beispiel `traff.env` mit Mobilithek (Pfade aus Sicht des Containers):
+
+```sh
+TRAFF_DATEX2_FEEDS=nrw-lms=https://mobilithek.info:8443/…<Abo-URL>…
+TRAFF_DATEX2_NRW_LMS_CLIENT_CERT=/secrets/mobilithek.crt
+TRAFF_DATEX2_NRW_LMS_CLIENT_KEY=/secrets/mobilithek.key
+TRAFF_USER_AGENT=better-maps-traff-server/0.1 (+https://github.com/WayneNani/better-maps)
+```
+
+`TRAFF_LISTEN`, `TRAFF_TOKENS_FILE` und die Ratenlimits setzt `compose.yaml` selbst; in der Env-Datei haben sie
+keine Wirkung. Ein Image für andere Deployments entsteht mit `podman build -f Containerfile .` (Einstiegspunkt
+`traff-server`, lauscht im Container auf `:8080`, braucht `TRAFF_TOKENS_FILE`).
+
+### App einrichten
+
+Einstellungen → **Verkehr**: „Live-Verkehrsdaten“ einschalten, zuerst die **Verkehrsdienst-URL** (z. B.
+`https://traff.example.org/`, im Emulator `http://10.0.2.2:18400/`), dann das **Zugangs-Token** des Geräts
+eintragen. Wie bei den anderen Servern: in der APK steht kein Token, `http://` geht nur für lokale Adressen (die URL
+wird sonst abgelehnt), das Token wird nur als „Gesetzt“/„Nicht gesetzt“ angezeigt, nie geloggt und nicht gesichert
+(app-private SharedPreferences `traffic_server`; die URL selbst liegt wie bisher in `settings.ini`).
+
+Das Token ist an den Server gebunden, für den es eingetragen wurde (Schema, Host und Port der URL), und geht nur
+dorthin:
+
+- Wechselt die URL auf einen anderen Server (anderer Host, Port oder Schema), löscht die App das Token und weist
+  darauf hin; für den neuen Server muss es neu eingetragen werden. Ein anderer Pfad auf demselben Server behält es.
+- An den eingebauten öffentlichen Dienst (`https://api.dev.traffxml.org`, Standard-URL ohne Eintrag) geht nie ein
+  Token; solange er eingestellt ist, lehnt die App die Token-Eingabe ab. Der Core prüft das zusätzlich
+  (`Framework::TrafficHttpTokenFor`).
+- Ein leeres Eingabefeld löscht das gespeicherte Token.
+
+Die App schickt das Token als `Authorization: Bearer` mit jeder TraFF-Anfrage (`libs/traffxml/traff_source.cpp`,
+`PrepareHttpRequest`); eine Änderung von Token oder URL baut die HTTP-Quelle neu auf.
+
+## Lokal starten (Entwicklung)
+
+Lokal mit Go 1.24, ohne Zugangskontrolle (nur auf dem eigenen Rechner!):
+
+```sh
+export TRAFF_INSECURE_NO_AUTH=1
 go run ./cmd/traff-server                     # alle Autobahnen, Port 8080
 go run ./cmd/traff-server -autobahn-roads A7,A9 -log-level debug
 
@@ -30,11 +143,18 @@ TRAFF_DATEX2_FEEDS="bw-incidents=https://api.mobidata-bw.de/datasets/traffic/inc
 TRAFF_CROWD_URL=http://127.0.0.1:8081 go run ./cmd/traff-server
 ```
 
+Mit Token-Datei (wie im Betrieb):
+
+```sh
+go run ./cmd/traff-server token laptop        # druckt token=… und line=… (Zeile für die Token-Datei)
+go run ./cmd/traff-server -tokens-file ~/.config/bettermaps-traff/tokens -listen 127.0.0.1:18400
+```
+
 Als Container (Podman):
 
 ```sh
 podman build -t traff-server -f Containerfile .
-podman run --rm -p 8080:8080 -e TRAFF_AUTOBAHN_ROADS=A7,A9 traff-server
+podman run --rm -p 127.0.0.1:8080:8080 -e TRAFF_INSECURE_NO_AUTH=1 -e TRAFF_AUTOBAHN_ROADS=A7,A9 traff-server
 ```
 
 Das Image ist mehrstufig gebaut, enthält nur das statische Binary (ca. 11 MB, `distroless/static`) und läuft
@@ -49,7 +169,12 @@ Jede Option gibt es als Flag und als Umgebungsvariable; das Flag hat Vorrang.
 
 | Flag | Umgebungsvariable | Standard | Bedeutung |
 |------|-------------------|----------|-----------|
-| `-listen` | `TRAFF_LISTEN` | `:8080` | Adresse des HTTP-Servers |
+| `-listen` | `TRAFF_LISTEN` | `:8080` | Adresse des HTTP-Servers, z. B. `127.0.0.1:18400` |
+| `-tokens-file` | `TRAFF_TOKENS_FILE` | – (Pflicht) | Datei mit den Token-Hashes der Geräte (`<label> sha256:<hex>` pro Zeile, `#` = Kommentar) |
+| – | `TRAFF_INSECURE_NO_AUTH` | `false` | `1` = ohne Token-Datei und ohne Zugangskontrolle starten (nur lokale Entwicklung/Tests, Warnung im Log) |
+| `-reload-tokens` | `TRAFF_RELOAD_TOKENS` | `30s` | Token-Datei so oft auf Änderungen prüfen, `0` = nur bei `SIGHUP` |
+| `-rate-per-minute` | `TRAFF_RATE_PER_MINUTE` | `60` | Anfragen pro Minute und Token im Mittel, `0` = unbegrenzt |
+| `-rate-burst` | `TRAFF_RATE_BURST` | `30` | Anfragen pro Token auf einmal |
 | `-poll-interval` | `TRAFF_POLL_INTERVAL` | `5m` | Abrufintervall der Quellen (mind. 10 s) |
 | `-autobahn` | `TRAFF_AUTOBAHN_ENABLED` | `true` | Autobahn-Quelle ein/aus |
 | `-autobahn-url` | `TRAFF_AUTOBAHN_URL` | `https://verkehr.autobahn.de/o/autobahn` | Basis-URL der API |
@@ -74,6 +199,9 @@ Jede Option gibt es als Flag und als Umgebungsvariable; das Flag hat Vorrang.
 | `-crowd-merge-distance` | `TRAFF_CROWD_MERGE_DISTANCE` | `25` | Toleranz in Metern zwischen Ausfahrts- und Einfahrtspunkt benachbarter Stau-Kacheln; `0` = nicht zusammenfassen (eine Meldung pro Kachel) |
 | `-crowd-max-length` | `TRAFF_CROWD_MAX_LENGTH` | `5000` | Höchstlänge einer zusammengefassten Meldung in Metern, `0` = unbegrenzt |
 
+`traff-server token <label>` erzeugt ein Token (256 Bit) und die Zeile für die Token-Datei;
+`scripts/new-token.sh <label>` erledigt beides. `SIGHUP` lädt die Token-Datei sofort neu.
+
 Zugangsdaten für DATEX-II-Feeds gibt es **nur** als Umgebungsvariablen (Flags wären in der Prozessliste sichtbar).
 `<NAME>` ist der Feed-Name in Großbuchstaben, `-` wird zu `_` (Feed `bw-incidents` → `TRAFF_DATEX2_BW_INCIDENTS_…`):
 
@@ -87,9 +215,13 @@ Zugangsdaten für DATEX-II-Feeds gibt es **nur** als Umgebungsvariablen (Flags w
 
 ## Schnittstelle
 
-Alle TraFF-Anfragen gehen per `POST` als XML an **eine** URL: `/` (Alias `/traff`). TraFF-Fehler werden mit
-HTTP 200 und einem TraFF-Status gemeldet, wie es die Spezifikation (Abschnitt 6.1) verlangt.
-`GET /healthz` liefert den Zustand als JSON: Anzahl Meldungen, Aufhebungen, Abos, `duplicates_suppressed` (im letzten
+Alle TraFF-Anfragen gehen per `POST` als XML an **eine** URL: `/` (Alias `/traff`), immer mit
+`Authorization: Bearer <token>`. TraFF-Fehler werden mit HTTP 200 und einem TraFF-Status gemeldet, wie es die
+Spezifikation (Abschnitt 6.1) verlangt. HTTP-Fehler: `401` (Token fehlt oder falsch), `429` (Ratenlimit, mit
+`Retry-After`), `413` (Anfrage > 1 MB), `405`.
+
+`GET /healthz` antwortet ohne Token nur mit `ok` (für Monitoring). `GET /status` (mit Token) liefert den Zustand als
+JSON: Anzahl Meldungen, Aufhebungen, Abos, `duplicates_suppressed` (im letzten
 Abruf unterdrückte Dubletten) und je Quelle letzter Abruf, Fehler, `messages`, `duplicates`, `duplicates_total`
 sowie bei DATEX-II-Feeds `details` (Downloads, `not_modified`, `fetch_errors`, Situationen, Records, Meldungen und
 übersprungene Records nach Grund, z. B. `skipped_alertc_only`). Die Crowd-Quelle (`crowd`) meldet in `details`
@@ -103,10 +235,12 @@ Unterstützte Operationen: `SUBSCRIBE`, `SUBSCRIPTION_CHANGE`, `POLL` (mit Abo, 
 
 ### Beispiele mit curl
 
+`$TOKEN` ist ein Geräte-Token (`scripts/new-token.sh`); lokal mit `TRAFF_INSECURE_NO_AUTH=1` geht es auch ohne.
+
 Abo für München und Umgebung anlegen (der erste Feed enthält alle passenden Meldungen):
 
 ```sh
-curl -s -X POST -H 'Content-Type: application/xml' http://localhost:8080/ --data-binary '
+curl -s -X POST -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/xml' http://localhost:8080/ --data-binary '
 <request operation="SUBSCRIBE">
   <filter_list>
     <filter bbox="47.9 11.2 48.4 11.9"/>
@@ -142,23 +276,24 @@ Antwort (gekürzt):
 Neue und geänderte Meldungen abholen (Folgefeeds enthalten nur Änderungen und Aufhebungen):
 
 ```sh
-curl -s -X POST http://localhost:8080/ --data '<request operation="POLL" subscription_id="3f0c…9a1e"/>'
+curl -s -X POST -H "Authorization: Bearer $TOKEN" http://localhost:8080/ --data '<request operation="POLL" subscription_id="3f0c…9a1e"/>'
 ```
 
 Filter ändern, Abo am Leben halten, abbestellen, Fähigkeiten abfragen:
 
 ```sh
-curl -s -X POST http://localhost:8080/ --data '<request operation="SUBSCRIPTION_CHANGE" subscription_id="3f0c…9a1e"><filter_list><filter bbox="53.3 9.7 53.7 10.3"/></filter_list></request>'
-curl -s -X POST http://localhost:8080/ --data '<request operation="HEARTBEAT" subscription_id="3f0c…9a1e"/>'
-curl -s -X POST http://localhost:8080/ --data '<request operation="UNSUBSCRIBE" subscription_id="3f0c…9a1e"/>'
-curl -s -X POST http://localhost:8080/ --data '<request operation="GET_CAPABILITIES"/>'
-curl -s http://localhost:8080/healthz
+curl -s -X POST -H "Authorization: Bearer $TOKEN" http://localhost:8080/ --data '<request operation="SUBSCRIPTION_CHANGE" subscription_id="3f0c…9a1e"><filter_list><filter bbox="53.3 9.7 53.7 10.3"/></filter_list></request>'
+curl -s -X POST -H "Authorization: Bearer $TOKEN" http://localhost:8080/ --data '<request operation="HEARTBEAT" subscription_id="3f0c…9a1e"/>'
+curl -s -X POST -H "Authorization: Bearer $TOKEN" http://localhost:8080/ --data '<request operation="UNSUBSCRIBE" subscription_id="3f0c…9a1e"/>'
+curl -s -X POST -H "Authorization: Bearer $TOKEN" http://localhost:8080/ --data '<request operation="GET_CAPABILITIES"/>'
+curl -s -H "Authorization: Bearer $TOKEN" http://localhost:8080/status
+curl -s http://localhost:8080/healthz          # ohne Token: nur "ok"
 ```
 
 Einmalabfrage ohne Abo (z. B. zum Erzeugen von Testdaten für das TraFF-Assessment-Tool):
 
 ```sh
-curl -s -X POST http://localhost:8080/ --data '<request operation="POLL"><filter_list><filter bbox="53.3 9.7 53.7 10.3"/></filter_list></request>'
+curl -s -X POST -H "Authorization: Bearer $TOKEN" http://localhost:8080/ --data '<request operation="POLL"><filter_list><filter bbox="53.3 9.7 53.7 10.3"/></filter_list></request>'
 ```
 
 ## Verhalten im Detail
@@ -312,7 +447,7 @@ App zwischen `from`, `via` und `to` sicher der Straße folgt.
 **Ausfall.** Scheitert ein Abruf (Netz, HTTP-Fehler, Zeitlimit, kaputtes JSON), verwendet die Quelle den letzten
 Export weiter, aber ohne die inzwischen abgelaufenen Abschnitte (`expires`, 20 min nach der Auswertung): Ein
 ausgefallener Crowd-Server hält keine alten Staus am Leben, sie werden spätestens 20 Minuten nach der letzten
-Auswertung aufgehoben. `/healthz` zeigt dann `last_error` und `export_age_seconds`. Vor dem ersten erfolgreichen
+Auswertung aufgehoben. `/status` zeigt dann `last_error` und `export_age_seconds`. Vor dem ersten erfolgreichen
 Abruf liefert die Quelle nichts.
 
 **Datenschutz.** Der Export enthält nur Aggregate (Zustand, Median, Zahl der Meldungen ≥ k) ohne Bezug zu
@@ -351,7 +486,7 @@ Die 250 m decken ab, dass die Autobahn-API nur `from`/`via`/`to` liefert und die
 Straße abweicht; Gleichheit der Straßenklasse und Richtung verhindert, dass ein Stau auf einer parallelen
 Bundesstraße verschluckt wird. Verschwindet die Meldung der höheren Quelle, erscheint die bisher unterdrückte beim
 nächsten Abruf. Unterdrückte
-Meldungen zählt `/healthz` (`duplicates_suppressed`, je Quelle `duplicates`/`duplicates_total`); mit
+Meldungen zählt `/status` (`duplicates_suppressed`, je Quelle `duplicates`/`duplicates_total`); mit
 `-log-level debug` stehen die Paare im Log (`duplicate suppressed id=… duplicate_of=…`). Live am 25.10.2026 mit
 A5/A6/A7/A8/A81 und den beiden BW-Feeds: 1 von 54 Polizeimeldungen als Dublette der Autobahn-API erkannt (Unfall mit
 Stau auf der A5 Karlsruhe → Heidelberg, gleiche Stelle wie die INRIX-Staumeldung), 5 von 1109 Baustellen als Dublette
@@ -379,18 +514,20 @@ Das kann nur der Projektinhaber erledigen (Konto, Vertragsannahme):
    chmod 600 mobilithek.key
    ```
 
-6. Server konfigurieren, Zertifikate als Secret einhängen (nie ins Repo):
+6. Server konfigurieren, Zertifikate als Secret einhängen (nie ins Repo): `mobilithek.crt` und `mobilithek.key`
+   nach `~/.config/bettermaps-traff/secrets/` (Rechte 600) und in `~/.config/bettermaps-traff/traff.env`:
 
    ```sh
-   podman run -d -p 8080:8080 \
-     -v /etc/traff-server/secrets:/run/secrets:ro,Z \
-     -e TRAFF_DATEX2_FEEDS="nrw-lms=https://mobilithek.info:8443/…<Abo-URL>…,bw-incidents=https://api.mobidata-bw.de/datasets/traffic/incidents/incidents_lmsbw.datex2.xml" \
-     -e TRAFF_DATEX2_NRW_LMS_CLIENT_CERT=/run/secrets/mobilithek.crt \
-     -e TRAFF_DATEX2_NRW_LMS_CLIENT_KEY=/run/secrets/mobilithek.key \
-     traff-server
+   TRAFF_DATEX2_FEEDS=nrw-lms=https://mobilithek.info:8443/…<Abo-URL>…,bw-incidents=https://api.mobidata-bw.de/datasets/traffic/incidents/incidents_lmsbw.datex2.xml
+   TRAFF_DATEX2_NRW_LMS_CLIENT_CERT=/secrets/mobilithek.crt
+   TRAFF_DATEX2_NRW_LMS_CLIENT_KEY=/secrets/mobilithek.key
    ```
 
-7. Prüfen: `curl -s localhost:8080/healthz` zeigt für `datex2-nrw-lms` `last_error` leer und `details.downloads ≥ 1`.
+   dann `scripts/run.sh`. Ohne die Skripte entsprechend `podman run … -v <secrets>:/secrets:ro,Z
+   -v <tokens>:/config/tokens:ro,Z -e TRAFF_TOKENS_FILE=/config/tokens -e TRAFF_DATEX2_…` (siehe `compose.yaml`).
+
+7. Prüfen: `curl -s -H "Authorization: Bearer $TOKEN" 127.0.0.1:18400/status` zeigt für `datex2-nrw-lms`
+   `last_error` leer und `details.downloads ≥ 1`.
    Bei HTTP 400/403 fehlt das Zertifikat oder das Abo ist nicht freigegeben.
 
 Feeds mit Basic-Auth (manche Länder-Portale) werden mit `TRAFF_DATEX2_<NAME>_USERNAME` und `…_PASSWORD_FILE`
@@ -402,26 +539,26 @@ Anfragen laufen nacheinander mit mindestens `autobahn-request-interval` Abstand,
 `If-None-Match`/`If-Modified-Since` (die API liefert ETags und antwortet mit 304). Scheitert eine Anfrage für eine
 Autobahn, werden deren letzte erfolgreiche Daten weiterverwendet; die übrigen Autobahnen sind nicht betroffen.
 
-## Datenschutz
-
-- Keine Protokollierung von IP-Adressen, User-Agents, Subscription-IDs oder Filtern. Auch Fehlermeldungen von
-  `net/http`, die Client-Adressen enthalten können, werden vor der Ausgabe bereinigt (`internal/logging`).
-- Abos liegen nur im Arbeitsspeicher und verfallen nach Inaktivität (`subscription-ttl`).
-- Die Subscription-ID ist das einzige Merkmal eines Abos; sie ist zufällig und nicht erratbar.
-
 ## Tests
 
 ```sh
 go vet ./... && go test -race -cover ./...       # oder: tools/better-maps/bm.sh go-test services/traff-server
 go test ./internal/source/autobahn ./internal/source/datex2 ./internal/server -update   # Golden-Files nach Prüfung neu schreiben
-scripts/smoke.sh                                  # Container bauen, starten, Abo/Poll/Change/Unsubscribe per curl,
-                                                  # mit lokaler DATEX-II-Fixture als zweiter Quelle
+scripts/smoke.sh                                  # Container bauen, Token erzeugen, starten, 401 ohne Token,
+                                                  # Abo/Poll/Change/Unsubscribe per curl mit Token, Log ohne
+                                                  # Token/Koordinaten/IPs, lokale DATEX-II-Fixture als zweite Quelle
 SMOKE_OFFLINE=1 scripts/smoke.sh                  # dito ohne Netzzugriff auf die Autobahn-API
 SMOKE_DATEX2= scripts/smoke.sh                    # ohne DATEX-II-Quelle
 scripts/smoke-crowd.sh                            # Container: crowd-traffic + Relay + traff-server im Pod, crowd-sim
                                                   # (A100-Stau), prüft zusammengefasste Meldungen und Aufhebung (~3 min)
 ```
 
+- Zugang: `internal/auth` (Token-Datei, Hashes, konstante Vergleiche), `internal/ratelimit`,
+  `internal/server/access_test.go` (401 ohne/mit falschem Token auf allen Pfaden, Rumpf wird nicht gelesen,
+  `/healthz` ohne Token und ohne Inhalt, Ratenlimit pro Token mit `Retry-After`, Fehlversuchsbremse, Log ohne
+  Token, bbox, Subscription-ID, User-Agent und Adressen), `cmd/traff-server/auth_test.go` (Start ohne Token-Datei
+  verweigert, `TRAFF_INSECURE_NO_AUTH` mit Warnung, `token`-Befehl, Neuladen bei Änderung und `SIGHUP`).
+  `tools/better-maps/traffic-e2e.sh` lässt den C++-Client mit Token gegen den Server laufen.
 - `internal/source/autobahn/testdata/*.json` sind echte, am 25.10.2026 aufgezeichnete API-Antworten. Die Tests
   greifen nicht aufs Netz zu (die API wird mit `httptest` nachgestellt).
 - `internal/source/datex2/testdata` enthält echte Auszüge der MobiData-BW-Feeds (25.10.2026) und selbst erstellte

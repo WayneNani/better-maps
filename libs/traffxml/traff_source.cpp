@@ -107,10 +107,18 @@ void MockTraffSource::Poll()
   }
 }
 
-TraffResponse HttpPost(std::string const & url, std::string data)
+void PrepareHttpRequest(platform::HttpClient & request, std::string const & token, std::string data)
+{
+  request.SetBodyData(std::move(data), "application/xml");
+  // better-maps: device token of services/traff-server. Never logged.
+  if (!token.empty())
+    request.SetRawHeader("Authorization", "Bearer " + token);
+}
+
+TraffResponse HttpPost(std::string const & url, std::string const & token, std::string data)
 {
   platform::HttpClient request(url);
-  request.SetBodyData(data, "application/xml");
+  PrepareHttpRequest(request, token, std::move(data));
 
   if (!request.RunHttpRequest() || request.ErrorCode() != 200)
   {
@@ -125,20 +133,22 @@ TraffResponse HttpPost(std::string const & url, std::string data)
   return result;
 }
 
-void HttpTraffSource::Create(TraffSourceManager & manager, std::string const & url)
+void HttpTraffSource::Create(TraffSourceManager & manager, std::string const & url, std::string const & token)
 {
-  std::unique_ptr<HttpTraffSource> source = std::unique_ptr<HttpTraffSource>(new HttpTraffSource(manager, url));
+  std::unique_ptr<HttpTraffSource> source =
+      std::unique_ptr<HttpTraffSource>(new HttpTraffSource(manager, url, token));
   manager.RegisterSource(std::move(source));
 }
 
-HttpTraffSource::HttpTraffSource(TraffSourceManager & manager, std::string const & url)
+HttpTraffSource::HttpTraffSource(TraffSourceManager & manager, std::string const & url, std::string const & token)
   : TraffSource(manager)
   , m_url(url)
+  , m_token(token)
 {}
 
 TraffResponse HttpTraffSource::Post(std::string const & data)
 {
-  return HttpPost(m_url, data);
+  return HttpPost(m_url, m_token, data);
 }
 
 void HttpTraffSource::RunAsync(std::function<void()> && task)
@@ -173,8 +183,8 @@ void HttpTraffSource::Close()
   LOG(LDEBUG, ("Sending request:\n", data));
 
   // The source may be destroyed before the request completes, do not access any members.
-  threads::SimpleThread thread([url = m_url, data]() {
-    TraffResponse response = HttpPost(url, data);
+  threads::SimpleThread thread([url = m_url, token = m_token, data]() {
+    TraffResponse response = HttpPost(url, token, data);
     return;
   });
   thread.detach();

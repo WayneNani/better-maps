@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Container smoke test for the TraFF server.
 #
-# Builds the image, starts a container, waits until the Autobahn source has delivered data,
+# Builds the image, creates a device token, starts a container with that token file, checks that
+# requests without the token are rejected, waits until the Autobahn source has delivered data,
 # subscribes with a bounding box, polls, changes the subscription and unsubscribes. A local
 # DATEX II fixture is mounted into the container and served as second source (file:// feed).
 #
@@ -34,16 +35,27 @@ fail() { echo "[smoke] FEHLER: $*" >&2; exit 1; }
 
 DATEX2_FIXTURE="${SMOKE_DATEX2-internal/server/testdata/datex2_e2e.xml}"
 DATA_DIR=""
+TOKEN_DIR=""
 
 cleanup() {
   $PODMAN logs "$NAME" >"${TMPDIR:-/tmp}/traff-smoke-$$.log" 2>&1 || true
   $PODMAN rm -f "$NAME" >/dev/null 2>&1 || true
   [[ -n "$DATA_DIR" ]] && rm -rf "$DATA_DIR"
+  [[ -n "$TOKEN_DIR" ]] && rm -rf "$TOKEN_DIR"
 }
 trap cleanup EXIT
 
 log "Baue Image $IMAGE"
 $PODMAN build -q -t "$IMAGE" -f Containerfile . >/dev/null
+
+log "Erzeuge Geräte-Token"
+out=$($PODMAN run --rm --network none "$IMAGE" token smoke)
+TOKEN=$(sed -n 's/^token=//p' <<<"$out")
+TOKEN_DIR=$(mktemp -d "${TMPDIR:-/tmp}/traff-smoke-tokens.XXXXXX")
+chmod 755 "$TOKEN_DIR"
+sed -n 's/^line=//p' <<<"$out" >"$TOKEN_DIR/tokens"
+chmod 644 "$TOKEN_DIR/tokens" # readable for uid 65532 in the container; only hashes
+[[ -n "$TOKEN" && -s "$TOKEN_DIR/tokens" ]] || fail "kein Token erzeugt"
 
 autobahn=true
 [[ "${SMOKE_OFFLINE:-0}" == "1" ]] && autobahn=false
@@ -57,6 +69,7 @@ if [[ -n "$DATEX2_FIXTURE" ]]; then
 fi
 log "Starte Container $NAME auf Port $PORT (Autobahn: $autobahn, Straßen: $ROADS, DATEX II: ${DATEX2_FIXTURE:-aus})"
 $PODMAN run -d --name "$NAME" -p "127.0.0.1:${PORT}:8080" \
+  -v "$TOKEN_DIR:/config:ro,Z" -e TRAFF_TOKENS_FILE=/config/tokens \
   -e TRAFF_AUTOBAHN_ENABLED="$autobahn" -e TRAFF_AUTOBAHN_ROADS="$ROADS" -e TRAFF_LOG_LEVEL=debug \
   "${datex_args[@]}" "$IMAGE" >/dev/null
 
@@ -74,16 +87,33 @@ ready() {
   [[ "$autobahn" == false && -z "$DATEX2_FIXTURE" ]] || grep -q '"messages":[1-9]' <<<"$1"
 }
 
+AUTH=(-H "Authorization: Bearer $TOKEN")
+
 log "Warte auf /healthz"
+for _ in $(seq 1 30); do
+  curl -fsS "$URL/healthz" >/dev/null 2>&1 && break
+  sleep 1
+done
+[[ "$(curl -fsS "$URL/healthz")" == ok ]] || fail "/healthz antwortet nicht nur mit ok"
+
+log "Ohne oder mit falschem Token: 401"
+for h in "" "Authorization: Bearer falsch-falsch-falsch-falsch-falsch" "Authorization: Basic $TOKEN"; do
+  code=$(curl -sS -o /dev/null -w '%{http_code}' ${h:+-H "$h"} -X POST --data-binary '<request operation="GET_CAPABILITIES"/>' "$URL/")
+  [[ "$code" == 401 ]] || fail "POST / mit '${h%% *}' = $code"
+done
+code=$(curl -sS -o /dev/null -w '%{http_code}' "$URL/status")
+[[ "$code" == 401 ]] || fail "GET /status ohne Token = $code"
+
+log "Warte auf /status (erster Abruf der Quellen)"
 health=""
 for _ in $(seq 1 90); do
-  if health=$(curl -fsS "$URL/healthz" 2>/dev/null) && ready "$health"; then
+  if health=$(curl -fsS "${AUTH[@]}" "$URL/status" 2>/dev/null) && ready "$health"; then
     break
   fi
   sleep 1
 done
-log "healthz: $health"
-grep -q '"status":"ok"' <<<"$health" || fail "healthz nicht ok"
+log "status: $health"
+grep -q '"status":"ok"' <<<"$health" || fail "status nicht ok"
 grep -q '"duplicates_suppressed":[0-9]' <<<"$health" || fail "healthz ohne Dublettenzähler"
 if [[ "$autobahn" == true ]]; then
   grep -q '"name":"autobahn","last_attempt":"[^"]*","last_success":"[^"]*","messages":[1-9]' <<<"$health" ||
@@ -94,7 +124,7 @@ if [[ -n "$DATEX2_FIXTURE" ]]; then
     fail "keine Meldungen aus der DATEX-II-Fixture"
 fi
 
-traff() { curl -fsS -X POST -H 'Content-Type: application/xml' --data-binary "$1" "$URL/"; }
+traff() { curl -fsS -X POST "${AUTH[@]}" -H 'Content-Type: application/xml' --data-binary "$1" "$URL/"; }
 attr() { sed -n "s/.*<response[^>]* $1=\"\([^\"]*\)\".*/\1/p" <<<"$2" | head -n1; }
 
 log "GET_CAPABILITIES"
@@ -157,9 +187,11 @@ resp=$(traff "<request operation=\"POLL\" subscription_id=\"$id\"/>")
 
 log "Prüfe Container-Log auf Client-Daten"
 logs=$($PODMAN logs "$NAME" 2>&1)
-if grep -E -q "$id|10\.[0-9]+\.[0-9]+\.[0-9]+|127\.0\.0\.1|curl/" <<<"$logs"; then
-  fail "Log enthält Subscription-ID, IP-Adresse oder User-Agent"
+if grep -E -q "$id|$TOKEN|10\.[0-9]+\.[0-9]+\.[0-9]+|127\.0\.0\.1|curl/|bbox=|47\.27 8\.97|53\.3 9\.7" <<<"$logs"; then
+  fail "Log enthält Subscription-ID, Token, Koordinaten, IP-Adresse oder User-Agent"
 fi
 grep -q 'operation=SUBSCRIBE' <<<"$logs" || fail "Debug-Log enthält keine Request-Zusammenfassung"
+grep -q 'device=smoke' <<<"$logs" || fail "Log enthält kein Geräte-Label"
+grep -q 'status=401 .*reason=auth' <<<"$logs" || fail "Log enthält keine abgewiesenen Anfragen"
 
 log "OK"

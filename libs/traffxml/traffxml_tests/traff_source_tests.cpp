@@ -6,6 +6,7 @@
 
 #include "indexer/data_source.hpp"
 
+#include "platform/http_client.hpp"
 #include "platform/local_country_file.hpp"
 
 #include <chrono>
@@ -354,5 +355,29 @@ UNIT_CLASS_TEST(HttpTraffSourceTest, HttpTraffSource_Unsubscribe)
   // unsubscribing again is a no-op
   m_source.Unsubscribe();
   TEST_EQUAL(m_source.RunPendingTasks(), 0, ());
+}
+// better-maps: every request carries the device token of services/traff-server, if one is set.
+UNIT_TEST(HttpTraffSource_RequestCarriesBearerToken)
+{
+  std::string const request = R"(<request operation="GET_CAPABILITIES"/>)";
+  platform::HttpClient withToken("https://traff.example.org/");
+  traffxml::PrepareHttpRequest(withToken, "tok-0123456789abcdefghij", request);
+  auto const & headers = withToken.GetHeaders();
+  auto const auth = headers.find("Authorization");
+  TEST(auth != headers.end(), ());
+  TEST_EQUAL(auth->second, "Bearer tok-0123456789abcdefghij", ());
+  auto const type = headers.find("Content-Type");
+  TEST(type != headers.end(), ());
+  TEST_EQUAL(type->second, "application/xml", ());
+  TEST_EQUAL(withToken.HttpMethod(), "POST", ());
+
+  // No token: no Authorization header at all (e.g. a public TraFF service).
+  platform::HttpClient withoutToken("https://traff.example.org/");
+  traffxml::PrepareHttpRequest(withoutToken, "", request);
+  TEST(withoutToken.GetHeaders().find("Authorization") == withoutToken.GetHeaders().end(), ());
+  TEST_EQUAL(withoutToken.HttpMethod(), "POST", ());
+
+  // The token is not part of what DebugPrint() would log.
+  TEST(DebugPrint(withToken).find("tok-0123456789abcdefghij") == std::string::npos, ());
 }
 }  // namespace traff_source_tests

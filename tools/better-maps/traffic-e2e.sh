@@ -2,8 +2,8 @@
 # End-to-end test of the TraFF integration without emulator (suitable for CI):
 #
 #   fake Autobahn API (static fixture, python3 http.server)
-#     -> TraFF server (services/traff-server, built with go)
-#       -> C++ TraFF client (libs/traffxml HttpTraffSource, traffxml_tests --filter=TraffE2E)
+#     -> TraFF server (services/traff-server, built with go, with a device token file)
+#       -> C++ TraFF client (libs/traffxml HttpTraffSource with that token, traffxml_tests --filter=TraffE2E)
 #         -> TraFF decoder on a real map (Germany_Berlin.mwm)
 #
 # The test subscribes, receives the first feed, decodes the messages (a closure and a queue on the
@@ -57,6 +57,13 @@ trap cleanup EXIT
 log "Baue TraFF-Server"
 (cd "$REPO_ROOT/services/traff-server" && go build -o "$WORK/traff-server" ./cmd/traff-server)
 
+log "Erzeuge Geräte-Token"
+"$WORK/traff-server" token e2e >"$WORK/token.out"
+TOKEN="$(sed -n 's/^token=//p' "$WORK/token.out")"
+sed -n 's/^line=//p' "$WORK/token.out" >"$WORK/tokens"
+rm "$WORK/token.out"
+[[ -n "$TOKEN" && -s "$WORK/tokens" ]] || fail "kein Token erzeugt"
+
 log "Starte Autobahn-API-Attrappe auf Port $API_PORT"
 python3 -m http.server "$API_PORT" --bind 127.0.0.1 --directory "$FIXTURE" >"$WORK/api.log" 2>&1 &
 api_pid=$!
@@ -65,15 +72,15 @@ api_pid=$!
 cat >"$WORK/start-server.sh" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
-"$WORK/traff-server" -listen 127.0.0.1:$PORT -autobahn-url http://127.0.0.1:$API_PORT \\
+"$WORK/traff-server" -listen 127.0.0.1:$PORT -tokens-file "$WORK/tokens" -autobahn-url http://127.0.0.1:$API_PORT \\
   -autobahn-roads A100 -autobahn-request-interval 10ms -poll-interval 10s -log-level debug \\
   >>"$WORK/server.log" 2>&1 &
 echo \$! >"$WORK/server.pid"
-for _ in \$(seq 1 100); do
-  if curl -fsS "http://127.0.0.1:$PORT/healthz" 2>/dev/null | grep -q '"messages":[1-9]'; then
+for _ in \$(seq 1 60); do
+  if curl -fsS -H "Authorization: Bearer $TOKEN" "http://127.0.0.1:$PORT/status" 2>/dev/null | grep -q '"messages":[1-9]'; then
     exit 0
   fi
-  sleep 0.2
+  sleep 1  # within the rate limit of the token (1/s on average)
 done
 echo "TraFF-Server liefert keine Meldungen, siehe $WORK/server.log" >&2
 exit 1
@@ -91,7 +98,9 @@ chmod +x "$WORK/start-server.sh" "$WORK/restart-server.sh"
 
 log "Starte TraFF-Server auf Port $PORT"
 "$WORK/start-server.sh" || { cat "$WORK/server.log" >&2; fail "Server startet nicht"; }
-log "healthz: $(curl -fsS "http://127.0.0.1:$PORT/healthz")"
+log "status: $(curl -fsS -H "Authorization: Bearer $TOKEN" "http://127.0.0.1:$PORT/status")"
+code=$(curl -sS -o /dev/null -w '%{http_code}' -X POST --data '<request operation="GET_CAPABILITIES"/>' "$URL")
+[[ "$code" == 401 ]] || fail "Server nimmt Anfragen ohne Token an ($code)"
 
 bin="${TRAFFXML_TESTS_BIN:-}"
 if [[ -z "$bin" ]]; then
@@ -107,7 +116,7 @@ log "Starte Ende-zu-Ende-Tests gegen $URL"
 rc=0
 (
   cd "$(dirname "$bin")"
-  TRAFF_E2E_URL="$URL" TRAFF_E2E_MAPS_DIR="$MAPS_DIR" TRAFF_E2E_MWMS="Germany_Berlin" \
+  TRAFF_E2E_URL="$URL" TRAFF_E2E_TOKEN="$TOKEN" TRAFF_E2E_MAPS_DIR="$MAPS_DIR" TRAFF_E2E_MWMS="Germany_Berlin" \
   TRAFF_E2E_RESTART_CMD="$WORK/restart-server.sh" TRAFF_E2E_EXPECT_FIXTURE=1 \
     "$bin" --data_path="$REPO_ROOT/data" --user_resource_path="$REPO_ROOT/data" --filter='TraffE2E'
 ) 2>&1 | tee "$WORK/e2e.log" || rc=$?
@@ -115,4 +124,8 @@ rc=0
 # make sure the tests did not skip themselves
 grep -q "Decoded .* of .* message" "$WORK/e2e.log" || fail "Dekodier-Test wurde nicht ausgeführt"
 grep -q "Restarting service" "$WORK/e2e.log" || fail "Neustart-Test wurde nicht ausgeführt"
+# every request of the client carried the token
+grep -q 'device=e2e' "$WORK/server.log" || fail "keine Anfrage mit Token im Server-Log"
+n401=$(grep -c 'status=401' "$WORK/server.log" || true)
+[[ "$n401" == 1 ]] || fail "$n401 Anfragen mit 401 (erwartet: nur die Prüfung ohne Token)"
 log "OK"

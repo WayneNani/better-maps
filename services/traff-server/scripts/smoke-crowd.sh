@@ -7,7 +7,8 @@
 # through the relay. Checks:
 #   - the TraFF feed of the traff-server contains the crowd jam as few merged CONGESTION_*
 #     messages (fewer than congested tiles in the crowd export), accepted by a TraFF subscription,
-#   - /healthz of the traff-server reports the crowd source with its counters,
+#   - /status of the traff-server reports the crowd source with its counters (the traff-server runs without
+#     tokens here, TRAFF_INSECURE_NO_AUTH=1; scripts/smoke.sh tests the tokens),
 #   - when the publications expire (65 s after the evaluation with a 60 s window), the
 #     traff-server sends cancellations,
 #   - the traff-server log contains no client addresses.
@@ -61,14 +62,14 @@ $PODMAN run -d --pod "$POD" --name "$POD-relay" --entrypoint /usr/local/bin/ohtt
   -listen :8090 -gateway http://localhost:8080 -per-hour 100000 -burst 100000 >/dev/null
 $PODMAN run -d --pod "$POD" --name "$POD-traff" \
   -e TRAFF_LISTEN=:8081 -e TRAFF_AUTOBAHN_ENABLED=false -e TRAFF_CROWD_URL=http://localhost:8080 \
-  -e TRAFF_CROWD_INTERVAL=10s -e TRAFF_LOG_LEVEL=debug localhost/traff-server:smoke >/dev/null
+  -e TRAFF_CROWD_INTERVAL=10s -e TRAFF_LOG_LEVEL=debug -e TRAFF_INSECURE_NO_AUTH=1 localhost/traff-server:smoke >/dev/null
 
 log "Warte auf /healthz beider Server"
 for _ in $(seq 1 30); do
   curl -fsS "$CROWD/healthz" >/dev/null 2>&1 && curl -fsS "$URL/healthz" >/dev/null 2>&1 && break
   sleep 1
 done
-health=$(curl -fsS "$URL/healthz") || fail "healthz des traff-servers nicht erreichbar"
+health=$(curl -fsS "$URL/status") || fail "status des traff-servers nicht erreichbar"
 grep -q '"name":"crowd"' <<<"$health" || fail "Crowd-Quelle nicht registriert: $health"
 
 traff() { curl -fsS -X POST -H 'Content-Type: application/xml' --data-binary "$1" "$URL/"; }
@@ -104,10 +105,10 @@ grep -q '<via>' <<<"$resp" || fail "zusammengefasste Meldung ohne via: $resp"
 grep -q 'road_class="MOTORWAY"' <<<"$resp" || fail "keine Autobahn-Meldung: $resp"
 if grep -q 'road_class="TERTIARY"' <<<"$resp"; then fail "Dorfstraße (unter k) im Feed"; fi
 
-health=$(curl -fsS "$URL/healthz")
-log "healthz: $health"
-grep -q '"name":"crowd","last_attempt":"[^"]*","last_success":"[^"]*","messages":[1-9]' <<<"$health" || fail "healthz ohne Crowd-Meldungen"
-grep -q '"congested_segments":[1-9]' <<<"$health" || fail "healthz ohne Crowd-Zähler"
+health=$(curl -fsS "$URL/status")
+log "status: $health"
+grep -q '"name":"crowd","last_attempt":"[^"]*","last_success":"[^"]*","messages":[1-9]' <<<"$health" || fail "status ohne Crowd-Meldungen"
+grep -q '"congested_segments":[1-9]' <<<"$health" || fail "status ohne Crowd-Zähler"
 
 log "Warte auf das Ende der Veröffentlichung (Aufhebung im traff-server)"
 cancelled=0

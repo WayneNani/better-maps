@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: Zugangs-Token für den TraFF-Server (services/traff-server), Einstellungen → Verkehr. -->
+<resources>
+  <string name="traffic_http_token">Zugangs-Token</string>
+  <string name="traffic_http_token_hint">Das Token dieses Geräts aus scripts/new-token.sh deines TraFF-Servers. Es wird nur an die Server-Adresse oben geschickt, nur über https:// (http:// nur im lokalen Netz) und nie an den eingebauten öffentlichen Dienst. Leer lassen, um das gespeicherte Token zu löschen.</string>
+  <string name="traffic_http_token_needs_url">Bitte zuerst die Adresse deines eigenen Verkehrsservers eintragen (https://…)</string>
+  <string name="traffic_http_token_removed">Zugangs-Token entfernt: Es gehört zum bisherigen Server. Bitte das Token für den neuen Server neu eintragen.</string>
+</resources>

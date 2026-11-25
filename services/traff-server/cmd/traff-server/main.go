@@ -1,6 +1,7 @@
 // Command traff-server serves traffic messages in TraFF format over HTTP.
 //
-// See README.md for configuration and usage.
+//	traff-server [flags]        serve (see README.md for the configuration)
+//	traff-server token <label>  print a new random device token and its line for the token file
 package main
 
 import (
@@ -18,6 +19,7 @@ import (
 	"time"
 	_ "time/tzdata" // the container image has no zoneinfo; Europe/Berlin is needed by the Autobahn source
 
+	"github.com/WayneNani/better-maps/services/traff-server/internal/auth"
 	"github.com/WayneNani/better-maps/services/traff-server/internal/config"
 	"github.com/WayneNani/better-maps/services/traff-server/internal/dedup"
 	"github.com/WayneNani/better-maps/services/traff-server/internal/logging"
@@ -31,7 +33,7 @@ import (
 )
 
 func main() {
-	if err := run(os.Args[1:], os.Getenv, os.Stderr); err != nil {
+	if err := run(os.Args[1:], os.Getenv, os.Stdout, os.Stderr); err != nil {
 		if errors.Is(err, flag.ErrHelp) {
 			return
 		}
@@ -40,7 +42,10 @@ func main() {
 	}
 }
 
-func run(args []string, env func(string) string, stderr io.Writer) error {
+func run(args []string, env func(string) string, stdout, stderr io.Writer) error {
+	if len(args) > 0 && args[0] == "token" {
+		return newToken(args[1:], stdout)
+	}
 	cfg, err := config.Parse(args, env, stderr)
 	if err != nil {
 		return err
@@ -65,9 +70,29 @@ type app struct {
 	subs         *subscription.Manager
 	runner       *source.Runner
 	srv          *server.Server
+	tokens       *auth.Store // nil without access control
+	tokensMod    time.Time   // modification time of the token file before it was loaded
 }
 
 func build(cfg config.Config, logger *slog.Logger) (*app, error) {
+	var tokens *auth.Store
+	var tokensMod time.Time
+	if cfg.InsecureNoAuth {
+		logger.Warn("TRAFF_INSECURE_NO_AUTH is set: serving WITHOUT access control, for local development only")
+	} else {
+		// Taken before loading: a change while loading is picked up by the next check.
+		tokensMod = modTime(cfg.TokensFile)
+		loaded, err := auth.Load(cfg.TokensFile)
+		if err != nil {
+			return nil, err
+		}
+		if loaded.Len() == 0 {
+			logger.Warn("token file has no tokens, every request is rejected", "file", cfg.TokensFile)
+		}
+		tokens = auth.NewStore()
+		tokens.Replace(loaded)
+	}
+
 	// Cancellations are kept as long as a subscription can stay idle, so every live subscriber
 	// sees them.
 	st := store.New(cfg.MessageLease, cfg.SubscriptionTTL)
@@ -115,9 +140,16 @@ func build(cfg config.Config, logger *slog.Logger) (*app, error) {
 	}
 	srv := &server.Server{
 		Store: st, Subs: subs, Coverage: runner.Coverage, Status: runner.Status,
-		MaxFilters: cfg.MaxFilters, Log: logger,
+		MaxFilters: cfg.MaxFilters, Log: logger, Tokens: tokens, Limits: limits(cfg),
 	}
-	return &app{cfg: cfg, janitorEvery: time.Minute, log: logger, store: st, subs: subs, runner: runner, srv: srv}, nil
+	return &app{cfg: cfg, janitorEvery: time.Minute, log: logger, store: st, subs: subs, runner: runner, srv: srv,
+		tokens: tokens, tokensMod: tokensMod}, nil
+}
+
+func limits(cfg config.Config) server.Limits {
+	l := server.DefaultLimits()
+	l.RatePerMinute, l.RateBurst = cfg.RatePerMinute, cfg.RateBurst
+	return l
 }
 
 func (a *app) serve(ctx context.Context, stderr io.Writer) error {
@@ -135,10 +167,18 @@ func (a *app) serve(ctx context.Context, stderr io.Writer) error {
 
 	go a.runner.Run(ctx)
 	go a.janitor(ctx)
+	if a.tokens != nil {
+		go a.maintainTokens(ctx)
+	}
 
 	errCh := make(chan error, 1)
 	go func() {
-		a.log.Info("listening", "addr", a.cfg.Listen)
+		if a.tokens != nil {
+			a.log.Info("listening", "addr", a.cfg.Listen, "tokens", a.tokens.Len(),
+				"rate_per_minute", a.cfg.RatePerMinute, "rate_burst", a.cfg.RateBurst)
+		} else {
+			a.log.Warn("listening without access control", "addr", a.cfg.Listen)
+		}
 		errCh <- httpSrv.ListenAndServe()
 	}()
 	select {
@@ -167,4 +207,65 @@ func (a *app) janitor(ctx context.Context) {
 			a.store.Purge(now)
 		}
 	}
+}
+
+// maintainTokens reloads the token file on SIGHUP or when it changed, and prunes idle rate limit
+// buckets. A broken token file keeps the previous tokens.
+func (a *app) maintainTokens(ctx context.Context) {
+	hup := make(chan os.Signal, 1)
+	signal.Notify(hup, syscall.SIGHUP)
+	defer signal.Stop(hup)
+	every := a.cfg.ReloadTokens
+	if every <= 0 {
+		every = time.Minute // still prune the rate limits
+	}
+	tick := time.NewTicker(every)
+	defer tick.Stop()
+	last := a.tokensMod
+	reload := func(reason string) {
+		tokens, err := auth.Load(a.cfg.TokensFile)
+		if err != nil {
+			a.log.Error("token file not reloaded, keeping the previous tokens", "error", err)
+			return
+		}
+		a.tokens.Replace(tokens)
+		a.log.Info("tokens reloaded", "reason", reason, "tokens", tokens.Len())
+	}
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-hup:
+			last = modTime(a.cfg.TokensFile)
+			reload("SIGHUP")
+		case <-tick.C:
+			a.srv.Prune()
+			if a.cfg.ReloadTokens > 0 {
+				if m := modTime(a.cfg.TokensFile); !m.Equal(last) {
+					last = m
+					reload("file changed")
+				}
+			}
+		}
+	}
+}
+
+func modTime(path string) time.Time {
+	st, err := os.Stat(path)
+	if err != nil {
+		return time.Time{}
+	}
+	return st.ModTime()
+}
+
+func newToken(args []string, stdout io.Writer) error {
+	if len(args) != 1 || !auth.ValidLabel(args[0]) {
+		return errors.New("usage: traff-server token <label> (label: A-Z a-z 0-9 . _ -, at most 32)")
+	}
+	token, err := auth.NewToken()
+	if err != nil {
+		return err
+	}
+	fmt.Fprintf(stdout, "token=%s\nline=%s\n", token, auth.HashLine(args[0], token))
+	return nil
 }

@@ -176,7 +176,7 @@ func (ce *crowdEnv) health(t *testing.T) (h struct {
 	Sources    []source.Status `json:"sources"`
 }) {
 	t.Helper()
-	resp, err := http.Get(ce.http.URL + "/healthz")
+	resp, err := http.Get(ce.http.URL + "/status")
 	if err != nil {
 		t.Fatal(err)
 	}

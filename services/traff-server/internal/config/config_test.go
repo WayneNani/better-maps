@@ -12,7 +12,66 @@ import (
 	"time"
 )
 
-func env(m map[string]string) func(string) string { return func(k string) string { return m[k] } }
+// env returns an environment of m. Unless m configures access control, it serves without tokens
+// (TRAFF_INSECURE_NO_AUTH=1), so that the tests of other options do not need a token file.
+func env(m map[string]string) func(string) string {
+	_, tokens := m["TRAFF_TOKENS_FILE"]
+	_, insecure := m["TRAFF_INSECURE_NO_AUTH"]
+	return func(k string) string {
+		if k == "TRAFF_INSECURE_NO_AUTH" && !tokens && !insecure {
+			return "1"
+		}
+		return m[k]
+	}
+}
+
+func TestAccessControl(t *testing.T) {
+	// Without a token file the server refuses to start ...
+	_, err := Parse(nil, env(map[string]string{"TRAFF_INSECURE_NO_AUTH": ""}), io.Discard)
+	if err == nil || !strings.Contains(err.Error(), "TRAFF_TOKENS_FILE") {
+		t.Errorf("no token file accepted: %v", err)
+	}
+	if _, err := Parse(nil, env(map[string]string{"TRAFF_INSECURE_NO_AUTH": "0"}), io.Discard); err == nil {
+		t.Error("TRAFF_INSECURE_NO_AUTH=0 accepted without token file")
+	}
+	// ... unless that is explicitly wanted.
+	c, err := Parse(nil, env(map[string]string{"TRAFF_INSECURE_NO_AUTH": "1"}), io.Discard)
+	if err != nil || !c.InsecureNoAuth || c.TokensFile != "" {
+		t.Errorf("insecure = %+v, %v", c, err)
+	}
+	// Both at once is a mistake.
+	if _, err := Parse(nil, env(map[string]string{"TRAFF_INSECURE_NO_AUTH": "1", "TRAFF_TOKENS_FILE": "/t"}), io.Discard); err == nil {
+		t.Error("token file and insecure mode accepted together")
+	}
+	// The insecure mode has no flag.
+	if _, err := Parse([]string{"-insecure-no-auth"}, env(map[string]string{"TRAFF_TOKENS_FILE": "/t"}), io.Discard); err == nil {
+		t.Error("-insecure-no-auth flag accepted")
+	}
+
+	c, err = Parse(nil, env(map[string]string{"TRAFF_TOKENS_FILE": "/etc/traff/tokens"}), io.Discard)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c.TokensFile != "/etc/traff/tokens" || c.InsecureNoAuth || c.ReloadTokens != DefaultReloadTokens ||
+		c.RatePerMinute != DefaultRatePerMinute || c.RateBurst != DefaultRateBurst {
+		t.Errorf("defaults = %+v", c)
+	}
+	e := env(map[string]string{"TRAFF_TOKENS_FILE": "/t", "TRAFF_RATE_PER_MINUTE": "12.5", "TRAFF_RATE_BURST": "4", "TRAFF_RELOAD_TOKENS": "0"})
+	c, err = Parse([]string{"-rate-burst", "5"}, e, io.Discard)
+	if err != nil || c.RatePerMinute != 12.5 || c.RateBurst != 5 || c.ReloadTokens != 0 {
+		t.Errorf("rate = %+v, %v", c, err)
+	}
+	for _, bad := range []map[string]string{
+		{"TRAFF_TOKENS_FILE": "/t", "TRAFF_RATE_PER_MINUTE": "-1"},
+		{"TRAFF_TOKENS_FILE": "/t", "TRAFF_RATE_BURST": "0"},
+		{"TRAFF_TOKENS_FILE": "/t", "TRAFF_RATE_PER_MINUTE": "fast"},
+		{"TRAFF_TOKENS_FILE": "/t", "TRAFF_RELOAD_TOKENS": "-1s"},
+	} {
+		if _, err := Parse(nil, env(bad), io.Discard); err == nil {
+			t.Errorf("%v accepted", bad)
+		}
+	}
+}
 
 func TestDefaults(t *testing.T) {
 	c, err := Parse(nil, env(nil), io.Discard)

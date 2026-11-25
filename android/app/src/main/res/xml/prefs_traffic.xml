@@ -15,11 +15,19 @@
     android:title="@string/traffic_http_url"
     app:singleLineTitle="false"
     android:order="2"/>
+  <!-- better-maps: not persistent, stored by TrafficServerSettings (app-private, not backed up). -->
+  <EditTextPreference
+    android:key="@string/pref_traffic_http_token"
+    android:title="@string/traffic_http_token"
+    android:dialogMessage="@string/traffic_http_token_hint"
+    android:persistent="false"
+    app:singleLineTitle="false"
+    android:order="3"/>
   <MultiSelectListPreference
     android:key="@string/pref_traffic_apps"
     android:title="@string/traffic_apps"
     app:singleLineTitle="false"
-    android:order="3"/>
+    android:order="4"/>
   <SwitchPreferenceCompat
     android:key="@string/pref_traffic_legacy_enabled"
     android:title="@string/traffic_legacy_enabled"
@@ -27,12 +35,12 @@
     android:summary="@string/traffic_legacy_enabled_description"
     android:defaultValue="true"
     android:widgetLayout="@layout/preference_switch"
-    android:order="4"/>
+    android:order="5"/>
 
   <PreferenceCategory
     android:key="@string/pref_crowd_traffic_category"
     android:title="@string/crowd_traffic_category"
-    android:order="5">
+    android:order="6">
     <SwitchPreferenceCompat
       android:key="@string/pref_crowd_traffic_enabled"
       android:title="@string/crowd_traffic_enabled"
