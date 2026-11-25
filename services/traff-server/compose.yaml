@@ -1,0 +1,44 @@
+# TraFF server for the app (traffic messages from the Autobahn API, DATEX II feeds incl. Mobilithek, crowd data).
+#
+# Normally driven by the scripts in scripts/ (they set the variables below). Direct use:
+#   export TRAFF_TOKENS_FILE=$HOME/.config/bettermaps-traff/tokens \
+#          TRAFF_ENV_FILE=$HOME/.config/bettermaps-traff/traff.env \
+#          TRAFF_SECRETS_DIR=$HOME/.config/bettermaps-traff/secrets
+#   podman-compose -p bettermaps-traff up -d traff
+#
+# The server is published on TRAFF_BIND:TRAFF_PORT (127.0.0.1:18400 by default); put a TLS reverse proxy in front.
+# It needs outgoing network for its sources. Every request except /healthz needs a device token.
+#
+# Rootless Podman: uid 0 in the container is your host user, so it can read the token file, env file and secrets
+# (mode 600) without making them readable for others. ":z" relabels the volumes for SELinux.
+
+services:
+  traff:
+    image: localhost/bettermaps-traff-server:latest
+    build:
+      context: .
+      dockerfile: Containerfile
+    restart: unless-stopped
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges"]
+    read_only: true
+    user: "0:0"
+    mem_limit: ${TRAFF_MEMORY:-256m}
+    memswap_limit: ${TRAFF_MEMORY:-256m}
+    cpus: 1
+    ports:
+      - "${TRAFF_BIND:-127.0.0.1}:${TRAFF_PORT:-18400}:8080"
+    # Sources and credentials (TRAFF_DATEX2_FEEDS, TRAFF_DATEX2_<NAME>_CLIENT_CERT=/secrets/..., TRAFF_USER_AGENT,
+    # TRAFF_AUTOBAHN_ROADS, TRAFF_CROWD_URL, ...). May be empty: then only the Autobahn API is used.
+    env_file:
+      - ${TRAFF_ENV_FILE:?set TRAFF_ENV_FILE}
+    # Set after env_file and therefore not overridable there.
+    environment:
+      TRAFF_LISTEN: ":8080"
+      TRAFF_TOKENS_FILE: /config/tokens
+      TRAFF_RATE_PER_MINUTE: ${TRAFF_RATE_PER_MINUTE:-60}
+      TRAFF_RATE_BURST: ${TRAFF_RATE_BURST:-30}
+      TRAFF_LOG_LEVEL: ${TRAFF_LOG_LEVEL:-info}
+    volumes:
+      - ${TRAFF_TOKENS_FILE:?set TRAFF_TOKENS_FILE}:/config/tokens:ro,z
+      - ${TRAFF_SECRETS_DIR:?set TRAFF_SECRETS_DIR}:/secrets:ro,z

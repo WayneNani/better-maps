@@ -1,7 +1,10 @@
 # TraFF server for better-maps.
 #
 # Build:  podman build -t traff-server -f Containerfile .
-# Run:    podman run --rm -p 8080:8080 traff-server
+# Run:    see compose.yaml and scripts/run.sh. The server needs a token file (TRAFF_TOKENS_FILE, created by
+#         scripts/new-token.sh) or, for local tests only, TRAFF_INSECURE_NO_AUTH=1:
+#         podman run --rm -p 127.0.0.1:8080:8080 -e TRAFF_INSECURE_NO_AUTH=1 traff-server
+# Token:  podman run --rm --network none traff-server token <label>
 
 # --- build stage -------------------------------------------------------------------------------
 FROM docker.io/library/golang:1.24 AS build
