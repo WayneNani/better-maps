@@ -107,14 +107,24 @@ keine Wirkung. Ein Image für andere Deployments entsteht mit `podman build -f C
 
 ### App einrichten
 
-Einstellungen → **Verkehr**: „Live-Verkehrsdaten“ einschalten, **Verkehrsdienst-URL** (z. B.
-`https://traff.example.org/`, im Emulator `http://10.0.2.2:18400/`) und **Zugangs-Token** des Geräts eintragen.
-Wie bei den anderen Servern: in der APK steht kein Token, `http://` geht nur für lokale Adressen (die URL wird sonst
-abgelehnt, und ein Token wird nie an eine solche URL geschickt), das Token wird nur als „Gesetzt“ angezeigt, nie
-geloggt und nicht gesichert (app-private SharedPreferences `traffic_server`; die URL selbst liegt wie bisher in
-`settings.ini`). Ein leeres Eingabefeld behält das gespeicherte Token. Die App schickt es als
-`Authorization: Bearer` mit jeder TraFF-Anfrage (`libs/traffxml/traff_source.cpp`, `PrepareHttpRequest`); eine
-Änderung von Token oder URL baut die HTTP-Quelle neu auf.
+Einstellungen → **Verkehr**: „Live-Verkehrsdaten“ einschalten, zuerst die **Verkehrsdienst-URL** (z. B.
+`https://traff.example.org/`, im Emulator `http://10.0.2.2:18400/`), dann das **Zugangs-Token** des Geräts
+eintragen. Wie bei den anderen Servern: in der APK steht kein Token, `http://` geht nur für lokale Adressen (die URL
+wird sonst abgelehnt), das Token wird nur als „Gesetzt“/„Nicht gesetzt“ angezeigt, nie geloggt und nicht gesichert
+(app-private SharedPreferences `traffic_server`; die URL selbst liegt wie bisher in `settings.ini`).
+
+Das Token ist an den Server gebunden, für den es eingetragen wurde (Schema, Host und Port der URL), und geht nur
+dorthin:
+
+- Wechselt die URL auf einen anderen Server (anderer Host, Port oder Schema), löscht die App das Token und weist
+  darauf hin; für den neuen Server muss es neu eingetragen werden. Ein anderer Pfad auf demselben Server behält es.
+- An den eingebauten öffentlichen Dienst (`https://api.dev.traffxml.org`, Standard-URL ohne Eintrag) geht nie ein
+  Token; solange er eingestellt ist, lehnt die App die Token-Eingabe ab. Der Core prüft das zusätzlich
+  (`Framework::TrafficHttpTokenFor`).
+- Ein leeres Eingabefeld löscht das gespeicherte Token.
+
+Die App schickt das Token als `Authorization: Bearer` mit jeder TraFF-Anfrage (`libs/traffxml/traff_source.cpp`,
+`PrepareHttpRequest`); eine Änderung von Token oder URL baut die HTTP-Quelle neu auf.
 
 ## Lokal starten (Entwicklung)
 

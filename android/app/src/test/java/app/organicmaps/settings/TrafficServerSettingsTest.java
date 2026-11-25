@@ -116,14 +116,22 @@ public class TrafficServerSettingsTest
     }
   }
 
+  private static final String DEFAULT_URL = "https://api.dev.traffxml.org";
+  private static final String OWN_URL = "https://traff.example.org/";
+
+  private static TrafficServerSettings settings(@NonNull Store store)
+  {
+    return new TrafficServerSettings(store, DEFAULT_URL);
+  }
+
   @Test
   public void noTokenByDefault()
   {
-    final TrafficServerSettings settings = new TrafficServerSettings(new Store());
+    final TrafficServerSettings settings = settings(new Store());
     assertFalse(settings.hasToken());
     assertEquals("", settings.getToken());
     final Sink sink = new Sink();
-    assertFalse(settings.apply("https://traff.example.org/", sink));
+    assertFalse(settings.apply(OWN_URL, sink));
     // The core is told explicitly that there is no token.
     assertEquals(1, sink.mTokens.size());
     assertEquals("", sink.last());
@@ -131,59 +139,140 @@ public class TrafficServerSettingsTest
   }
 
   @Test
-  public void tokenIsStoredTrimmedAndSentToHttpsUrl()
+  public void tokenIsStoredTrimmedWithItsOriginAndSentThere()
   {
     final Store store = new Store();
-    final TrafficServerSettings settings = new TrafficServerSettings(store);
-    settings.setToken("  " + TOKEN + " ");
+    final TrafficServerSettings settings = settings(store);
+    assertTrue(settings.setToken("  " + TOKEN + " ", " " + OWN_URL + " "));
     assertTrue(settings.hasToken());
     assertEquals(TOKEN, store.getString(TrafficServerSettings.KEY_TOKEN, null));
+    assertEquals("https://traff.example.org:443", settings.getTokenOrigin());
     final Sink sink = new Sink();
-    assertTrue(settings.apply(" https://traff.example.org/ ", sink));
+    assertTrue(settings.apply(OWN_URL, sink));
     assertEquals(TOKEN, sink.last());
-    assertTrue(settings.apply("https://traff.example.org:8443/traff", sink));
-    assertEquals(TOKEN, sink.last());
-  }
-
-  @Test
-  public void tokenNeverGoesOverPlainHttpToPublicHostsOrBadUrls()
-  {
-    final TrafficServerSettings settings = new TrafficServerSettings(new Store());
-    settings.setToken(TOKEN);
-    for (String url : new String[] {"http://traff.example.org/", "http://93.184.216.34:8080/", "ftp://traff.example.org",
-                                    "https://user:pw@traff.example.org", "https://traff.example.org/?a=b",
-                                    "traff.example.org", "", "   ", null})
+    // Same origin, other path or explicit default port: still the same server.
+    for (String url : new String[] {"https://traff.example.org", "https://TRAFF.example.org:443/traff"})
     {
-      final Sink sink = new Sink();
-      assertFalse(String.valueOf(url), settings.apply(url, sink));
-      assertEquals(String.valueOf(url), "", sink.last());
-      assertEquals(String.valueOf(url), "", settings.tokenFor(url));
-    }
-    // Plain http is fine for local addresses (emulator, LAN, the machine itself).
-    for (String url : new String[] {"http://10.0.2.2:18400/", "http://192.168.1.5:18400", "http://localhost:18400/",
-                                    "http://127.0.0.1:18400", "http://traff.local/"})
-    {
-      final Sink sink = new Sink();
       assertTrue(url, settings.apply(url, sink));
       assertEquals(url, TOKEN, sink.last());
     }
   }
 
   @Test
-  public void emptyTokenRemovesIt()
+  public void tokenIsNeverSentToTheDefaultOrPublicService()
+  {
+    final TrafficServerSettings settings = settings(new Store());
+    // Entering a token while the default service is set is refused.
+    for (String url : new String[] {DEFAULT_URL, DEFAULT_URL + "/", "https://API.dev.traffxml.org:443/x"})
+    {
+      assertFalse(url, settings.acceptsTokenFor(url));
+      assertFalse(url, settings.setToken(TOKEN, url));
+      assertFalse(url, settings.hasToken());
+    }
+    // A token entered for the own server does not go to the default service either.
+    assertTrue(settings.setToken(TOKEN, OWN_URL));
+    final Sink sink = new Sink();
+    assertFalse(settings.apply(DEFAULT_URL, sink));
+    assertEquals("", sink.last());
+    assertEquals("", settings.tokenFor(DEFAULT_URL + "/"));
+    // Also when the core's default is another URL, the known public service never gets it.
+    final TrafficServerSettings other = new TrafficServerSettings(new Store(), "https://traff.default.example");
+    assertFalse(other.setToken(TOKEN, "https://api.dev.traffxml.org/"));
+    assertFalse(other.setToken(TOKEN, "https://traff.default.example/"));
+  }
+
+  @Test
+  public void tokenIsNotSentToAnotherOrigin()
+  {
+    final TrafficServerSettings settings = settings(new Store());
+    assertTrue(settings.setToken(TOKEN, OWN_URL));
+    for (String url : new String[] {"https://other.example.org/", "https://traff.example.org:8443/",
+                                    "http://traff.example.org/", "https://evil.traff.example.org/",
+                                    "http://10.0.2.2:18400/", "", null})
+    {
+      final Sink sink = new Sink();
+      assertFalse(String.valueOf(url), settings.apply(url, sink));
+      assertEquals(String.valueOf(url), "", sink.last());
+    }
+  }
+
+  @Test
+  public void originChangeClearsTheToken()
   {
     final Store store = new Store();
-    final TrafficServerSettings settings = new TrafficServerSettings(store);
-    settings.setToken(TOKEN);
-    settings.setToken("   ");
+    final TrafficServerSettings settings = settings(store);
+    assertTrue(settings.setToken(TOKEN, OWN_URL));
+    // Another path on the same server keeps it.
+    assertFalse(settings.onUrlChanged("https://traff.example.org/traff"));
+    assertTrue(settings.hasToken());
+    // Another server drops it, also from the store, and nothing is sent anymore, not even back to the old server.
+    assertTrue(settings.onUrlChanged("https://other.example.org/"));
     assertFalse(settings.hasToken());
     assertFalse(store.contains(TrafficServerSettings.KEY_TOKEN));
-    settings.setToken(TOKEN);
-    settings.setToken(null);
+    assertFalse(store.contains(TrafficServerSettings.KEY_TOKEN_ORIGIN));
+    final Sink sink = new Sink();
+    assertFalse(settings.apply(OWN_URL, sink));
+    assertEquals("", sink.last());
+    // Switching to the default service or an empty URL drops it as well; without a token nothing is reported.
+    assertTrue(settings.setToken(TOKEN, OWN_URL));
+    assertTrue(settings.onUrlChanged(DEFAULT_URL));
+    assertFalse(settings.hasToken());
+    assertTrue(settings.setToken(TOKEN, OWN_URL));
+    assertTrue(settings.onUrlChanged(""));
+    assertFalse(settings.onUrlChanged("https://third.example.org/"));
+  }
+
+  @Test
+  public void localHttpServersWork()
+  {
+    final TrafficServerSettings settings = settings(new Store());
+    for (String url : new String[] {"http://10.0.2.2:18400/", "http://192.168.1.5:18400", "http://localhost:18400/",
+                                    "http://127.0.0.1:18400", "http://traff.local/"})
+    {
+      assertTrue(url, settings.setToken(TOKEN, url));
+      final Sink sink = new Sink();
+      assertTrue(url, settings.apply(url, sink));
+      assertEquals(url, TOKEN, sink.last());
+    }
+    // Plain http to public hosts and broken URLs never get one.
+    for (String url : new String[] {"http://traff.example.org/", "http://93.184.216.34:8080/", "ftp://traff.example.org",
+                                    "https://user:pw@traff.example.org", "https://traff.example.org/?a=b",
+                                    "traff.example.org", "", "   ", null})
+    {
+      assertFalse(String.valueOf(url), settings.acceptsTokenFor(url));
+      assertEquals(String.valueOf(url), "", settings.tokenFor(url));
+    }
+  }
+
+  @Test
+  public void emptyInputClearsTheToken()
+  {
+    final Store store = new Store();
+    final TrafficServerSettings settings = settings(store);
+    assertTrue(settings.setToken(TOKEN, OWN_URL));
+    assertTrue(settings.setToken("   ", OWN_URL));
+    assertFalse(settings.hasToken());
+    assertFalse(store.contains(TrafficServerSettings.KEY_TOKEN));
+    assertFalse(store.contains(TrafficServerSettings.KEY_TOKEN_ORIGIN));
+    assertTrue(settings.setToken(TOKEN, OWN_URL));
+    // Clearing works whatever the URL is (also the default service).
+    assertTrue(settings.setToken(null, DEFAULT_URL));
     assertFalse(settings.hasToken());
     final Sink sink = new Sink();
-    assertFalse(settings.apply("https://traff.example.org/", sink));
+    assertFalse(settings.apply(OWN_URL, sink));
     assertEquals("", sink.last());
+  }
+
+  @Test
+  public void tokenWithoutOriginIsNotSent()
+  {
+    // E.g. stored by an earlier build that did not bind tokens to a server.
+    final Store store = new Store();
+    store.putString(TrafficServerSettings.KEY_TOKEN, TOKEN);
+    final TrafficServerSettings settings = settings(store);
+    assertEquals("", settings.tokenFor(OWN_URL));
+    assertTrue(settings.onUrlChanged(OWN_URL));
+    assertFalse(settings.hasToken());
   }
 
   /** Reads a resource file of the app module (the tests run in android/app). */

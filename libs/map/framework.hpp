@@ -255,6 +255,8 @@ protected:
   TrafficManager m_trafficManager;
   // better-maps: see SetTrafficHttpToken().
   std::string m_trafficHttpToken;
+  // m_trafficHttpToken, or "" for |url| if it is the built-in default service.
+  std::string TrafficHttpTokenFor(std::string const & url) const;
 
   /// This function will be called by m_storage when latest local files
   /// is downloaded.
@@ -930,6 +932,8 @@ public:
   // request of the HTTP TraFF source; empty for none. Kept in memory only (the app stores it outside the backed-up
   // settings) and never logged. A change recreates the source if it is enabled.
   void SetTrafficHttpToken(std::string const & token);
+  // The built-in default TraFF URL (used while none is set). The token is never sent to it.
+  static std::string GetTrafficHttpUrlDefault();
 
   bool LoadTrafficSimplifiedColors();
   void SaveTrafficSimplifiedColors(bool simplified);

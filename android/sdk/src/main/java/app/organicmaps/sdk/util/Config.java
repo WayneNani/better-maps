@@ -438,6 +438,13 @@ public final class Config
   {
     nativeSetTrafficHttpToken(value);
   }
+
+  /** The built-in default traffic service URL (used while none is set); the token is never sent to it. */
+  @NonNull
+  public static String getTrafficHttpUrlDefault()
+  {
+    return nativeGetTrafficHttpUrlDefault();
+  }
   
   /**
    * Settings of the anonymous congestion reports, see app.organicmaps.sdk.crowdtraffic.CrowdTrafficSettings
@@ -651,6 +658,7 @@ public final class Config
   private static native String nativeGetTrafficHttpUrl();
   private static native void nativeSetTrafficHttpUrl(String value);
   private static native void nativeSetTrafficHttpToken(String value);
+  private static native String nativeGetTrafficHttpUrlDefault();
   private static native void applyTrafficApps(String[] value);
   private static native void applyTrafficLegacyEnabled(boolean value);
 }

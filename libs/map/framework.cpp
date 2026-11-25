@@ -466,7 +466,7 @@ void Framework::InitializeTraffic()
   m_trafficManager.SetEnabled(CurrentMapModeHasTraffic());
   if (!m_trafficManager.IsTestMode() && LoadTrafficHttpEnabled())
     // TODO handle invalid URLs
-    traffxml::HttpTraffSource::Create(m_trafficManager, LoadTrafficHttpUrl(), m_trafficHttpToken);
+    traffxml::HttpTraffSource::Create(m_trafficManager, LoadTrafficHttpUrl(), TrafficHttpTokenFor(LoadTrafficHttpUrl()));
 
   /*
    * MockTraffSource for debugging purposes.
@@ -2696,7 +2696,7 @@ void Framework::SetFontScaleFactor(double scaleFactor)
 
 void Framework::SetTrafficHttpEnabled(bool enabled)
 {
-  m_trafficManager.SetHttpTraffSource(enabled, LoadTrafficHttpUrl(), m_trafficHttpToken);
+  m_trafficManager.SetHttpTraffSource(enabled, LoadTrafficHttpUrl(), TrafficHttpTokenFor(LoadTrafficHttpUrl()));
 }
 
 bool Framework::LoadTrafficHttpEnabled()
@@ -2714,7 +2714,28 @@ void Framework::SaveTrafficHttpEnabled(bool trafficHttpEnabled)
 
 void Framework::SetTrafficHttpUrl(std::string url)
 {
-  m_trafficManager.SetHttpTraffSource(LoadTrafficHttpEnabled(), url, m_trafficHttpToken);
+  m_trafficManager.SetHttpTraffSource(LoadTrafficHttpEnabled(), url, TrafficHttpTokenFor(url));
+}
+
+std::string Framework::TrafficHttpTokenFor(std::string const & url) const
+{
+  // The app binds the token to the origin it was entered for; as a second line of defence, the token never goes to
+  // the built-in (public) default service.
+  auto const normalize = [](std::string u)
+  {
+    strings::AsciiToLower(u);
+    while (!u.empty() && u.back() == '/')
+      u.pop_back();
+    return u;
+  };
+  if (normalize(url) == normalize(TRAFFIC_HTTP_URL_DEFAULT))
+    return {};
+  return m_trafficHttpToken;
+}
+
+std::string Framework::GetTrafficHttpUrlDefault()
+{
+  return TRAFFIC_HTTP_URL_DEFAULT;
 }
 
 void Framework::SetTrafficHttpToken(std::string const & token)
@@ -2724,7 +2745,7 @@ void Framework::SetTrafficHttpToken(std::string const & token)
   m_trafficHttpToken = token;
   // Recreate the source only if it exists: SetHttpTraffSource() replaces it with one using the new token.
   if (LoadTrafficHttpEnabled())
-    m_trafficManager.SetHttpTraffSource(true, LoadTrafficHttpUrl(), m_trafficHttpToken);
+    m_trafficManager.SetHttpTraffSource(true, LoadTrafficHttpUrl(), TrafficHttpTokenFor(LoadTrafficHttpUrl()));
 }
 
 std::string Framework::LoadTrafficHttpUrl()

@@ -94,40 +94,57 @@ public class TrafficSettingsFragment extends BaseXmlSettingsFragment
       }
       if (!oldVal.equals(newVal))
       {
+        // The token belongs to the server it was entered for: another origin drops it.
+        if (TrafficServerSettings.get(requireContext()).onUrlChanged(newVal))
+          Toast.makeText(requireContext(), R.string.traffic_http_token_removed, Toast.LENGTH_LONG).show();
         // The token for the new URL first, so that a token never goes to a URL it is not meant for.
         TrafficServerSettings.applyToCore(requireContext(), newVal);
         Config.setTrafficHttpUrl(newVal);
       }
-      new Handler(Looper.getMainLooper()).post(this::updateTrafficHttpUrlSummary);
+      new Handler(Looper.getMainLooper()).post(() -> {
+        updateTrafficHttpUrlSummary();
+        refreshTokenSummary();
+      });
       return true;
     });
   }
 
+  private void refreshTokenSummary()
+  {
+    final EditTextPreference pref = getPreference(getString(R.string.pref_traffic_http_token));
+    // Setting the provider again makes the preference re-evaluate its summary.
+    pref.setSummaryProvider(pref.getSummaryProvider());
+  }
+
   /**
    * better-maps: access token of the TraFF server (services/traff-server). Stored by {@link TrafficServerSettings}
-   * (app-private, not backed up), shown as "Set"/"Not set" only, never logged.
+   * (app-private, not backed up), bound to the server URL it was entered for, shown as "Set"/"Not set" only, never
+   * logged. An empty input deletes it.
    */
   private void initTrafficHttpTokenPrefs()
   {
     final EditTextPreference pref = getPreference(getString(R.string.pref_traffic_http_token));
-    final Preference.SummaryProvider<EditTextPreference> summary =
+    pref.setSummaryProvider(
         p -> getString(TrafficServerSettings.get(requireContext()).hasToken() ? R.string.routing_server_token_set
-                                                                               : R.string.routing_server_not_set);
-    pref.setSummaryProvider(summary);
+                                                                               : R.string.routing_server_not_set));
     pref.setOnBindEditTextListener(editText -> {
       editText.setSingleLine(true);
       editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-      // Don't show the stored token again; an empty field keeps it.
+      // Never show the stored token again.
       editText.setText("");
     });
     pref.setOnPreferenceChangeListener((p, value) -> {
       final String token = value == null ? "" : value.toString().trim();
-      if (token.isEmpty())
-        return false;  // Empty input keeps the stored token.
-      TrafficServerSettings.get(requireContext()).setToken(token);
+      final TrafficServerSettings settings = TrafficServerSettings.get(requireContext());
+      // An empty input deletes the token; a token needs the URL of the user's own server first.
+      if (!settings.setToken(token, Config.getTrafficHttpUrl()))
+      {
+        Toast.makeText(requireContext(), R.string.traffic_http_token_needs_url, Toast.LENGTH_LONG).show();
+        return false;
+      }
       TrafficServerSettings.applyToCore(requireContext());
       // The preference keeps no copy (not persistent, and false skips setText); refresh the summary.
-      pref.setSummaryProvider(summary);
+      refreshTokenSummary();
       return false;
     });
   }

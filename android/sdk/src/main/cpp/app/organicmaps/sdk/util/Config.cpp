@@ -167,6 +167,12 @@ Java_app_organicmaps_sdk_util_Config_nativeSetTrafficHttpToken(JNIEnv * env, jcl
   frm()->SetTrafficHttpToken(jni::ToNativeString(env, value));
 }
 
+JNIEXPORT jstring JNICALL
+Java_app_organicmaps_sdk_util_Config_nativeGetTrafficHttpUrlDefault(JNIEnv * env, jclass thiz)
+{
+  return jni::ToJavaString(env, ::Framework::GetTrafficHttpUrlDefault());
+}
+
 JNIEXPORT void JNICALL
 Java_app_organicmaps_sdk_util_Config_applyTrafficLegacyEnabled(JNIEnv * env, jclass thiz,
                                                                jboolean value)
