@@ -398,6 +398,8 @@ public class OnlineTransitServiceTest
     assertEquals("/api/v6/stoptimes", url.encodedPath());
     assertEquals("de-VBB_de:11000:900100003", url.queryParameter("stopId"));
     assertEquals("20", url.queryParameter("n"));
+    // Needed to detect trips that realtime data cuts short.
+    assertEquals("true", url.queryParameter("fetchStops"));
   }
 
   @Test

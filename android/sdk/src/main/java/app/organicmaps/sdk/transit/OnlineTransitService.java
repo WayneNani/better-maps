@@ -118,7 +118,12 @@ public class OnlineTransitService implements TransitService
     }
     try
     {
-      mTimetableApi.stoptimes().stopId(stopId).n(limit).executeAsync(new Callback<>(result, MotisMapper::toDepartures));
+      // The following stops tell whether realtime data cuts the trip short (see MotisMapper#toDeparture).
+      mTimetableApi.stoptimes()
+          .stopId(stopId)
+          .n(limit)
+          .fetchStops(true)
+          .executeAsync(new Callback<>(result, MotisMapper::toDepartures));
     }
     catch (ApiException e)
     {

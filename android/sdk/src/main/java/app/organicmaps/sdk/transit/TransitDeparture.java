@@ -20,6 +20,9 @@ public final class TransitDeparture
   @Nullable
   String mDirection;
   @Nullable
+  String mScheduledDirection;
+  boolean mShortened;
+  @Nullable
   String mAgencyName;
   @Nullable
   String mRouteColor;
@@ -72,11 +75,30 @@ public final class TransitDeparture
     return mHeadsign;
   }
 
-  /** Direction for display: the headsign, or the final stop of the trip if there is no headsign. */
+  /**
+   * Direction for display: the headsign, or the final stop of the trip if there is no headsign. If realtime data
+   * cuts the trip short ({@link #isShortened()}), the last stop the trip still serves.
+   */
   @Nullable
   public String getDirection()
   {
     return mDirection;
+  }
+
+  /**
+   * True if realtime data cancels the last stops of the trip, so it ends before its scheduled destination, e.g. a
+   * tram turning early because a replacement bus serves the rest of the line. {@link #getDirection()} is the new end.
+   */
+  public boolean isShortened()
+  {
+    return mShortened;
+  }
+
+  /** The direction according to the timetable if the trip {@link #isShortened()}, else null. */
+  @Nullable
+  public String getScheduledDirection()
+  {
+    return mScheduledDirection;
   }
 
   @Nullable
@@ -128,7 +150,7 @@ public final class TransitDeparture
     return mRealTime;
   }
 
-  /** True if the trip or this stop is cancelled. */
+  /** True if the trip or this stop is cancelled, or no later stop of the trip is served. */
   public boolean isCancelled()
   {
     return mCancelled;

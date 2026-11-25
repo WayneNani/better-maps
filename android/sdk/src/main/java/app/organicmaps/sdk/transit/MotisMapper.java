@@ -202,7 +202,41 @@ final class MotisMapper
     result.mRealTime = Boolean.TRUE.equals(stopTime.getRealTime());
     result.mCancelled = Boolean.TRUE.equals(stopTime.getCancelled()) || Boolean.TRUE.equals(stopTime.getTripCancelled())
                      || result.mPlace.isCancelled();
+    applyShortening(result, stopTime.getNextStops());
     return result;
+  }
+
+  /**
+   * Realtime data can cancel the last stops of a trip (e.g. a tram that turns early while replacement buses serve
+   * the rest of the line). The headsign still names the scheduled destination, so the direction is replaced by the
+   * last stop that is still served. If no later stop is served at all, the departure is cancelled.
+   *
+   * @param nextStops the stops after this one, returned by the stoptimes endpoint with {@code fetchStops=true}.
+   */
+  private static void applyShortening(@NonNull TransitDeparture departure, @Nullable List<Place> nextStops)
+  {
+    if (nextStops == null || nextStops.isEmpty() || !isCancelled(nextStops.get(nextStops.size() - 1)))
+      return;
+    Place lastServed = null;
+    for (int i = nextStops.size() - 1; i >= 0 && lastServed == null; --i)
+      if (!isCancelled(nextStops.get(i)))
+        lastServed = nextStops.get(i);
+    if (lastServed == null)
+    {
+      departure.mCancelled = true;
+      return;
+    }
+    final String end = emptyToNull(lastServed.getName());
+    if (end == null || end.equals(departure.mDirection))
+      return;
+    departure.mScheduledDirection = departure.mDirection;
+    departure.mDirection = end;
+    departure.mShortened = true;
+  }
+
+  private static boolean isCancelled(@NonNull Place place)
+  {
+    return Boolean.TRUE.equals(place.getCancelled());
   }
 
   @NonNull
