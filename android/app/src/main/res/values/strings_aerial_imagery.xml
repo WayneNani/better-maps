@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: aerial imagery layer "Luftbild" (map layers menu, settings, attribution). -->
+<resources>
+  <string name="button_layer_aerial">Aerial</string>
+  <string name="aerial_imagery_server_title">Aerial imagery server</string>
+  <string name="aerial_imagery_info">The \"Aerial\" map layer shows open orthophotos of the German states and Sentinel-2 imagery from your own imagery server (services/imagery-proxy). The map tiles of the visible area are requested from the server; they are cached on the device (up to 200 MB). Switch the layer on in the map layers menu.</string>
+  <string name="aerial_imagery_url">Server address</string>
+  <string name="aerial_imagery_url_hint">e.g. https://aerial.example.org</string>
+  <string name="aerial_imagery_token">Access token</string>
+  <string name="aerial_imagery_token_hint">The token of this device from scripts/new-token.sh. Leave empty to keep the stored token.</string>
+  <string name="aerial_imagery_needs_server">Set up the aerial imagery server first (Settings → Map appearance → Aerial imagery server)</string>
+  <string name="aerial_imagery_attribution_title">Aerial imagery sources</string>
+  <string name="aerial_imagery_attribution_fallback">Aerial imagery: sources unavailable</string>
+  <string name="aerial_imagery_license">License: %s</string>
+</resources>

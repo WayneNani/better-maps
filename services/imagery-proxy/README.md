@@ -118,7 +118,7 @@ loginctl enable-linger "$USER"                                  # Start ohne Anm
 
 ### App einrichten
 
-Einstellungen → Karte → **Luftbild-Server**: Server-Adresse (z. B. `https://luftbild.example.org`) und Token des
+Einstellungen → Kartendarstellung → **Luftbild-Server**: Server-Adresse (z. B. `https://luftbild.example.org`) und Token des
 Geräts eintragen. Dann im Ebenen-Menü der Karte **Luftbild** einschalten. Im Emulator erreicht man den Rechner unter
 `http://10.0.2.2:18200`.
 

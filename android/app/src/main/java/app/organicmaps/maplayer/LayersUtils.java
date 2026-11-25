@@ -13,6 +13,8 @@ public class LayersUtils
     availableLayers.add(Mode.ISOLINES);
     availableLayers.add(Mode.SUBWAY);
     availableLayers.add(Mode.TRAFFIC);
+    // better-maps: aerial imagery from the user's own server (Settings -> Aerial imagery server).
+    availableLayers.add(Mode.AERIAL);
     return availableLayers;
   }
 }

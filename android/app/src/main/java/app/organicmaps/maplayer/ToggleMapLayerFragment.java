@@ -14,6 +14,7 @@ import app.organicmaps.MwmApplication;
 import app.organicmaps.R;
 import app.organicmaps.sdk.maplayer.Mode;
 import app.organicmaps.sdk.util.SharedPropertiesUtils;
+import app.organicmaps.settings.AerialImagerySettings;
 import app.organicmaps.util.ThemeSwitcher;
 import app.organicmaps.util.Utils;
 import app.organicmaps.util.bottomsheet.MenuBottomSheetFragment;
@@ -72,6 +73,12 @@ public class ToggleMapLayerFragment extends Fragment
     Mode mode = item.getMode();
     Context context = v.getContext();
     SharedPropertiesUtils.setLayerMarkerShownForLayerMode(mode);
+    // better-maps: the aerial imagery layer needs a server first.
+    if (mode == Mode.AERIAL && !mode.isEnabled(context) && !AerialImagerySettings.get(context).isConfigured())
+    {
+      Utils.showSnackbar(context, v.getRootView(), R.string.aerial_imagery_needs_server);
+      return;
+    }
     mode.setEnabled(context, !mode.isEnabled(context));
     // TODO: dirty hack :(
     if (mode == Mode.OUTDOORS)

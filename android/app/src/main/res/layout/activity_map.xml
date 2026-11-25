@@ -31,6 +31,25 @@
       android:layout_alignParentBottom="true"
       android:layout_marginStart="@dimen/margin_half"
       android:layout_marginEnd="@dimen/transit_card_margin_end" />
+    <!-- better-maps: attribution of the aerial imagery layer, above the bottom buttons (margin set in code). -->
+    <TextView
+      android:id="@+id/aerial_attribution"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentBottom="true"
+      android:layout_alignParentStart="true"
+      android:layout_marginStart="@dimen/margin_half"
+      android:layout_marginEnd="@dimen/margin_half"
+      android:background="#B3FFFFFF"
+      android:ellipsize="end"
+      android:maxLines="2"
+      android:paddingHorizontal="4dp"
+      android:paddingVertical="1dp"
+      android:textColor="#DE000000"
+      android:textSize="10sp"
+      android:visibility="gone"
+      tools:text="Geobasis NRW, dl-de/zero-2-0"
+      tools:visibility="visible" />
     <include
       android:id="@+id/position_chooser"
       layout="@layout/position_chooser" />

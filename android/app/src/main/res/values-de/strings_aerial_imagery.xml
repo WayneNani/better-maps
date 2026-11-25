@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: Luftbild-Ebene (Ebenen-Menü, Einstellungen, Quellenangabe). -->
+<resources>
+  <string name="button_layer_aerial">Luftbild</string>
+  <string name="aerial_imagery_server_title">Luftbild-Server</string>
+  <string name="aerial_imagery_info">Die Kartenebene „Luftbild“ zeigt offene Orthophotos der Bundesländer und Sentinel-2-Bilder von deinem eigenen Luftbild-Server (services/imagery-proxy). Die Kacheln des sichtbaren Ausschnitts werden beim Server angefragt und auf dem Gerät zwischengespeichert (bis 200 MB). Eingeschaltet wird die Ebene im Ebenen-Menü der Karte.</string>
+  <string name="aerial_imagery_url">Server-Adresse</string>
+  <string name="aerial_imagery_url_hint">z. B. https://luftbild.example.org</string>
+  <string name="aerial_imagery_token">Zugangs-Token</string>
+  <string name="aerial_imagery_token_hint">Das Token dieses Geräts aus scripts/new-token.sh. Leer lassen, um das gespeicherte Token zu behalten.</string>
+  <string name="aerial_imagery_needs_server">Bitte zuerst den Luftbild-Server einrichten (Einstellungen → Kartendarstellung → Luftbild-Server)</string>
+  <string name="aerial_imagery_attribution_title">Quellen des Luftbilds</string>
+  <string name="aerial_imagery_attribution_fallback">Luftbild: Quellen nicht abrufbar</string>
+  <string name="aerial_imagery_license">Lizenz: %s</string>
+</resources>

@@ -47,6 +47,14 @@ public class MapAppearanceSettingsFragment extends BaseXmlSettingsFragment imple
   {
     super.onResume();
     updateMapLanguageCodeSummary();
+    updateAerialImagerySummary();
+  }
+
+  private void updateAerialImagerySummary()
+  {
+    final Preference pref = getPreference("aerial_imagery_screen");
+    final AerialImagerySettings settings = AerialImagerySettings.get(requireContext());
+    pref.setSummary(settings.isConfigured() ? settings.getUrl() : getString(R.string.routing_server_not_set));
   }
 
   @Override
