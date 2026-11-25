@@ -7,6 +7,7 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewParent;
 import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +20,9 @@ import androidx.annotation.Nullable;
  * <p>
  * The sheet sits at the bottom of the screen and grows upwards, so it moves under the finger: all distances are taken
  * from raw screen coordinates.
+ * <p>
+ * A child that keeps the gesture ({@link #keepGestureForChild()}, e.g. a ride dragged in the time grid) gets it to
+ * the end: the sheet does not start a drag then.
  */
 public class TransitSheetLayout extends LinearLayout
 {
@@ -60,6 +64,8 @@ public class TransitSheetLayout extends LinearLayout
   @NonNull
   private Mode mMode = Mode.CHILD;
   private boolean mInScrollingChild;
+  // A child asked to keep the gesture.
+  private boolean mChildKeeps;
   private boolean mDragStarted;
   private float mDownX;
   private float mDownY;
@@ -112,6 +118,7 @@ public class TransitSheetLayout extends LinearLayout
     if (action == MotionEvent.ACTION_DOWN)
     {
       mMode = listener.canDrag() ? Mode.UNDECIDED : Mode.CHILD;
+      mChildKeeps = false;
       mDownX = ev.getRawX();
       mDownY = ev.getRawY();
       mLastY = mDownY;
@@ -128,7 +135,8 @@ public class TransitSheetLayout extends LinearLayout
       final float dy = ev.getRawY() - mDownY;
       if (mMode == Mode.UNDECIDED && Math.max(Math.abs(dx), Math.abs(dy)) > mTouchSlop)
         mMode = Math.abs(dy) > Math.abs(dx) && shouldDrag(listener, dy) ? Mode.DRAG : Mode.CHILD;
-      else if (mMode == Mode.CHILD && mInScrollingChild && ev.getRawY() > mLastY && listener.canShrink()
+      else if (mMode == Mode.CHILD && !mChildKeeps && mInScrollingChild && ev.getRawY() > mLastY
+               && listener.canShrink()
                && mScrollingChild != null && !mScrollingChild.canScrollVertically(-1) && Math.abs(dy) > Math.abs(dx))
       {
         // The list was scrolled back to its top and the finger goes on downwards: hand over to the sheet.
@@ -165,6 +173,33 @@ public class TransitSheetLayout extends LinearLayout
     final boolean handled = super.dispatchTouchEvent(ev);
     // Keep the gesture even if it starts where no child takes it (e.g. on the handle), so that it can be a drag.
     return handled || (action == MotionEvent.ACTION_DOWN && mMode == Mode.UNDECIDED);
+  }
+
+  /**
+   * The current gesture belongs to a child (e.g. a ride lifted in the time grid): the sheet does not start a drag
+   * until the finger is lifted. Unlike {@link #requestDisallowInterceptTouchEvent}, which the list also calls while it
+   * scrolls, this keeps the sheet out of the gesture even at the top of the list.
+   */
+  public void keepGestureForChild()
+  {
+    // Too late once the sheet is dragged: it took the gesture from the children already.
+    if (mMode == Mode.DRAG)
+      return;
+    mMode = Mode.CHILD;
+    mChildKeeps = true;
+  }
+
+  /** True if any ancestor of the view is a sheet, then told to {@link #keepGestureForChild()}. */
+  static boolean keepGesture(@NonNull View child)
+  {
+    boolean found = false;
+    for (ViewParent parent = child.getParent(); parent != null; parent = parent.getParent())
+      if (parent instanceof TransitSheetLayout)
+      {
+        ((TransitSheetLayout) parent).keepGestureForChild();
+        found = true;
+      }
+    return found;
   }
 
   private boolean shouldDrag(@NonNull DragListener listener, float dy)

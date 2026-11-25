@@ -188,6 +188,9 @@
   </plurals>
   <string name="transit_alt_hint_missed">%1$s missed · arrival %2$s</string>
   <string name="transit_alt_hint_arrival">Arrival %1$s</string>
+  <string name="transit_alt_hint_drag_missed">%1$s missed · the rest is searched again</string>
+  <string name="transit_alt_earlier">Earlier departure</string>
+  <string name="transit_alt_later">Later departure</string>
   <string name="transit_alt_done">Done</string>
   <string name="transit_alt_details">Details</string>
   <string name="transit_alt_list_title">Change first ride · same %1$s</string>

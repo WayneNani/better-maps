@@ -131,7 +131,7 @@ public final class TransitItemFactory
           option.getDeparture().getEpochSecond(), badge(leg), option.getStatus(),
           buffer == null ? 0 : Math.floorDiv(buffer, 60),
           mFormatter.formatTime(option.getArrival(), optionLegs.get(optionLegs.size() - 1).getTo().getTimeZone()),
-          mFormatter.placeName(leg.getFrom()), option == selected, option.getKey().equals(session.getPendingKey()),
+          option.getArrival().getEpochSecond(), mFormatter.placeName(leg.getFrom()), option == selected, option.getKey().equals(session.getPendingKey()),
           option.isCurrent()));
     }
     return new AlternativesItem(connection, legIndex, ride.getPosition(), ride.getNumber(),

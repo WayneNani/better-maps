@@ -21,6 +21,7 @@ public final class AlternativesItem
     final long mBufferMinutes;
     @NonNull
     final String mArrival;
+    final long mArrivalEpoch;
     @NonNull
     final String mBoarding;
     final boolean mSelected;
@@ -28,8 +29,8 @@ public final class AlternativesItem
     final boolean mCurrent;
 
     Chip(@NonNull String departure, long departureEpoch, @NonNull LineBadge badge,
-         @NonNull LegAlternatives.Status status, long bufferMinutes, @NonNull String arrival, @NonNull String boarding,
-         boolean selected, boolean pending, boolean current)
+         @NonNull LegAlternatives.Status status, long bufferMinutes, @NonNull String arrival, long arrivalEpoch,
+         @NonNull String boarding, boolean selected, boolean pending, boolean current)
     {
       mDeparture = departure;
       mDepartureEpoch = departureEpoch;
@@ -37,6 +38,7 @@ public final class AlternativesItem
       mStatus = status;
       mBufferMinutes = bufferMinutes;
       mArrival = arrival;
+      mArrivalEpoch = arrivalEpoch;
       mBoarding = boarding;
       mSelected = selected;
       mPending = pending;
@@ -79,6 +81,12 @@ public final class AlternativesItem
     public String getArrival()
     {
       return mArrival;
+    }
+
+    /** Arrival at the end of the ride in epoch seconds, e.g. for the time grid. */
+    public long getArrivalEpoch()
+    {
+      return mArrivalEpoch;
     }
 
     /** Stop where the ride starts. */
