@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import android.content.Context;
+import android.graphics.RectF;
 import android.os.SystemClock;
 import android.view.InputDevice;
 import android.view.MotionEvent;
@@ -254,23 +255,31 @@ public class LegAlternativesFlowTest
     waitFor(() -> onMain(() -> presenter.getState().getScreen() == ConnectionsState.Screen.LIST && grid.isShown()
                                    && grid.getRideCenter(0, 1) != null));
 
-    // Held and let go without moving: selected with its departures and the hint card, nothing chosen.
+    // Held and let go without moving: selected with its departures and the hint card, nothing chosen. The S5 stays
+    // where it was, the departures appear beside it.
+    final List<Float> s5 = onScreen(grid, 0, 1);
+    final List<Integer> sheet = onScreen(scenarioRoot(scenario));
     Finger.hold(grid, 0, 1).lift();
     assertFalse(onMain(grid::isDragging));
     waitFor(() -> onMain(() -> {
       final AlternativesItem alternatives = presenter.getState().getAlternatives();
       return alternatives != null && !alternatives.isLoading() && grid.getAlternativeCenter(1) != null;
     }));
+    assertEquals(s5, onScreen(grid, 0, 1));
+    assertEquals(sheet, onScreen(scenarioRoot(scenario)));
+    assertPillsBeside(grid, 0, 1);
     assertEquals(2, mServer.getRequestCount());
     assertEquals(ConnectionsState.Screen.LIST, onMain(() -> presenter.getState().getScreen()));
     assertNull(onMain(() -> presenter.getState().getItems().get(0).getChange()));
     onView(withId(R.id.transit_grid_hint)).check(matches(isDisplayed()));
 
-    // A tap on the selected S5 ends the selection; the connection does not open.
+    // A tap on the selected S5 ends the selection; the connection does not open, the S5 stays where it is.
     Finger.tapRide(grid, 0, 1);
     waitFor(() -> onMain(() -> presenter.getState().getAlternatives() == null));
     assertEquals(ConnectionsState.Screen.LIST, onMain(() -> presenter.getState().getScreen()));
     onView(withId(R.id.transit_grid_hint)).check(matches(not(isDisplayed())));
+    assertEquals(s5, onScreen(grid, 0, 1));
+    assertEquals(sheet, onScreen(scenarioRoot(scenario)));
 
     // Again (the departures are known): a tap beside the rides ends the selection too.
     Finger.hold(grid, 0, 1).lift();
@@ -402,14 +411,23 @@ public class LegAlternativesFlowTest
     // Walk, S5, walk, U2, walk: the S5 is leg 1.
     waitFor(() -> onMain(() -> grid.isShown() && grid.getRideCenter(0, 1) != null));
     final int sheetHeight = onMain(() -> scrollRef.get().getHeight());
+    final List<Float> s5 = onScreen(grid, 0, 1);
+    final List<Integer> sheet = onScreen(scenarioRoot(scenario));
 
-    // Hold the S5: it is lifted and its departures are searched (one request), nothing is chosen yet.
+    // Hold the S5: it is lifted and its departures are searched (one request), nothing is chosen yet. It stays under
+    // the finger: its departures and the hint card appear without moving anything.
     final Finger finger = Finger.hold(grid, 0, 1);
     waitFor(() -> onMain(grid::isDragging));
     waitFor(() -> onMain(() -> {
       final AlternativesItem alternatives = presenter.getState().getAlternatives();
       return alternatives != null && !alternatives.isLoading() && grid.getAlternativeCenter(0) != null;
     }));
+    InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+    assertEquals(s5, onScreen(grid, 0, 1));
+    assertEquals(sheet, onScreen(scenarioRoot(scenario)));
+    assertEquals(sheetHeight, (int) onMain(() -> scrollRef.get().getHeight()));
+    assertPillsBeside(grid, 0, 1);
+    onView(withId(R.id.transit_grid_hint)).check(matches(isDisplayed()));
     assertEquals(2, mServer.getRequestCount());
     mServer.takeRequest();
     final List<String> lines = onMain(() -> {
@@ -431,8 +449,10 @@ public class LegAlternativesFlowTest
     assertFalse(onMain(grid::isDragging));
     assertNull(onMain(() -> presenter.getState().getItems().get(0).getChange()));
     onView(withId(R.id.transit_grid_hint_title)).check(matches(withText(containsString("S5"))));
-    // The sheet stayed as it was.
+    // The sheet and the S5 stayed as they were.
     assertEquals(sheetHeight, (int) onMain(() -> scrollRef.get().getHeight()));
+    assertEquals(s5, onScreen(grid, 0, 1));
+    assertEquals(sheet, onScreen(scenarioRoot(scenario)));
 
     // Down to the S9 (it misses the U2) and back to the S5: nothing changes.
     final Finger again = Finger.hold(grid, 0, 1);
@@ -479,6 +499,56 @@ public class LegAlternativesFlowTest
     });
     assertNull(onMain(() -> presenter.getState().getItems().get(0).getChange()));
     assertEquals(sheetHeight, (int) onMain(() -> scrollRef.get().getHeight()));
+  }
+
+  @NonNull
+  private static View scenarioRoot(@NonNull FragmentScenario<OnlineTransitFlowTest.PanelHostFragment> scenario)
+  {
+    final AtomicReference<View> root = new AtomicReference<>();
+    scenario.onFragment(fragment -> root.set(fragment.requireView()));
+    return root.get();
+  }
+
+  /** Where a ride of the time grid is on the screen: left, top, right, bottom. */
+  @NonNull
+  private static List<Float> onScreen(@NonNull TimeGridView grid, int connection, int legIndex) throws Exception
+  {
+    return onMain(() -> {
+      final RectF bounds = grid.getRideBounds(connection, legIndex);
+      assertNotNull(bounds);
+      final int[] location = new int[2];
+      grid.getLocationOnScreen(location);
+      return List.of(location[0] + bounds.left, location[1] + bounds.top, location[0] + bounds.right,
+                     location[1] + bounds.bottom);
+    });
+  }
+
+  /** Where a view is on the screen: left, top, width, height. */
+  @NonNull
+  private static List<Integer> onScreen(@NonNull View view) throws Exception
+  {
+    return onMain(() -> {
+      final int[] location = new int[2];
+      view.getLocationOnScreen(location);
+      return List.of(location[0], location[1], view.getWidth(), view.getHeight());
+    });
+  }
+
+  /** The pills of the selected ride are beside it (not over it) and in view. */
+  private static void assertPillsBeside(@NonNull TimeGridView grid, int connection, int legIndex) throws Exception
+  {
+    onMain(() -> {
+      final RectF ride = grid.getRideBounds(connection, legIndex);
+      final View scroll = (View) grid.getParent();
+      final int scrollX = scroll.getScrollX();
+      for (int i = 0; grid.getAlternativeCenter(i) != null; ++i)
+      {
+        final float x = grid.getAlternativeCenter(i)[0];
+        assertTrue("pill " + i + " at " + x + " over the ride " + ride, x < ride.left || x > ride.right);
+        assertTrue("pill " + i + " at " + x + " out of view", x > scrollX && x < scrollX + scroll.getWidth());
+      }
+      return null;
+    });
   }
 
   /** A finger on the time grid, injected as motion events in screen coordinates. */

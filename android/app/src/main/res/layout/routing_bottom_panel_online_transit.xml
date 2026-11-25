@@ -345,86 +345,97 @@
       android:textAllCaps="false" />
   </LinearLayout>
 
-  <!-- Time grid: the axis stays, the columns scroll sideways. The height is set in code. -->
-  <HorizontalScrollView
-    android:id="@+id/transit_grid_scroll"
+  <!-- Time grid and the card over it while a ride is selected: the card appearing does not move the grid. -->
+  <FrameLayout
+    android:id="@+id/transit_grid_frame"
     android:layout_width="match_parent"
-    android:layout_height="320dp"
-    android:fillViewport="true"
-    android:scrollbars="none"
-    android:visibility="gone">
+    android:layout_height="wrap_content">
 
-    <app.organicmaps.transit.ui.TimeGridView
-      android:id="@+id/transit_grid"
-      android:layout_width="wrap_content"
-      android:layout_height="match_parent" />
-  </HorizontalScrollView>
+    <!-- Time grid: the axis stays, the columns scroll sideways. The height is set in code. -->
+    <HorizontalScrollView
+      android:id="@+id/transit_grid_scroll"
+      android:layout_width="match_parent"
+      android:layout_height="320dp"
+      android:fillViewport="true"
+      android:scrollbars="none"
+      android:visibility="gone">
 
-  <!-- Time grid with a selected ride: which one and whether its other departures reach the next ride. -->
-  <LinearLayout
-    android:id="@+id/transit_grid_hint"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="@dimen/margin_half"
-    android:layout_marginTop="@dimen/margin_quarter"
-    android:layout_marginEnd="@dimen/margin_half"
-    android:background="@drawable/bg_transit_hint"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:paddingStart="14dp"
-    android:paddingEnd="4dp"
-    android:visibility="gone"
-    tools:visibility="visible">
+      <app.organicmaps.transit.ui.TimeGridView
+        android:id="@+id/transit_grid"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" />
+    </HorizontalScrollView>
 
+    <!-- Time grid with a selected ride: which one and whether its other departures reach the next ride. Over the
+         bottom of the grid, or its top if the ride is in the lower half (set in code). -->
     <LinearLayout
-      android:layout_width="0dp"
+      android:id="@+id/transit_grid_hint"
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_marginTop="@dimen/margin_half"
-      android:layout_marginBottom="@dimen/margin_half"
-      android:layout_weight="1"
-      android:accessibilityLiveRegion="polite"
-      android:orientation="vertical">
+      android:layout_gravity="bottom"
+      android:layout_marginStart="@dimen/margin_half"
+      android:layout_marginTop="@dimen/margin_quarter"
+      android:layout_marginEnd="@dimen/margin_half"
+      android:layout_marginBottom="@dimen/margin_quarter"
+      android:elevation="2dp"
+      android:background="@drawable/bg_transit_hint"
+      android:gravity="center_vertical"
+      android:orientation="horizontal"
+      android:paddingStart="14dp"
+      android:paddingEnd="4dp"
+      android:visibility="gone"
+      tools:visibility="visible">
 
-      <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/transit_grid_hint_title"
-        android:layout_width="match_parent"
+      <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/MwmTextAppearance.Body3"
-        android:textColor="@color/transit_hint_text"
-        android:textStyle="bold"
-        tools:text="First ride: 63 at 09:29" />
+        android:layout_marginTop="@dimen/margin_half"
+        android:layout_marginBottom="@dimen/margin_half"
+        android:layout_weight="1"
+        android:accessibilityLiveRegion="polite"
+        android:orientation="vertical">
 
-      <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/transit_grid_hint_text"
-        android:layout_width="match_parent"
+        <com.google.android.material.textview.MaterialTextView
+          android:id="@+id/transit_grid_hint_title"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:textAppearance="@style/MwmTextAppearance.Body3"
+          android:textColor="@color/transit_hint_text"
+          android:textStyle="bold"
+          tools:text="First ride: 63 at 09:29" />
+
+        <com.google.android.material.textview.MaterialTextView
+          android:id="@+id/transit_grid_hint_text"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:textAppearance="@style/MwmTextAppearance.Body4"
+          android:textColor="@color/transit_hint_text_secondary"
+          tools:text="5 departures reach the ICE 1022 · 4 min buffer" />
+      </LinearLayout>
+
+      <com.google.android.material.button.MaterialButton
+        android:id="@+id/transit_grid_hint_details"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/MwmTextAppearance.Body4"
-        android:textColor="@color/transit_hint_text_secondary"
-        tools:text="5 departures reach the ICE 1022 · 4 min buffer" />
+        android:minWidth="0dp"
+        android:minHeight="44dp"
+        android:text="@string/transit_alt_details"
+        android:textAllCaps="false"
+        android:textColor="@color/transit_hint_action" />
+
+      <com.google.android.material.button.MaterialButton
+        android:id="@+id/transit_grid_hint_done"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="0dp"
+        android:minHeight="44dp"
+        android:text="@string/transit_alt_done"
+        android:textAllCaps="false"
+        android:textColor="@color/transit_hint_action" />
     </LinearLayout>
-
-    <com.google.android.material.button.MaterialButton
-      android:id="@+id/transit_grid_hint_details"
-      style="@style/Widget.Material3.Button.TextButton"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:minWidth="0dp"
-      android:minHeight="44dp"
-      android:text="@string/transit_alt_details"
-      android:textAllCaps="false"
-      android:textColor="@color/transit_hint_action" />
-
-    <com.google.android.material.button.MaterialButton
-      android:id="@+id/transit_grid_hint_done"
-      style="@style/Widget.Material3.Button.TextButton"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:minWidth="0dp"
-      android:minHeight="44dp"
-      android:text="@string/transit_alt_done"
-      android:textAllCaps="false"
-      android:textColor="@color/transit_hint_action" />
-  </LinearLayout>
+  </FrameLayout>
 
   <app.organicmaps.transit.ui.MaxHeightRecyclerView
     android:id="@+id/transit_list"

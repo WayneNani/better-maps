@@ -30,6 +30,7 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import androidx.customview.widget.ExploreByTouchHelper;
 import app.organicmaps.R;
 import app.organicmaps.transit.AlternativesItem;
+import app.organicmaps.transit.GridLane;
 import app.organicmaps.transit.ItineraryItem;
 import app.organicmaps.transit.ItineraryTimeline;
 import app.organicmaps.transit.JourneyBarLayout;
@@ -55,13 +56,15 @@ import java.util.List;
  * A tap anywhere in a column, on a ride or beside it, opens the connection.
  * <p>
  * Holding a ride ({@link #HOLD_MS}, with a haptic long press) selects it and lifts it in one gesture. Selected, its
- * other departures are shown: the other columns fade, the column gets a background and a lane on its left with small
- * "ghost" pills at the departure times (dashed if they miss the next ride). Lifted, the ride can be dragged up and down
- * right away and snaps to its other departures ({@link RideDragSnap}) with a haptic tick each, the target pill
- * highlighted. Lifting the finger uses that departure as a tap on its pill would; lifted without moving, back at the
- * start, or cancelled, nothing changes and the ride stays selected, so that its pills can be tapped. While the
- * departures are loading the ride is lifted in place. The scrolling parents do not get the gesture while a ride is
- * lifted.
+ * other departures are shown: the other columns fade, the column gets a background and a lane beside it with small
+ * "ghost" pills at the departure times (dashed if they miss the next ride). The lane is drawn over the faded neighbour
+ * (on the left if it fits into the view there, else on the right, see {@link GridLane}): nothing is laid out again and
+ * the time axis stays as it is, so that the held ride stays exactly under the finger. Departures outside the time axis
+ * are at its edge. Lifted, the ride can be dragged up and down right away and snaps to its other departures
+ * ({@link RideDragSnap}) with a haptic tick each, the target pill highlighted. Lifting the finger uses that departure
+ * as a tap on its pill would; lifted without moving, back at the start, or cancelled, nothing changes and the ride
+ * stays selected, so that its pills can be tapped. While the departures are loading the ride is lifted in place. The
+ * scrolling parents do not get the gesture while a ride is lifted.
  * <p>
  * While a ride is selected, a tap on a pill uses that departure, "Earlier" and "Later" page as usual, and any other
  * tap (on the selected ride, another ride or beside the rides) only ends the selection; it never opens a connection,
@@ -136,9 +139,11 @@ public final class TimeGridView extends View
   private static final float LANE_DP = 46;
   private static final float LABEL_OVERHANG_DP = 20;
   private static final float PILL_DP = 17;
+  /** Touch targets of the pills are this high where they fit. */
+  private static final float PILL_TOUCH_DP = 44;
   private static final float PILL_TEXT_SP = 10;
   private static final float STRIPE_DP = 4;
-  /** Taps this close to a pill or a ride count, so that small targets are easy to hit. */
+  /** Taps this close to a ride count, so that small rides are easy to hit. */
   private static final float TOUCH_DP = 22;
   /** Holding a ride this long lifts it for dragging. */
   @VisibleForTesting
@@ -178,6 +183,7 @@ public final class TimeGridView extends View
   private final Paint mShadow = new Paint(Paint.ANTI_ALIAS_FLAG);
   private final Paint mSlot = new Paint(Paint.ANTI_ALIAS_FLAG);
   private final Paint mTarget = new Paint(Paint.ANTI_ALIAS_FLAG);
+  private final Paint mLane = new Paint();
   private final RectF mRect = new RectF();
   private final Paint.FontMetrics mMetrics = new Paint.FontMetrics();
   @ColorInt
@@ -222,8 +228,15 @@ public final class TimeGridView extends View
   // Pills of the other departures in view coordinates, in the order of the chips; computed with the layout.
   @Nullable
   private List<RectF> mPills;
+  // Touch areas of the pills (top and bottom of each, see GridLane.touchAreas).
+  @Nullable
+  private float[] mPillTouch;
   // Wide enough for the longest departure time in a pill.
   private int mLaneWidth;
+  // The ride the side of the lane was chosen for (see rideId), 0 for none: the lane stays on that side while the ride
+  // is selected.
+  private int mLaneFor;
+  private boolean mLaneOnRight;
   // A ride under the finger that is lifted when held long enough; -1 if none.
   private int mHoldConnection = -1;
   private int mHoldLeg = -1;
@@ -296,6 +309,7 @@ public final class TimeGridView extends View
     mTarget.setStyle(Paint.Style.STROKE);
     mTarget.setStrokeWidth(dp(2));
     mTarget.setColor(mAccentColor);
+    mLane.setColor(backgroundColor(context));
     mAxisWidth = dp(MIN_AXIS_DP);
     mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
 
@@ -339,16 +353,16 @@ public final class TimeGridView extends View
                       @Nullable AlternativesItem alternatives)
   {
     final float oldAxisWidth = mAxisWidth;
-    final boolean sizeChanged = items.size() != mItems.size() || showEarlier != mShowEarlier || showLater != mShowLater
-                             || (alternatives == null) != (mAlternatives == null);
+    // The lane of a selected ride is drawn over the grid: a selection does not change the size.
+    final boolean sizeChanged = items.size() != mItems.size() || showEarlier != mShowEarlier || showLater != mShowLater;
     mAlternatives = alternatives != null && alternatives.getConnection() < items.size() ? alternatives : null;
     float text = 0;
     if (mAlternatives != null)
       for (AlternativesItem.Chip chip : mAlternatives.getChips())
         text = Math.max(text, mPillText.measureText(chip.getDeparture()));
-    final int laneWidth = Math.round(Math.max(dp(LANE_DP), text + dp(STRIPE_DP) + dp(12)));
-    final boolean laneChanged = laneWidth != mLaneWidth;
-    mLaneWidth = laneWidth;
+    mLaneWidth = Math.round(Math.max(dp(LANE_DP), text + dp(STRIPE_DP) + dp(12)));
+    if (mAlternatives == null || mLaneFor != rideId(mAlternatives.getConnection(), mAlternatives.getLegIndex()))
+      mLaneFor = 0;
     mItems = new ArrayList<>(items);
     mNow = now;
     mFormatter = formatter;
@@ -360,7 +374,7 @@ public final class TimeGridView extends View
     mLoadingLater = loadingLater;
     mLayout = null;
     mPills = null;
-    if (sizeChanged || laneChanged || oldAxisWidth != mAxisWidth)
+    if (sizeChanged || oldAxisWidth != mAxisWidth)
       requestLayout();
     final Drag drag = mDrag;
     if (drag != null && drag.mShown && !isDraggedRideShown(drag))
@@ -414,6 +428,21 @@ public final class TimeGridView extends View
     return null;
   }
 
+  /** Bounds of a ride in view coordinates, null if there is no such ride. */
+  @VisibleForTesting
+  @Nullable
+  public RectF getRideBounds(int index, int legIndex)
+  {
+    final TimeGridLayout layout = layout();
+    if (layout == null || index < 0 || index >= layout.getColumns().size())
+      return null;
+    final TimeGridLayout.Column column = layout.getColumns().get(index);
+    for (TimeGridLayout.Block block : column.getBlocks())
+      if (block.getKind() == ItineraryTimeline.Kind.RIDE && block.getSegment().getLegIndex() == legIndex)
+        return new RectF(column.getLeft(), block.getTop(), column.getRight(), block.getBottom());
+    return null;
+  }
+
   /** Center of the pill of an other departure in view coordinates, null if there is none. */
   @VisibleForTesting
   @Nullable
@@ -445,8 +474,7 @@ public final class TimeGridView extends View
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
   {
     final int content = Math.round(leadingWidth() + mItems.size() * (dp(COLUMN_DP) + dp(GAP_DP)) + dp(GAP_DP)
-                                   + (mShowLater ? dp(PAGING_DP) + dp(GAP_DP) : 0)
-                                   + (mAlternatives != null ? laneWidth() : 0));
+                                   + (mShowLater ? dp(PAGING_DP) + dp(GAP_DP) : 0));
     final int width = Math.max(content, MeasureSpec.getSize(widthMeasureSpec));
     setMeasuredDimension(width, getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec));
   }
@@ -479,16 +507,6 @@ public final class TimeGridView extends View
       params.minTickSpacing = Math.round(dp(MIN_TICK_SPACING_DP));
       params.maxPixelsPerMinute = dp(MAX_DP_PER_MINUTE);
       params.minBlockHeight = Math.round(dp(MIN_BLOCK_DP));
-      if (mAlternatives != null)
-      {
-        params.laneIndex = mAlternatives.getConnection();
-        params.laneWidth = laneWidth();
-        for (AlternativesItem.Chip chip : mAlternatives.getChips())
-        {
-          params.includeStart = Math.min(params.includeStart, chip.getDepartureEpoch());
-          params.includeEnd = Math.max(params.includeEnd, chip.getDepartureEpoch());
-        }
-      }
       final List<ItineraryTimeline> timelines = new ArrayList<>(mItems.size());
       for (ItineraryItem item : mItems)
         timelines.add(item.getTimeline());
@@ -499,9 +517,62 @@ public final class TimeGridView extends View
     return mLayout;
   }
 
-  private int laneWidth()
+  /**
+   * The lane of the selected ride in view coordinates: as wide as the lane, as high as the time range; null without a
+   * selection. Its side is chosen once for the selected ride, from what is in view then.
+   */
+  @Nullable
+  private RectF laneRect()
   {
-    return mLaneWidth;
+    final TimeGridLayout layout = layout();
+    final AlternativesItem alternatives = mAlternatives;
+    if (layout == null || alternatives == null || alternatives.getConnection() >= layout.getColumns().size())
+      return null;
+    final TimeGridLayout.Column column = layout.getColumns().get(alternatives.getConnection());
+    final int ride = rideId(alternatives.getConnection(), alternatives.getLegIndex());
+    if (mLaneFor != ride)
+    {
+      final int scroll = scrollOffset();
+      final int visibleRight = Math.min(getWidth(), scroll + viewportWidth());
+      mLaneOnRight = GridLane.onRight(column.getLeft(), column.getRight(), mLaneWidth, Math.round(scroll + mAxisWidth),
+                                      visibleRight);
+      mLaneFor = ride;
+    }
+    final int left = GridLane.left(column.getLeft(), column.getRight(), mLaneWidth, mLaneOnRight);
+    return new RectF(left, layout.y(layout.getRangeStart()), left + mLaneWidth, layout.y(layout.getRangeEnd()));
+  }
+
+  /**
+   * What the lane hides: the whole place of the neighbouring column (or "Earlier" / "Later") on its side, so that no
+   * faded sliver of it is left beside the lane. As high as the view.
+   */
+  @NonNull
+  private RectF laneCover(@NonNull RectF lane)
+  {
+    final float width = Math.max(lane.width(), dp(COLUMN_DP) + dp(GAP_DP));
+    return mLaneOnRight ? new RectF(lane.left, 0, lane.left + width, getHeight())
+                        : new RectF(lane.right - width, 0, lane.right, getHeight());
+  }
+
+  /** Virtual view id of a ride, see {@link #ID_RIDE}. */
+  private static int rideId(int connection, int legIndex)
+  {
+    return ID_RIDE + connection * RIDE_STRIDE + legIndex;
+  }
+
+  private int viewportWidth()
+  {
+    return getParent() instanceof View parent ? parent.getWidth() : getWidth();
+  }
+
+  /**
+   * True if a ride is mostly in the lower half of the grid, e.g. to show something in the upper half while it is
+   * selected. A selection does not move it.
+   */
+  public boolean isRideLow(int index, int legIndex)
+  {
+    final float[] center = getRideCenter(index, legIndex);
+    return center != null && center[1] > getHeight() / 2f;
   }
 
   /**
@@ -517,10 +588,12 @@ public final class TimeGridView extends View
     if (layout == null || mAlternatives == null)
       return -1;
     final TimeGridLayout.Column column = layout.getColumns().get(mAlternatives.getConnection());
+    final RectF lane = laneRect();
     final int margin = Math.round(dp(GAP_DP));
-    final int left = column.getLaneLeft() - margin;
+    final int left = Math.round(lane != null ? Math.min(lane.left, column.getLeft()) : column.getLeft()) - margin;
     // The time labels are wider than the column.
-    final int right = column.getRight() + Math.round(dp(LABEL_OVERHANG_DP));
+    final int right =
+        Math.round(Math.max(column.getRight() + dp(LABEL_OVERHANG_DP), lane != null ? lane.right + margin : 0));
     if (right > scrollX + viewportWidth)
       return Math.max(0, Math.min(right - viewportWidth, left - Math.round(mAxisWidth)));
     if (left < scrollX + mAxisWidth)
@@ -528,27 +601,44 @@ public final class TimeGridView extends View
     return -1;
   }
 
-  /** Pills of the other departures at their times in the lane, moved apart where they would overlap. */
+  /**
+   * Pills of the other departures at their times in the lane, moved apart where they would overlap and into the time
+   * range where they are outside it.
+   */
   @Nullable
   private List<RectF> pills()
   {
     final TimeGridLayout layout = layout();
-    if (layout == null || mAlternatives == null)
+    final RectF lane = laneRect();
+    if (layout == null || lane == null || mAlternatives == null)
       return null;
     if (mPills == null)
     {
-      final TimeGridLayout.Column column = layout.getColumns().get(mAlternatives.getConnection());
-      final List<RectF> pills = new ArrayList<>();
-      float minTop = Float.NEGATIVE_INFINITY;
-      for (AlternativesItem.Chip chip : mAlternatives.getChips())
-      {
-        final float top = Math.max(layout.y(chip.getDepartureEpoch()) - dp(PILL_DP) / 2, minTop);
-        pills.add(new RectF(column.getLaneLeft() + dp(2), top, column.getLeft() - dp(4), top + dp(PILL_DP)));
-        minTop = top + dp(PILL_DP) + dp(1);
-      }
+      final List<AlternativesItem.Chip> chips = mAlternatives.getChips();
+      final float[] centers = new float[chips.size()];
+      for (int i = 0; i < centers.length; ++i)
+        centers[i] = layout.y(chips.get(i).getDepartureEpoch());
+      final float height = dp(PILL_DP);
+      final float[] tops = GridLane.pillTops(centers, height, dp(1), lane.top, lane.bottom);
+      final List<RectF> pills = new ArrayList<>(tops.length);
+      for (float top : tops)
+        pills.add(new RectF(lane.left + dp(4), top, lane.right - dp(4), top + height));
+      mPillTouch = GridLane.touchAreas(tops, height, dp(PILL_TOUCH_DP));
       mPills = pills;
     }
     return mPills;
+  }
+
+  /** Touch area of a pill in view coordinates (as wide as the lane), null if there is none. */
+  @Nullable
+  private RectF pillTouchRect(int index)
+  {
+    final List<RectF> pills = pills();
+    final RectF lane = laneRect();
+    final float[] touch = mPillTouch;
+    if (pills == null || lane == null || touch == null || index < 0 || 2 * index + 1 >= touch.length)
+      return null;
+    return new RectF(lane.left, touch[2 * index], lane.right, touch[2 * index + 1]);
   }
 
   private float labelHeight()
@@ -594,10 +684,7 @@ public final class TimeGridView extends View
     {
       final TimeGridLayout.Column column = layout.getColumns().get(i);
       if (i == selected)
-      {
-        drawSelectedColumn(canvas, layout, column, mItems.get(i));
         continue;
-      }
       if (selected >= 0)
       {
         // Wide enough for the time labels above and below.
@@ -610,6 +697,9 @@ public final class TimeGridView extends View
     }
     if (mShowLater)
       drawPaging(canvas, layout.getContentWidth(), layout, false);
+    // Last: its lane is drawn over a neighbour.
+    if (selected >= 0 && selected < layout.getColumns().size() && selected < mItems.size())
+      drawSelectedColumn(canvas, layout, layout.getColumns().get(selected), mItems.get(selected));
     canvas.restore();
 
     // The axis stays in place.
@@ -686,10 +776,19 @@ public final class TimeGridView extends View
                                   @NonNull TimeGridLayout.Column column, @NonNull ItineraryItem item)
   {
     final AlternativesItem alternatives = mAlternatives;
-    if (alternatives == null)
+    final RectF lane = laneRect();
+    if (alternatives == null || lane == null)
       return;
-    mRect.set(column.getLaneLeft() - dp(2), layout.y(layout.getRangeStart()), column.getRight() + dp(4),
-              layout.y(layout.getRangeEnd()));
+    // The lane hides the neighbour below it (with its time labels); the grid lines and "now" go on through it.
+    final RectF cover = laneCover(lane);
+    canvas.drawRect(cover, mLane);
+    for (TimeGridLayout.Tick tick : layout.getTicks())
+      canvas.drawLine(cover.left, tick.getY(), cover.right, tick.getY(), mGridLine);
+    final Integer nowY = layout.getNowY();
+    if (nowY != null)
+      canvas.drawLine(cover.left, nowY, cover.right, nowY, mNowLine);
+    mRect.set(Math.min(cover.left, column.getLeft()) - dp(2), lane.top,
+              Math.max(cover.right, column.getRight()) + dp(2), lane.bottom);
     canvas.drawRoundRect(mRect, dp(8), dp(8), mSelection);
     final Drag drag = mDrag != null && isDraggedRideShown(mDrag) ? mDrag : null;
     drawColumn(canvas, column, item, drag != null ? drag.mLegIndex : -1);
@@ -752,10 +851,13 @@ public final class TimeGridView extends View
     mRect.set(pill.left - dp(1), pill.top - dp(1), pill.right + dp(1), pill.bottom + dp(1));
     canvas.drawRoundRect(mRect, dp(4), dp(4), mTarget);
     final AlternativesItem.Chip chip = alternatives.getChips().get(target);
-    final float top = layout.y(chip.getDepartureEpoch());
-    final float bottom = chip.getArrivalEpoch() > chip.getDepartureEpoch() ? layout.y(chip.getArrivalEpoch())
-                                                                          : top + selectedBlock.getHeight();
-    drawLifted(canvas, column, chip.getBadge(), top, Math.max(bottom, top + dp(MIN_BLOCK_DP)));
+    final float departure = layout.y(chip.getDepartureEpoch());
+    final float arrival = chip.getArrivalEpoch() > chip.getDepartureEpoch() ? layout.y(chip.getArrivalEpoch())
+                                                                           : departure + selectedBlock.getHeight();
+    final float height = Math.max(arrival - departure, dp(MIN_BLOCK_DP));
+    // Outside the time range (like its pill): at its edge.
+    final float top = GridLane.liftedTop(departure, height, lane.top, lane.bottom);
+    drawLifted(canvas, column, chip.getBadge(), top, top + height);
   }
 
   /** A lifted ride (in the line of the departure it is at): a little wider, with a shadow and an outline. */
@@ -817,21 +919,26 @@ public final class TimeGridView extends View
     final TimeGridLayout layout = layout();
     if (layout == null || x < scrollOffset() + mAxisWidth)
       return ExploreByTouchHelper.INVALID_ID;
+    // The lane is over a neighbour.
+    final RectF lane = laneRect();
+    final RectF cover = lane != null ? laneCover(lane) : null;
+    if (cover != null && x >= cover.left && x < cover.right)
+    {
+      final int pill = pillAt(x, y);
+      return pill >= 0 ? ID_PILL - pill : ID_DISMISS;
+    }
     final RectF earlier = pagingRect(true);
     if (earlier != null && earlier.contains(x, y))
       return ID_EARLIER;
     final RectF later = pagingRect(false);
     if (later != null && later.contains(x, y))
       return ID_LATER;
-    final int pill = pillAt(x, y);
-    if (pill >= 0)
-      return ID_PILL - pill;
     final int column = layout.columnAt(x);
     if (column < 0 || column >= mItems.size())
       return mAlternatives != null ? ID_DISMISS : ExploreByTouchHelper.INVALID_ID;
     final int ride = rideAt(layout.getColumns().get(column), y);
     if (ride >= 0)
-      return ID_RIDE + column * RIDE_STRIDE + ride;
+      return rideId(column, ride);
     return column;
   }
 
@@ -848,27 +955,19 @@ public final class TimeGridView extends View
     return target;
   }
 
-  /** Index of the nearest pill at a point in the lane, -1 if none. */
+  /** Index of the pill whose touch area is at a point, -1 if none. */
   private int pillAt(float x, float y)
   {
     final List<RectF> pills = pills();
-    if (pills == null || pills.isEmpty())
+    if (pills == null)
       return -1;
-    final RectF first = pills.get(0);
-    if (x < first.left - dp(4) || x > first.right + dp(4))
-      return -1;
-    int best = -1;
-    float distance = dp(TOUCH_DP);
     for (int i = 0; i < pills.size(); ++i)
     {
-      final float d = Math.abs(pills.get(i).centerY() - y);
-      if (d <= distance)
-      {
-        distance = d;
-        best = i;
-      }
+      final RectF touch = pillTouchRect(i);
+      if (touch != null && touch.contains(x, y))
+        return i;
     }
-    return best;
+    return -1;
   }
 
   /** Leg index of the ride at y in a column (small rides are easier to hit), -1 if none. */
@@ -1115,6 +1214,17 @@ public final class TimeGridView extends View
                                   item.getDuration(), transport);
   }
 
+  /** The sheet's background: under the lane. */
+  @ColorInt
+  private static int backgroundColor(@NonNull Context context)
+  {
+    final TypedValue value = new TypedValue();
+    if (context.getTheme().resolveAttribute(R.attr.appBackground, value, true)
+        && value.type >= TypedValue.TYPE_FIRST_COLOR_INT && value.type <= TypedValue.TYPE_LAST_COLOR_INT)
+      return value.data;
+    return ThemeUtils.getColor(context, android.R.attr.colorBackground);
+  }
+
   private float dp(float value)
   {
     return value * mDensity;
@@ -1151,7 +1261,7 @@ public final class TimeGridView extends View
           ids.add(i);
           for (TimeGridLayout.Block block : layout.getColumns().get(i).getBlocks())
             if (block.getKind() == ItineraryTimeline.Kind.RIDE && block.getSegment().getLegIndex() >= 0)
-              ids.add(ID_RIDE + i * RIDE_STRIDE + block.getSegment().getLegIndex());
+              ids.add(rideId(i, block.getSegment().getLegIndex()));
           if (mAlternatives != null && mAlternatives.getConnection() == i)
             for (int c = 0; c < mAlternatives.getChips().size(); ++c)
               ids.add(ID_PILL - c);
@@ -1177,11 +1287,11 @@ public final class TimeGridView extends View
       }
       else if (id <= ID_PILL && mAlternatives != null)
       {
-        final List<RectF> pills = pills();
         final int chip = ID_PILL - id;
-        if (pills != null && chip < pills.size() && chip < mAlternatives.getChips().size())
+        final RectF touch = pillTouchRect(chip);
+        if (touch != null && chip < mAlternatives.getChips().size())
         {
-          pills.get(chip).roundOut(bounds);
+          touch.roundOut(bounds);
           node.setContentDescription(
               AlternativesViews.description(getContext(), mAlternatives.getChips().get(chip), mAlternatives.getNextLine()));
           node.setSelected(mAlternatives.getChips().get(chip).isSelected());

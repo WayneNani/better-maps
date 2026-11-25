@@ -42,13 +42,6 @@ public final class TimeGridLayout
     public float maxPixelsPerMinute;
     /** Minimum height of a ride block, so that very short rides stay visible. */
     public int minBlockHeight;
-    /** Column with a lane on its left (e.g. for other departures of a ride), -1 for none. */
-    public int laneIndex = -1;
-    /** Width of that lane; the columns after it move right. */
-    public int laneWidth;
-    /** Times (epoch seconds) that must be on the axis too, e.g. other departures; ignored if not set. */
-    public long includeStart = Long.MAX_VALUE;
-    public long includeEnd = Long.MIN_VALUE;
   }
 
   public static final class Tick
@@ -130,7 +123,6 @@ public final class TimeGridLayout
 
   public static final class Column
   {
-    private final int mLaneLeft;
     private final int mLeft;
     private final int mRight;
     private final int mTop;
@@ -138,9 +130,8 @@ public final class TimeGridLayout
     @NonNull
     private final List<Block> mBlocks;
 
-    Column(int laneLeft, int left, int right, int top, int bottom, @NonNull List<Block> blocks)
+    Column(int left, int right, int top, int bottom, @NonNull List<Block> blocks)
     {
-      mLaneLeft = laneLeft;
       mLeft = left;
       mRight = right;
       mTop = top;
@@ -151,17 +142,6 @@ public final class TimeGridLayout
     public int getLeft()
     {
       return mLeft;
-    }
-
-    /** Left edge of the lane before the column; equal to {@link #getLeft()} without a lane. */
-    public int getLaneLeft()
-    {
-      return mLaneLeft;
-    }
-
-    public boolean hasLane()
-    {
-      return mLaneLeft < mLeft;
     }
 
     public int getRight()
@@ -244,8 +224,6 @@ public final class TimeGridLayout
       start = now;
       end = now + 3600;
     }
-    start = Math.min(start, params.includeStart);
-    end = Math.max(end, params.includeEnd);
     if (now < start && start - now <= NOW_MARGIN_SECONDS)
       start = now;
     start = floorLocal(start, RANGE_ROUNDING_SECONDS, zone);
@@ -279,9 +257,7 @@ public final class TimeGridLayout
     for (int i = 0; i < timelines.size(); ++i)
     {
       final ItineraryTimeline timeline = timelines.get(i);
-      final boolean lane = params.laneIndex >= 0 && i >= params.laneIndex;
-      final int left = params.axisWidth + params.columnGap + i * (params.columnWidth + params.columnGap)
-                     + (lane ? params.laneWidth : 0);
+      final int left = params.axisWidth + params.columnGap + i * (params.columnWidth + params.columnGap);
       final int bottomLimit = y(end, start, params.top, pixelsPerSecond);
       final List<Block> blocks = new ArrayList<>();
       for (ItineraryTimeline.Segment segment : timeline.getSegments())
@@ -300,15 +276,14 @@ public final class TimeGridLayout
         if (bottom > top)
           blocks.add(new Block(segment, top, bottom));
       }
-      columns.add(new Column(i == params.laneIndex ? left - params.laneWidth : left, left, left + params.columnWidth,
+      columns.add(new Column(left, left + params.columnWidth,
                              y(timeline.getStart(), start, params.top, pixelsPerSecond),
                              y(timeline.getEnd(), start, params.top, pixelsPerSecond), blocks));
     }
 
     final Integer nowY = now >= start && now <= end ? y(now, start, params.top, pixelsPerSecond) : null;
     final int contentWidth = params.axisWidth + params.columnGap
-                           + timelines.size() * (params.columnWidth + params.columnGap)
-                           + (params.laneIndex >= 0 && params.laneIndex < timelines.size() ? params.laneWidth : 0);
+                           + timelines.size() * (params.columnWidth + params.columnGap);
     return new TimeGridLayout(start, end, params.top, pixelsPerSecond, tickMinutes, ticks, columns, nowY, contentWidth,
                               params.columnGap);
   }
@@ -366,13 +341,13 @@ public final class TimeGridLayout
     return y(time, mRangeStart, mTop, mPixelsPerSecond);
   }
 
-  /** Index of the column at x (including its lane and half of the gaps around it), -1 if none. */
+  /** Index of the column at x (including half of the gaps around it), -1 if none. */
   public int columnAt(float x)
   {
     for (int i = 0; i < mColumns.size(); ++i)
     {
       final Column column = mColumns.get(i);
-      if (x >= column.getLaneLeft() - mColumnGap / 2f && x < column.getRight() + mColumnGap / 2f)
+      if (x >= column.getLeft() - mColumnGap / 2f && x < column.getRight() + mColumnGap / 2f)
         return i;
     }
     return -1;
