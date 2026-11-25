@@ -215,10 +215,15 @@ ganzer Etagen (`indoor=level`) zählen nur, wenn kein Raum passt.
    Terminals).
 3. **Anhängen**: Wände, Linien, Punkte und Flächen mit Etage (Läden, Bahnsteige, …), deren Mittelpunkt höchstens
    20 m von den Innenraumflächen einer Venue entfernt liegt, gehören zu ihr (zur nächsten, wenn mehrere in Frage
-   kommen). Alles andere wird ignoriert.
+   kommen). Was weiter weg liegt, aber in (oder ≤ 20 m neben, z. B. Gates am Fluggastbrückenende) einem
+   **Terminal, Bahnhofsgebäude oder einer Mall** (benannt), gehört zu der Venue, die dieses Gebäude „beansprucht“
+   (≥ 25 % ihrer Innenraumflächen liegen darin), sonst zu einer neuen **Gebäude-Venue** aus genau diesem Gebäude
+   (das kleinste, wenn sie verschachtelt sind). Viele Terminals und Bahnhöfe haben Läden, Gates und Toiletten mit
+   `level`, aber kaum `indoor=room` (Frankfurt Terminal 1). Alles andere wird ignoriert.
 4. **Schwellen** (Konstanten in `internal/venues/build.go`): Eine Venue bleibt, wenn sie mindestens **8
    Innenraumflächen** mit zusammen mindestens **1500 m²** Raum/Gang/Bereich hat (Etagenumrisse zählen nicht zur
-   Fläche) **oder** mindestens **2 Etagen mit je 4 Features**. Sonst wird sie übersprungen (`skipped_small`).
+   Fläche) **oder** mindestens **2 Etagen mit je 4 Features** (für Gebäude-Venues gilt nur diese Regel). Sonst
+   wird sie übersprungen (`skipped_small`).
 5. **Name und Art**: das Objekt, das mehr als die Hälfte der Innenraumflächen enthält, nach Vorrang
    `aeroway=terminal` (airport) > `building=train_station|transportation` bzw. Bahnhofsfläche (station) >
    `shop=mall|department_store` (mall) > anderes benanntes Gebäude (building) > `aeroway=aerodrome` (airport),
@@ -228,10 +233,13 @@ ganzer Etagen (`indoor=level`) zählen nur, wenn kein Raum passt.
    (z. B. `cw12345`). Teilen sich zwei Venues ein namengebendes Objekt (z. B. den Flughafen), bekommt die größere
    dessen Id und die andere die `c…`-Id. Die Ids bleiben über Importe stabil, solange sich die OSM-Objekte nicht
    ändern.
-7. **Etagen**: alle Etagen der Features, `label` aus `level:ref`, `level_ref` oder `name` der `indoor=level`-Fläche
+7. **Umriss**: Hat eine Venue keine `indoor=level`-Fläche, aber ein Terminal/Bahnhofsgebäude/eine Mall, aus dem sie
+   entstanden ist oder nach dem sie benannt ist, bekommt sie dessen Umriss als `level`-Fläche auf allen ihren
+   Etagen (Feature-Id = Id des Gebäudes).
+8. **Etagen**: alle Etagen der Features, `label` aus `level:ref`, `level_ref` oder `name` der `indoor=level`-Fläche
    genau dieser Etage, wenn höchstens 8 Zeichen, sonst die Zahl. `default_level`: 0, falls vorhanden, sonst die
    Etage mit den meisten Features (bei Gleichstand die nähere an 0, dann die obere).
-8. **Geometrie**: Douglas-Peucker mit 0,15 m, Ringe mit weniger als 3 Punkten fallen weg (Polygon ohne Außenring
+9. **Geometrie**: Douglas-Peucker mit 0,15 m, Ringe mit weniger als 3 Punkten fallen weg (Polygon ohne Außenring
    ganz), Koordinaten auf 1e-6° gerundet.
 
 ## Ressourcenbedarf

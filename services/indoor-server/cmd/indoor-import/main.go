@@ -135,8 +135,8 @@ func run(args []string, stdout, stderr io.Writer, now func() time.Time) error {
 	}
 	fmt.Fprintf(&sb, "features_read=%d unusable=%d indoor_features=%d indoor_areas=%d bad_level=%d duplicate_lines=%d containers=%d station_nodes=%d\n",
 		st.Read, unusable, st.Features, st.Seeds, st.BadLevel, st.DuplicateLines, st.Containers, st.Stations)
-	fmt.Fprintf(&sb, "clusters=%d split_clusters=%d unattached=%d doors_without_level=%d\n",
-		st.Clusters, st.SplitClusters, st.Unattached, st.DoorsWithoutLevel)
+	fmt.Fprintf(&sb, "clusters=%d split_clusters=%d unattached=%d doors_without_level=%d building_venues=%d\n",
+		st.Clusters, st.SplitClusters, st.Unattached, st.DoorsWithoutLevel, st.BuildingVenues)
 	fmt.Fprintf(&sb, "venues=%d skipped_small=%d (features %d) venue_features=%d\n",
 		st.Venues, st.SkippedSmall, st.SkippedFeatures, st.VenueFeatures)
 	fmt.Fprintf(&sb, "size_gz_total=%d size_plain_total=%d index_bytes=%d\n", totalGz, totalPlain, len(indexJSON))

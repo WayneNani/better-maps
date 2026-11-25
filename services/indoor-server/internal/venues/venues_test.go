@@ -590,3 +590,52 @@ func TestIDs(t *testing.T) {
 		}
 	}
 }
+
+func TestBuildingVenues(t *testing.T) {
+	b := NewBuilder(DefaultOptions())
+	// A terminal without indoor areas, with shops and gates on two levels.
+	b.Add(area("w1", 0, 0, 300, 100, "aeroway=terminal", "name=Flugsteig X"))
+	for i := 0; i < 4; i++ {
+		b.Add(point(fmt.Sprintf("n%d", 10+i), float64(20+i*50), 50, "shop=gift", "level=0"))
+		b.Add(point(fmt.Sprintf("n%d", 20+i), float64(20+i*50), 60, "aeroway=gate", "ref=X"+fmt.Sprint(i), "level=1"))
+	}
+	b.Add(point("n30", 150, 115, "aeroway=gate", "ref=X9", "level=1")) // 15 m outside: joins
+	b.Add(point("n31", 150, 140, "aeroway=gate", "level=1"))           // 40 m outside: ignored
+	// A named building that is not a terminal/station/mall does not form a venue.
+	b.Add(area("w2", 1000, 0, 100, 100, "building=office", "name=Büro"))
+	for i := 0; i < 8; i++ {
+		b.Add(point(fmt.Sprintf("n%d", 40+i), 1010+float64(i)*10, 50, "shop=gift", "level="+fmt.Sprint(i%2)))
+	}
+	// A terminal with too little.
+	b.Add(area("w3", 2000, 0, 100, 100, "aeroway=terminal", "name=Klein"))
+	b.Add(point("n60", 2050, 50, "shop=gift", "level=0"))
+	vs := b.Build()
+	if len(vs) != 1 || b.Stats.BuildingVenues != 1 || b.Stats.SkippedSmall != 1 {
+		t.Fatalf("%d venues, stats %+v", len(vs), b.Stats)
+	}
+	v := vs[0]
+	if v.ID != "w1" || v.Name != "Flugsteig X" || v.Kind != "airport" || len(v.Features) != 10 {
+		t.Fatalf("%s %q %s %d", v.ID, v.Name, v.Kind, len(v.Features))
+	}
+	if f := v.Features[0]; f.ID != "w1" || f.Kind != "level" || !slices.Equal(f.Levels, []float64{0, 1}) {
+		t.Fatalf("outline %+v", f)
+	}
+}
+
+func TestClaimedBuilding(t *testing.T) {
+	b := NewBuilder(DefaultOptions())
+	b.Add(area("w1", -10, -10, 600, 60, "building=train_station", "name=Hbf"))
+	rooms(b, 8, 0, 0, "0")                               // all inside the station: it names and claims the venue
+	b.Add(point("n1", 500, 20, "shop=books", "level=0")) // far from the rooms, inside the station
+	vs := b.Build()
+	if len(vs) != 1 || vs[0].ID != "w1" || vs[0].Kind != "station" || b.Stats.BuildingVenues != 0 {
+		t.Fatalf("%d venues", len(vs))
+	}
+	ids := map[string]bool{}
+	for _, f := range vs[0].Features {
+		ids[f.ID] = true
+	}
+	if !ids["n1"] || !ids["w1"] { // the POI and the building outline (no indoor=level areas)
+		t.Fatal(ids)
+	}
+}

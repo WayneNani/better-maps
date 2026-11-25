@@ -9,7 +9,10 @@
 //  3. split: huge clusters (and clusters spanning several terminals) are split by the enclosing
 //     terminal/building objects.
 //  4. attach: walls, lines, points and level-tagged POIs within AttachM of a venue's indoor
-//     areas join that venue; everything else is ignored.
+//     areas join that venue. The others join the venue that claims the terminal, station or
+//     mall they lie in, or form a venue of that building (many terminals and stations have
+//     level-tagged shops, gates and toilets but few or no indoor=room areas). Everything else is
+//     ignored.
 //  5. filter (thresholds), name, and encode (simplified geometry, encoded polylines).
 //
 // See README.md ("Datenaufbereitung") for the rules and the thresholds.
@@ -43,6 +46,9 @@ type Options struct {
 	// NameShare: a container names a venue if it contains more than this share of its indoor
 	// areas (by the centre of their bounding boxes).
 	NameShare float64
+	// ClaimShare: a venue claims a terminal, station or mall that contains at least this share
+	// of its indoor areas; features in that building beyond AttachM then still join the venue.
+	ClaimShare float64
 	// Thresholds: a venue is kept if it has MinIndoorAreas indoor areas with MinRoomAreaM2 of
 	// room/corridor/area surface together, or MinLevels levels with MinFeaturesPerLevel features
 	// each.
@@ -63,6 +69,7 @@ const (
 	DefaultTerminalShare       = 0.10
 	DefaultSplitJoinM          = 50
 	DefaultNameShare           = 0.5
+	DefaultClaimShare          = 0.25
 	DefaultMinIndoorAreas      = 8
 	DefaultMinRoomAreaM2       = 1500
 	DefaultMinLevels           = 2
@@ -74,7 +81,7 @@ func DefaultOptions() Options {
 	return Options{
 		ClusterGapM: DefaultClusterGapM, AttachM: DefaultAttachM, SimplifyM: DefaultSimplifyM, DoorSnapM: DefaultDoorSnapM,
 		SplitExtentM: DefaultSplitExtentM, SplitSeeds: DefaultSplitSeeds, TerminalShare: DefaultTerminalShare,
-		SplitJoinM: DefaultSplitJoinM, NameShare: DefaultNameShare,
+		SplitJoinM: DefaultSplitJoinM, NameShare: DefaultNameShare, ClaimShare: DefaultClaimShare,
 		MinIndoorAreas: DefaultMinIndoorAreas, MinRoomAreaM2: DefaultMinRoomAreaM2,
 		MinLevels: DefaultMinLevels, MinFeaturesPerLevel: DefaultMinFeaturesPerLevel,
 	}
@@ -92,6 +99,7 @@ type Stats struct {
 	Clusters          int // clusters of indoor areas
 	SplitClusters     int // clusters that were split
 	Unattached        int // features outside every venue
+	BuildingVenues    int // venues formed by a terminal/station/mall without indoor areas (kept)
 	DoorsWithoutLevel int // doors/entrances without level not on an indoor outline (dropped)
 	Venues            int // venues kept
 	SkippedSmall      int // venues below the thresholds
@@ -148,6 +156,10 @@ type Venue struct {
 	seeds      []*Feature
 	seedBBox   geo.BBox
 	roomAreaM2 float64
+	// building: the terminal/station/mall this venue was formed from (no indoor areas).
+	building *container
+	// namedBy: the container that gave the venue its name.
+	namedBy *container
 }
 
 // Level is one entry of a venue's level list.
@@ -194,7 +206,7 @@ func (b *Builder) Build() []*Venue {
 		v.Features = append(v.Features, g...)
 		vs[i] = v
 	}
-	b.attach(vs, others)
+	vs = append(vs, b.attach(vs, others, cgrid)...)
 
 	var kept []*Venue
 	for _, v := range vs {
@@ -203,6 +215,9 @@ func (b *Builder) Build() []*Venue {
 			b.Stats.SkippedSmall++
 			b.Stats.SkippedFeatures += len(v.Features)
 			continue
+		}
+		if v.building != nil {
+			b.Stats.BuildingVenues++
 		}
 		kept = append(kept, v)
 	}
@@ -216,6 +231,7 @@ func (b *Builder) Build() []*Venue {
 	used := map[string]bool{}
 	for _, v := range kept {
 		b.name(v, cgrid, used)
+		addOutline(v)
 		finish(v)
 		b.Stats.VenueFeatures += len(v.Features)
 	}
@@ -385,13 +401,18 @@ func (b *Builder) split(cl []*Feature, cgrid *grid) [][]*Feature {
 }
 
 // attach adds every non-seed feature to the venue whose indoor areas are nearest (within AttachM).
-func (b *Builder) attach(vs []*Venue, others []*Feature) {
+// A feature farther away that lies in a terminal, station or mall joins the venue claiming that
+// building, or a new venue of the building (returned).
+func (b *Builder) attach(vs []*Venue, others []*Feature, cgrid *grid) []*Venue {
 	g := newGrid(0.005)
 	exp := make([]geo.BBox, len(vs))
 	for i, v := range vs {
 		exp[i] = v.seedBBox.Expand(b.opt.AttachM)
 		g.insert(i, exp[i])
 	}
+	claims := b.claims(vs, cgrid)
+	var buildingVenues []*Venue
+	byBuilding := map[*container]*Venue{}
 	for _, f := range others {
 		c := f.BBox.Center()
 		best, bestD, bestA := -1, math.Inf(1), math.Inf(1)
@@ -405,12 +426,91 @@ func (b *Builder) attach(vs []*Venue, others []*Feature) {
 				best, bestD, bestA = i, d, a
 			}
 		})
-		if best < 0 {
-			b.Stats.Unattached++
+		if best >= 0 {
+			vs[best].Features = append(vs[best].Features, f)
 			continue
 		}
-		vs[best].Features = append(vs[best].Features, f)
+		// In (or within AttachM of, e.g. a gate at the end of a jet bridge) a building? The
+		// smallest claimed one, else the smallest one.
+		var claimed, smallest *container
+		near := geo.BBox{MinLon: c.Lon, MinLat: c.Lat, MaxLon: c.Lon, MaxLat: c.Lat}.Expand(b.opt.AttachM)
+		cgrid.query(near, func(i int) {
+			k := b.containers[i]
+			if k.class > classMall || !k.bbox.Intersects(near) || !(k.contains(c) || k.within(c, b.opt.AttachM)) {
+				return
+			}
+			if claims[k] != nil && (claimed == nil || smaller(k, claimed)) {
+				claimed = k
+			}
+			if smallest == nil || smaller(k, smallest) {
+				smallest = k
+			}
+		})
+		switch {
+		case claimed != nil:
+			claims[claimed].Features = append(claims[claimed].Features, f)
+		case smallest != nil:
+			v := byBuilding[smallest]
+			if v == nil {
+				v = &Venue{building: smallest, seedBBox: smallest.bbox}
+				byBuilding[smallest] = v
+				buildingVenues = append(buildingVenues, v)
+			}
+			v.Features = append(v.Features, f)
+		default:
+			b.Stats.Unattached++
+		}
 	}
+	return buildingVenues
+}
+
+func smaller(a, b *container) bool {
+	return a.areaM2 < b.areaM2 || (a.areaM2 == b.areaM2 && compareIDs(a.id, b.id) < 0)
+}
+
+// claims maps each terminal, station or mall to the venue with the most indoor areas in it (at
+// least ClaimShare of the venue's indoor areas).
+func (b *Builder) claims(vs []*Venue, cgrid *grid) map[*container]*Venue {
+	out := map[*container]*Venue{}
+	count := map[*container]int{}
+	for _, v := range vs {
+		for _, k := range b.candidates(cgrid, v.seedBBox) {
+			if k.class > classMall {
+				continue
+			}
+			n := 0
+			for _, s := range v.seeds {
+				if k.contains(s.BBox.Center()) {
+					n++
+				}
+			}
+			if n > 0 && float64(n) >= b.opt.ClaimShare*float64(len(v.seeds)) && n > count[k] {
+				out[k], count[k] = v, n
+			}
+		}
+	}
+	return out
+}
+
+// addOutline gives a venue without indoor=level areas the outline of its terminal, station or
+// mall (the one it was formed from or named after) as floor outline on every level.
+func addOutline(v *Venue) {
+	k := v.building
+	if k == nil {
+		k = v.namedBy
+	}
+	if k == nil || k.class > classMall {
+		return
+	}
+	var lv []float64
+	for _, f := range v.Features {
+		if f.Kind == "level" && f.T == GeomArea {
+			return
+		}
+		lv = levels.Union(lv, f.Levels)
+	}
+	v.Features = append(v.Features, &Feature{ID: k.id, T: GeomArea, Kind: "level", Levels: lv, Polys: k.polys,
+		BBox: k.bbox, AreaM2: k.areaM2})
 }
 
 // levelsFromOutlines gives doors and entrances without level the levels of the indoor areas whose
@@ -488,6 +588,14 @@ func (b *Builder) bigEnough(v *Venue) bool {
 // mall, building, aerodrome; the smallest of a class) holding more than NameShare of the indoor
 // areas; else a station node in the venue; else the most common name of its indoor=level areas.
 func (b *Builder) name(v *Venue, cgrid *grid, used map[string]bool) {
+	if k := v.building; k != nil {
+		v.Name, v.Kind, v.ID = k.name, classKind[k.class], k.id
+		if used[k.id] || !validID(k.id) {
+			v.ID = "c" + k.id
+		}
+		used[v.ID] = true
+		return
+	}
 	var best *container
 	for _, k := range b.candidates(cgrid, v.seedBBox) {
 		n := 0
@@ -508,6 +616,7 @@ func (b *Builder) name(v *Venue, cgrid *grid, used map[string]bool) {
 	switch {
 	case best != nil:
 		v.Name, v.Kind, id = best.name, classKind[best.class], best.id
+		v.namedBy = best
 	default:
 		area := v.seedBBox.Expand(b.opt.AttachM)
 		center := v.seedBBox.Center()

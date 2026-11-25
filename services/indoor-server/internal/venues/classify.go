@@ -397,6 +397,16 @@ func (c *container) contains(p geo.Point) bool {
 	return false
 }
 
+// within reports whether p is at most m metres from the outer outline of c.
+func (c *container) within(p geo.Point, m float64) bool {
+	for _, poly := range c.polys {
+		if geo.DistanceToRing(p, poly[0]) <= m {
+			return true
+		}
+	}
+	return false
+}
+
 type stationNode struct {
 	id   string
 	name string
