@@ -177,6 +177,10 @@ public class RoutingPlanController extends ToolbarController
     // See {@link #RoutingBottomMenuController.setStartButton()}.
     if (RoutingController.get().isNavigating())
       return;
+    // better-maps: like the back button, the arrow first goes back from a connection's details to the list of
+    // connections; it was easily tapped by mistake and lost the search.
+    if (onBackPressed())
+      return;
     RoutingController.get().cancel();
   }
 
