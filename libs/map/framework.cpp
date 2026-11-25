@@ -1660,6 +1660,9 @@ void Framework::CreateDrapeEngine(ref_ptr<dp::GraphicsContextFactory> contextFac
 
   m_transitManager.EnableTransitSchemeMode(CurrentMapModeHasTransitLines());
 
+  if (m_aerialImagery.IsActive())
+    m_drapeEngine->SetRasterLayer(m_aerialImagery);
+
   // Show debug info if it's enabled in the config.
   bool showDebugInfo;
   if (!settings::Get(kShowDebugInfo, showDebugInfo))
@@ -1668,6 +1671,27 @@ void Framework::CreateDrapeEngine(ref_ptr<dp::GraphicsContextFactory> contextFac
     m_drapeEngine->ShowDebugInfo(showDebugInfo);
 
   benchmark::RunGraphicsBenchmark(this);
+}
+
+void Framework::SetAerialImagery(bool enabled, std::string const & url, std::string const & token)
+{
+  df::raster::RasterLayerParams params;
+  params.m_enabled = enabled;
+  params.m_url = url;
+  params.m_token = token;
+  params.m_cacheDir = GetPlatform().TmpPathForFile("aerial_tiles");
+  if (params == m_aerialImagery)
+    return;
+  m_aerialImagery = params;
+  // Neither the URL nor the token is logged.
+  LOG(LINFO, ("Aerial imagery", params.IsActive() ? "on" : "off"));
+  if (m_drapeEngine)
+    m_drapeEngine->SetRasterLayer(m_aerialImagery);
+}
+
+bool Framework::IsAerialImageryActive() const
+{
+  return m_aerialImagery.IsActive();
 }
 
 void Framework::OnRecoverSurface(int width, int height, bool recreateContextDependentResources)
