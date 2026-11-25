@@ -31,9 +31,16 @@ public final class ItineraryTimeline
     @Nullable
     private final LineBadge mBadge;
     private final boolean mCancelled;
+    private final int mLegIndex;
 
     Segment(@NonNull Kind kind, long start, long end, @Nullable LineBadge badge, boolean cancelled)
     {
+      this(kind, start, end, badge, cancelled, -1);
+    }
+
+    Segment(@NonNull Kind kind, long start, long end, @Nullable LineBadge badge, boolean cancelled, int legIndex)
+    {
+      mLegIndex = legIndex;
       mKind = kind;
       mStart = start;
       mEnd = end;
@@ -73,6 +80,12 @@ public final class ItineraryTimeline
     {
       return mCancelled;
     }
+
+    /** Index of the leg in {@link TransitItinerary#getLegs()}, -1 if unknown. */
+    public int getLegIndex()
+    {
+      return mLegIndex;
+    }
   }
 
   private final long mStart;
@@ -93,8 +106,10 @@ public final class ItineraryTimeline
     long start = itinerary.getStartTime().getEpochSecond();
     long end = itinerary.getEndTime().getEpochSecond();
     final List<Segment> segments = new ArrayList<>();
-    for (TransitLeg leg : itinerary.getLegs())
+    final List<TransitLeg> legs = itinerary.getLegs();
+    for (int i = 0; i < legs.size(); ++i)
     {
+      final TransitLeg leg = legs.get(i);
       final long legStart = leg.getStartTime().getEpochSecond();
       final long legEnd = leg.getEndTime().getEpochSecond();
       if (legEnd <= legStart)
@@ -102,9 +117,9 @@ public final class ItineraryTimeline
       start = Math.min(start, legStart);
       end = Math.max(end, legEnd);
       if (leg.isTransit())
-        segments.add(new Segment(Kind.RIDE, legStart, legEnd, TransitItemFactory.badge(leg), leg.isCancelled()));
+        segments.add(new Segment(Kind.RIDE, legStart, legEnd, TransitItemFactory.badge(leg), leg.isCancelled(), i));
       else
-        segments.add(new Segment(Kind.WALK, legStart, legEnd, null, false));
+        segments.add(new Segment(Kind.WALK, legStart, legEnd, null, false, i));
     }
     return new ItineraryTimeline(start, Math.max(start, end), segments);
   }

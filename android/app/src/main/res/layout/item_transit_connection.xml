@@ -74,17 +74,18 @@
       tools:text="17 min · Direct" />
   </LinearLayout>
 
-  <!-- The whole connection: rides in line colors, walks dotted, waits empty. -->
+  <!-- The whole connection: rides in line colors, walks dotted, waits empty. A tap on the first ride shows its
+       other departures; the padding makes it easier to hit. -->
   <app.organicmaps.transit.ui.JourneyBarView
     android:id="@+id/bar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="6dp" />
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp" />
 
   <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="6dp"
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
@@ -104,6 +105,132 @@
       android:maxLines="2"
       android:textAppearance="@style/MwmTextAppearance.Body3"
       tools:text="S+U Berlin Hauptbahnhof · Pl. 15" />
+
+    <!-- Other departures of the first ride; the negative margins keep the row low with a large touch target. -->
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/alternatives_button"
+      style="@style/Widget.Material3.Button.TextButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="-10dp"
+      android:layout_marginBottom="-10dp"
+      android:contentDescription="@string/transit_alt_list_button_description"
+      android:minWidth="0dp"
+      android:minHeight="44dp"
+      android:paddingStart="8dp"
+      android:paddingEnd="4dp"
+      android:text="@string/transit_alt_list_button"
+      android:textAllCaps="false"
+      android:textAppearance="@style/MwmTextAppearance.Body4"
+      android:textColor="?android:textColorSecondary"
+      app:icon="@drawable/ic_expand_more"
+      app:iconTint="?android:textColorSecondary"
+      app:iconGravity="end"
+      app:iconPadding="0dp"
+      app:iconSize="18dp" />
+  </LinearLayout>
+
+  <!-- The user chose another departure for a ride of this connection. -->
+  <com.google.android.material.textview.MaterialTextView
+    android:id="@+id/changed"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textAppearance="@style/MwmTextAppearance.Body4"
+    android:textColor="@color/base_accent"
+    android:visibility="gone"
+    tools:text="Changed: other first ride, same connection"
+    tools:visibility="visible" />
+
+  <!-- Other departures of the first ride, shown on demand. -->
+  <LinearLayout
+    android:id="@+id/alternatives"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp"
+    android:background="@drawable/bg_transit_alt_area"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/margin_half"
+    android:paddingBottom="@dimen/margin_half"
+    android:visibility="gone"
+    tools:visibility="visible">
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/alternatives_title"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:accessibilityHeading="true"
+      android:paddingStart="10dp"
+      android:paddingEnd="10dp"
+      android:textAppearance="@style/MwmTextAppearance.Body4"
+      android:textStyle="bold"
+      tools:text="Change first ride · same ICE 1022" />
+
+    <HorizontalScrollView
+      android:id="@+id/alternatives_scroll"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="6dp"
+      android:clipToPadding="false"
+      android:paddingStart="10dp"
+      android:paddingEnd="10dp"
+      android:scrollbars="none">
+
+      <LinearLayout
+        android:id="@+id/alternatives_chips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" />
+    </HorizontalScrollView>
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+      android:id="@+id/alternatives_progress"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="10dp"
+      android:layout_marginTop="6dp"
+      android:layout_marginEnd="10dp"
+      android:indeterminate="true"
+      android:visibility="gone" />
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/alternatives_message"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/margin_quarter"
+      android:accessibilityLiveRegion="polite"
+      android:paddingStart="10dp"
+      android:paddingEnd="10dp"
+      android:textAppearance="@style/MwmTextAppearance.Body4"
+      android:visibility="gone"
+      tools:text="No other departures found" />
+
+    <LinearLayout
+      android:id="@+id/alternatives_change"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center_vertical"
+      android:orientation="horizontal"
+      android:paddingStart="10dp"
+      android:visibility="gone">
+
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/alternatives_change_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:accessibilityLiveRegion="polite"
+        android:textAppearance="@style/MwmTextAppearance.Body4"
+        tools:text="ICE 1022 no longer reachable · rest searched again, arrival 10:30 (+24 min)" />
+
+      <com.google.android.material.button.MaterialButton
+        android:id="@+id/alternatives_undo"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="44dp"
+        android:text="@string/transit_alt_undo"
+        android:textAllCaps="false" />
+    </LinearLayout>
   </LinearLayout>
 
   <com.google.android.material.textview.MaterialTextView

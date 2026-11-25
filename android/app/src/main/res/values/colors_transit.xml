@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: colors of the online public transport views (alternative departures). Dark variants in values-night. -->
+<resources>
+  <!-- The open ride and its row of other departures. -->
+  <color name="transit_alt_area">#140F766E</color>
+  <color name="transit_alt_area_stroke">#470F766E</color>
+  <!-- One departure ("chip"). -->
+  <color name="transit_alt_chip">#FFFFFFFF</color>
+  <color name="transit_alt_chip_missed">#FFF3F5F5</color>
+  <color name="transit_alt_chip_stroke">#33000000</color>
+  <color name="transit_alt_ok">#FF2E6B30</color>
+  <color name="transit_alt_tight">#FF8A4B00</color>
+  <!-- The rest of the connection was searched again. -->
+  <color name="transit_alt_banner">#FFFFF4E5</color>
+  <color name="transit_alt_banner_stroke">#FFF3C98B</color>
+  <color name="transit_alt_banner_text">#FF5C3300</color>
+  <!-- Hint card of the time grid while a ride is selected. -->
+  <color name="transit_hint">#FF1F2A28</color>
+  <color name="transit_hint_text">#FFFFFFFF</color>
+  <color name="transit_hint_text_secondary">#FFC9D3D1</color>
+  <color name="transit_hint_action">#FF5EEAD4</color>
+</resources>

@@ -31,6 +31,9 @@ public final class ItineraryItem
   final boolean mRealTime;
   @NonNull
   final ItineraryTimeline mTimeline;
+  // Set once by the factory for a connection the user changed.
+  @Nullable
+  ChangeItem mChange;
 
   ItineraryItem(@NonNull String key, @NonNull String departure, @NonNull TransitFormatter.Delay departureDelay,
                 @NonNull String arrival, @NonNull TransitFormatter.Delay arrivalDelay, long arrivalDayOffset,
@@ -142,5 +145,12 @@ public final class ItineraryItem
   public ItineraryTimeline getTimeline()
   {
     return mTimeline;
+  }
+
+  /** How the user changed the found connection (another departure for one ride), null if unchanged. */
+  @Nullable
+  public ChangeItem getChange()
+  {
+    return mChange;
   }
 }

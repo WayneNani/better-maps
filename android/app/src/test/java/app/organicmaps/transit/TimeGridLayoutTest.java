@@ -5,6 +5,7 @@ import static app.organicmaps.transit.JourneyBarLayoutTest.ride;
 import static app.organicmaps.transit.JourneyBarLayoutTest.timeline;
 import static app.organicmaps.transit.JourneyBarLayoutTest.walk;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -279,5 +280,54 @@ public class TimeGridLayoutTest
     assertEquals(after.y(min(10)), after.getColumns().get(1).getTop());
     assertTrue(after.getPixelsPerMinute() < before.getPixelsPerMinute());
     assertEquals(1, after.columnAt(130));
+  }
+
+  @Test
+  public void laneBeforeASelectedColumn()
+  {
+    final TimeGridLayout.Params params = params(30);
+    params.laneIndex = 1;
+    params.laneWidth = 30;
+    final TimeGridLayout layout = TimeGridLayout.compute(connections(10, 20, 30), min(-60), BERLIN, params);
+    final TimeGridLayout.Column first = layout.getColumns().get(0);
+    final TimeGridLayout.Column second = layout.getColumns().get(1);
+    final TimeGridLayout.Column third = layout.getColumns().get(2);
+    assertEquals(50, first.getLeft());
+    assertEquals(50, first.getLaneLeft());
+    assertFalse(first.hasLane());
+    assertEquals(110, second.getLaneLeft());
+    assertEquals(140, second.getLeft());
+    assertEquals(190, second.getRight());
+    assertTrue(second.hasLane());
+    assertEquals(200, third.getLeft());
+    assertEquals(260, layout.getContentWidth());
+    // The lane belongs to its column.
+    assertEquals(0, layout.columnAt(104));
+    assertEquals(1, layout.columnAt(106));
+    assertEquals(1, layout.columnAt(120));
+    assertEquals(2, layout.columnAt(196));
+  }
+
+  @Test
+  public void laneOutsideTheColumnsIsIgnored()
+  {
+    final TimeGridLayout.Params params = params(30);
+    params.laneIndex = 5;
+    params.laneWidth = 30;
+    final TimeGridLayout layout = TimeGridLayout.compute(connections(10, 20), min(-60), BERLIN, params);
+    assertEquals(170, layout.getContentWidth());
+    assertEquals(110, layout.getColumns().get(1).getLeft());
+  }
+
+  @Test
+  public void includedTimesWidenTheRange()
+  {
+    final TimeGridLayout.Params params = params(30);
+    params.includeStart = min(-18);
+    params.includeEnd = min(90);
+    final TimeGridLayout layout = TimeGridLayout.compute(connections(10, 20), min(-60), BERLIN, params);
+    assertEquals(min(-20), layout.getRangeStart());
+    assertTrue(layout.getRangeEnd() >= min(90));
+    assertTrue(layout.y(min(-18)) >= params.top);
   }
 }

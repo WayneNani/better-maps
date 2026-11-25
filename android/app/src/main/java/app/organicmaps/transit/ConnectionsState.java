@@ -64,6 +64,10 @@ public final class ConnectionsState
   @NonNull
   final String mToLabel;
   final boolean mFarAhead;
+  // Set once by the presenter.
+  @Nullable
+  AlternativesItem mAlternatives;
+  boolean mCanChooseAlternatives;
 
   ConnectionsState(@NonNull Screen screen, @NonNull String timeLabel, boolean arriveBy, boolean loading,
                    boolean loadingEarlier, boolean loadingLater, @Nullable TransitError error,
@@ -255,5 +259,18 @@ public final class ConnectionsState
   public String getToLabel()
   {
     return mToLabel;
+  }
+
+  /** The other departures of the open ride, null if no ride is open. */
+  @Nullable
+  public AlternativesItem getAlternatives()
+  {
+    return mAlternatives;
+  }
+
+  /** True if other departures can be chosen for the rides (not for a saved connection). */
+  public boolean canChooseAlternatives()
+  {
+    return mCanChooseAlternatives;
   }
 }

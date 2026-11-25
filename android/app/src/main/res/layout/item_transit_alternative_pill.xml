@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: one other departure of the first ride in the connection list: time and line (or "lost"). -->
+<FrameLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:layout_marginEnd="6dp"
+  android:background="@drawable/bg_transit_alt_chip"
+  android:clickable="true"
+  android:focusable="true"
+  android:foreground="?selectableItemBackground"
+  android:minHeight="44dp">
+
+  <LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical"
+    android:duplicateParentState="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp">
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/alt_time"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textAppearance="@style/MwmTextAppearance.Body3.Primary"
+      android:textStyle="bold"
+      tools:text="09:29" />
+
+    <include
+      android:id="@+id/alt_badge"
+      layout="@layout/item_transit_badge"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="6dp" />
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/alt_status"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="6dp"
+      android:maxLines="1"
+      android:textAppearance="@style/MwmTextAppearance.Body4"
+      android:textStyle="bold"
+      android:visibility="gone"
+      tools:text="Connection lost" />
+  </LinearLayout>
+</FrameLayout>

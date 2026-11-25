@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: one other departure of a ride in the detail view: time, line, buffer to the next ride. -->
+<FrameLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:layout_marginEnd="@dimen/margin_half"
+  android:background="@drawable/bg_transit_alt_chip"
+  android:clickable="true"
+  android:focusable="true"
+  android:foreground="?selectableItemBackground"
+  android:minWidth="80dp"
+  android:minHeight="64dp">
+
+  <LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:duplicateParentState="true"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/margin_half"
+    android:paddingTop="6dp"
+    android:paddingEnd="@dimen/margin_half"
+    android:paddingBottom="6dp">
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/alt_time"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textAppearance="@style/MwmTextAppearance.Body3.Primary"
+      android:textStyle="bold"
+      tools:text="09:29" />
+
+    <include
+      android:id="@+id/alt_badge"
+      layout="@layout/item_transit_badge"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="2dp" />
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/alt_status"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="2dp"
+      android:maxLines="1"
+      android:textAppearance="@style/MwmTextAppearance.Body4"
+      android:textStyle="bold"
+      tools:text="4 min, tight" />
+  </LinearLayout>
+</FrameLayout>

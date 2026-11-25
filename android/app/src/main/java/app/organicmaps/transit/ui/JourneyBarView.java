@@ -8,9 +8,13 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.view.MotionEvent;
+import android.view.SoundEffectConstants;
 import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import app.organicmaps.R;
 import app.organicmaps.transit.ItineraryTimeline;
 import app.organicmaps.transit.JourneyBarLayout;
 import app.organicmaps.transit.LineBadge;
@@ -21,9 +25,20 @@ import java.util.List;
 /**
  * Horizontal bar over the whole duration of a connection: rides in their line colors with the line name if it fits,
  * walks as dotted lines, waits empty. The geometry comes from {@link JourneyBarLayout}.
+ * <p>
+ * One ride can be made tappable ({@link #setRideClickListener}), e.g. to show other departures of the first ride;
+ * other taps go to the parent (e.g. to open the connection).
  */
 public final class JourneyBarView extends View
 {
+  public interface RideClickListener
+  {
+    void onRideClick(int legIndex);
+  }
+
+  /** Taps this far beside the ride still count. */
+  private static final float TOUCH_SLACK_DP = 8;
+
   private static final float HEIGHT_DP = 20;
   private static final float MIN_RIDE_DP = 6;
   private static final float GAP_DP = 2;
@@ -46,6 +61,13 @@ public final class JourneyBarView extends View
   @NonNull
   private List<JourneyBarLayout.Piece> mPieces = Collections.emptyList();
   private int mLayoutWidth = -1;
+  @Nullable
+  private RideClickListener mRideListener;
+  private int mRideLegIndex = -1;
+  private boolean mRidePressed;
+  // Leg index of the highlighted (open) ride, -1 for none.
+  private int mOpenLegIndex = -1;
+  private final Paint mOutline = new Paint(Paint.ANTI_ALIAS_FLAG);
 
   public JourneyBarView(@NonNull Context context)
   {
@@ -66,8 +88,79 @@ public final class JourneyBarView extends View
     // Zero-length dashes with round caps are dots.
     mWalk.setPathEffect(new DashPathEffect(new float[] {0, dp(DOT_SPACING_DP)}, 0));
     mWalk.setColor(ThemeUtils.getColor(context, android.R.attr.textColorSecondary));
-    // The rows around it describe the connection.
+    // The rows around it describe the connection; the ride is also reachable with a button.
     setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
+    mOutline.setStyle(Paint.Style.STROKE);
+    mOutline.setStrokeWidth(dp(2));
+    mOutline.setColor(ContextCompat.getColor(context, R.color.base_accent));
+  }
+
+  /**
+   * Makes one ride tappable.
+   *
+   * @param legIndex leg index of the ride ({@link ItineraryTimeline.Segment#getLegIndex()}).
+   * @param open the ride is outlined, e.g. while its other departures are shown.
+   */
+  public void setRideClickListener(@Nullable RideClickListener listener, int legIndex, boolean open)
+  {
+    mRideListener = listener;
+    mRideLegIndex = listener != null ? legIndex : -1;
+    mOpenLegIndex = open ? legIndex : -1;
+    mRidePressed = false;
+    invalidate();
+  }
+
+  @Override
+  public boolean onTouchEvent(@NonNull MotionEvent event)
+  {
+    if (mRideListener == null)
+      return super.onTouchEvent(event);
+    switch (event.getActionMasked())
+    {
+    case MotionEvent.ACTION_DOWN:
+      mRidePressed = isOnRide(event.getX());
+      return mRidePressed;
+    case MotionEvent.ACTION_UP:
+      if (mRidePressed && isOnRide(event.getX()))
+      {
+        mRidePressed = false;
+        playSoundEffect(SoundEffectConstants.CLICK);
+        mRideListener.onRideClick(mRideLegIndex);
+        return true;
+      }
+      mRidePressed = false;
+      return false;
+    case MotionEvent.ACTION_CANCEL: mRidePressed = false; return false;
+    default: return mRidePressed;
+    }
+  }
+
+  private boolean isOnRide(float x)
+  {
+    final JourneyBarLayout.Piece piece = ridePiece();
+    if (piece == null)
+      return false;
+    final float[] bounds = bounds(piece);
+    return x >= bounds[0] - dp(TOUCH_SLACK_DP) && x <= bounds[1] + dp(TOUCH_SLACK_DP);
+  }
+
+  @Nullable
+  private JourneyBarLayout.Piece ridePiece()
+  {
+    for (JourneyBarLayout.Piece piece : mPieces)
+      if (piece.getKind() == ItineraryTimeline.Kind.RIDE && piece.getSegment().getLegIndex() == mRideLegIndex)
+        return piece;
+    return null;
+  }
+
+  /** Left and right of a piece in view coordinates. */
+  @NonNull
+  private float[] bounds(@NonNull JourneyBarLayout.Piece piece)
+  {
+    final int width = getWidth() - getPaddingLeft() - getPaddingRight();
+    final float left = getLayoutDirection() == LAYOUT_DIRECTION_RTL ? getPaddingLeft() + width - piece.getRight()
+                                                                    : getPaddingLeft() + piece.getLeft();
+    return new float[] {left, left + piece.getWidth()};
   }
 
   public void setTimeline(@Nullable ItineraryTimeline timeline)
@@ -123,6 +216,12 @@ public final class JourneyBarView extends View
       mFill.setAlpha(alpha);
       mRect.set(left, top, right, bottom);
       canvas.drawRoundRect(mRect, dp(CORNER_DP), dp(CORNER_DP), mFill);
+      if (mOpenLegIndex >= 0 && piece.getSegment().getLegIndex() == mOpenLegIndex)
+      {
+        mRect.inset(-dp(2), -dp(2));
+        canvas.drawRoundRect(mRect, dp(CORNER_DP + 2), dp(CORNER_DP + 2), mOutline);
+        mRect.inset(dp(2), dp(2));
+      }
       for (String label : JourneyBarLayout.labelCandidates(badge.getText()))
       {
         if (JourneyBarLayout.fitsLabel(piece.getWidth(), mText.measureText(label), Math.round(dp(LABEL_PADDING_DP))))

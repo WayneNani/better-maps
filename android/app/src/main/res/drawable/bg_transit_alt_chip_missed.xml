@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: a departure that misses the next ride (dashed). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+  <solid android:color="@color/transit_alt_chip_missed" />
+  <stroke android:width="1dp" android:color="@color/transit_alt_chip_stroke" android:dashWidth="4dp" android:dashGap="3dp" />
+  <corners android:radius="10dp" />
+</shape>

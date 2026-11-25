@@ -1,0 +1,247 @@
+{
+ "requestParameters": {},
+ "debugOutput": {
+  "algorithm": 1,
+  "direct": 6,
+  "execute_time": 34,
+  "fares": 0,
+  "fastest_direct": 0,
+  "fp_update_prevented_by_lower_bound": 0,
+  "gpu_supported": 1,
+  "gpu_used": 1,
+  "interval_extensions": 0,
+  "lb_time": 0,
+  "n_dest_offsets": 105,
+  "n_earliest_arrival_updated_by_footpath": 0,
+  "n_earliest_arrival_updated_by_route": 0,
+  "n_earliest_trip_calls": 0,
+  "n_events_skipped_by_early_termination": 0,
+  "n_execute_bwd": 7,
+  "n_execute_fwd": 7,
+  "n_footpaths_visited": 0,
+  "n_routes_visited": 0,
+  "n_routing_time": 0,
+  "n_start_offsets": 91,
+  "n_td_dest_offsets": 0,
+  "n_td_start_offsets": 0,
+  "prepare": 40,
+  "prepare_backward_WALK": 21,
+  "prepare_forward_WALK": 18,
+  "route_update_prevented_by_lower_bound": 0,
+  "search_interval_reduction_by_early_termination": 0
+ },
+ "from": {
+  "name": "START",
+  "lat": 52.525,
+  "lon": 13.3694,
+  "vertexType": "NORMAL"
+ },
+ "to": {
+  "name": "END",
+  "lat": 52.5219,
+  "lon": 13.4132,
+  "vertexType": "NORMAL"
+ },
+ "direct": [],
+ "previousPageCursor": "",
+ "nextPageCursor": "",
+ "itineraries": [
+  {
+   "id": "test-rest",
+   "startTime": "2026-10-25T16:42:00Z",
+   "endTime": "2026-10-25T16:57:00Z",
+   "duration": 900,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "from": {
+      "name": "S+U Alexanderplatz Bhf (Berlin)",
+      "stopId": "de-VBB_de:11000:900100003:2:52",
+      "parentId": "de-VBB_de:11000:900100003",
+      "importance": 0.00653447350487113,
+      "lat": 52.52152,
+      "lon": 13.411226,
+      "level": 1.0,
+      "tz": "Europe/Berlin",
+      "arrival": "2026-10-25T16:37:00Z",
+      "scheduledArrival": "2026-10-25T16:37:00Z",
+      "description": "S-Bahnsteig Gleis 3",
+      "vertexType": "TRANSIT",
+      "pickupType": "NORMAL",
+      "dropoffType": "NORMAL",
+      "cancelled": false,
+      "arrivalTimestampReason": "PREDICTED",
+      "departureTimestampReason": "PREDICTED",
+      "modes": [
+       "SUBURBAN",
+       "SUBWAY"
+      ]
+     },
+     "to": {
+      "tz": "Europe/Berlin",
+      "vertexType": "TRANSIT",
+      "name": "U Alexanderplatz",
+      "lat": 52.5215,
+      "lon": 13.4119,
+      "stopId": "test_u2_alex"
+     },
+     "duration": 180,
+     "startTime": "2026-10-25T16:42:00Z",
+     "endTime": "2026-10-25T16:45:00Z",
+     "scheduledStartTime": "2026-10-25T16:42:00Z",
+     "scheduledEndTime": "2026-10-25T16:45:00Z",
+     "realTime": false,
+     "scheduled": false,
+     "distance": 150.0,
+     "legGeometry": {
+      "points": "qbtdcBqypqXR[??~IgP??y@iB??`@s@??|CqF??Tc@??_CqF??kAcC??dJuQ??pE_J??E}A{@_K??}@{JwFaO??aI~L{@pA??wKmU??mEeK",
+      "precision": 6,
+      "length": 33
+     }
+    },
+    {
+     "mode": "SUBWAY",
+     "from": {
+      "tz": "Europe/Berlin",
+      "vertexType": "TRANSIT",
+      "name": "U Alexanderplatz",
+      "lat": 52.5215,
+      "lon": 13.4119,
+      "stopId": "test_u2_alex",
+      "departure": "2026-10-25T16:52:00Z",
+      "scheduledDeparture": "2026-10-25T16:52:00Z"
+     },
+     "to": {
+      "tz": "Europe/Berlin",
+      "vertexType": "TRANSIT",
+      "name": "U Klosterstra\u00dfe",
+      "lat": 52.517,
+      "lon": 13.4122,
+      "stopId": "test_u2_kloster",
+      "arrival": "2026-10-25T16:54:00Z",
+      "scheduledArrival": "2026-10-25T16:54:00Z"
+     },
+     "duration": 120,
+     "startTime": "2026-10-25T16:52:00Z",
+     "endTime": "2026-10-25T16:54:00Z",
+     "scheduledStartTime": "2026-10-25T16:52:00Z",
+     "scheduledEndTime": "2026-10-25T16:54:00Z",
+     "realTime": false,
+     "scheduled": true,
+     "interlineWithPreviousLeg": false,
+     "headsign": "Ruhleben",
+     "tripFrom": {
+      "name": "S Westkreuz (Berlin)",
+      "stopId": "de-VBB_de:11000:900024102:2:52",
+      "parentId": "de-VBB_de:11000:900024102",
+      "importance": 0.0027320533990859985,
+      "lat": 52.50089,
+      "lon": 13.28459,
+      "level": -1.0,
+      "tz": "Europe/Berlin",
+      "departure": "2026-10-25T16:18:00Z",
+      "scheduledDeparture": "2026-10-25T16:17:00Z",
+      "scheduledTrack": "3",
+      "track": "3",
+      "description": "S-Bahnsteig Gleis 3",
+      "vertexType": "TRANSIT",
+      "pickupType": "NORMAL",
+      "dropoffType": "NORMAL",
+      "cancelled": false,
+      "departureTimestampReason": "PREDICTED",
+      "modes": [
+       "SUBURBAN",
+       "BUS"
+      ]
+     },
+     "tripTo": {
+      "name": "S Mahlsdorf Bhf (Berlin)",
+      "stopId": "de-VBB_de:11000:900176001:1:50",
+      "parentId": "de-VBB_de:11000:900176001",
+      "importance": 0.0013848968083038926,
+      "lat": 52.512253,
+      "lon": 13.610598,
+      "level": 1.0,
+      "tz": "Europe/Berlin",
+      "arrival": "2026-10-25T17:04:00Z",
+      "scheduledArrival": "2026-10-25T17:04:00Z",
+      "scheduledTrack": "1",
+      "track": "1",
+      "description": "S-Bahnsteig Gleis 1",
+      "vertexType": "TRANSIT",
+      "pickupType": "NORMAL",
+      "dropoffType": "NORMAL",
+      "cancelled": false,
+      "arrivalTimestampReason": "PREDICTED",
+      "modes": [
+       "REGIONAL_RAIL",
+       "SUBURBAN",
+       "BUS"
+      ]
+     },
+     "routeId": "test_u2",
+     "routeUrl": "",
+     "directionId": "1",
+     "routeColor": "DA421E",
+     "routeTextColor": "FFFFFF",
+     "routeType": 109,
+     "agencyName": "S-Bahn Berlin GmbH",
+     "agencyUrl": "https://www.s-bahn-berlin.de",
+     "agencyFareUrl": "",
+     "agencyId": "1",
+     "tripId": "test_u2_1652",
+     "routeShortName": "U2",
+     "routeLongName": "",
+     "tripShortName": "U2",
+     "displayName": "U2",
+     "cancelled": false,
+     "source": "de_VBB.gtfs.zip/stop_times.txt:196388:196408",
+     "intermediateStops": [],
+     "legGeometry": {
+      "points": "sd{dcBs__oXaIgoDfOyyApz@o_ClmBymBfg@omA|QkjA}A_fDnaAs|GuEld@fEa]r@yH~BcV~Ck_@rCu[T_Dd@yHVsHLcIFoNUeX_@mQSgIIuEUoK[kTg@aQuAef@u@mY{@wQcAqOyBqT}DoUuEsTqCmJO]sAsEsEeMmU_m@uf@umAaKi\\{EqTmD}RkCwScByT{@yQg@{RKgRo@sg@]cZI_RKeKG{HOgFW{Is@aNUyDaAyM{@eI{@iIeCaT?G{A}Eu@oKgEyW_CkMm@aDuAcIoFiXoEkU{@mEs@{EcBuL{AyNe@}Fg@}G]iISoIY{HEqFGgG?o@F{IDyIXyIJoFV_H\\yFd@sFb@oGz@gInA}InA_J~@{F`CyLpBwHnBcI~E_PrAoEjBaGvMwa@~DeMfDoJdDkI`AeCvBsE~BeFnCoFnOcYfOsXLUa@n@",
+      "precision": 6,
+      "length": 112
+     },
+     "bikesAllowed": true,
+     "wheelchairAccessible": "ACCESSIBLE",
+     "reservation": "NONE",
+     "alternatives": []
+    },
+    {
+     "mode": "WALK",
+     "from": {
+      "tz": "Europe/Berlin",
+      "vertexType": "TRANSIT",
+      "name": "U Klosterstra\u00dfe",
+      "lat": 52.517,
+      "lon": 13.4122,
+      "stopId": "test_u2_kloster"
+     },
+     "to": {
+      "name": "END",
+      "lat": 52.5219,
+      "lon": 13.4132,
+      "tz": "Europe/Berlin",
+      "arrival": "2026-10-25T16:41:00Z",
+      "scheduledArrival": "2026-10-25T16:41:00Z",
+      "vertexType": "NORMAL"
+     },
+     "duration": 180,
+     "startTime": "2026-10-25T16:54:00Z",
+     "endTime": "2026-10-25T16:57:00Z",
+     "scheduledStartTime": "2026-10-25T16:54:00Z",
+     "scheduledEndTime": "2026-10-25T16:57:00Z",
+     "realTime": false,
+     "scheduled": false,
+     "distance": 150.0,
+     "legGeometry": {
+      "points": "qbtdcBqypqXR[??~IgP??y@iB??`@s@??|CqF??Tc@??_CqF??kAcC??dJuQ??pE_J??E}A{@_K??}@{JwFaO??aI~L{@pA??wKmU??mEeK",
+      "precision": 6,
+      "length": 33
+     }
+    }
+   ]
+  }
+ ]
+}
