@@ -1253,6 +1253,85 @@ JNIEXPORT void JNICALL Java_app_organicmaps_sdk_Framework_nativeSetAerialImagery
   frm()->SetAerialImagery(enabled, jni::ToNativeString(env, url), jni::ToNativeString(env, token));
 }
 
+// better-maps: indoor maps. Empty url or token, or enabled == false, turns them off. The token is not logged.
+JNIEXPORT void JNICALL Java_app_organicmaps_sdk_Framework_nativeSetIndoorServer(JNIEnv * env, jclass, jboolean enabled,
+                                                                               jstring url, jstring token)
+{
+  frm()->SetIndoorServer(enabled, jni::ToNativeString(env, url), jni::ToNativeString(env, token));
+}
+
+JNIEXPORT void JNICALL Java_app_organicmaps_sdk_Framework_nativeSetIndoorLevel(JNIEnv *, jclass, jdouble level)
+{
+  frm()->SetIndoorLevel(level);
+}
+
+// better-maps: the listener of the indoor maps (null removes it). Called on the main thread.
+JNIEXPORT void JNICALL Java_app_organicmaps_sdk_Framework_nativeSetIndoorListener(JNIEnv * env, jclass,
+                                                                                 jobject jListener)
+{
+  static jobject s_listener = nullptr;
+  if (s_listener != nullptr)
+  {
+    frm()->SetIndoorListeners({}, {});
+    env->DeleteGlobalRef(s_listener);
+    s_listener = nullptr;
+  }
+  if (jListener == nullptr)
+    return;
+  s_listener = env->NewGlobalRef(jListener);
+  jmethodID const stateId = jni::GetMethodID(env, s_listener, "onIndoorStateChanged",
+                                             "(ZLjava/lang/String;Ljava/lang/String;[D[Ljava/lang/String;D)V");
+  jmethodID const tapId =
+      jni::GetMethodID(env, s_listener, "onIndoorFeatureTapped",
+                       "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;"
+                       "Ljava/lang/String;[Ljava/lang/String;DD)V");
+  auto const onState = [stateId](IndoorManager::State const & state)
+  {
+    if (s_listener == nullptr)
+      return;
+    JNIEnv * env = jni::GetEnv();
+    std::vector<double> levels;
+    std::vector<std::string> labels;
+    for (auto const & l : state.m_levels)
+    {
+      levels.push_back(l.m_level);
+      labels.push_back(l.m_label);
+    }
+    jni::TScopedLocalRef name(env, jni::ToJavaString(env, state.m_venueName));
+    jni::TScopedLocalRef attribution(env, jni::ToJavaString(env, state.m_attribution));
+    jni::ScopedLocalRef<jdoubleArray> jLevels(env, env->NewDoubleArray(static_cast<jsize>(levels.size())));
+    env->SetDoubleArrayRegion(jLevels.get(), 0, static_cast<jsize>(levels.size()), levels.data());
+    jni::TScopedLocalObjectArrayRef jLabels(env, jni::ToJavaStringArray(env, labels));
+    env->CallVoidMethod(s_listener, stateId, static_cast<jboolean>(state.m_visible), name.get(), attribution.get(),
+                        jLevels.get(), jLabels.get(), static_cast<jdouble>(state.m_level));
+  };
+  auto const onTap = [tapId](IndoorManager::FeatureInfo const & info)
+  {
+    if (s_listener == nullptr)
+      return;
+    JNIEnv * env = jni::GetEnv();
+    std::vector<std::string> tags;
+    for (auto const & [k, v] : info.m_tags)
+    {
+      tags.push_back(k);
+      tags.push_back(v);
+    }
+    auto const ll = mercator::ToLatLon(info.m_point);
+    jni::TScopedLocalRef name(env, jni::ToJavaString(env, info.m_name));
+    jni::TScopedLocalRef ref(env, jni::ToJavaString(env, info.m_ref));
+    jni::TScopedLocalRef kind(env, jni::ToJavaString(env, info.m_kind));
+    jni::TScopedLocalRef level(env, jni::ToJavaString(env, info.m_levelLabel));
+    jni::TScopedLocalRef venue(env, jni::ToJavaString(env, info.m_venueName));
+    jni::TScopedLocalRef osmId(env, jni::ToJavaString(env, info.m_osmId));
+    jni::TScopedLocalObjectArrayRef jTags(env, jni::ToJavaStringArray(env, tags));
+    env->CallVoidMethod(s_listener, tapId, name.get(), ref.get(), kind.get(), level.get(), venue.get(), osmId.get(),
+                        jTags.get(), static_cast<jdouble>(ll.m_lat), static_cast<jdouble>(ll.m_lon));
+  };
+  frm()->SetIndoorListeners(onState, onTap);
+  // The current state at once (e.g. after the activity was recreated).
+  onState(frm()->GetIndoorManager().GetState());
+}
+
 // better-maps: the current viewport as {minLon, minLat, maxLon, maxLat} (for the attribution of the aerial imagery).
 JNIEXPORT jdoubleArray JNICALL Java_app_organicmaps_sdk_Framework_nativeGetViewportLatLonRect(JNIEnv * env, jclass)
 {

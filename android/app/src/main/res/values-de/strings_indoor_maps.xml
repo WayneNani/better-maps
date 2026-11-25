@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: Innenraumkarten von Flughäfen, Bahnhöfen und Einkaufszentren (Einstellungen, Ebenenwahl, Details). -->
+<resources>
+  <string name="indoor_maps_server_title">Innenraumkarten-Server</string>
+  <string name="indoor_maps_info">Innenraumkarten zeigen Räume, Geschäfte, Gates, Toiletten und andere Orte auf den Ebenen großer Flughäfen, Bahnhöfe und Einkaufszentren, aus OpenStreetMap-Daten auf deinem eigenen Innenraumkarten-Server (services/indoor-server). Wenn du einen solchen Ort nah heranzoomst (ab Zoomstufe 16), werden die Gebäude rund um den sichtbaren Ausschnitt beim Server angefragt und auf dem Gerät zwischengespeichert.</string>
+  <string name="indoor_maps_enabled">Innenraumkarten anzeigen</string>
+  <string name="indoor_maps_url">Server-Adresse</string>
+  <string name="indoor_maps_url_hint">z. B. https://innen.example.org</string>
+  <string name="indoor_maps_token">Zugangs-Token</string>
+  <string name="indoor_maps_token_hint">Das Token dieses Geräts aus scripts/new-token.sh. Leer lassen, um das gespeicherte Token zu behalten.</string>
+  <string name="indoor_maps_needs_server">Bitte auch Server-Adresse und Zugangs-Token eintragen</string>
+  <string name="indoor_maps_off">Aus</string>
+  <!-- Ebenenwahl auf der Karte. -->
+  <string name="indoor_levels_of">Ebenen von %s</string>
+  <string name="indoor_levels">Ebenen</string>
+  <string name="indoor_level">Ebene %s</string>
+  <string name="indoor_level_shown">angezeigt</string>
+  <string name="indoor_attribution">© OpenStreetMap-Mitwirkende</string>
+  <!-- Details eines angetippten Raums oder Orts. -->
+  <string name="indoor_ref">Nr. %s</string>
+  <string name="indoor_gate">Gate %s</string>
+  <string name="indoor_opening_hours">Öffnungszeiten: %s</string>
+  <string name="indoor_cuisine">Küche: %s</string>
+  <string name="indoor_operator">Betreiber: %s</string>
+  <string name="indoor_wheelchair_yes">Rollstuhlgerecht</string>
+  <string name="indoor_wheelchair_limited">Eingeschränkt rollstuhlgerecht</string>
+  <string name="indoor_wheelchair_no">Nicht rollstuhlgerecht</string>
+  <string name="indoor_fee_yes">Kostenpflichtig</string>
+  <string name="indoor_fee_no">Kostenlos</string>
+  <string name="indoor_kind_level">Etage</string>
+  <string name="indoor_kind_corridor">Gang</string>
+  <string name="indoor_kind_room">Raum</string>
+  <string name="indoor_kind_area">Bereich</string>
+  <string name="indoor_kind_shop">Geschäft</string>
+  <string name="indoor_kind_food">Essen und Trinken</string>
+  <string name="indoor_kind_toilets">Toiletten</string>
+  <string name="indoor_kind_stairs">Treppe</string>
+  <string name="indoor_kind_elevator">Aufzug</string>
+  <string name="indoor_kind_escalator">Rolltreppe</string>
+  <string name="indoor_kind_gate">Gate</string>
+  <string name="indoor_kind_service">Service</string>
+  <string name="indoor_kind_platform">Bahnsteig</string>
+  <string name="indoor_kind_restricted">Kein öffentlicher Zugang</string>
+  <string name="indoor_kind_door">Tür</string>
+  <string name="indoor_kind_entrance">Eingang</string>
+  <string name="indoor_kind_info">Information</string>
+  <string name="indoor_kind_atm">Geldautomat</string>
+  <string name="indoor_kind_pharmacy">Apotheke</string>
+  <string name="indoor_kind_luggage">Gepäck</string>
+  <string name="indoor_kind_ticket">Fahrkarten</string>
+  <string name="indoor_kind_poi">Ort</string>
+</resources>

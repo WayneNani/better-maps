@@ -1,0 +1,6 @@
+scripts
+systemd
+config
+**/testdata
+**/*_test.go
+README.md

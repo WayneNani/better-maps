@@ -100,6 +100,16 @@ set(SRC
   gui/shape.hpp
   gui/skin.cpp
   gui/skin.hpp
+  indoor_builder.cpp
+  indoor_builder.hpp
+  indoor_cache.cpp
+  indoor_cache.hpp
+  indoor_data.cpp
+  indoor_data.hpp
+  indoor_renderer.cpp
+  indoor_renderer.hpp
+  indoor_triangulation.cpp
+  indoor_triangulation.hpp
   kinetic_scroller.cpp
   kinetic_scroller.hpp
   line_shape.cpp
@@ -233,6 +243,7 @@ target_link_libraries(${PROJECT_NAME}
   PRIVATE
     cppjansson
     editor
+    glaze::glaze
 )
 
 omim_add_test_subdirectory(drape_frontend_tests)

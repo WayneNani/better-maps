@@ -78,6 +78,7 @@ import app.organicmaps.leftbutton.LeftButton;
 import app.organicmaps.leftbutton.LeftButtonsHolder;
 import app.organicmaps.leftbutton.LeftToggleButton;
 import app.organicmaps.location.TrackRecordingService;
+import app.organicmaps.indoor.IndoorController;
 import app.organicmaps.maplayer.AerialAttributionController;
 import app.organicmaps.maplayer.MapButtonsController;
 import app.organicmaps.maplayer.MapButtonsViewModel;
@@ -212,6 +213,9 @@ public class MwmActivity extends BaseMwmFragmentActivity
   // better-maps: attribution of the aerial imagery layer.
   @Nullable
   private AerialAttributionController mAerialAttribution;
+  // better-maps: level switcher and details of the indoor maps.
+  @Nullable
+  private IndoorController mIndoorController;
   // Last result of canShowSavedConnection(), to update the card only when it changes.
   private boolean mSavedConnectionCardRoom;
   private boolean mIsTabletLayout;
@@ -680,6 +684,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
     initOnmapDownloader();
     initSavedConnectionCard();
     initAerialAttribution();
+    mIndoorController = new IndoorController(this);
     initPositionChooser();
   }
 
@@ -1256,6 +1261,8 @@ public class MwmActivity extends BaseMwmFragmentActivity
     processSavedConnectionIntent();
     if (mAerialAttribution != null)
       mAerialAttribution.onResume();
+    if (mIndoorController != null)
+      mIndoorController.onResume();
   }
 
   @Override
@@ -1272,6 +1279,8 @@ public class MwmActivity extends BaseMwmFragmentActivity
       mOnmapDownloader.onPause();
     if (mAerialAttribution != null)
       mAerialAttribution.onPause();
+    if (mIndoorController != null)
+      mIndoorController.onPause();
     MwmApplication.from(this).getSensorHelper().removeListener(this);
     dismissLocationErrorDialog();
     dismissAlertDialog();
@@ -1343,6 +1352,11 @@ public class MwmActivity extends BaseMwmFragmentActivity
     {
       mAerialAttribution.onDestroy();
       mAerialAttribution = null;
+    }
+    if (mIndoorController != null)
+    {
+      mIndoorController.onDestroy();
+      mIndoorController = null;
     }
     if (mRemoveDisplayListener && !isChangingConfigurations())
       mDisplayManager.removeListener(DisplayType.Device);

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: dimensions of the indoor map UI. -->
+<resources>
+  <!-- Level buttons: at least 48dp (touch target, accessibility). -->
+  <dimen name="indoor_level_button_size">48dp</dimen>
+  <dimen name="indoor_level_corner">24dp</dimen>
+  <dimen name="indoor_level_text">15sp</dimen>
+  <!-- Below the top search bar and the track recording status. -->
+  <dimen name="indoor_panel_margin_top">132dp</dimen>
+</resources>

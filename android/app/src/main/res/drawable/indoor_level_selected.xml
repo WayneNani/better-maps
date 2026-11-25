@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: the shown level in the indoor level switcher. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+  <solid android:color="?colorPrimaryContainer" />
+</shape>

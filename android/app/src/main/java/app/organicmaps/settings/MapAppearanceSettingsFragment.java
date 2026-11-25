@@ -48,6 +48,19 @@ public class MapAppearanceSettingsFragment extends BaseXmlSettingsFragment imple
     super.onResume();
     updateMapLanguageCodeSummary();
     updateAerialImagerySummary();
+    updateIndoorMapsSummary();
+  }
+
+  private void updateIndoorMapsSummary()
+  {
+    final Preference pref = getPreference("indoor_maps_screen");
+    final IndoorMapsSettings settings = IndoorMapsSettings.get(requireContext());
+    if (settings.isActive())
+      pref.setSummary(settings.getUrl());
+    else if (settings.isConfigured())
+      pref.setSummary(R.string.indoor_maps_off);
+    else
+      pref.setSummary(R.string.routing_server_not_set);
   }
 
   private void updateAerialImagerySummary()

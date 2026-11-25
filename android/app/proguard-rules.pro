@@ -48,3 +48,10 @@
 -keep class app.organicmaps.ev.EvPlanOptions$* { <fields>; <init>(); }
 -keep class app.organicmaps.ev.EvPlanResult { <fields>; <init>(); }
 -keep class app.organicmaps.ev.EvPlanResult$* { <fields>; <init>(); }
+
+# better-maps: the core calls the indoor maps listener through JNI by name.
+-keep interface app.organicmaps.sdk.indoor.IndoorListener { *; }
+-keepclassmembers class * implements app.organicmaps.sdk.indoor.IndoorListener {
+  void onIndoorStateChanged(boolean, java.lang.String, java.lang.String, double[], java.lang.String[], double);
+  void onIndoorFeatureTapped(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String[], double, double);
+}

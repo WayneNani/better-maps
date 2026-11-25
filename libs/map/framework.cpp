@@ -326,6 +326,7 @@ void Framework::OnViewportChanged(ScreenBase const & screen)
   m_trafficManager.UpdateViewport(m_currentModelView);
   m_transitManager.UpdateViewport(m_currentModelView);
   m_isolinesManager.UpdateViewport(m_currentModelView);
+  m_indoorManager.UpdateViewport(m_currentModelView);
 
   if (m_viewportChangedFn != nullptr)
     m_viewportChangedFn(screen);
@@ -455,6 +456,7 @@ Framework::~Framework()
 
   GetBookmarkManager().Teardown();
   m_trafficManager.Teardown();
+  m_indoorManager.Teardown();
   DestroyDrapeEngine();
   m_featuresFetcher.SetOnMapDeregisteredCallback(nullptr);
 }
@@ -1628,7 +1630,13 @@ void Framework::CreateDrapeEngine(ref_ptr<dp::GraphicsContextFactory> contextFac
   m_drapeEngine->SetModelViewListener([this](ScreenBase const & screen)
   { GetPlatform().RunTask(Platform::Thread::Gui, [this, screen]() { OnViewportChanged(screen); }); });
   m_drapeEngine->SetTapEventInfoListener([this](df::TapInfo const & tapInfo)
-  { GetPlatform().RunTask(Platform::Thread::Gui, [this, tapInfo]() { OnTapEvent(place_page::BuildInfo(tapInfo)); }); });
+  {
+    GetPlatform().RunTask(Platform::Thread::Gui, [this, tapInfo]()
+    {
+      if (!OnIndoorTap(tapInfo))
+        OnTapEvent(place_page::BuildInfo(tapInfo));
+    });
+  });
   m_drapeEngine->SetUserPositionListener([this](m2::PointD const & position, bool hasPosition)
   {
     GetPlatform().RunTask(Platform::Thread::Gui,
@@ -1654,6 +1662,7 @@ void Framework::CreateDrapeEngine(ref_ptr<dp::GraphicsContextFactory> contextFac
   m_trafficManager.SetDrapeEngine(make_ref(m_drapeEngine));
   m_transitManager.SetDrapeEngine(make_ref(m_drapeEngine));
   m_isolinesManager.SetDrapeEngine(make_ref(m_drapeEngine));
+  m_indoorManager.SetDrapeEngine(make_ref(m_drapeEngine));
   m_searchMarks.SetDrapeEngine(make_ref(m_drapeEngine));
 
   InvalidateUserMarks();
@@ -1692,6 +1701,40 @@ void Framework::SetAerialImagery(bool enabled, std::string const & url, std::str
 bool Framework::IsAerialImageryActive() const
 {
   return m_aerialImagery.IsActive();
+}
+
+void Framework::SetIndoorServer(bool enabled, std::string const & url, std::string const & token)
+{
+  m_indoorManager.SetServer(enabled, url, token, GetPlatform().TmpPathForFile("indoor_venues"));
+}
+
+void Framework::SetIndoorListeners(IndoorManager::StateListener stateListener, IndoorFeatureListener featureListener)
+{
+  m_indoorManager.SetStateListener(std::move(stateListener));
+  m_indoorFeatureListener = std::move(featureListener);
+}
+
+void Framework::SetIndoorLevel(double level)
+{
+  m_indoorManager.SetLevel(level);
+}
+
+bool Framework::OnIndoorTap(df::TapInfo const & tapInfo)
+{
+  if (tapInfo.m_isLong || tapInfo.m_isMyPositionTapped || !m_indoorFeatureListener || !m_indoorManager.IsEnabled())
+    return false;
+  // Ruler routing continues the route to the tap.
+  if (m_routingManager.IsRoutingActive() && m_routingManager.GetCurrentRouterType() == routing::RouterType::Ruler)
+    return false;
+  double const radius = m_currentModelView.GetScale() * df::VisualParams::Instance().GetTouchRectRadius();
+  // Indoor POIs first; then a tapped map POI or user mark keeps its normal place page; then indoor rooms.
+  bool const mapObjectTapped = tapInfo.m_featureTapped.IsValid() || tapInfo.m_markTapped != kml::kInvalidMarkId;
+  auto info = m_indoorManager.HitTest(tapInfo.m_mercator, radius, !mapObjectTapped /* withAreas */);
+  if (!info)
+    return false;
+  DeactivateMapSelection();
+  m_indoorFeatureListener(*info);
+  return true;
 }
 
 void Framework::OnRecoverSurface(int width, int height, bool recreateContextDependentResources)
@@ -1748,6 +1791,7 @@ void Framework::DestroyDrapeEngine()
     m_trafficManager.SetDrapeEngine(nullptr);
     m_transitManager.SetDrapeEngine(nullptr);
     m_isolinesManager.SetDrapeEngine(nullptr);
+    m_indoorManager.SetDrapeEngine(nullptr);
     m_searchMarks.SetDrapeEngine(nullptr);
     GetBookmarkManager().SetDrapeEngine(nullptr);
 

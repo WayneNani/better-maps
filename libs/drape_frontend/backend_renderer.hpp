@@ -28,6 +28,7 @@ class TextureManager;
 namespace df
 {
 class DrapeApiBuilder;
+class IndoorBuilder;
 class Message;
 class ReadManager;
 class RouteBuilder;
@@ -132,6 +133,9 @@ private:
   drape_ptr<TrafficGenerator> m_trafficGenerator;
   drape_ptr<UserMarkGenerator> m_userMarkGenerator;
   drape_ptr<DrapeApiBuilder> m_drapeApiBuilder;
+  // better-maps: indoor maps.
+  drape_ptr<IndoorBuilder> m_indoorBuilder;
+  void RebuildIndoor();
   gui::LayerCacher m_guiCacher;
 
   ref_ptr<RequestedTiles> m_requestedTiles;

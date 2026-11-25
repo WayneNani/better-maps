@@ -109,6 +109,9 @@ std::string DebugPrint(Message::Type msgType)
   case Message::Type::VisualScaleChanged: return "VisualScaleChanged";
   case Message::Type::SetRasterLayer: return "SetRasterLayer";
   case Message::Type::RasterTileLoaded: return "RasterTileLoaded";
+  case Message::Type::SetIndoorLevel: return "SetIndoorLevel";
+  case Message::Type::FlushIndoor: return "FlushIndoor";
+  case Message::Type::RegenerateIndoor: return "RegenerateIndoor";
   }
   ASSERT(false, ("Unknown message type."));
   return "Unknown type";

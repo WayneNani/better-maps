@@ -13,6 +13,7 @@
 #include "drape_frontend/my_position_controller.hpp"
 #include "drape_frontend/overlay_batcher.hpp"
 #include "drape_frontend/postprocess_renderer.hpp"
+#include "drape_frontend/indoor_builder.hpp"
 #include "drape_frontend/raster_tile_loader.hpp"
 #include "drape_frontend/render_node.hpp"
 #include "drape_frontend/route_shape.hpp"
@@ -1188,6 +1189,43 @@ public:
 private:
   uint64_t const m_generation;
   raster::RasterTileImage m_image;
+};
+
+// better-maps: indoor maps. The level of a venue to show (no venue: none), to the backend.
+class SetIndoorLevelMessage : public Message
+{
+public:
+  explicit SetIndoorLevelMessage(IndoorLevelParams const & params) : m_params(params) {}
+
+  Type GetType() const override { return Type::SetIndoorLevel; }
+
+  IndoorLevelParams const & GetParams() const { return m_params; }
+
+private:
+  IndoorLevelParams const m_params;
+};
+
+// better-maps: indoor maps. The built level, from the backend to the frontend.
+class FlushIndoorMessage : public Message
+{
+public:
+  explicit FlushIndoorMessage(IndoorRenderBatch && batch) : m_batch(std::move(batch)) {}
+
+  Type GetType() const override { return Type::FlushIndoor; }
+  bool IsGraphicsContextDependent() const override { return true; }
+  bool ContainsRenderState() const override { return true; }
+
+  IndoorRenderBatch && AcceptBatch() { return std::move(m_batch); }
+
+private:
+  IndoorRenderBatch m_batch;
+};
+
+// better-maps: indoor maps. Build the shown level again (the GPU data was lost), to the backend.
+class RegenerateIndoorMessage : public Message
+{
+public:
+  Type GetType() const override { return Type::RegenerateIndoor; }
 };
 
 class EnableTransitSchemeMessage : public Message

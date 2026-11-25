@@ -1,0 +1,14 @@
+# Weekly indoor data update (user service). Install, see README "Wöchentliches Update".
+[Unit]
+Description=better-maps indoor server: fetch the OSM extracts and re-import the venues
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+# Adjust the path to your checkout. Environment variables from scripts/common.sh can be set here.
+Environment="INDOOR_REGIONS=europe/germany/hessen europe/germany/nordrhein-westfalen"
+Environment=INDOOR_PORT=18300
+ExecStart=%h/Projects/better-maps/services/indoor-server/scripts/update.sh
+Nice=10
+IOSchedulingClass=idle

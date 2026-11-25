@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: colours of the indoor map UI (dark variants in values-night). -->
+<resources>
+  <color name="indoor_attribution_background">#B3FFFFFF</color>
+</resources>

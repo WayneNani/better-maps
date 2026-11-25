@@ -1,0 +1,17 @@
+# Starts the indoor gateway at boot (user service). Install, see README "Dauerbetrieb".
+[Unit]
+Description=better-maps indoor server (gateway)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# Adjust the path to your checkout. Environment variables from scripts/common.sh can be set here.
+Environment=INDOOR_PORT=18300
+ExecStart=%h/Projects/better-maps/services/indoor-server/scripts/run.sh
+ExecStop=%h/Projects/better-maps/services/indoor-server/scripts/stop.sh
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target
