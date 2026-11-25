@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: accessibility actions of the time grid, which draws its rides itself. -->
+<resources>
+  <item name="transit_action_earlier_departure" type="id" />
+  <item name="transit_action_later_departure" type="id" />
+</resources>

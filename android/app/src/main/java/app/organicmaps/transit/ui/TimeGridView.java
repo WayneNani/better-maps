@@ -9,12 +9,15 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.GestureDetector;
+import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import androidx.annotation.ColorInt;
@@ -31,6 +34,7 @@ import app.organicmaps.transit.ItineraryItem;
 import app.organicmaps.transit.ItineraryTimeline;
 import app.organicmaps.transit.JourneyBarLayout;
 import app.organicmaps.transit.LineBadge;
+import app.organicmaps.transit.RideDragSnap;
 import app.organicmaps.transit.TimeGridLayout;
 import app.organicmaps.transit.TransitFormatter;
 import app.organicmaps.util.ThemeUtils;
@@ -52,6 +56,11 @@ import java.util.List;
  * and a lane on its left with small "ghost" pills at the departure times (dashed if they miss the next ride). A tap
  * on a pill uses that departure; a tap elsewhere ends the selection. Without a selection, a tap elsewhere in a
  * column opens the connection.
+ * <p>
+ * Holding a ride lifts it (and selects it if it was not): it can then be dragged up and down and snaps to its other
+ * departures ({@link RideDragSnap}) with a haptic tick each, the target pill highlighted. Lifting the finger uses that
+ * departure as a tap on its pill would; back at the start, or cancelled, nothing changes. While the departures are
+ * loading the ride is lifted in place. The scrolling parents do not get the gesture while a ride is lifted.
  */
 public final class TimeGridView extends View
 {
@@ -71,6 +80,34 @@ public final class TimeGridView extends View
 
     /** A tap outside the selected ride and its departures. */
     default void onDismissAlternatives() {}
+
+    /**
+     * A lifted ride snapped to another departure (or back to its own): show what it would mean. -1 when the drag ends
+     * (then {@link #onAlternativeClick} follows if the ride was dropped at another departure).
+     */
+    default void onAlternativePreview(int chipIndex) {}
+  }
+
+  /** A held ride, lifted to be dragged to its other departures. */
+  private static final class Drag
+  {
+    final int mConnection;
+    final int mLegIndex;
+    final RideDragSnap mSnap;
+    float mFingerY;
+    // The pills the snap knows, to update it when they move.
+    @Nullable
+    List<RectF> mPills;
+    // The departures of this ride were shown during the drag.
+    boolean mShown;
+
+    Drag(int connection, int legIndex, @NonNull RideDragSnap snap, float fingerY)
+    {
+      mConnection = connection;
+      mLegIndex = legIndex;
+      mSnap = snap;
+      mFingerY = fingerY;
+    }
   }
 
   private static final float MIN_AXIS_DP = 40;
@@ -95,6 +132,13 @@ public final class TimeGridView extends View
   private static final float STRIPE_DP = 4;
   /** Taps this close to a pill or a ride count, so that small targets are easy to hit. */
   private static final float TOUCH_DP = 22;
+  /** Holding a ride this long lifts it for dragging. */
+  @VisibleForTesting
+  public static final long HOLD_MS = 300;
+  /** See {@link RideDragSnap}: a little more than the middle between two departures switches. */
+  private static final float SNAP_HYSTERESIS_DP = 3;
+  /** A lifted ride is this much wider on each side. */
+  private static final float LIFT_DP = 3;
 
   /** Virtual view ids for accessibility; connections use their index. */
   private static final int ID_EARLIER = -10;
@@ -123,6 +167,9 @@ public final class TimeGridView extends View
   private final Paint mPillStroke = new Paint(Paint.ANTI_ALIAS_FLAG);
   private final Paint mPillDashed = new Paint(Paint.ANTI_ALIAS_FLAG);
   private final Paint mPillText = new Paint(Paint.ANTI_ALIAS_FLAG);
+  private final Paint mShadow = new Paint(Paint.ANTI_ALIAS_FLAG);
+  private final Paint mSlot = new Paint(Paint.ANTI_ALIAS_FLAG);
+  private final Paint mTarget = new Paint(Paint.ANTI_ALIAS_FLAG);
   private final RectF mRect = new RectF();
   private final Paint.FontMetrics mMetrics = new Paint.FontMetrics();
   @ColorInt
@@ -142,6 +189,8 @@ public final class TimeGridView extends View
   private final GestureDetector mGestures;
   private final AccessHelper mAccess;
   private final ViewTreeObserver.OnScrollChangedListener mScrollListener = this::invalidate;
+  private final int mTouchSlop;
+  private final Runnable mHold = this::startDrag;
 
   @NonNull
   private List<ItineraryItem> mItems = Collections.emptyList();
@@ -167,6 +216,14 @@ public final class TimeGridView extends View
   private List<RectF> mPills;
   // Wide enough for the longest departure time in a pill.
   private int mLaneWidth;
+  // A ride under the finger that is lifted when held long enough; -1 if none.
+  private int mHoldConnection = -1;
+  private int mHoldLeg = -1;
+  private float mDownX;
+  private float mDownY;
+  private float mLastY;
+  @Nullable
+  private Drag mDrag;
 
   public TimeGridView(@NonNull Context context)
   {
@@ -223,7 +280,16 @@ public final class TimeGridView extends View
     mPillText.setTypeface(Typeface.DEFAULT_BOLD);
     mPillText.setTextAlign(Paint.Align.LEFT);
     mPillText.setTextSize(sp(PILL_TEXT_SP));
+    mShadow.setColor(Color.argb(0x50, 0, 0, 0));
+    mSlot.setStyle(Paint.Style.STROKE);
+    mSlot.setStrokeWidth(dp(1.5f));
+    mSlot.setColor(mAccentColor);
+    mSlot.setPathEffect(new DashPathEffect(new float[] {dp(4), dp(3)}, 0));
+    mTarget.setStyle(Paint.Style.STROKE);
+    mTarget.setStrokeWidth(dp(2));
+    mTarget.setColor(mAccentColor);
     mAxisWidth = dp(MIN_AXIS_DP);
+    mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
 
     mGestures = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
       @Override
@@ -288,8 +354,20 @@ public final class TimeGridView extends View
     mPills = null;
     if (sizeChanged || laneChanged || oldAxisWidth != mAxisWidth)
       requestLayout();
+    final Drag drag = mDrag;
+    if (drag != null && drag.mShown && !isDraggedRideShown(drag))
+      endDrag(); // E.g. a new search: the departures of the lifted ride are gone.
+    else if (drag != null)
+      updateDrag(drag); // E.g. the departures arrived.
     invalidate();
     mAccess.invalidateRoot();
+  }
+
+  /** True while a ride is lifted for dragging. */
+  @VisibleForTesting
+  public boolean isDragging()
+  {
+    return mDrag != null;
   }
 
   /** Horizontal distance between two connections, e.g. to keep them in view when earlier ones are added. */
@@ -349,6 +427,8 @@ public final class TimeGridView extends View
   @Override
   protected void onDetachedFromWindow()
   {
+    cancelHold();
+    endDrag();
     getViewTreeObserver().removeOnScrollChangedListener(mScrollListener);
     super.onDetachedFromWindow();
   }
@@ -479,6 +559,9 @@ public final class TimeGridView extends View
   protected void onDraw(@NonNull Canvas canvas)
   {
     super.onDraw(canvas);
+    // The layout may be new (e.g. the departures arrived): the lifted ride snaps to the new pills.
+    if (mDrag != null)
+      updateDrag(mDrag);
     final TimeGridLayout layout = layout();
     if (layout == null)
       return;
@@ -535,6 +618,13 @@ public final class TimeGridView extends View
 
   private void drawColumn(@NonNull Canvas canvas, @NonNull TimeGridLayout.Column column, @NonNull ItineraryItem item)
   {
+    drawColumn(canvas, column, item, -1);
+  }
+
+  /** @param skipLeg leg index of a ride not to draw (it is lifted), -1 for none. */
+  private void drawColumn(@NonNull Canvas canvas, @NonNull TimeGridLayout.Column column, @NonNull ItineraryItem item,
+                          int skipLeg)
+  {
     final float centerX = column.getCenterX();
     for (TimeGridLayout.Block block : column.getBlocks())
     {
@@ -545,29 +635,10 @@ public final class TimeGridView extends View
         continue;
       }
       final LineBadge badge = block.getBadge();
-      if (badge == null)
+      if (badge == null || (skipLeg >= 0 && block.getSegment().getLegIndex() == skipLeg))
         continue;
-      final int alpha = block.getSegment().isCancelled() ? CANCELLED_ALPHA : 0xFF;
-      mFill.setColor(badge.getBackgroundColor());
-      mFill.setAlpha(alpha);
       mRect.set(column.getLeft(), block.getTop(), column.getRight(), block.getBottom());
-      canvas.drawRoundRect(mRect, dp(CORNER_DP), dp(CORNER_DP), mFill);
-      mBlockText.getFontMetrics(mMetrics);
-      final float textHeight = mMetrics.descent - mMetrics.ascent;
-      if (block.getHeight() >= textHeight + dp(2))
-      {
-        for (String label : JourneyBarLayout.labelCandidates(badge.getText()))
-        {
-          if (!JourneyBarLayout.fitsLabel(column.getRight() - column.getLeft(), mBlockText.measureText(label),
-                                          Math.round(dp(2))))
-            continue;
-          mBlockText.setColor(badge.getTextColor());
-          mBlockText.setAlpha(alpha);
-          final float centerY = (block.getTop() + block.getBottom()) / 2f;
-          canvas.drawText(label, centerX, centerY - (mMetrics.ascent + mMetrics.descent) / 2, mBlockText);
-          break;
-        }
-      }
+      drawRide(canvas, mRect, badge, block.getSegment().isCancelled() ? CANCELLED_ALPHA : 0xFF);
     }
 
     // Departure above, arrival below, colored by delay.
@@ -578,7 +649,31 @@ public final class TimeGridView extends View
     canvas.drawText(item.getArrival(), centerX, column.getBottom() + dp(3) - mMetrics.ascent, mLabel);
   }
 
-  /** The column with the selected ride: a background, the ride outlined, the other departures in the lane. */
+  /** A ride block with its line name if it fits. */
+  private void drawRide(@NonNull Canvas canvas, @NonNull RectF rect, @NonNull LineBadge badge, int alpha)
+  {
+    mFill.setColor(badge.getBackgroundColor());
+    mFill.setAlpha(alpha);
+    canvas.drawRoundRect(rect, dp(CORNER_DP), dp(CORNER_DP), mFill);
+    mBlockText.getFontMetrics(mMetrics);
+    final float textHeight = mMetrics.descent - mMetrics.ascent;
+    if (rect.height() < textHeight + dp(2))
+      return;
+    for (String label : JourneyBarLayout.labelCandidates(badge.getText()))
+    {
+      if (!JourneyBarLayout.fitsLabel(Math.round(rect.width()), mBlockText.measureText(label), Math.round(dp(2))))
+        continue;
+      mBlockText.setColor(badge.getTextColor());
+      mBlockText.setAlpha(alpha);
+      canvas.drawText(label, rect.centerX(), rect.centerY() - (mMetrics.ascent + mMetrics.descent) / 2, mBlockText);
+      break;
+    }
+  }
+
+  /**
+   * The column with the selected ride: a background, the ride outlined, the other departures in the lane. A lifted
+   * ride is drawn above everything at the departure it snaps to, its place as a dashed outline.
+   */
   private void drawSelectedColumn(@NonNull Canvas canvas, @NonNull TimeGridLayout layout,
                                   @NonNull TimeGridLayout.Column column, @NonNull ItineraryItem item)
   {
@@ -588,17 +683,24 @@ public final class TimeGridView extends View
     mRect.set(column.getLaneLeft() - dp(2), layout.y(layout.getRangeStart()), column.getRight() + dp(4),
               layout.y(layout.getRangeEnd()));
     canvas.drawRoundRect(mRect, dp(8), dp(8), mSelection);
-    drawColumn(canvas, column, item);
+    final Drag drag = mDrag != null && isDraggedRideShown(mDrag) ? mDrag : null;
+    drawColumn(canvas, column, item, drag != null ? drag.mLegIndex : -1);
+    TimeGridLayout.Block selectedBlock = null;
     for (TimeGridLayout.Block block : column.getBlocks())
       if (block.getKind() == ItineraryTimeline.Kind.RIDE
           && block.getSegment().getLegIndex() == alternatives.getLegIndex())
       {
+        selectedBlock = block;
         mRect.set(column.getLeft() - dp(2), block.getTop() - dp(2), column.getRight() + dp(2), block.getBottom() + dp(2));
-        canvas.drawRoundRect(mRect, dp(CORNER_DP + 2), dp(CORNER_DP + 2), mOutline);
+        canvas.drawRoundRect(mRect, dp(CORNER_DP + 2), dp(CORNER_DP + 2), drag != null ? mSlot : mOutline);
       }
     final List<RectF> pills = pills();
     if (pills == null)
+    {
+      if (drag != null && selectedBlock != null)
+        drawLifted(canvas, column, selectedBlock, selectedBlock.getTop(), selectedBlock.getBottom());
       return;
+    }
     mPillText.getFontMetrics(mMetrics);
     final float corner = dp(3);
     for (int i = 0; i < pills.size(); ++i)
@@ -627,6 +729,41 @@ public final class TimeGridView extends View
       final float baseline = pill.centerY() - (mMetrics.ascent + mMetrics.descent) / 2;
       canvas.drawText(chip.getDeparture(), pill.left + dp(STRIPE_DP) + dp(2), baseline, mPillText);
     }
+    if (drag == null || selectedBlock == null)
+      return;
+    final int target = drag.mSnap.getIndex();
+    if (target < 0 || target >= pills.size() || target == drag.mSnap.getOriginal())
+    {
+      drawLifted(canvas, column, selectedBlock, selectedBlock.getTop(), selectedBlock.getBottom());
+      return;
+    }
+    // The pill it snaps to, and the ride at that departure.
+    final RectF pill = pills.get(target);
+    mPill.setColor(Color.argb(0x55, Color.red(mAccentColor), Color.green(mAccentColor), Color.blue(mAccentColor)));
+    canvas.drawRoundRect(pill, dp(3), dp(3), mPill);
+    mRect.set(pill.left - dp(1), pill.top - dp(1), pill.right + dp(1), pill.bottom + dp(1));
+    canvas.drawRoundRect(mRect, dp(4), dp(4), mTarget);
+    final AlternativesItem.Chip chip = alternatives.getChips().get(target);
+    final float top = layout.y(chip.getDepartureEpoch());
+    final float bottom = chip.getArrivalEpoch() > chip.getDepartureEpoch() ? layout.y(chip.getArrivalEpoch())
+                                                                          : top + selectedBlock.getHeight();
+    drawLifted(canvas, column, selectedBlock, top, Math.max(bottom, top + dp(MIN_BLOCK_DP)));
+  }
+
+  /** A lifted ride: a little wider, with a shadow and an outline. */
+  private void drawLifted(@NonNull Canvas canvas, @NonNull TimeGridLayout.Column column,
+                          @NonNull TimeGridLayout.Block block, float top, float bottom)
+  {
+    final LineBadge badge = block.getBadge();
+    if (badge == null)
+      return;
+    final float grow = dp(LIFT_DP);
+    mRect.set(column.getLeft() - grow, top + dp(1), column.getRight() + grow, bottom + dp(4));
+    canvas.drawRoundRect(mRect, dp(CORNER_DP + 2), dp(CORNER_DP + 2), mShadow);
+    mRect.set(column.getLeft() - grow, top - dp(1), column.getRight() + grow, bottom + dp(1));
+    drawRide(canvas, mRect, badge, 0xFF);
+    mRect.inset(-dp(2), -dp(2));
+    canvas.drawRoundRect(mRect, dp(CORNER_DP + 2), dp(CORNER_DP + 2), mOutline);
   }
 
   private void setLabelStyle(@NonNull TransitFormatter.Delay delay, boolean cancelled)
@@ -763,7 +900,169 @@ public final class TimeGridView extends View
   @Override
   public boolean onTouchEvent(@NonNull MotionEvent event)
   {
+    if (mDrag != null)
+    {
+      onDragEvent(mDrag, event);
+      return true;
+    }
+    switch (event.getActionMasked())
+    {
+    case MotionEvent.ACTION_DOWN:
+      cancelHold();
+      mDownX = event.getX();
+      mDownY = event.getY();
+      mLastY = mDownY;
+      final int target = mListener != null ? targetAt(mDownX, mDownY) : ExploreByTouchHelper.INVALID_ID;
+      if (target >= ID_RIDE)
+      {
+        mHoldConnection = (target - ID_RIDE) / RIDE_STRIDE;
+        mHoldLeg = (target - ID_RIDE) % RIDE_STRIDE;
+        postDelayed(mHold, HOLD_MS);
+      }
+      break;
+    case MotionEvent.ACTION_MOVE:
+      mLastY = event.getY();
+      // A scroll (of the grid or the sheet), not a hold.
+      if (Math.abs(event.getX() - mDownX) > mTouchSlop || Math.abs(event.getY() - mDownY) > mTouchSlop)
+        cancelHold();
+      break;
+    case MotionEvent.ACTION_POINTER_DOWN:
+    case MotionEvent.ACTION_UP:
+    case MotionEvent.ACTION_CANCEL: cancelHold(); break;
+    default: break;
+    }
     return mGestures.onTouchEvent(event) || super.onTouchEvent(event);
+  }
+
+  private void cancelHold()
+  {
+    removeCallbacks(mHold);
+    mHoldConnection = -1;
+    mHoldLeg = -1;
+  }
+
+  /** The ride under the finger was held long enough: lift it, and show its departures if they are not shown. */
+  private void startDrag()
+  {
+    final Listener listener = mListener;
+    if (listener == null || mHoldConnection < 0)
+      return;
+    final Drag drag = new Drag(mHoldConnection, mHoldLeg, new RideDragSnap(dp(SNAP_HYSTERESIS_DP)), mLastY);
+    cancelHold();
+    mDrag = drag;
+    // The rest of the gesture is no tap, and the scrolling parents must not take it.
+    final long now = SystemClock.uptimeMillis();
+    final MotionEvent cancel = MotionEvent.obtain(now, now, MotionEvent.ACTION_CANCEL, 0, 0, 0);
+    mGestures.onTouchEvent(cancel);
+    cancel.recycle();
+    final ViewParent parent = getParent();
+    if (parent != null)
+      parent.requestDisallowInterceptTouchEvent(true);
+    TransitSheetLayout.keepGesture(this);
+    performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+    if (!isDraggedRideShown(drag))
+      listener.onRideClick(drag.mConnection, drag.mLegIndex);
+    updateDrag(drag);
+    invalidate();
+  }
+
+  private void onDragEvent(@NonNull Drag drag, @NonNull MotionEvent event)
+  {
+    switch (event.getActionMasked())
+    {
+    case MotionEvent.ACTION_MOVE:
+      drag.mFingerY = event.getY();
+      updateDrag(drag);
+      if (drag.mSnap.move(drag.mFingerY))
+      {
+        performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
+        if (mListener != null)
+          mListener.onAlternativePreview(drag.mSnap.getIndex());
+        invalidate();
+      }
+      break;
+    case MotionEvent.ACTION_UP:
+      final int chosen = isDraggedRideShown(drag) ? drag.mSnap.result() : -1;
+      endDrag();
+      if (chosen >= 0 && mListener != null)
+      {
+        playSoundEffect(android.view.SoundEffectConstants.CLICK);
+        mListener.onAlternativeClick(chosen);
+      }
+      break;
+    case MotionEvent.ACTION_CANCEL: endDrag(); break;
+    default: break;
+    }
+  }
+
+  /** Lets the lifted ride snap to the pills once its departures are there, and as they move. */
+  private void updateDrag(@NonNull Drag drag)
+  {
+    final AlternativesItem alternatives = mAlternatives;
+    if (alternatives == null || !isDraggedRideShown(drag))
+      return;
+    drag.mShown = true;
+    final List<RectF> pills = pills();
+    if (pills == null || pills == drag.mPills)
+      return;
+    drag.mPills = pills;
+    final boolean wasSnapping = drag.mSnap.hasTargets();
+    final List<AlternativesItem.Chip> chips = alternatives.getChips();
+    final boolean usable = !alternatives.isLoading() && alternatives.getError() == null && chips.size() == pills.size();
+    final float[] centers = new float[usable ? pills.size() : 0];
+    int original = -1;
+    for (int i = 0; i < centers.length; ++i)
+    {
+      centers[i] = pills.get(i).centerY();
+      if (chips.get(i).isSelected())
+        original = i;
+    }
+    // Unknown which departure the connection uses: the one at the ride's departure.
+    final float top = rideTop(drag.mConnection, drag.mLegIndex);
+    drag.mSnap.setTargets(centers, original, Float.isNaN(top) ? drag.mFingerY : top, drag.mFingerY);
+    if (!wasSnapping && drag.mSnap.hasTargets() && mListener != null)
+      mListener.onAlternativePreview(drag.mSnap.getIndex());
+  }
+
+  private void endDrag()
+  {
+    if (mDrag == null)
+      return;
+    mDrag = null;
+    if (mListener != null)
+      mListener.onAlternativePreview(-1);
+    invalidate();
+  }
+
+  /** Index of the departure a shown ride uses, -1 if its departures are not shown (or not known yet). */
+  private int selectedChip(int connection, int legIndex)
+  {
+    final AlternativesItem alternatives = mAlternatives;
+    if (alternatives == null || alternatives.getConnection() != connection || alternatives.getLegIndex() != legIndex
+        || alternatives.isLoading())
+      return -1;
+    for (int i = 0; i < alternatives.getChips().size(); ++i)
+      if (alternatives.getChips().get(i).isSelected())
+        return i;
+    return -1;
+  }
+
+  /** Top of a ride in view coordinates, NaN if there is no such ride. */
+  private float rideTop(int connection, int legIndex)
+  {
+    final TimeGridLayout layout = layout();
+    if (layout == null || connection < 0 || connection >= layout.getColumns().size())
+      return Float.NaN;
+    for (TimeGridLayout.Block block : layout.getColumns().get(connection).getBlocks())
+      if (block.getKind() == ItineraryTimeline.Kind.RIDE && block.getSegment().getLegIndex() == legIndex)
+        return block.getTop();
+    return Float.NaN;
+  }
+
+  private boolean isDraggedRideShown(@NonNull Drag drag)
+  {
+    return mAlternatives != null && mAlternatives.getConnection() == drag.mConnection
+        && mAlternatives.getLegIndex() == drag.mLegIndex;
   }
 
   @Override
@@ -887,6 +1186,14 @@ public final class TimeGridView extends View
               node.setContentDescription(getContext().getString(R.string.transit_alt_show) + ": "
                                          + (badge != null ? badge.getText() : "") + " " + time);
             }
+          // What dragging the selected ride does: the previous or next departure.
+          final int selected = selectedChip(index, leg);
+          if (selected > 0)
+            node.addAction(new AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                R.id.transit_action_earlier_departure, getContext().getString(R.string.transit_alt_earlier)));
+          if (selected >= 0 && mAlternatives != null && selected + 1 < mAlternatives.getChips().size())
+            node.addAction(new AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                R.id.transit_action_later_departure, getContext().getString(R.string.transit_alt_later)));
         }
       }
       else if (layout != null && id >= 0 && id < layout.getColumns().size() && id < mItems.size())
@@ -905,6 +1212,16 @@ public final class TimeGridView extends View
     @Override
     protected boolean onPerformActionForVirtualView(int id, int action, @Nullable Bundle arguments)
     {
+      if ((action == R.id.transit_action_earlier_departure || action == R.id.transit_action_later_departure)
+          && id >= ID_RIDE && mListener != null)
+      {
+        final int selected = selectedChip((id - ID_RIDE) / RIDE_STRIDE, (id - ID_RIDE) % RIDE_STRIDE);
+        final int chip = selected + (action == R.id.transit_action_earlier_departure ? -1 : 1);
+        if (selected < 0 || mAlternatives == null || chip < 0 || chip >= mAlternatives.getChips().size())
+          return false;
+        mListener.onAlternativeClick(chip);
+        return true;
+      }
       return action == AccessibilityNodeInfoCompat.ACTION_CLICK && perform(id);
     }
   }
