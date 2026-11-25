@@ -154,6 +154,8 @@ public class PlacePageTransitDeparturesFragment
     TransitViews.bindBadge(badge, item.getBadge());
     direction.setText(item.getDirection());
     TransitViews.setStrikeThrough(direction, item.isCancelled());
+    if (item.isDirectionChanged())
+      direction.setTextColor(TransitViews.lateColor(row.getContext()));
     UiUtils.setTextAndHideIfEmpty(track, item.getTrack());
     if (item.isTrackChanged())
       track.setTextColor(TransitViews.lateColor(row.getContext()));

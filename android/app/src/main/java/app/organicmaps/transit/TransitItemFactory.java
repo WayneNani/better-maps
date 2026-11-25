@@ -156,7 +156,11 @@ public final class TransitItemFactory
   public DepartureItem departure(@NonNull TransitDeparture departure)
   {
     final TransitPlace place = departure.getPlace();
-    return new DepartureItem(badge(departure), departure.getDirection(),
+    String direction = departure.getDirection();
+    final String scheduled = departure.getScheduledDirection();
+    if (departure.isShortened() && direction != null && scheduled != null)
+      direction = mFormatter.getTexts().shortenedDirection(direction, scheduled);
+    return new DepartureItem(badge(departure), direction, departure.isShortened(),
                              mFormatter.formatTime(departure.getDeparture(), place.getTimeZone()),
                              mFormatter.delay(departure.getDelaySeconds(), departure.isRealTime()),
                              track(place.getTrack()), place.isTrackChanged(), departure.isCancelled());

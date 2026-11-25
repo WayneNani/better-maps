@@ -277,6 +277,75 @@ public class MotisMapperTest
   }
 
   @Test
+  public void departureShortenedByRealtime() throws IOException
+  {
+    // Line 66 in Bonn at night: the tram turns at Bertha-von-Suttner-Platz, replacement buses serve Beuel - Siegburg.
+    final TransitDepartures departures = MotisMapper.toDepartures(withNextStops(
+        stop("Bonn Stadthaus", false), stop("Bonn Bertha-von-Suttner-Pl.", false),
+        stop("Bonn Beuel Konrad-Adenauer-Platz", true), stop("Siegburg Bf", true)));
+    final TransitDeparture departure = departures.getDepartures().get(0);
+    assertTrue(departure.isShortened());
+    assertEquals("Bonn Bertha-von-Suttner-Pl.", departure.getDirection());
+    assertEquals("U Ruhleben (Berlin)", departure.getScheduledDirection());
+    assertFalse(departure.isCancelled());
+  }
+
+  @Test
+  public void departureWithCancelledIntermediateStopIsNotShortened() throws IOException
+  {
+    // Skipped stops in the middle (e.g. Oberkassel) do not change the destination.
+    final TransitDepartures departures = MotisMapper.toDepartures(
+        withNextStops(stop("Bonn Oberkassel Mitte", true), stop("Bad Honnef (Stadtbahn)", false)));
+    final TransitDeparture departure = departures.getDepartures().get(0);
+    assertFalse(departure.isShortened());
+    assertEquals("U Ruhleben (Berlin)", departure.getDirection());
+    assertNull(departure.getScheduledDirection());
+    assertFalse(departure.isCancelled());
+  }
+
+  @Test
+  public void departureWithoutServedNextStopIsCancelled() throws IOException
+  {
+    final TransitDepartures departures =
+        MotisMapper.toDepartures(withNextStops(stop("A", true), stop("B", true)));
+    final TransitDeparture departure = departures.getDepartures().get(0);
+    assertTrue(departure.isCancelled());
+    assertFalse(departure.isShortened());
+  }
+
+  @Test
+  public void departureShortenedToItsHeadsignIsNotMarked() throws IOException
+  {
+    // Only a stop beyond the headsign (e.g. a depot run) is cancelled: nothing to tell the passenger.
+    final TransitDepartures departures = MotisMapper.toDepartures(
+        withNextStops(stop("U Ruhleben (Berlin)", false), stop("Depot", true)));
+    final TransitDeparture departure = departures.getDepartures().get(0);
+    assertFalse(departure.isShortened());
+    assertEquals("U Ruhleben (Berlin)", departure.getDirection());
+  }
+
+  /** The Alexanderplatz departures with the given next stops for the first departure. */
+  private static Stoptimes200Response withNextStops(JsonObject... stops) throws IOException
+  {
+    final JsonObject json = JsonParser.parseString(Fixtures.read("stoptimes_alex.json")).getAsJsonObject();
+    final JsonArray nextStops = new JsonArray();
+    for (JsonObject stop : stops)
+      nextStops.add(stop);
+    json.getAsJsonArray("stopTimes").get(0).getAsJsonObject().add("nextStops", nextStops);
+    return Stoptimes200Response.fromJson(json.toString());
+  }
+
+  private static JsonObject stop(String name, boolean cancelled)
+  {
+    final JsonObject stop = new JsonObject();
+    stop.addProperty("name", name);
+    stop.addProperty("lat", 50.73);
+    stop.addProperty("lon", 7.1);
+    stop.addProperty("cancelled", cancelled);
+    return stop;
+  }
+
+  @Test
   public void stopsFromReverseGeocoding()
   {
     final List<Match> matches =

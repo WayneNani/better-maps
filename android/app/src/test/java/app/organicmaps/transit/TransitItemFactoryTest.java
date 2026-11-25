@@ -179,5 +179,19 @@ public class TransitItemFactoryTest
     assertEquals(TransitFormatter.Delay.UNKNOWN, noRealtime.getDelay());
     assertNull(noRealtime.getTrack());
     assertTrue(noRealtime.isCancelled());
+    assertFalse(item.isDirectionChanged());
+  }
+
+  @Test
+  public void shortenedDepartureItem()
+  {
+    final TransitDeparture departure = TransitTestData.shortened(TransitTestData.departure(
+        TransitMode.TRAM, "66", "Siegburg Bf",
+        place("Bonn Hbf").departure(t("2026-11-24T22:33:00Z"), t("2026-11-24T22:34:00Z")).build(), true, false,
+        null), "Bonn Bertha-von-Suttner-Pl.");
+    final DepartureItem item = mFactory.departure(departure);
+    assertEquals("Bonn Bertha-von-Suttner-Pl. (instead of Siegburg Bf)", item.getDirection());
+    assertTrue(item.isDirectionChanged());
+    assertFalse(item.isCancelled());
   }
 }

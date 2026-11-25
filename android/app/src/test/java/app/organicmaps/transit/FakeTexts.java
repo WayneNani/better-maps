@@ -138,4 +138,11 @@ class FakeTexts implements TransitTexts
   {
     return "on the way";
   }
+
+  @NonNull
+  @Override
+  public String shortenedDirection(@NonNull String direction, @NonNull String scheduledDirection)
+  {
+    return direction + " (instead of " + scheduledDirection + ")";
+  }
 }
