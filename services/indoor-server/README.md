@@ -127,6 +127,7 @@ Skripte (`scripts/common.sh`, alles über Umgebungsvariablen):
 | `INDOOR_RATE_PER_MINUTE` / `INDOOR_RATE_BURST` | `120` / `60` | Ratenlimit pro Token |
 | `INDOOR_LOG_LEVEL` | `info` | `debug`, `info`, `warn`, `error` |
 | `INDOOR_MAX_FILESIZE` | `4G` | größter erlaubter Download |
+| `INDOOR_RESTART_CMD` | leer | Gateway läuft nicht über `run.sh`, sondern z. B. als systemd-/Quadlet-Unit mit `data/` als Bind-Mount: dieser Befehl startet es nach neuen Daten neu (ein Bind-Mount zeigt nach dem Austausch noch auf das alte Verzeichnis), z. B. `systemctl restart bettermaps-indoor-gateway.service` |
 
 Gateway (Flag oder Umgebungsvariable, das Flag hat Vorrang): `-listen`/`INDOOR_LISTEN` (`:8080`),
 `-data-dir`/`INDOOR_DATA_DIR`, `-tokens-file`/`INDOOR_TOKENS_FILE`, `-reload-tokens`/`INDOOR_RELOAD_TOKENS` (`30s`),

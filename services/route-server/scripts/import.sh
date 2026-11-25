@@ -41,6 +41,21 @@ if [[ "${OSRM_PREFILTER:-1}" == 1 ]]; then
   log "filtered in $((SECONDS - start)) s: $(du -h "$next/$OSRM_REGION.osm.pbf" | cut -f1)"
 fi
 
+# Server managed elsewhere (e.g. a systemd/Quadlet unit): ROUTE_RESTART_CMD replaces the detection of compose
+# containers below and is run after the new data is in place. ROUTE_STOP_CMD (optional, needs ROUTE_RESTART_CMD)
+# stops the server for the import, so that osrm-routed and osrm-extract do not need memory at the same time; the
+# app routes on the device meanwhile. After a failed import ROUTE_RESTART_CMD brings the server back with the old
+# data.
+if [[ -n "${ROUTE_STOP_CMD:-}" && -z "${ROUTE_RESTART_CMD:-}" ]]; then
+  die "ROUTE_STOP_CMD needs ROUTE_RESTART_CMD"
+fi
+stopped=false
+if [[ -n "${ROUTE_STOP_CMD:-}" ]]; then
+  log "stopping the server for the import: $ROUTE_STOP_CMD"
+  bash -c "$ROUTE_STOP_CMD" || die "ROUTE_STOP_CMD failed"
+  stopped=true
+fi
+
 log "import $OSRM_REGION (limits: ${OSRM_IMPORT_MEMORY} RAM, ${OSRM_THREADS} threads) ..."
 set +e
 compose --profile import run -T --rm --name bettermaps-route-import import 2>&1 | tee -a "$logfile"
@@ -49,6 +64,10 @@ set -e
 stats="$(grep -a 'import-stats:' "$logfile" | tail -1 || true)"
 if [[ $rc -ne 0 ]] || ! grep -q 'exit=0' <<<"$stats"; then
   rm -rf "$next"
+  if $stopped && [[ -d "$OSRM_REGION_DIR/data" ]]; then
+    log "restarting the server with the old data: $ROUTE_RESTART_CMD"
+    bash -c "$ROUTE_RESTART_CMD" || log "ROUTE_RESTART_CMD failed"
+  fi
   die "import failed (exit $rc), log: $logfile; current data left unchanged"
 fi
 
@@ -61,19 +80,6 @@ cp "$OSRM_PBF.sha256" "$next/inputs.sha256" 2>/dev/null || sha256sum "$OSRM_PBF"
 } | tee "$OSRM_REGION_DIR/import-stats.txt" >&2
 { tr '\n' ' ' <"$OSRM_REGION_DIR/import-stats.txt"; echo; } >>"$OSRM_REGION_DIR/import-history.txt"
 
-# Restart the server only if it currently serves this region.
-was_running=false
-for c in $(podman_cmd ps --filter name=bettermaps-route_osrm --format '{{.Names}}'); do
-  if podman_cmd inspect "$c" --format '{{range .Mounts}}{{.Source}} {{end}}' | grep -qF "$OSRM_REGION_DIR/data "; then
-    was_running=true
-  fi
-done
-rm -rf "$OSRM_REGION_DIR/data.prev"
-[[ -d "$OSRM_REGION_DIR/data" ]] && mv "$OSRM_REGION_DIR/data" "$OSRM_REGION_DIR/data.prev"
-mv "$next" "$OSRM_REGION_DIR/data"
-if $was_running; then
-  log "restarting server with the new data"
-  "$ROUTE_DIR/scripts/run.sh"
-fi
-rm -rf "$OSRM_REGION_DIR/data.prev"
+cp "$OSRM_REGION_DIR/import-stats.txt" "$next/import-stats.txt"
+swap_in_data "$next"
 log "import done: $OSRM_REGION_DIR/data"

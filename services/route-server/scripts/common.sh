@@ -64,3 +64,32 @@ compose() {
   fi
   "${tool[@]}" -f "$ROUTE_DIR/compose.yaml" -p bettermaps-route "$@"
 }
+
+# Swaps a complete data directory (<region>/data.next of import.sh, or one built elsewhere, see install-data.sh) in
+# for <region>/data and restarts the server if it serves this region. A server managed elsewhere (e.g. a
+# systemd/Quadlet unit) is restarted with ROUTE_RESTART_CMD instead; a bind mount of data/ keeps pointing at the old
+# directory after the swap, so it has to be restarted in any case.
+swap_in_data() { # <dir with the new data>
+  local next="$1" was_running=false c
+  # osrm-extract writes .fileIndex with mode 0700; make everything readable for a server that does not run as the
+  # owner (e.g. as nobody under rootful Podman), whoever wrote or copied the files.
+  chmod -R u+rwX,go+rX,go-w "$next"
+  if [[ -z "${ROUTE_RESTART_CMD:-}" ]]; then
+    for c in $(podman_cmd ps --filter name=bettermaps-route_osrm --format '{{.Names}}'); do
+      if podman_cmd inspect "$c" --format '{{range .Mounts}}{{.Source}} {{end}}' | grep -qF "$OSRM_REGION_DIR/data "; then
+        was_running=true
+      fi
+    done
+  fi
+  rm -rf "$OSRM_REGION_DIR/data.prev"
+  if [[ -d "$OSRM_REGION_DIR/data" ]]; then mv "$OSRM_REGION_DIR/data" "$OSRM_REGION_DIR/data.prev"; fi
+  mv "$next" "$OSRM_REGION_DIR/data"
+  if [[ -n "${ROUTE_RESTART_CMD:-}" ]]; then
+    log "restarting the server with the new data: $ROUTE_RESTART_CMD"
+    bash -c "$ROUTE_RESTART_CMD" || die "ROUTE_RESTART_CMD failed (new data is in place)"
+  elif $was_running; then
+    log "restarting server with the new data"
+    "$ROUTE_DIR/scripts/run.sh"
+  fi
+  rm -rf "$OSRM_REGION_DIR/data.prev"
+}

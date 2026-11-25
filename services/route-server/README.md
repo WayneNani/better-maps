@@ -29,7 +29,9 @@ Der Server läuft im Heimnetz, ist aber von außen erreichbar. Deshalb:
 - **Grenzen**: höchstens 25 Punkte pro Route, Anfrage höchstens 4 KB, nur `application/json`, Zeitlimits für
   Header (5 s), Anfrage (10 s) und OSRM (10 s), höchstens 8 gleichzeitige Anfragen an OSRM (sonst `503`).
 - **Logs**: nur Methode, Status, Dauer, Bytes und das **Label** des Tokens (z. B. `device=pixel`). Nie das Token, nie
-  Koordinaten, nie Client-Adressen (auch die Fehlermeldungen von `net/http` werden bereinigt).
+  Koordinaten, nie Client-Adressen (auch die Fehlermeldungen von `net/http` werden bereinigt). `osrm-routed` läuft
+  mit `--verbosity WARNING`: auf der Standardstufe `INFO` schreibt es jede Anfrage samt URL, also die Koordinaten der
+  Route, ins Container-Log (geprüft am 25.11.2026: mit `WARNING` keine einzige Zeile).
 - **TLS** macht der Reverse Proxy. Das Gateway lauscht standardmäßig nur auf `127.0.0.1:18100`. Die App akzeptiert
   `http://` nur für lokale Adressen (Emulator, LAN), sonst nur `https://`.
 - In der App bleibt das Token in den app-privaten Einstellungen (nicht im Backup), wird nie geloggt und nie in die
@@ -94,6 +96,8 @@ Skripte (`scripts/common.sh`, alles über Umgebungsvariablen):
 | `ROUTE_TOKENS_FILE` | `~/.config/bettermaps-route/tokens` | Token-Hashes |
 | `ROUTE_RATE_PER_MINUTE` / `ROUTE_RATE_BURST` | `30` / `60` | Ratenlimit pro Token |
 | `ROUTE_MAX_POINTS` | `25` | Höchstzahl Punkte (Start, Zwischenziele, Ziel) |
+| `ROUTE_RESTART_CMD` | leer | Server läuft nicht über `run.sh`, sondern z. B. als systemd-/Quadlet-Unit: dieser Befehl startet ihn nach neuen Daten neu (statt `run.sh`), z. B. `systemctl restart bettermaps-osrm.service` |
+| `ROUTE_STOP_CMD` | leer | Server während `osrm-extract` anhalten (braucht `ROUTE_RESTART_CMD`), damit `osrm-routed` und der Import nicht gleichzeitig Speicher brauchen; die App rechnet solange selbst. Nach einem Fehlschlag startet `ROUTE_RESTART_CMD` ihn mit den alten Daten |
 
 Gateway (Flag oder Umgebungsvariable, das Flag hat Vorrang): `-listen`/`ROUTE_LISTEN` (`:8080`),
 `-osrm-url`/`ROUTE_OSRM_URL`, `-osrm-timeout`/`ROUTE_OSRM_TIMEOUT` (`10s`), `-tokens-file`/`ROUTE_TOKENS_FILE`,
@@ -161,8 +165,38 @@ Geofabrik-Stand 08.11.2026, Rechner mit 16 Threads / 31 GB):
 | Antwortzeit (Gateway + OSRM) | | 15–30 ms für 300–600 km |
 
 Für ganz Deutschland also auf dem Server `OSRM_IMPORT_MEMORY=20g` setzen (und ~20 GB frei haben, alte und neue Daten
-liegen beim Update nebeneinander); mit weniger RAM einen Ausschnitt mit `OSRM_BBOX` importieren. Routen, deren Start
-oder Ziel außerhalb des Ausschnitts liegt, rechnet die App lokal (die Serverroute endet dann weit vom Ziel).
+liegen beim Update nebeneinander); mit weniger RAM einen Ausschnitt mit `OSRM_BBOX` importieren oder auf einem
+anderen Rechner importieren und die Daten kopieren (siehe unten). Routen, deren Start oder Ziel außerhalb des
+Ausschnitts liegt, rechnet die App lokal (die Serverroute endet dann weit vom Ziel).
+
+Nachgemessen am 25.11.2026 mit Hessen (Geofabrik-Stand 24.11., 333 MB, gefiltert 90 MB, 4 Threads), um den Bedarf
+für Deutschland abzuschätzen:
+
+- Fast die ganze Spitze entfällt auf `osrm-extract` (cgroup-Spitze 1,71 GB in 32 s); `osrm-partition` 0,49 GB,
+  `osrm-customize` 0,44 GB. Mit hartem Limit (ohne Swap) bricht `osrm-extract` bei 1,2 GB ab und läuft mit 1,35 GB
+  (1 Thread, 71 s statt 29 s mit 4 Threads); die Thread-Zahl ändert den Bedarf kaum. Das sind gut 14 × der
+  gefilterten Eingabe; für Deutschland (1,2 GB gefiltert) also **etwa 17–20 GB**, passend zu den Abbrüchen bei 12 GB.
+- Ein schärferer Filter (nur Wege, die das Autoprofil befahren kann: halb so viele Knoten und Wege) senkte die Spitze
+  nur um 4 % und änderte die Abbiegedaten (`.edges`, `.icd`): nicht übernommen. Die Spitze entsteht beim Aufbau des
+  kantenbasierten Graphen, nicht beim Einlesen.
+
+### Import auf einem anderen Rechner
+
+Hat der Server zu wenig Speicher, läuft `scripts/update.sh` (bzw. `fetch-data.sh` + `import.sh`) auf einem Rechner
+mit genug RAM, und der Server übernimmt nur das Ergebnis (`<region>/data`, Deutschland ~7–8 GB):
+
+```sh
+# auf dem Rechner mit genug RAM
+OSRM_IMPORT_MEMORY=20g scripts/update.sh
+rsync -a --delete ~/.cache/bettermaps-osrm/germany/data/ server:/var/tmp/osrm-germany/
+# auf dem Server (gleiche OSRM_VERSION, gleiche Region)
+OSRM_EXTRACT=europe/germany scripts/install-data.sh /var/tmp/osrm-germany
+```
+
+`install-data.sh` prüft Region, OSRM-Version und Vollständigkeit (`import-stats.txt`, das `import.sh` seit dem
+25.11.2026 mit in `data/` legt), tauscht die Daten wie `import.sh` aus und startet den Server neu
+(`ROUTE_RESTART_CMD` bzw. `run.sh`). Das Quellverzeichnis ist danach weg. Eine fehlgeschlagene Prüfung lässt die
+ausgelieferten Daten unverändert.
 
 ## Wöchentliches Update
 
