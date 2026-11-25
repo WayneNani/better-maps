@@ -3,11 +3,14 @@ package app.organicmaps.transit.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -78,6 +81,7 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
   private final View mDetailTitles;
   private final TextView mDetailSubtitle;
   private final View mGridHint;
+  private final View mGridFrame;
   private final TextView mGridHintTitle;
   private final TextView mGridHintText;
   private final View mProgress;
@@ -118,6 +122,9 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
   private String mScrolledAlternatives;
   @Nullable
   private String mGridSelection;
+  // The ride the card over the grid was placed for.
+  @Nullable
+  private String mGridHintFor;
   // Departure a ride is dragged to in the time grid, -1 if none.
   private int mGridPreview = -1;
 
@@ -148,6 +155,8 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
     mDetailTitles = panel.findViewById(R.id.transit_detail_titles);
     mDetailSubtitle = panel.findViewById(R.id.transit_detail_subtitle);
     mGridHint = panel.findViewById(R.id.transit_grid_hint);
+    mGridFrame = panel.findViewById(R.id.transit_grid_frame);
+    absorbTouches(mGridHint);
     mGridHintTitle = panel.findViewById(R.id.transit_grid_hint_title);
     mGridHintText = panel.findViewById(R.id.transit_grid_hint_text);
     mProgress = panel.findViewById(R.id.transit_progress);
@@ -668,7 +677,7 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
     for (int i = 0; i < mPanel.getChildCount(); ++i)
     {
       final View child = mPanel.getChildAt(i);
-      if (child != mList && child != mGridScroll && child != mSummary && child.getVisibility() != View.GONE)
+      if (child != mList && child != mGridFrame && child != mSummary && child.getVisibility() != View.GONE)
         chrome += child.getHeight();
     }
     if (UiUtils.isVisible(mSummary))
@@ -678,15 +687,34 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
   }
 
   /**
-   * The card below the time grid while a ride is selected; hidden for null. While the ride is dragged, it tells about
+   * The card over the time grid while a ride is selected; hidden for null. While the ride is dragged, it tells about
    * the departure it would snap to.
+   * <p>
+   * It is over the grid, so that the grid does not move when it appears: over the bottom of the grid, or over its top
+   * if the ride is in the lower half.
    */
   private void bindGridHint(@Nullable ConnectionsState state)
   {
     final AlternativesItem alternatives = state != null ? state.getAlternatives() : null;
     UiUtils.showIf(alternatives != null, mGridHint);
     if (alternatives == null)
+    {
+      mGridHintFor = null;
       return;
+    }
+    final String hintFor = alternatives.getConnection() + ":" + alternatives.getLegIndex();
+    if (!hintFor.equals(mGridHintFor))
+    {
+      mGridHintFor = hintFor;
+      final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mGridHint.getLayoutParams();
+      final int gravity =
+          mGrid.isRideLow(alternatives.getConnection(), alternatives.getLegIndex()) ? Gravity.TOP : Gravity.BOTTOM;
+      if (params.gravity != gravity)
+      {
+        params.gravity = gravity;
+        mGridHint.setLayoutParams(params);
+      }
+    }
     final String ride =
         AlternativesViews.rideName(mActivity, alternatives.getPosition(), alternatives.getRideNumber(), true);
     final AlternativesItem.Chip preview = mGridPreview >= 0 && mGridPreview < alternatives.getChips().size()
@@ -757,15 +785,23 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
       });
     }
     mGridFirstKey = first;
-    // A newly selected ride comes into view with its other departures.
+    // A newly selected ride comes into view with its other departures, unless it is held: then it stays under the
+    // finger, and its lane is beside it where there is room (see TimeGridView).
     final AlternativesItem alternatives = state.getAlternatives();
     final String selection = alternatives != null ? alternatives.getConnection() + ":" + alternatives.getLegIndex() : null;
-    if (selection != null && !selection.equals(mGridSelection))
+    if (selection != null && !selection.equals(mGridSelection) && !mGrid.isDragging())
       mGridScroll.post(this::scrollGridToSelection);
     mGridSelection = selection;
   }
 
-  /** Once the grid is wide enough for the lane of the selected ride, scrolls it into view. */
+  /** Touches on a card over the grid (but not on its buttons) do not reach the grid below. */
+  @SuppressLint("ClickableViewAccessibility")
+  private static void absorbTouches(@NonNull View card)
+  {
+    card.setOnTouchListener((v, event) -> true);
+  }
+
+  /** Once the grid is laid out, scrolls the selected ride with its lane into view. */
   private void scrollGridToSelection()
   {
     if (!mShown)
