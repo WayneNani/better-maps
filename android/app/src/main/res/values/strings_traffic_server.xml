@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: access token for the TraFF server (services/traff-server), Settings → Traffic. -->
+<resources>
+  <string name="traffic_http_token">Access token</string>
+  <string name="traffic_http_token_hint">The token of this device from scripts/new-token.sh of your TraFF server. It is sent only to the traffic service URL above, and only over https:// (http:// only in the local network). Leave empty to keep the stored token.</string>
+</resources>

@@ -428,6 +428,16 @@ public final class Config
   {
     nativeSetTrafficHttpUrl(value);
   }
+
+  /**
+   * better-maps: device token for the TraFF server, sent as "Authorization: Bearer" with every request; empty for
+   * none. The core keeps it in memory only; the app stores it outside the backed-up settings (see
+   * app.organicmaps.settings.TrafficServerSettings). Never log it.
+   */
+  public static void setTrafficHttpToken(@NonNull String value)
+  {
+    nativeSetTrafficHttpToken(value);
+  }
   
   /**
    * Settings of the anonymous congestion reports, see app.organicmaps.sdk.crowdtraffic.CrowdTrafficSettings
@@ -640,6 +650,7 @@ public final class Config
   private static native void nativeSetTrafficHttpEnabled(boolean value);
   private static native String nativeGetTrafficHttpUrl();
   private static native void nativeSetTrafficHttpUrl(String value);
+  private static native void nativeSetTrafficHttpToken(String value);
   private static native void applyTrafficApps(String[] value);
   private static native void applyTrafficLegacyEnabled(boolean value);
 }

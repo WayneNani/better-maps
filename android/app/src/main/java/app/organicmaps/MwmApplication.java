@@ -36,6 +36,7 @@ import app.organicmaps.sdk.util.log.Logger;
 import app.organicmaps.settings.AerialImagerySettings;
 import app.organicmaps.settings.IndoorMapsSettings;
 import app.organicmaps.settings.RoutingServerSettings;
+import app.organicmaps.settings.TrafficServerSettings;
 import app.organicmaps.util.ThemeSwitcher;
 import app.organicmaps.util.Utils;
 import java.io.IOException;
@@ -156,6 +157,7 @@ public class MwmApplication extends Application implements Application.ActivityL
       RoutingServerSettings.applyToCore(this);
       AerialImagerySettings.init(this);
       IndoorMapsSettings.applyToCore(this);
+      TrafficServerSettings.applyToCore(this);
       ProcessLifecycleOwner.get().getLifecycle().addObserver(mProcessLifecycleObserver);
       onComplete.run();
     });

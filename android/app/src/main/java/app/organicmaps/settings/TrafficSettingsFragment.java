@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Toast;
 import androidx.annotation.Keep;
@@ -47,6 +50,7 @@ public class TrafficSettingsFragment extends BaseXmlSettingsFragment
     super.onViewCreated(view, savedInstanceState);
     initTrafficHttpEnabledPrefsCallbacks();
     initTrafficHttpUrlPrefsCallbacks();
+    initTrafficHttpTokenPrefs();
     initTrafficAppsPrefs();
     initTrafficLegacyEnabledPrefsCallbacks();
     initCrowdTrafficPrefs();
@@ -74,11 +78,57 @@ public class TrafficSettingsFragment extends BaseXmlSettingsFragment
     ((EditTextPreference)pref).setText(Config.getTrafficHttpUrl());
     pref.setOnPreferenceChangeListener((preference, newValue) -> {
       final String oldVal = Config.getTrafficHttpUrl();
-      final String newVal = (String) newValue;
+      final String newVal = newValue == null ? "" : ((String) newValue).trim();
+      // better-maps: same rules as the other servers (https://, http:// only for local addresses), so that the access
+      // token never travels in plain text over the internet. Empty stays allowed ("Not set").
+      final RoutingServerSettings.UrlProblem problem = RoutingServerSettings.checkUrl(newVal);
+      if (problem == RoutingServerSettings.UrlProblem.INVALID)
+      {
+        Toast.makeText(requireContext(), R.string.routing_server_url_invalid, Toast.LENGTH_LONG).show();
+        return false;
+      }
+      if (problem == RoutingServerSettings.UrlProblem.INSECURE)
+      {
+        Toast.makeText(requireContext(), R.string.routing_server_url_insecure, Toast.LENGTH_LONG).show();
+        return false;
+      }
       if (!oldVal.equals(newVal))
+      {
+        // The token for the new URL first, so that a token never goes to a URL it is not meant for.
+        TrafficServerSettings.applyToCore(requireContext(), newVal);
         Config.setTrafficHttpUrl(newVal);
-
+      }
+      new Handler(Looper.getMainLooper()).post(this::updateTrafficHttpUrlSummary);
       return true;
+    });
+  }
+
+  /**
+   * better-maps: access token of the TraFF server (services/traff-server). Stored by {@link TrafficServerSettings}
+   * (app-private, not backed up), shown as "Set"/"Not set" only, never logged.
+   */
+  private void initTrafficHttpTokenPrefs()
+  {
+    final EditTextPreference pref = getPreference(getString(R.string.pref_traffic_http_token));
+    final Preference.SummaryProvider<EditTextPreference> summary =
+        p -> getString(TrafficServerSettings.get(requireContext()).hasToken() ? R.string.routing_server_token_set
+                                                                               : R.string.routing_server_not_set);
+    pref.setSummaryProvider(summary);
+    pref.setOnBindEditTextListener(editText -> {
+      editText.setSingleLine(true);
+      editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+      // Don't show the stored token again; an empty field keeps it.
+      editText.setText("");
+    });
+    pref.setOnPreferenceChangeListener((p, value) -> {
+      final String token = value == null ? "" : value.toString().trim();
+      if (token.isEmpty())
+        return false;  // Empty input keeps the stored token.
+      TrafficServerSettings.get(requireContext()).setToken(token);
+      TrafficServerSettings.applyToCore(requireContext());
+      // The preference keeps no copy (not persistent, and false skips setText); refresh the summary.
+      pref.setSummaryProvider(summary);
+      return false;
     });
   }
 
