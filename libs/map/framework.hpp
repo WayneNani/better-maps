@@ -4,6 +4,7 @@
 #include "map/bookmark_manager.hpp"
 #include "map/ev_planning_api.hpp"
 #include "map/features_fetcher.hpp"
+#include "map/indoor_manager.hpp"
 #include "map/isolines_manager.hpp"
 #include "map/mwm_url.hpp"
 #include "map/place_page_info.hpp"
@@ -241,6 +242,12 @@ protected:
 
   TransitReadManager m_transitManager;
   IsolinesManager m_isolinesManager;
+  // better-maps: indoor maps from the own indoor server.
+  IndoorManager m_indoorManager;
+  using IndoorFeatureListener = std::function<void(IndoorManager::FeatureInfo const &)>;
+  IndoorFeatureListener m_indoorFeatureListener;
+  // Opens the details of an indoor feature at the tap; false if there is none (or a map POI was tapped).
+  bool OnIndoorTap(df::TapInfo const & tapInfo);
 
   // Note. |m_routingManager| should be declared before |m_trafficManager|
   RoutingManager m_routingManager;
@@ -899,6 +906,15 @@ public:
   // a device token. The token is kept in memory only and never logged. Tiles are cached in TmpDir()/aerial_tiles.
   void SetAerialImagery(bool enabled, std::string const & url, std::string const & token);
   bool IsAerialImageryActive() const;
+
+  // better-maps: indoor maps (services/indoor-server). Off unless enabled with a server URL and a device token, which
+  // is kept in memory only and never logged. Venues are cached in TmpDir()/indoor_venues.
+  void SetIndoorServer(bool enabled, std::string const & url, std::string const & token);
+  // |stateListener|: venue in view with its levels (for the level switcher), or none. |featureListener|: a tapped
+  // indoor room or POI. Both are called on the GUI thread.
+  void SetIndoorListeners(IndoorManager::StateListener stateListener, IndoorFeatureListener featureListener);
+  void SetIndoorLevel(double level);
+  IndoorManager & GetIndoorManager() { return m_indoorManager; }
 
   void SetTrafficHttpEnabled(bool enabled);
   bool LoadTrafficHttpEnabled();
