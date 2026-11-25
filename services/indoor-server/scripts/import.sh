@@ -74,13 +74,20 @@ cp "$INDOOR_CACHE/import-stats.txt" "$next/import-stats.txt"
 { head -12 "$INDOOR_CACHE/import-stats.txt" | tr '\n' ' '; echo; } >>"$INDOOR_CACHE/import-history.txt"
 sed -n '1,12p' "$INDOOR_CACHE/import-stats.txt" >&2
 
-# Swap in the new data; restart the gateway only if it is running.
+# Swap in the new data; restart the gateway only if it is running. A gateway managed elsewhere (e.g. a
+# systemd/Quadlet unit that mounts data/) is restarted with INDOOR_RESTART_CMD instead: a bind mount of data/ keeps
+# pointing at the old directory after the swap.
 was_running=false
-if [[ -n "$(podman_cmd ps -q --filter name=bettermaps-indoor_gateway)" ]]; then was_running=true; fi
+if [[ -z "${INDOOR_RESTART_CMD:-}" && -n "$(podman_cmd ps -q --filter name=bettermaps-indoor_gateway)" ]]; then
+  was_running=true
+fi
 rm -rf "$INDOOR_CACHE/data.prev"
 [[ -d "$INDOOR_DATA_DIR" ]] && mv "$INDOOR_DATA_DIR" "$INDOOR_CACHE/data.prev"
 mv "$next" "$INDOOR_DATA_DIR"
-if $was_running; then
+if [[ -n "${INDOOR_RESTART_CMD:-}" ]]; then
+  log "restarting the gateway with the new data: $INDOOR_RESTART_CMD"
+  bash -c "$INDOOR_RESTART_CMD" || die "INDOOR_RESTART_CMD failed (new data is in place)"
+elif $was_running; then
   log "restarting the gateway with the new data"
   "$INDOOR_DIR/scripts/run.sh"
 fi
