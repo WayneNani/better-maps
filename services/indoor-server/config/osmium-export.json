@@ -1,0 +1,25 @@
+{
+    "attributes": {
+        "type": false, "id": false, "version": false, "changeset": false,
+        "timestamp": false, "uid": false, "user": false, "way_nodes": false
+    },
+    "format_options": {
+        "print_record_separator": false
+    },
+    "linear_tags": [
+        "highway", "conveying", "indoor=yes", "barrier"
+    ],
+    "area_tags": [
+        "indoor=room", "indoor=corridor", "indoor=area", "indoor=level", "indoor=wall", "room",
+        "building", "building:part", "shop", "amenity", "office", "tourism", "healthcare",
+        "aeroway=terminal", "aeroway=aerodrome", "aeroway=gate",
+        "railway=platform", "railway=station", "public_transport=platform", "public_transport=station",
+        "area=yes", "type=multipolygon"
+    ],
+    "exclude_tags": [
+        "created_by", "source", "source:*", "note", "note:*", "fixme", "FIXME", "check_date*", "survey:*",
+        "name:*", "alt_name*", "old_name*", "wikidata", "wikipedia", "wikimedia_commons", "mapillary", "image",
+        "contact:*", "phone", "fax", "email", "addr:*", "ref:*", "roof:*", "building:levels", "height"
+    ],
+    "include_tags": []
+}

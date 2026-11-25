@@ -1,0 +1,370 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version="0.6" generator="genfixture">
+  <node id="1001" version="1" lat="50.0500000" lon="8.5600000"/>
+  <node id="1002" version="1" lat="50.0500000" lon="8.5614000"/>
+  <node id="1003" version="1" lat="50.0506000" lon="8.5614000"/>
+  <node id="1004" version="1" lat="50.0506000" lon="8.5600000"/>
+  <node id="1005" version="1" lat="50.0500000" lon="8.5600000"/>
+  <node id="1006" version="1" lat="50.0500000" lon="8.5614000"/>
+  <node id="1007" version="1" lat="50.0506000" lon="8.5614000"/>
+  <node id="1008" version="1" lat="50.0506000" lon="8.5600000"/>
+  <node id="1009" version="1" lat="50.0500000" lon="8.5600000"/>
+  <node id="1010" version="1" lat="50.0500000" lon="8.5614000"/>
+  <node id="1011" version="1" lat="50.0506000" lon="8.5614000"/>
+  <node id="1012" version="1" lat="50.0506000" lon="8.5600000"/>
+  <node id="1013" version="1" lat="50.0500000" lon="8.5600000"/>
+  <node id="1014" version="1" lat="50.0500000" lon="8.5602000">
+    <tag k="door" v="hinged"/>
+  </node>
+  <node id="1015" version="1" lat="50.0502000" lon="8.5602000"/>
+  <node id="1016" version="1" lat="50.0502000" lon="8.5600000"/>
+  <node id="1017" version="1" lat="50.0500000" lon="8.5602000"/>
+  <node id="1018" version="1" lat="50.0500000" lon="8.5604000"/>
+  <node id="1019" version="1" lat="50.0502000" lon="8.5604000"/>
+  <node id="1020" version="1" lat="50.0502000" lon="8.5602000"/>
+  <node id="1021" version="1" lat="50.0500000" lon="8.5604000"/>
+  <node id="1022" version="1" lat="50.0500000" lon="8.5606000"/>
+  <node id="1023" version="1" lat="50.0502000" lon="8.5606000"/>
+  <node id="1024" version="1" lat="50.0502000" lon="8.5604000"/>
+  <node id="1025" version="1" lat="50.0500000" lon="8.5606000"/>
+  <node id="1026" version="1" lat="50.0500000" lon="8.5608000"/>
+  <node id="1027" version="1" lat="50.0502000" lon="8.5608000"/>
+  <node id="1028" version="1" lat="50.0502000" lon="8.5606000"/>
+  <node id="1029" version="1" lat="50.0504000" lon="8.5600000"/>
+  <node id="1030" version="1" lat="50.0504000" lon="8.5602000"/>
+  <node id="1031" version="1" lat="50.0506000" lon="8.5602000"/>
+  <node id="1032" version="1" lat="50.0506000" lon="8.5600000"/>
+  <node id="1033" version="1" lat="50.0504000" lon="8.5602000"/>
+  <node id="1034" version="1" lat="50.0504000" lon="8.5604000"/>
+  <node id="1035" version="1" lat="50.0506000" lon="8.5604000"/>
+  <node id="1036" version="1" lat="50.0506000" lon="8.5602000"/>
+  <node id="1037" version="1" lat="50.0504000" lon="8.5604000"/>
+  <node id="1038" version="1" lat="50.0504000" lon="8.5606000"/>
+  <node id="1039" version="1" lat="50.0506000" lon="8.5606000"/>
+  <node id="1040" version="1" lat="50.0506000" lon="8.5604000"/>
+  <node id="1041" version="1" lat="50.0504000" lon="8.5608000"/>
+  <node id="1042" version="1" lat="50.0504000" lon="8.5612000"/>
+  <node id="1043" version="1" lat="50.0506000" lon="8.5612000"/>
+  <node id="1044" version="1" lat="50.0506000" lon="8.5608000"/>
+  <node id="1045" version="1" lat="50.0504500" lon="8.5609000"/>
+  <node id="1046" version="1" lat="50.0504500" lon="8.5610000"/>
+  <node id="1047" version="1" lat="50.0505500" lon="8.5610000"/>
+  <node id="1048" version="1" lat="50.0505500" lon="8.5609000"/>
+  <node id="1049" version="1" lat="50.0502000" lon="8.5600000"/>
+  <node id="1050" version="1" lat="50.0502000" lon="8.5614000"/>
+  <node id="1051" version="1" lat="50.0504000" lon="8.5614000"/>
+  <node id="1052" version="1" lat="50.0504000" lon="8.5600000"/>
+  <node id="1053" version="1" lat="50.0500000" lon="8.5610000"/>
+  <node id="1054" version="1" lat="50.0500000" lon="8.5614000"/>
+  <node id="1055" version="1" lat="50.0502000" lon="8.5614000"/>
+  <node id="1056" version="1" lat="50.0502000" lon="8.5610000"/>
+  <node id="1057" version="1" lat="50.0500000" lon="8.5608000"/>
+  <node id="1058" version="1" lat="50.0502000" lon="8.5608000"/>
+  <node id="1059" version="1" lat="50.0502000" lon="8.5608500"/>
+  <node id="1060" version="1" lat="50.0503000" lon="8.5607000"/>
+  <node id="1061" version="1" lat="50.0503000" lon="8.5607100"/>
+  <node id="1062" version="1" lat="50.0503100" lon="8.5607100"/>
+  <node id="1063" version="1" lat="50.0503100" lon="8.5607000"/>
+  <node id="1064" version="1" lat="50.0501000" lon="8.5606500"/>
+  <node id="1065" version="1" lat="50.0501000" lon="8.5607500"/>
+  <node id="1066" version="1" lat="50.0503000" lon="8.5609000"/>
+  <node id="1067" version="1" lat="50.0505000" lon="8.5609000"/>
+  <node id="1068" version="1" lat="50.0504500" lon="8.5601000"/>
+  <node id="1069" version="1" lat="50.0504500" lon="8.5603000"/>
+  <node id="1070" version="1" lat="50.0505500" lon="8.5603000"/>
+  <node id="1071" version="1" lat="50.0505500" lon="8.5601000"/>
+  <node id="1072" version="1" lat="50.0500000" lon="8.5620000"/>
+  <node id="1073" version="1" lat="50.0500000" lon="8.5621000"/>
+  <node id="1074" version="1" lat="50.0501000" lon="8.5621000"/>
+  <node id="1075" version="1" lat="50.0501000" lon="8.5620000"/>
+  <node id="1076" version="1" lat="50.0498000" lon="8.5600000"/>
+  <node id="1077" version="1" lat="50.0498000" lon="8.5614000"/>
+  <node id="1078" version="1" lat="50.0499000" lon="8.5614000"/>
+  <node id="1079" version="1" lat="50.0499000" lon="8.5600000"/>
+  <node id="1080" version="1" lat="50.0502000" lon="8.5612000"/>
+  <node id="1081" version="1" lat="50.0502000" lon="8.5614000"/>
+  <node id="1082" version="1" lat="50.0504000" lon="8.5614000"/>
+  <node id="1083" version="1" lat="50.0504000" lon="8.5612000"/>
+  <node id="1084" version="1" lat="50.0600000" lon="8.5700000"/>
+  <node id="1085" version="1" lat="50.0600000" lon="8.5702000"/>
+  <node id="1086" version="1" lat="50.0602000" lon="8.5702000"/>
+  <node id="1087" version="1" lat="50.0602000" lon="8.5700000"/>
+  <node id="1088" version="1" lat="50.0505000" lon="8.5601000">
+    <tag k="amenity" v="toilets"/>
+    <tag k="level" v="1"/>
+    <tag k="wheelchair" v="yes"/>
+    <tag k="changing_table" v="yes"/>
+  </node>
+  <node id="1089" version="1" lat="50.0501000" lon="8.5612000">
+    <tag k="aeroway" v="gate"/>
+    <tag k="ref" v="A5"/>
+    <tag k="level" v="0"/>
+  </node>
+  <node id="1090" version="1" lat="50.0503500" lon="8.5607000">
+    <tag k="highway" v="elevator"/>
+    <tag k="level" v="-1;0;1"/>
+  </node>
+  <node id="1091" version="1" lat="50.0503000" lon="8.5603000">
+    <tag k="shop" v="newsagent"/>
+    <tag k="name" v="Presse"/>
+    <tag k="level" v="0"/>
+    <tag k="opening_hours" v="24/7"/>
+  </node>
+  <node id="1092" version="1" lat="50.0505000" lon="8.5605000">
+    <tag k="amenity" v="cafe"/>
+    <tag k="name" v="Kaffee"/>
+    <tag k="level" v="1"/>
+    <tag k="cuisine" v="coffee_shop"/>
+  </node>
+  <node id="1093" version="1" lat="50.0503000" lon="8.5606000">
+    <tag k="shop" v="gift"/>
+    <tag k="level" v="EG"/>
+  </node>
+  <node id="1094" version="1" lat="50.0503000" lon="8.5611000">
+    <tag k="tourism" v="information"/>
+    <tag k="level" v="0"/>
+  </node>
+  <node id="1095" version="1" lat="50.0503000" lon="8.5613000">
+    <tag k="amenity" v="atm"/>
+    <tag k="level" v="0"/>
+    <tag k="operator" v="Bank"/>
+  </node>
+  <node id="1096" version="1" lat="50.0503000" lon="8.5614000">
+    <tag k="entrance" v="main"/>
+    <tag k="level" v="0"/>
+  </node>
+  <node id="1097" version="1" lat="50.0501000" lon="8.5607000">
+    <tag k="railway" v="station"/>
+    <tag k="public_transport" v="station"/>
+    <tag k="name" v="Teststation"/>
+  </node>
+  <node id="1098" version="1" lat="50.0700000" lon="8.5800000">
+    <tag k="shop" v="bakery"/>
+    <tag k="level" v="0"/>
+  </node>
+  <way id="1" version="1">
+    <nd ref="1001"/>
+    <nd ref="1002"/>
+    <nd ref="1003"/>
+    <nd ref="1004"/>
+    <nd ref="1001"/>
+    <tag k="aeroway" v="terminal"/>
+    <tag k="building" v="yes"/>
+    <tag k="name" v="Terminal 9"/>
+  </way>
+  <way id="2" version="1">
+    <nd ref="1005"/>
+    <nd ref="1006"/>
+    <nd ref="1007"/>
+    <nd ref="1008"/>
+    <nd ref="1005"/>
+    <tag k="indoor" v="level"/>
+    <tag k="level" v="0"/>
+    <tag k="level:ref" v="EG"/>
+    <tag k="name" v="Erdgeschoss"/>
+  </way>
+  <way id="3" version="1">
+    <nd ref="1009"/>
+    <nd ref="1010"/>
+    <nd ref="1011"/>
+    <nd ref="1012"/>
+    <nd ref="1009"/>
+    <tag k="indoor" v="level"/>
+    <tag k="level" v="1"/>
+    <tag k="name" v="Abflug"/>
+  </way>
+  <way id="10" version="1">
+    <nd ref="1013"/>
+    <nd ref="1014"/>
+    <nd ref="1015"/>
+    <nd ref="1016"/>
+    <nd ref="1013"/>
+    <tag k="indoor" v="room"/>
+    <tag k="level" v="0"/>
+    <tag k="shop" v="kiosk"/>
+    <tag k="name" v="Relay"/>
+    <tag k="opening_hours" v="Mo-Su 05:00-23:00"/>
+  </way>
+  <way id="11" version="1">
+    <nd ref="1017"/>
+    <nd ref="1018"/>
+    <nd ref="1019"/>
+    <nd ref="1020"/>
+    <nd ref="1017"/>
+    <tag k="indoor" v="room"/>
+    <tag k="level" v="0"/>
+    <tag k="amenity" v="toilets"/>
+    <tag k="wheelchair" v="yes"/>
+  </way>
+  <way id="12" version="1">
+    <nd ref="1021"/>
+    <nd ref="1022"/>
+    <nd ref="1023"/>
+    <nd ref="1024"/>
+    <nd ref="1021"/>
+    <tag k="indoor" v="room"/>
+    <tag k="level" v="0"/>
+    <tag k="access" v="private"/>
+  </way>
+  <way id="13" version="1">
+    <nd ref="1025"/>
+    <nd ref="1026"/>
+    <nd ref="1027"/>
+    <nd ref="1028"/>
+    <nd ref="1025"/>
+    <tag k="indoor" v="room"/>
+    <tag k="level" v="0;1"/>
+    <tag k="room" v="stairs"/>
+  </way>
+  <way id="14" version="1">
+    <nd ref="1029"/>
+    <nd ref="1030"/>
+    <nd ref="1031"/>
+    <nd ref="1032"/>
+    <nd ref="1029"/>
+    <tag k="indoor" v="room"/>
+    <tag k="level" v="1"/>
+    <tag k="amenity" v="restaurant"/>
+    <tag k="name" v="Bistro"/>
+  </way>
+  <way id="15" version="1">
+    <nd ref="1033"/>
+    <nd ref="1034"/>
+    <nd ref="1035"/>
+    <nd ref="1036"/>
+    <nd ref="1033"/>
+    <tag k="indoor" v="room"/>
+    <tag k="level" v="1"/>
+    <tag k="office" v="airline"/>
+  </way>
+  <way id="16" version="1">
+    <nd ref="1037"/>
+    <nd ref="1038"/>
+    <nd ref="1039"/>
+    <nd ref="1040"/>
+    <nd ref="1037"/>
+    <tag k="indoor" v="area"/>
+    <tag k="level" v="1"/>
+  </way>
+  <way id="17" version="1">
+    <nd ref="1041"/>
+    <nd ref="1042"/>
+    <nd ref="1043"/>
+    <nd ref="1044"/>
+    <nd ref="1041"/>
+  </way>
+  <way id="18" version="1">
+    <nd ref="1045"/>
+    <nd ref="1046"/>
+    <nd ref="1047"/>
+    <nd ref="1048"/>
+    <nd ref="1045"/>
+  </way>
+  <way id="20" version="1">
+    <nd ref="1049"/>
+    <nd ref="1050"/>
+    <nd ref="1051"/>
+    <nd ref="1052"/>
+    <nd ref="1049"/>
+    <tag k="indoor" v="corridor"/>
+    <tag k="level" v="0"/>
+  </way>
+  <way id="21" version="1">
+    <nd ref="1053"/>
+    <nd ref="1054"/>
+    <nd ref="1055"/>
+    <nd ref="1056"/>
+    <nd ref="1053"/>
+    <tag k="indoor" v="area"/>
+    <tag k="aeroway" v="gate"/>
+    <tag k="ref" v="B12"/>
+    <tag k="level" v="0"/>
+  </way>
+  <way id="30" version="1">
+    <nd ref="1057"/>
+    <nd ref="1058"/>
+    <nd ref="1059"/>
+    <tag k="indoor" v="wall"/>
+    <tag k="level" v="0"/>
+  </way>
+  <way id="31" version="1">
+    <nd ref="1060"/>
+    <nd ref="1061"/>
+    <nd ref="1062"/>
+    <nd ref="1063"/>
+    <nd ref="1060"/>
+    <tag k="indoor" v="wall"/>
+    <tag k="level" v="0"/>
+  </way>
+  <way id="40" version="1">
+    <nd ref="1064"/>
+    <nd ref="1065"/>
+    <tag k="highway" v="steps"/>
+    <tag k="level" v="0;1"/>
+    <tag k="indoor" v="yes"/>
+  </way>
+  <way id="41" version="1">
+    <nd ref="1066"/>
+    <nd ref="1067"/>
+    <tag k="highway" v="steps"/>
+    <tag k="conveying" v="forward"/>
+    <tag k="level" v="0-1"/>
+  </way>
+  <way id="42" version="1">
+    <nd ref="1068"/>
+    <nd ref="1069"/>
+    <nd ref="1070"/>
+    <nd ref="1071"/>
+    <nd ref="1068"/>
+    <tag k="highway" v="footway"/>
+    <tag k="indoor" v="yes"/>
+    <tag k="level" v="1"/>
+  </way>
+  <way id="43" version="1">
+    <nd ref="1072"/>
+    <nd ref="1073"/>
+    <nd ref="1074"/>
+    <nd ref="1075"/>
+    <nd ref="1072"/>
+    <tag k="highway" v="footway"/>
+  </way>
+  <way id="50" version="1">
+    <nd ref="1076"/>
+    <nd ref="1077"/>
+    <nd ref="1078"/>
+    <nd ref="1079"/>
+    <nd ref="1076"/>
+    <tag k="railway" v="platform"/>
+    <tag k="public_transport" v="platform"/>
+    <tag k="level" v="-1"/>
+    <tag k="ref" v="3"/>
+  </way>
+  <way id="51" version="1">
+    <nd ref="1080"/>
+    <nd ref="1081"/>
+    <nd ref="1082"/>
+    <nd ref="1083"/>
+    <nd ref="1080"/>
+    <tag k="highway" v="pedestrian"/>
+    <tag k="area" v="yes"/>
+    <tag k="level" v="0"/>
+  </way>
+  <way id="60" version="1">
+    <nd ref="1084"/>
+    <nd ref="1085"/>
+    <nd ref="1086"/>
+    <nd ref="1087"/>
+    <nd ref="1084"/>
+    <tag k="building" v="yes"/>
+    <tag k="name" v="Faraway"/>
+  </way>
+  <relation id="1" version="1">
+    <member type="way" ref="17" role="outer"/>
+    <member type="way" ref="18" role="inner"/>
+    <tag k="type" v="multipolygon"/>
+    <tag k="indoor" v="room"/>
+    <tag k="level" v="1"/>
+    <tag k="shop" v="duty_free"/>
+    <tag k="name" v="Heinemann"/>
+  </relation>
+</osm>

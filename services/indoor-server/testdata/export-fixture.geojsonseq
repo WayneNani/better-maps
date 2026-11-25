@@ -1,0 +1,34 @@
+{"type":"Feature","id":"n1014","geometry":{"type":"Point","coordinates":[8.5602,50.05]},"properties":{"door":"hinged"}}
+{"type":"Feature","id":"n1088","geometry":{"type":"Point","coordinates":[8.5601,50.0505]},"properties":{"amenity":"toilets","level":"1","wheelchair":"yes","changing_table":"yes"}}
+{"type":"Feature","id":"n1089","geometry":{"type":"Point","coordinates":[8.5612,50.0501]},"properties":{"aeroway":"gate","ref":"A5","level":"0"}}
+{"type":"Feature","id":"n1090","geometry":{"type":"Point","coordinates":[8.5607,50.05035]},"properties":{"highway":"elevator","level":"-1;0;1"}}
+{"type":"Feature","id":"n1091","geometry":{"type":"Point","coordinates":[8.5603,50.0503]},"properties":{"shop":"newsagent","name":"Presse","level":"0","opening_hours":"24/7"}}
+{"type":"Feature","id":"n1092","geometry":{"type":"Point","coordinates":[8.5605,50.0505]},"properties":{"amenity":"cafe","name":"Kaffee","level":"1","cuisine":"coffee_shop"}}
+{"type":"Feature","id":"n1093","geometry":{"type":"Point","coordinates":[8.5606,50.0503]},"properties":{"shop":"gift","level":"EG"}}
+{"type":"Feature","id":"n1094","geometry":{"type":"Point","coordinates":[8.5611,50.0503]},"properties":{"tourism":"information","level":"0"}}
+{"type":"Feature","id":"n1095","geometry":{"type":"Point","coordinates":[8.5613,50.0503]},"properties":{"amenity":"atm","level":"0","operator":"Bank"}}
+{"type":"Feature","id":"n1096","geometry":{"type":"Point","coordinates":[8.5614,50.0503]},"properties":{"entrance":"main","level":"0"}}
+{"type":"Feature","id":"n1097","geometry":{"type":"Point","coordinates":[8.5607,50.0501]},"properties":{"railway":"station","public_transport":"station","name":"Teststation"}}
+{"type":"Feature","id":"n1098","geometry":{"type":"Point","coordinates":[8.58,50.07]},"properties":{"shop":"bakery","level":"0"}}
+{"type":"Feature","id":"w30","geometry":{"type":"LineString","coordinates":[[8.5608,50.05],[8.5608,50.0502],[8.56085,50.0502]]},"properties":{"indoor":"wall","level":"0"}}
+{"type":"Feature","id":"w40","geometry":{"type":"LineString","coordinates":[[8.56065,50.0501],[8.56075,50.0501]]},"properties":{"highway":"steps","level":"0;1","indoor":"yes"}}
+{"type":"Feature","id":"w41","geometry":{"type":"LineString","coordinates":[[8.5609,50.0503],[8.5609,50.0505]]},"properties":{"highway":"steps","conveying":"forward","level":"0-1"}}
+{"type":"Feature","id":"w42","geometry":{"type":"LineString","coordinates":[[8.5601,50.05045],[8.5603,50.05045],[8.5603,50.05055],[8.5601,50.05055],[8.5601,50.05045]]},"properties":{"highway":"footway","indoor":"yes","level":"1"}}
+{"type":"Feature","id":"w43","geometry":{"type":"LineString","coordinates":[[8.562,50.05],[8.5621,50.05],[8.5621,50.0501],[8.562,50.0501],[8.562,50.05]]},"properties":{"highway":"footway"}}
+{"type":"Feature","id":"a2","geometry":{"type":"MultiPolygon","coordinates":[[[[8.56,50.05],[8.5614,50.05],[8.5614,50.0506],[8.56,50.0506],[8.56,50.05]]]]},"properties":{"aeroway":"terminal","building":"yes","name":"Terminal 9"}}
+{"type":"Feature","id":"a4","geometry":{"type":"MultiPolygon","coordinates":[[[[8.56,50.05],[8.5614,50.05],[8.5614,50.0506],[8.56,50.0506],[8.56,50.05]]]]},"properties":{"indoor":"level","level":"0","level:ref":"EG","name":"Erdgeschoss"}}
+{"type":"Feature","id":"a6","geometry":{"type":"MultiPolygon","coordinates":[[[[8.56,50.05],[8.5614,50.05],[8.5614,50.0506],[8.56,50.0506],[8.56,50.05]]]]},"properties":{"indoor":"level","level":"1","name":"Abflug"}}
+{"type":"Feature","id":"a20","geometry":{"type":"MultiPolygon","coordinates":[[[[8.56,50.05],[8.5602,50.05],[8.5602,50.0502],[8.56,50.0502],[8.56,50.05]]]]},"properties":{"indoor":"room","level":"0","shop":"kiosk","name":"Relay","opening_hours":"Mo-Su 05:00-23:00"}}
+{"type":"Feature","id":"a22","geometry":{"type":"MultiPolygon","coordinates":[[[[8.5602,50.05],[8.5604,50.05],[8.5604,50.0502],[8.5602,50.0502],[8.5602,50.05]]]]},"properties":{"indoor":"room","level":"0","amenity":"toilets","wheelchair":"yes"}}
+{"type":"Feature","id":"a24","geometry":{"type":"MultiPolygon","coordinates":[[[[8.5604,50.05],[8.5606,50.05],[8.5606,50.0502],[8.5604,50.0502],[8.5604,50.05]]]]},"properties":{"indoor":"room","level":"0","access":"private"}}
+{"type":"Feature","id":"a26","geometry":{"type":"MultiPolygon","coordinates":[[[[8.5606,50.05],[8.5608,50.05],[8.5608,50.0502],[8.5606,50.0502],[8.5606,50.05]]]]},"properties":{"indoor":"room","level":"0;1","room":"stairs"}}
+{"type":"Feature","id":"a28","geometry":{"type":"MultiPolygon","coordinates":[[[[8.56,50.0504],[8.5602,50.0504],[8.5602,50.0506],[8.56,50.0506],[8.56,50.0504]]]]},"properties":{"indoor":"room","level":"1","amenity":"restaurant","name":"Bistro"}}
+{"type":"Feature","id":"a30","geometry":{"type":"MultiPolygon","coordinates":[[[[8.5602,50.0504],[8.5604,50.0504],[8.5604,50.0506],[8.5602,50.0506],[8.5602,50.0504]]]]},"properties":{"indoor":"room","level":"1","office":"airline"}}
+{"type":"Feature","id":"a32","geometry":{"type":"MultiPolygon","coordinates":[[[[8.5604,50.0504],[8.5606,50.0504],[8.5606,50.0506],[8.5604,50.0506],[8.5604,50.0504]]]]},"properties":{"indoor":"area","level":"1"}}
+{"type":"Feature","id":"a3","geometry":{"type":"MultiPolygon","coordinates":[[[[8.5608,50.0504],[8.5612,50.0504],[8.5612,50.0506],[8.5608,50.0506],[8.5608,50.0504]],[[8.5609,50.05045],[8.5609,50.05055],[8.561,50.05055],[8.561,50.05045],[8.5609,50.05045]]]]},"properties":{"indoor":"room","level":"1","shop":"duty_free","name":"Heinemann"}}
+{"type":"Feature","id":"a40","geometry":{"type":"MultiPolygon","coordinates":[[[[8.56,50.0502],[8.5614,50.0502],[8.5614,50.0504],[8.56,50.0504],[8.56,50.0502]]]]},"properties":{"indoor":"corridor","level":"0"}}
+{"type":"Feature","id":"a42","geometry":{"type":"MultiPolygon","coordinates":[[[[8.561,50.05],[8.5614,50.05],[8.5614,50.0502],[8.561,50.0502],[8.561,50.05]]]]},"properties":{"indoor":"area","aeroway":"gate","ref":"B12","level":"0"}}
+{"type":"Feature","id":"a62","geometry":{"type":"MultiPolygon","coordinates":[[[[8.5607,50.0503],[8.56071,50.0503],[8.56071,50.05031],[8.5607,50.05031],[8.5607,50.0503]]]]},"properties":{"indoor":"wall","level":"0"}}
+{"type":"Feature","id":"a100","geometry":{"type":"MultiPolygon","coordinates":[[[[8.56,50.0498],[8.5614,50.0498],[8.5614,50.0499],[8.56,50.0499],[8.56,50.0498]]]]},"properties":{"railway":"platform","public_transport":"platform","level":"-1","ref":"3"}}
+{"type":"Feature","id":"a102","geometry":{"type":"MultiPolygon","coordinates":[[[[8.5612,50.0502],[8.5614,50.0502],[8.5614,50.0504],[8.5612,50.0504],[8.5612,50.0502]]]]},"properties":{"highway":"pedestrian","area":"yes","level":"0"}}
+{"type":"Feature","id":"a120","geometry":{"type":"MultiPolygon","coordinates":[[[[8.57,50.06],[8.5702,50.06],[8.5702,50.0602],[8.57,50.0602],[8.57,50.06]]]]},"properties":{"building":"yes","name":"Faraway"}}
