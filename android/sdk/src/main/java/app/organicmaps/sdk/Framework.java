@@ -417,6 +417,18 @@ public class Framework
    */
   public static native void nativeSetAerialImagery(boolean enabled, @NonNull String url, @NonNull String token);
 
+  /**
+   * better-maps: indoor maps (services/indoor-server). Off unless enabled with a server URL and a device token. The
+   * token is kept in memory by the core only.
+   */
+  public static native void nativeSetIndoorServer(boolean enabled, @NonNull String url, @NonNull String token);
+
+  /** better-maps: shows another level of the venue in view (ignored if it has no such level). */
+  public static native void nativeSetIndoorLevel(double level);
+
+  /** better-maps: the listener of the indoor maps (null removes it); it gets the current state at once. */
+  public static native void nativeSetIndoorListener(@Nullable app.organicmaps.sdk.indoor.IndoorListener listener);
+
   /** better-maps: the current viewport as {minLon, minLat, maxLon, maxLat}. */
   @NonNull
   public static native double[] nativeGetViewportLatLonRect();
