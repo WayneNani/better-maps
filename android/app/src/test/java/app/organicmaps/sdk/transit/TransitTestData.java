@@ -113,6 +113,18 @@ public final class TransitTestData
     return departure;
   }
 
+  /** Sets the trip id of a built leg. */
+  public static void tripId(@NonNull TransitLeg leg, @Nullable String tripId)
+  {
+    leg.mTripId = tripId;
+  }
+
+  /** Marks a built leg as continuing in the vehicle of the previous leg. */
+  public static void interline(@NonNull TransitLeg leg)
+  {
+    leg.mInterlineWithPreviousLeg = true;
+  }
+
   public static final class PlaceBuilder
   {
     private final TransitPlace mPlace = new TransitPlace();
