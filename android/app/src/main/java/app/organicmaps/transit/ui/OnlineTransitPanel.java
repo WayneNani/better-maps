@@ -229,7 +229,7 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
       }
 
       @Override
-      public void onRideClick(int index, int legIndex)
+      public void onRideLongClick(int index, int legIndex)
       {
         mPresenter.toggleAlternatives(index, legIndex);
       }

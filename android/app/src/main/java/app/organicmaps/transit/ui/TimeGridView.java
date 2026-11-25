@@ -52,15 +52,23 @@ import java.util.List;
  * The view lives in a {@link android.widget.HorizontalScrollView}; the axis stays at the left edge while the
  * columns scroll. "Earlier" and "Later" are narrow columns at the start and the end.
  * <p>
- * A tap on a ride selects it and shows its other departures: the other columns fade, the column gets a background
- * and a lane on its left with small "ghost" pills at the departure times (dashed if they miss the next ride). A tap
- * on a pill uses that departure; a tap elsewhere ends the selection. Without a selection, a tap elsewhere in a
- * column opens the connection.
+ * A tap anywhere in a column, on a ride or beside it, opens the connection.
  * <p>
- * Holding a ride lifts it (and selects it if it was not): it can then be dragged up and down and snaps to its other
- * departures ({@link RideDragSnap}) with a haptic tick each, the target pill highlighted. Lifting the finger uses that
- * departure as a tap on its pill would; back at the start, or cancelled, nothing changes. While the departures are
- * loading the ride is lifted in place. The scrolling parents do not get the gesture while a ride is lifted.
+ * Holding a ride ({@link #HOLD_MS}, with a haptic long press) selects it and lifts it in one gesture. Selected, its
+ * other departures are shown: the other columns fade, the column gets a background and a lane on its left with small
+ * "ghost" pills at the departure times (dashed if they miss the next ride). Lifted, the ride can be dragged up and down
+ * right away and snaps to its other departures ({@link RideDragSnap}) with a haptic tick each, the target pill
+ * highlighted. Lifting the finger uses that departure as a tap on its pill would; lifted without moving, back at the
+ * start, or cancelled, nothing changes and the ride stays selected, so that its pills can be tapped. While the
+ * departures are loading the ride is lifted in place. The scrolling parents do not get the gesture while a ride is
+ * lifted.
+ * <p>
+ * While a ride is selected, a tap on a pill uses that departure, "Earlier" and "Later" page as usual, and any other
+ * tap (on the selected ride, another ride or beside the rides) only ends the selection; it never opens a connection,
+ * so that nothing opens by accident while the departures are showing. Holding a ride works as without a selection.
+ * <p>
+ * Screen readers: a ride's click opens the connection (or ends the selection), its long click shows or hides its
+ * other departures.
  */
 public final class TimeGridView extends View
 {
@@ -72,13 +80,13 @@ public final class TimeGridView extends View
 
     void onLaterClick();
 
-    /** A ride of a connection was tapped: show (or hide) its other departures. */
-    default void onRideClick(int index, int legIndex) {}
+    /** A ride of a connection was held (or long-clicked by a screen reader): show (or hide) its other departures. */
+    default void onRideLongClick(int index, int legIndex) {}
 
     /** An other departure of the selected ride was tapped. */
     default void onAlternativeClick(int chipIndex) {}
 
-    /** A tap outside the selected ride and its departures. */
+    /** A tap while a ride is selected, other than on a pill or "Earlier" / "Later": end the selection. */
     default void onDismissAlternatives() {}
 
     /**
@@ -824,7 +832,20 @@ public final class TimeGridView extends View
     final int ride = rideAt(layout.getColumns().get(column), y);
     if (ride >= 0)
       return ID_RIDE + column * RIDE_STRIDE + ride;
-    return mAlternatives != null ? ID_DISMISS : column;
+    return column;
+  }
+
+  /**
+   * What a tap (or a screen reader's click) on a target does: rides and columns open their connection, or end the
+   * selection while a ride is selected.
+   */
+  private int tapAction(int target)
+  {
+    if (target >= ID_RIDE)
+      target = (target - ID_RIDE) / RIDE_STRIDE;
+    if (target >= 0 && mAlternatives != null)
+      return ID_DISMISS;
+    return target;
   }
 
   /** Index of the nearest pill at a point in the lane, -1 if none. */
@@ -874,24 +895,23 @@ public final class TimeGridView extends View
     if (mListener == null || target == ExploreByTouchHelper.INVALID_ID)
       return false;
     playSoundEffect(android.view.SoundEffectConstants.CLICK);
-    if (target == ID_EARLIER)
+    final int action = tapAction(target);
+    if (action == ID_EARLIER)
     {
       if (!mLoadingEarlier)
         mListener.onEarlierClick();
     }
-    else if (target == ID_LATER)
+    else if (action == ID_LATER)
     {
       if (!mLoadingLater)
         mListener.onLaterClick();
     }
-    else if (target == ID_DISMISS)
+    else if (action == ID_DISMISS)
       mListener.onDismissAlternatives();
-    else if (target <= ID_PILL)
-      mListener.onAlternativeClick(ID_PILL - target);
-    else if (target >= ID_RIDE)
-      mListener.onRideClick((target - ID_RIDE) / RIDE_STRIDE, (target - ID_RIDE) % RIDE_STRIDE);
+    else if (action <= ID_PILL)
+      mListener.onAlternativeClick(ID_PILL - action);
     else
-      mListener.onConnectionClick(target);
+      mListener.onConnectionClick(action);
     mAccess.sendEventForVirtualView(target, android.view.accessibility.AccessibilityEvent.TYPE_VIEW_CLICKED);
     return true;
   }
@@ -940,7 +960,7 @@ public final class TimeGridView extends View
     mHoldLeg = -1;
   }
 
-  /** The ride under the finger was held long enough: lift it, and show its departures if they are not shown. */
+  /** The ride under the finger was held long enough: select it (show its departures) if it is not, and lift it. */
   private void startDrag()
   {
     final Listener listener = mListener;
@@ -960,7 +980,7 @@ public final class TimeGridView extends View
     TransitSheetLayout.keepGesture(this);
     performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
     if (!isDraggedRideShown(drag))
-      listener.onRideClick(drag.mConnection, drag.mLegIndex);
+      listener.onRideLongClick(drag.mConnection, drag.mLegIndex);
     updateDrag(drag);
     invalidate();
   }
@@ -1182,9 +1202,15 @@ public final class TimeGridView extends View
               final String time = mFormatter != null
                                     ? mFormatter.formatDeviceTime(Instant.ofEpochSecond(block.getSegment().getStart()))
                                     : "";
-              node.setContentDescription(getContext().getString(R.string.transit_alt_show) + ": "
-                                         + (badge != null ? badge.getText() : "") + " " + time);
+              node.setContentDescription((badge != null ? badge.getText() : "") + " " + time);
             }
+          // Holding the ride: its other departures.
+          final boolean shown =
+              mAlternatives != null && mAlternatives.getConnection() == index && mAlternatives.getLegIndex() == leg;
+          node.addAction(new AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+              AccessibilityNodeInfoCompat.ACTION_LONG_CLICK,
+              getContext().getString(shown ? R.string.transit_alt_hide : R.string.transit_alt_show)));
+          node.setLongClickable(true);
           // What dragging the selected ride does: the previous or next departure.
           final int selected = selectedChip(index, leg);
           if (selected > 0)
@@ -1204,7 +1230,13 @@ public final class TimeGridView extends View
       if (bounds.isEmpty())
         bounds.set(0, 0, 1, 1);
       node.setBoundsInParent(bounds);
-      node.addAction(AccessibilityNodeInfoCompat.ACTION_CLICK);
+      // Rides and columns open their connection, or end the selection.
+      final int tap = tapAction(id);
+      final String label = tap == ID_DISMISS ? getContext().getString(R.string.transit_alt_done)
+                         : tap >= 0          ? getContext().getString(R.string.transit_alt_details)
+                                             : null;
+      node.addAction(new AccessibilityNodeInfoCompat.AccessibilityActionCompat(AccessibilityNodeInfoCompat.ACTION_CLICK,
+                                                                               label));
       node.setClickable(true);
     }
 
@@ -1219,6 +1251,13 @@ public final class TimeGridView extends View
         if (selected < 0 || mAlternatives == null || chip < 0 || chip >= mAlternatives.getChips().size())
           return false;
         mListener.onAlternativeClick(chip);
+        return true;
+      }
+      if (action == AccessibilityNodeInfoCompat.ACTION_LONG_CLICK && id >= ID_RIDE && mListener != null)
+      {
+        performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+        mListener.onRideLongClick((id - ID_RIDE) / RIDE_STRIDE, (id - ID_RIDE) % RIDE_STRIDE);
+        sendEventForVirtualView(id, android.view.accessibility.AccessibilityEvent.TYPE_VIEW_LONG_CLICKED);
         return true;
       }
       return action == AccessibilityNodeInfoCompat.ACTION_CLICK && perform(id);
