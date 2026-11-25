@@ -100,10 +100,14 @@ set(SRC
   gui/shape.hpp
   gui/skin.cpp
   gui/skin.hpp
+  indoor_builder.cpp
+  indoor_builder.hpp
   indoor_cache.cpp
   indoor_cache.hpp
   indoor_data.cpp
   indoor_data.hpp
+  indoor_renderer.cpp
+  indoor_renderer.hpp
   indoor_triangulation.cpp
   indoor_triangulation.hpp
   kinetic_scroller.cpp

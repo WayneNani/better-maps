@@ -247,6 +247,8 @@ public:
 
   // better-maps: raster tile layer ("Luftbild"), see raster_tile_loader.hpp. Inactive params switch it off.
   void SetRasterLayer(raster::RasterLayerParams const & params);
+  // better-maps: indoor maps. Shows one level of a venue (params.m_venue == nullptr: hides the indoor layer).
+  void SetIndoorLevel(IndoorLevelParams const & params);
 
   void SetFontScaleFactor(double scaleFactor);
 

@@ -111,6 +111,10 @@ public:
     // better-maps: raster tile layer ("Luftbild").
     SetRasterLayer,
     RasterTileLoaded,
+    // better-maps: indoor maps.
+    SetIndoorLevel,
+    FlushIndoor,
+    RegenerateIndoor,
   };
 
   virtual ~Message() = default;

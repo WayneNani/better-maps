@@ -3,6 +3,7 @@
 #include "drape_frontend/animation/animation.hpp"
 #include "drape_frontend/base_renderer.hpp"
 #include "drape_frontend/frame_values.hpp"
+#include "drape_frontend/indoor_renderer.hpp"
 #include "drape_frontend/gui/skin.hpp"
 #include "drape_frontend/my_position_controller.hpp"
 #include "drape_frontend/overlays_tracker.hpp"
@@ -355,6 +356,11 @@ private:
   // better-maps: raster tile layer ("Luftbild"). The loader exists while the layer is active.
   void ApplyRasterLayer(raster::RasterLayerParams const & params);
   void RenderRasterLayer(ScreenBase const & modelView);
+
+  // better-maps: indoor maps (one level of a venue, built by the backend).
+  void RenderIndoorLayer(ScreenBase const & modelView);
+  void RenderIndoorOverlays(ScreenBase const & modelView);
+  drape_ptr<IndoorRenderer> m_indoorRenderer;
   // Area fills are not drawn where the raster layer shows imagery (hybrid look).
   bool IsHiddenByRasterLayer(BaseRenderGroup const & group) const;
   drape_ptr<RasterRenderer> m_rasterRenderer;

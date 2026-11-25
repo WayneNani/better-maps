@@ -178,6 +178,7 @@ FrontendRenderer::FrontendRenderer(Params && params)
   , m_trafficRenderer(new TrafficRenderer())
   , m_transitSchemeRenderer(new TransitSchemeRenderer())
   , m_drapeApiRenderer(new DrapeApiRenderer())
+  , m_indoorRenderer(new IndoorRenderer())
   , m_rasterRenderer(new RasterRenderer())
   , m_overlayTree(new dp::OverlayTree(VisualParams::Instance().GetVisualScale()))
   , m_searchMarkTextOverlayTree(new dp::OverlayTree(VisualParams::Instance().GetVisualScale()))
@@ -848,6 +849,15 @@ void FrontendRenderer::AcceptMessage(ref_ptr<Message> message)
     break;
   }
 
+  case Message::Type::FlushIndoor:
+  {
+    ref_ptr<FlushIndoorMessage> msg = message;
+    CHECK(m_context != nullptr, ());
+    m_indoorRenderer->SetRenderData(m_context, make_ref(m_gpuProgramManager), make_ref(m_overlayTree),
+                                    msg->AcceptBatch());
+    break;
+  }
+
   case Message::Type::SetRasterLayer:
   {
     ref_ptr<SetRasterLayerMessage> msg = message;
@@ -1140,6 +1150,9 @@ void FrontendRenderer::UpdateContextDependentResources()
     m_commutator->PostMessage(ThreadsCommutator::ResourceUploadThread, make_unique_dp<RegenerateTransitMessage>(),
                               MessagePriority::Normal);
   }
+  // The indoor level is kept by the backend and built again.
+  m_commutator->PostMessage(ThreadsCommutator::ResourceUploadThread, make_unique_dp<RegenerateIndoorMessage>(),
+                            MessagePriority::Normal);
 
   m_gpsTrackRenderer->Update();
 }
@@ -1476,6 +1489,7 @@ void FrontendRenderer::RenderScene(ScreenBase const & modelView, bool activeFram
 
     RenderRasterLayer(modelView);
     Render2dLayer(modelView);
+    RenderIndoorLayer(modelView);
     RenderUserMarksLayer(modelView, DepthLayer::UserLineLayer);
 
     RenderOverlayUnderBuildingLayer(modelView);
@@ -1516,6 +1530,7 @@ void FrontendRenderer::RenderScene(ScreenBase const & modelView, bool activeFram
     {
       StencilWriterGuard guard(make_ref(m_postprocessRenderer), m_context);
       RenderOverlayLayer(modelView);
+      RenderIndoorOverlays(modelView);
     }
 
     if (IsValidCurrentZoom())
@@ -1669,6 +1684,24 @@ void FrontendRenderer::ApplyRasterLayer(raster::RasterLayerParams const & params
   }
   // Neither the server address nor the token is logged.
   LOG(LINFO, ("Raster layer", params.IsActive() ? "on" : "off"));
+}
+
+void FrontendRenderer::RenderIndoorLayer(ScreenBase const & modelView)
+{
+  TRACE_SECTION("[drape] RenderIndoorLayer");
+  if (!m_indoorRenderer->IsVisible(GetCurrentZoom()))
+    return;
+  DEBUG_LABEL(m_context, "Indoor Layer");
+  m_indoorRenderer->RenderGeometry(m_context, make_ref(m_gpuProgramManager), modelView, m_frameValues);
+}
+
+void FrontendRenderer::RenderIndoorOverlays(ScreenBase const & modelView)
+{
+  TRACE_SECTION("[drape] RenderIndoorOverlays");
+  if (!m_indoorRenderer->IsVisible(GetCurrentZoom()))
+    return;
+  DEBUG_LABEL(m_context, "Indoor Overlays");
+  m_indoorRenderer->RenderOverlays(m_context, make_ref(m_gpuProgramManager), modelView, m_frameValues);
 }
 
 void FrontendRenderer::RenderRasterLayer(ScreenBase const & modelView)
@@ -2029,6 +2062,8 @@ void FrontendRenderer::BuildOverlayTree(ScreenBase const & modelView)
   }
   if (m_transitSchemeRenderer->IsSchemeVisible(GetCurrentZoom()) && !HasTransitRouteData())
     m_transitSchemeRenderer->CollectOverlays(make_ref(m_overlayTree), modelView);
+  if (m_indoorRenderer->IsVisible(GetCurrentZoom()))
+    m_indoorRenderer->CollectOverlays(make_ref(m_overlayTree), modelView);
   EndUpdateOverlayTree();
 }
 
@@ -2506,6 +2541,7 @@ void FrontendRenderer::OnContextDestroy()
   m_gpsTrackRenderer->ClearRenderData();
   m_trafficRenderer->ClearContextDependentResources();
   m_rasterRenderer->ClearContextDependentResources();
+  m_indoorRenderer->Clear(nullptr /* tree */);
   m_drapeApiRenderer->Clear();
   m_postprocessRenderer->ClearContextDependentResources();
   m_transitSchemeRenderer->ClearContextDependentResources(nullptr /* overlayTree */);
@@ -2667,6 +2703,7 @@ void FrontendRenderer::ReleaseResources()
   m_trafficRenderer.reset();
   m_rasterLoader.reset();
   m_rasterRenderer.reset();
+  m_indoorRenderer.reset();
   m_transitSchemeRenderer.reset();
   m_postprocessRenderer.reset();
   m_transitBackground.reset();

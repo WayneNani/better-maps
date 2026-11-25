@@ -4,6 +4,7 @@
 #include "drape_frontend/batchers_pool.hpp"
 #include "drape_frontend/circles_pack_shape.hpp"
 #include "drape_frontend/drape_api_builder.hpp"
+#include "drape_frontend/indoor_builder.hpp"
 #include "drape_frontend/map_shape.hpp"
 #include "drape_frontend/message.hpp"
 #include "drape_frontend/message_subclasses.hpp"
@@ -64,6 +65,7 @@ BackendRenderer::BackendRenderer(Params && params)
   , m_trafficGenerator(make_unique_dp<TrafficGenerator>(std::bind(&BackendRenderer::FlushTrafficRenderData, this, _1)))
   , m_userMarkGenerator(
         make_unique_dp<UserMarkGenerator>(std::bind(&BackendRenderer::FlushUserMarksRenderData, this, _1)))
+  , m_indoorBuilder(make_unique_dp<IndoorBuilder>())
   , m_requestedTiles(params.m_requestedTiles)
   , m_updateCurrentCountryFn(params.m_updateCurrentCountryFn)
   , m_metalineManager(make_unique_dp<MetalineManager>(params.m_commutator, m_model))
@@ -380,6 +382,7 @@ void BackendRenderer::AcceptMessage(ref_ptr<Message> message)
 #endif
     m_trafficGenerator->InvalidateTexturesCache();
     m_transitBuilder->RebuildSchemes(m_context, m_texMng);
+    RebuildIndoor();
 
     CleanupTextures();
     break;
@@ -410,6 +413,7 @@ void BackendRenderer::AcceptMessage(ref_ptr<Message> message)
 #endif
     m_trafficGenerator->InvalidateTexturesCache();
     m_transitBuilder->RebuildSchemes(m_context, m_texMng);
+    RebuildIndoor();
 
     CleanupTextures();
     break;
@@ -584,6 +588,23 @@ void BackendRenderer::AcceptMessage(ref_ptr<Message> message)
     break;
   }
 
+  case Message::Type::SetIndoorLevel:
+  {
+    ref_ptr<SetIndoorLevelMessage> msg = message;
+    CHECK(m_context != nullptr, ());
+    m_commutator->PostMessage(
+        ThreadsCommutator::RenderThread,
+        make_unique_dp<FlushIndoorMessage>(m_indoorBuilder->Build(m_context, m_texMng, msg->GetParams())),
+        MessagePriority::Normal);
+    break;
+  }
+
+  case Message::Type::RegenerateIndoor:
+  {
+    RebuildIndoor();
+    break;
+  }
+
   case Message::Type::DrapeApiRemove:
   {
     ref_ptr<DrapeApiRemoveMessage> msg = message;
@@ -685,6 +706,16 @@ void BackendRenderer::AcceptMessage(ref_ptr<Message> message)
   }
 }
 
+void BackendRenderer::RebuildIndoor()
+{
+  if (!m_indoorBuilder->HasLevel())
+    return;
+  CHECK(m_context != nullptr, ());
+  m_commutator->PostMessage(ThreadsCommutator::RenderThread,
+                            make_unique_dp<FlushIndoorMessage>(m_indoorBuilder->Rebuild(m_context, m_texMng)),
+                            MessagePriority::Normal);
+}
+
 void BackendRenderer::ReleaseResources()
 {
   m_readManager->Stop();
@@ -695,6 +726,7 @@ void BackendRenderer::ReleaseResources()
   m_routeBuilder.reset();
   m_overlays.clear();
   m_trafficGenerator.reset();
+  m_indoorBuilder.reset();
 
   m_texMng->Release();
 

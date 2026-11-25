@@ -898,6 +898,12 @@ void DrapeEngine::SetRasterLayer(raster::RasterLayerParams const & params)
                                   MessagePriority::Normal);
 }
 
+void DrapeEngine::SetIndoorLevel(IndoorLevelParams const & params)
+{
+  m_threadCommutator->PostMessage(ThreadsCommutator::ResourceUploadThread,
+                                  make_unique_dp<SetIndoorLevelMessage>(params), MessagePriority::Normal);
+}
+
 void DrapeEngine::SetFontScaleFactor(double scaleFactor)
 {
   VisualParams::Instance().SetFontScale(scaleFactor);
