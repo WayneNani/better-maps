@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Raster mit alternativen Abfahrten</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0B6E65}a:hover{color:#08524B}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #FFFFFF; font-family: Roboto, system-ui, sans-serif; color: #1B1F1E; overflow: hidden">
+  <div style="height: 56px; flex-shrink: 0; background: #0E6B63; display: flex; align-items: center; gap: 12px; padding: 0 8px; color: #FFFFFF">
+    <button aria-label="Routenplanung schließen" style="width: 44px; height: 44px; border: 0; background: transparent; color: #FFFFFF; display: flex; align-items: center; justify-content: center; border-radius: 22px">
+      <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="M11 6l-6 6 6 6"></path></svg>
+    </button>
+    <div style="font-size: 16px; font-weight: 500">Bonn-Oberkassel → Köln Hbf</div>
+  </div>
+  <div style="height: 84px; flex-shrink: 0; background: #EFE8DC"></div>
+  <div style="flex: 1; display: flex; flex-direction: column; border-radius: 16px 16px 0 0; margin-top: -12px; background: #FFFFFF; box-shadow: 0 -2px 8px rgba(0,0,0,0.12); position: relative; overflow: hidden">
+    <div style="width: 36px; height: 4px; border-radius: 2px; background: #C9CFCD; align-self: center; margin-top: 8px"></div>
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 16px">
+      <div style="display: flex; align-items: center; gap: 8px; color: #0B6E65; font-size: 15px; font-weight: 500">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+        Jetzt losfahren
+      </div>
+      <div style="display: flex; border: 1px solid #8A9593; border-radius: 18px; overflow: hidden">
+        <button aria-label="Liste" style="width: 48px; height: 36px; border: 0; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3E4846" stroke-width="2" stroke-linecap="round"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"></path></svg></button>
+        <button aria-label="Raster" aria-pressed="true" style="width: 48px; height: 36px; border: 0; border-left: 1px solid #8A9593; background: #BDEBCB; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1B1F1E" stroke-width="2" stroke-linecap="round"><path d="M6 5v14M12 5v14M18 5v14"></path></svg></button>
+      </div>
+    </div>
+
+    <div style="position: relative; height: 560px; margin: 4px 0 0 0">
+      <div style="position: absolute; left: 0; top: 24px; width: 390px; height: 1px; background: #E3E7E6"></div>
+      <div style="position: absolute; left: 8px; top: 16px; font-size: 11px; color: #5D6664">09:00</div>
+      <div style="position: absolute; left: 0; top: 124px; width: 390px; height: 1px; background: #E3E7E6"></div>
+      <div style="position: absolute; left: 8px; top: 116px; font-size: 11px; color: #5D6664">09:20</div>
+      <div style="position: absolute; left: 0; top: 224px; width: 390px; height: 1px; background: #E3E7E6"></div>
+      <div style="position: absolute; left: 8px; top: 216px; font-size: 11px; color: #5D6664">09:40</div>
+      <div style="position: absolute; left: 0; top: 324px; width: 390px; height: 1px; background: #E3E7E6"></div>
+      <div style="position: absolute; left: 8px; top: 316px; font-size: 11px; color: #5D6664">10:00</div>
+      <div style="position: absolute; left: 0; top: 424px; width: 390px; height: 1px; background: #E3E7E6"></div>
+      <div style="position: absolute; left: 8px; top: 416px; font-size: 11px; color: #5D6664">10:20</div>
+      <div style="position: absolute; left: 0; top: 524px; width: 390px; height: 1px; background: #E3E7E6"></div>
+      <div style="position: absolute; left: 8px; top: 516px; font-size: 11px; color: #5D6664">10:40</div>
+
+      <div style="position: absolute; left: 0; top: 0; width: 390px; height: 560px; opacity: 0.35">
+        <div style="position: absolute; left: 56px; top: 50px; width: 60px; text-align: center; font-size: 12px; font-weight: 700; color: #2E7D32">09:09</div>
+        <div style="position: absolute; left: 85px; top: 69px; width: 0; height: 55px; border-left: 2px dotted #6B7472"></div>
+        <div style="position: absolute; left: 56px; top: 124px; width: 60px; height: 350px; border-radius: 6px; background: #0B7F75; color: #FFFFFF; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center">16</div>
+        <div style="position: absolute; left: 56px; top: 480px; width: 60px; text-align: center; font-size: 12px; font-weight: 700; color: #2E7D32">10:34</div>
+
+        <div style="position: absolute; left: 244px; top: 100px; width: 60px; text-align: center; font-size: 12px; font-weight: 700; color: #2E7D32">09:19</div>
+        <div style="position: absolute; left: 273px; top: 119px; width: 0; height: 69px; border-left: 2px dotted #6B7472"></div>
+        <div style="position: absolute; left: 244px; top: 184px; width: 60px; height: 340px; border-radius: 6px; background: #0B7F75; color: #FFFFFF; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center">16</div>
+
+        <div style="position: absolute; left: 316px; top: 140px; width: 60px; text-align: center; font-size: 12px; font-weight: 700; color: #C62828">09:25</div>
+        <div style="position: absolute; left: 316px; top: 184px; width: 60px; height: 30px; border-radius: 6px; background: #C2185B; color: #FFFFFF; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center">66</div>
+        <div style="position: absolute; left: 345px; top: 214px; width: 0; height: 60px; border-left: 2px dotted #6B7472"></div>
+        <div style="position: absolute; left: 316px; top: 274px; width: 60px; height: 140px; border-radius: 6px; background: #6B7075; color: #FFFFFF; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center">RB26</div>
+        <div style="position: absolute; left: 316px; top: 420px; width: 60px; text-align: center; font-size: 12px; font-weight: 700; color: #C62828">10:20</div>
+      </div>
+
+      <div style="position: absolute; left: 122px; top: 30px; width: 116px; height: 520px; border-radius: 10px; background: #F2F8F7; border: 1px solid #CFE5E1"></div>
+
+      <div style="position: absolute; left: 168px; top: {{c.startTop}}; width: 64px; text-align: center; font-size: 12px; font-weight: 700; color: #2E7D32">{{c.start}}</div>
+      <div style="position: absolute; left: 199px; top: {{c.walkTop}}; width: 0; height: {{c.walkH}}; border-left: 2px dotted #6B7472"></div>
+      <div style="position: absolute; left: 168px; top: {{c.leg1Top}}; width: 64px; height: {{c.leg1H}}; box-sizing: border-box; border-radius: 6px; background: {{c.leg1Color}}; color: {{c.leg1Text}}; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; outline: 2px solid #0B6E65; outline-offset: 2px">{{c.leg1Line}}</div>
+      <div style="position: absolute; left: 199px; top: {{c.xferTop}}; width: 0; height: {{c.xferH}}; border-left: 2px dotted #6B7472"></div>
+      <div style="position: absolute; left: 168px; top: {{c.leg2Top}}; width: 64px; height: {{c.leg2H}}; border-radius: 6px; background: {{c.leg2Color}}; color: #FFFFFF; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-align: center">{{c.leg2Line}}</div>
+      <div style="position: absolute; left: 168px; top: {{c.arrTop}}; width: 64px; text-align: center; font-size: 12px; font-weight: 700; color: {{c.arrColor}}">{{c.arr}}</div>
+
+      <sc-for list="{{ghosts}}" as="g" hint-placeholder-count="7">
+        <button onClick="{{g.pick}}" aria-label="{{g.label}}" aria-pressed="{{g.pressed}}" style="position: absolute; left: 126px; top: {{g.top}}; width: 38px; height: 15px; box-sizing: border-box; padding: 0 0 0 4px; border-radius: 4px; border: {{g.border}}; border-left: 4px solid {{g.color}}; background: {{g.bg}}; color: {{g.textColor}}; font-size: 10px; font-weight: 700; display: flex; align-items: center; cursor: pointer">{{g.dep}}</button>
+      </sc-for>
+    </div>
+
+    <div style="position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; align-items: center; gap: 10px; padding: 10px 8px 10px 14px; border-radius: 12px; background: #1F2A28; color: #FFFFFF; box-shadow: 0 4px 12px rgba(0,0,0,0.25)">
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 14px; font-weight: 500">{{hintTitle}}</span>
+        <span style="font-size: 12px; color: #C9D3D1">{{hintText}}</span>
+      </div>
+      <button onClick="{{reset}}" style="min-height: 44px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; color: #8FE0D3; font-size: 14px; font-weight: 700; cursor: pointer">Fertig</button>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sel: 4 };
+  }
+  renderVals() {
+    const L = {
+      '63': { color: '#8FCBEA', text: '#0B2A3A' },
+      '16': { color: '#0B7F75', text: '#FFFFFF' }
+    };
+    const raw = [
+      { dep: '09:09', arr: '09:19', line: '16', buffer: 24 },
+      { dep: '09:19', arr: '09:29', line: '63', buffer: 14 },
+      { dep: '09:22', arr: '09:32', line: '16', buffer: 11 },
+      { dep: '09:26', arr: '09:36', line: '16', buffer: 7 },
+      { dep: '09:29', arr: '09:39', line: '63', buffer: 4 },
+      { dep: '09:39', arr: '09:49', line: '63', buffer: -1 },
+      { dep: '09:42', arr: '09:52', line: '16', buffer: -1 }
+    ];
+    const toMin = (t) => { const p = t.split(':'); return Number(p[0]) * 60 + Number(p[1]); };
+    const fmt = (m) => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+    const y = (m) => 24 + (m - 540) * 5;
+    const px = (v) => v + 'px';
+    const sel = this.state.sel;
+    const cur = raw[sel];
+    const missed = cur.buffer < 0;
+    const dep = toMin(cur.dep);
+    const arr1 = toMin(cur.arr);
+    const start = dep - 13;
+    const leg2Dep = missed ? toMin('10:07') : toMin('09:47');
+    const leg2Arr = missed ? toMin('10:30') : toMin('10:06');
+    const c = {
+      start: fmt(start),
+      startTop: px(y(start) - 18),
+      walkTop: px(y(start)),
+      walkH: px(Math.max(0, y(dep) - y(start))),
+      leg1Top: px(y(dep)),
+      leg1H: px(y(arr1) - y(dep)),
+      leg1Color: L[cur.line].color,
+      leg1Text: L[cur.line].text,
+      leg1Line: cur.line,
+      xferTop: px(y(arr1)),
+      xferH: px(Math.max(0, y(leg2Dep) - y(arr1))),
+      leg2Top: px(y(leg2Dep)),
+      leg2H: px(y(leg2Arr) - y(leg2Dep)),
+      leg2Color: missed ? '#6B7075' : '#45494E',
+      leg2Line: missed ? 'RE 5' : 'ICE 1022',
+      arrTop: px(y(leg2Arr) + 4),
+      arr: fmt(leg2Arr),
+      arrColor: missed ? '#8A4B00' : '#2E7D32'
+    };
+    const ghosts = raw.map((a, i) => {
+      const selected = i === sel;
+      const miss = a.buffer < 0;
+      return {
+        dep: a.dep,
+        top: px(y(toMin(a.dep)) - 7),
+        color: L[a.line].color,
+        label: 'Linie ' + a.line + ' um ' + a.dep + (miss ? ', erreicht den ICE nicht' : ', ' + a.buffer + ' Minuten Puffer'),
+        pressed: selected ? 'true' : 'false',
+        border: selected ? '1px solid #0B6E65' : (miss ? '1px dashed #9AA4A2' : '1px solid #C9D3D1'),
+        bg: selected ? '#D7EEEA' : '#FFFFFF',
+        textColor: miss ? '#6B7472' : '#1B1F1E',
+        pick: () => this.setState({ sel: i })
+      };
+    });
+    return {
+      c: c,
+      ghosts: ghosts,
+      hintTitle: 'Erste Fahrt: ' + cur.line + ' um ' + cur.dep,
+      hintText: missed ? 'ICE verpasst · weiter mit RE 5, an 10:30' : '5 Abfahrten links erreichen den ICE 1022 · Puffer ' + cur.buffer + ' Min',
+      reset: () => this.setState({ sel: 4 })
+    };
+  }
+}
+</script>
+</body>
+</html>
