@@ -178,6 +178,7 @@ FrontendRenderer::FrontendRenderer(Params && params)
   , m_trafficRenderer(new TrafficRenderer())
   , m_transitSchemeRenderer(new TransitSchemeRenderer())
   , m_drapeApiRenderer(new DrapeApiRenderer())
+  , m_rasterRenderer(new RasterRenderer())
   , m_overlayTree(new dp::OverlayTree(VisualParams::Instance().GetVisualScale()))
   , m_searchMarkTextOverlayTree(new dp::OverlayTree(VisualParams::Instance().GetVisualScale()))
   , m_enablePerspectiveInNavigation(false)
@@ -847,6 +848,21 @@ void FrontendRenderer::AcceptMessage(ref_ptr<Message> message)
     break;
   }
 
+  case Message::Type::SetRasterLayer:
+  {
+    ref_ptr<SetRasterLayerMessage> msg = message;
+    ApplyRasterLayer(msg->GetParams());
+    break;
+  }
+
+  case Message::Type::RasterTileLoaded:
+  {
+    ref_ptr<RasterTileLoadedMessage> msg = message;
+    if (m_rasterLoader != nullptr && msg->GetGeneration() == m_rasterGeneration)
+      m_rasterRenderer->OnTileLoaded(msg->AcceptImage());
+    break;
+  }
+
   case Message::Type::EnableTransitScheme:
   {
     ref_ptr<EnableTransitSchemeMessage> msg = message;
@@ -1458,6 +1474,7 @@ void FrontendRenderer::RenderScene(ScreenBase const & modelView, bool activeFram
     m_context->ApplyFramebuffer("Static frame");
     m_viewport.Apply(m_context);
 
+    RenderRasterLayer(modelView);
     Render2dLayer(modelView);
     RenderUserMarksLayer(modelView, DepthLayer::UserLineLayer);
 
@@ -1564,8 +1581,13 @@ void FrontendRenderer::Render2dLayer(ScreenBase const & modelView)
 
   CHECK(m_context != nullptr, ());
   DEBUG_LABEL(m_context, "2D Layer");
+  bool const rasterLayer = m_rasterLoader != nullptr;
   for (drape_ptr<RenderGroup> const & group : layer2d.m_renderGroups)
+  {
+    if (rasterLayer && IsHiddenByRasterLayer(*group))
+      continue;
     RenderSingleGroup(m_context, modelView, make_ref(group));
+  }
 }
 
 void FrontendRenderer::PreRender3dLayer(ScreenBase const & modelView)
@@ -1585,8 +1607,13 @@ void FrontendRenderer::PreRender3dLayer(ScreenBase const & modelView)
   m_viewport.Apply(m_context);
 
   layer.Sort(make_ref(m_overlayTree));
+  bool const rasterLayer = m_rasterLoader != nullptr;
   for (drape_ptr<RenderGroup> const & group : layer.m_renderGroups)
+  {
+    if (rasterLayer && IsHiddenByRasterLayer(*group))
+      continue;
     RenderSingleGroup(m_context, modelView, make_ref(group));
+  }
 }
 
 void FrontendRenderer::Render3dLayer(ScreenBase const & modelView)
@@ -1610,8 +1637,64 @@ void FrontendRenderer::Render3dLayer(ScreenBase const & modelView)
     m_context->Clear(dp::ClearBits::DepthBit, dp::kClearBitsStoreAll);
 
     layer.Sort(make_ref(m_overlayTree));
+    bool const rasterLayer = m_rasterLoader != nullptr;
     for (drape_ptr<RenderGroup> const & group : layer.m_renderGroups)
+    {
+      if (rasterLayer && IsHiddenByRasterLayer(*group))
+        continue;
       RenderSingleGroup(m_context, modelView, make_ref(group));
+    }
+  }
+}
+
+void FrontendRenderer::ApplyRasterLayer(raster::RasterLayerParams const & params)
+{
+  if (params == m_rasterParams)
+    return;
+  m_rasterParams = params;
+  m_rasterLoader.reset();
+  m_rasterRenderer->Clear();
+  ++m_rasterGeneration;
+  if (params.IsActive())
+  {
+    ref_ptr<ThreadsCommutator> commutator = m_commutator;
+    auto const generation = m_rasterGeneration;
+    m_rasterLoader = std::make_unique<raster::RasterTileLoader>(
+        params, [commutator, generation](raster::RasterTileImage && image)
+    {
+      commutator->PostMessage(ThreadsCommutator::RenderThread,
+                              make_unique_dp<RasterTileLoadedMessage>(generation, std::move(image)),
+                              MessagePriority::Normal);
+    });
+  }
+  // Neither the server address nor the token is logged.
+  LOG(LINFO, ("Raster layer", params.IsActive() ? "on" : "off"));
+}
+
+void FrontendRenderer::RenderRasterLayer(ScreenBase const & modelView)
+{
+  TRACE_SECTION("[drape] RenderRasterLayer");
+  if (m_rasterLoader == nullptr)
+    return;
+  std::vector<raster::RasterTileKey> toLoad;
+  if (m_rasterRenderer->UpdateWanted(modelView, VisualParams::Instance().GetVisualScale(), toLoad))
+    m_rasterLoader->SetWanted(toLoad);
+  DEBUG_LABEL(m_context, "Raster Layer");
+  m_rasterRenderer->Render(m_context, make_ref(m_gpuProgramManager), modelView, m_frameValues);
+}
+
+bool FrontendRenderer::IsHiddenByRasterLayer(BaseRenderGroup const & group) const
+{
+  switch (group.GetState().GetProgram<gpu::Program>())
+  {
+  case gpu::Program::Area:
+  case gpu::Program::AreaOutline:
+  case gpu::Program::Area3d:
+  case gpu::Program::Area3dOutline:
+  case gpu::Program::HatchingArea:
+  case gpu::Program::TransparentArea:
+    return m_rasterRenderer->IsCovered(group.GetTileKey().GetGlobalRect());
+  default: return false;
   }
 }
 
@@ -2422,6 +2505,7 @@ void FrontendRenderer::OnContextDestroy()
   m_routeRenderer->ClearContextDependentResources();
   m_gpsTrackRenderer->ClearRenderData();
   m_trafficRenderer->ClearContextDependentResources();
+  m_rasterRenderer->ClearContextDependentResources();
   m_drapeApiRenderer->Clear();
   m_postprocessRenderer->ClearContextDependentResources();
   m_transitSchemeRenderer->ClearContextDependentResources(nullptr /* overlayTree */);
@@ -2581,6 +2665,8 @@ void FrontendRenderer::ReleaseResources()
   m_buildingsFramebuffer.reset();
   m_screenQuadRenderer.reset();
   m_trafficRenderer.reset();
+  m_rasterLoader.reset();
+  m_rasterRenderer.reset();
   m_transitSchemeRenderer.reset();
   m_postprocessRenderer.reset();
   m_transitBackground.reset();

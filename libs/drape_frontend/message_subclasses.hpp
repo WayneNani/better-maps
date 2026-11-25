@@ -13,6 +13,7 @@
 #include "drape_frontend/my_position_controller.hpp"
 #include "drape_frontend/overlay_batcher.hpp"
 #include "drape_frontend/postprocess_renderer.hpp"
+#include "drape_frontend/raster_tile_loader.hpp"
 #include "drape_frontend/render_node.hpp"
 #include "drape_frontend/route_shape.hpp"
 #include "drape_frontend/selection_shape.hpp"
@@ -1154,6 +1155,39 @@ public:
 
 private:
   bool m_isEnabled = false;
+};
+
+// better-maps: switches the raster tile layer ("Luftbild") on or off and sets its server.
+class SetRasterLayerMessage : public Message
+{
+public:
+  explicit SetRasterLayerMessage(raster::RasterLayerParams const & params) : m_params(params) {}
+
+  Type GetType() const override { return Type::SetRasterLayer; }
+
+  raster::RasterLayerParams const & GetParams() const { return m_params; }
+
+private:
+  raster::RasterLayerParams const m_params;
+};
+
+// better-maps: a tile of the raster layer was loaded (or failed), from a loader thread to the render thread.
+class RasterTileLoadedMessage : public Message
+{
+public:
+  RasterTileLoadedMessage(uint64_t generation, raster::RasterTileImage && image)
+    : m_generation(generation)
+    , m_image(std::move(image))
+  {}
+
+  Type GetType() const override { return Type::RasterTileLoaded; }
+
+  uint64_t GetGeneration() const { return m_generation; }
+  raster::RasterTileImage && AcceptImage() { return std::move(m_image); }
+
+private:
+  uint64_t const m_generation;
+  raster::RasterTileImage m_image;
 };
 
 class EnableTransitSchemeMessage : public Message

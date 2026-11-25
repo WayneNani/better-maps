@@ -108,6 +108,9 @@ public:
     OnEnterBackground,
     Arrow3dRecache,
     VisualScaleChanged,
+    // better-maps: raster tile layer ("Luftbild").
+    SetRasterLayer,
+    RasterTileLoaded,
   };
 
   virtual ~Message() = default;

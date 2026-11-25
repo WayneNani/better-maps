@@ -107,6 +107,8 @@ std::string DebugPrint(Message::Type msgType)
   case Message::Type::OnEnterBackground: return "OnEnterBackground";
   case Message::Type::Arrow3dRecache: return "Arrow3dRecache";
   case Message::Type::VisualScaleChanged: return "VisualScaleChanged";
+  case Message::Type::SetRasterLayer: return "SetRasterLayer";
+  case Message::Type::RasterTileLoaded: return "RasterTileLoaded";
   }
   ASSERT(false, ("Unknown message type."));
   return "Unknown type";

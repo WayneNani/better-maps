@@ -7,6 +7,8 @@
 #include "drape_frontend/my_position_controller.hpp"
 #include "drape_frontend/overlays_tracker.hpp"
 #include "drape_frontend/postprocess_renderer.hpp"
+#include "drape_frontend/raster_renderer.hpp"
+#include "drape_frontend/raster_tile_loader.hpp"
 #include "drape_frontend/render_group.hpp"
 #include "drape_frontend/render_state_extension.hpp"
 #include "drape_frontend/requested_tiles.hpp"
@@ -349,6 +351,16 @@ private:
   drape_ptr<ScreenQuadRenderer> m_screenQuadRenderer;
   drape_ptr<GpsTrackRenderer> m_gpsTrackRenderer;
   drape_ptr<DrapeApiRenderer> m_drapeApiRenderer;
+
+  // better-maps: raster tile layer ("Luftbild"). The loader exists while the layer is active.
+  void ApplyRasterLayer(raster::RasterLayerParams const & params);
+  void RenderRasterLayer(ScreenBase const & modelView);
+  // Area fills are not drawn where the raster layer shows imagery (hybrid look).
+  bool IsHiddenByRasterLayer(BaseRenderGroup const & group) const;
+  drape_ptr<RasterRenderer> m_rasterRenderer;
+  std::unique_ptr<raster::RasterTileLoader> m_rasterLoader;
+  raster::RasterLayerParams m_rasterParams;
+  uint64_t m_rasterGeneration = 0;
 
   drape_ptr<dp::OverlayTree> m_overlayTree;
   // Actually, it holds displacing Bookmark titles. The tree named after SearchMarkLayer.
