@@ -118,6 +118,8 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
   private String mScrolledAlternatives;
   @Nullable
   private String mGridSelection;
+  // Departure a ride is dragged to in the time grid, -1 if none.
+  private int mGridPreview = -1;
 
   public OnlineTransitPanel(@NonNull Activity activity, @NonNull View panel)
   {
@@ -242,6 +244,14 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
       public void onDismissAlternatives()
       {
         mPresenter.closeAlternatives();
+      }
+
+      @Override
+      public void onAlternativePreview(int chipIndex)
+      {
+        mGridPreview = chipIndex;
+        if (UiUtils.isVisible(mGridHint))
+          bindGridHint(mPresenter.getState());
       }
     });
     panel.findViewById(R.id.transit_grid_hint_done).setOnClickListener(v -> mPresenter.closeAlternatives());
@@ -667,7 +677,10 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
     return Math.max(0, bottom - top - chrome - mPanel.getPaddingBottom() - margin);
   }
 
-  /** The card below the time grid while a ride is selected; hidden for null. */
+  /**
+   * The card below the time grid while a ride is selected; hidden for null. While the ride is dragged, it tells about
+   * the departure it would snap to.
+   */
   private void bindGridHint(@Nullable ConnectionsState state)
   {
     final AlternativesItem alternatives = state != null ? state.getAlternatives() : null;
@@ -676,6 +689,27 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
       return;
     final String ride =
         AlternativesViews.rideName(mActivity, alternatives.getPosition(), alternatives.getRideNumber(), true);
+    final AlternativesItem.Chip preview = mGridPreview >= 0 && mGridPreview < alternatives.getChips().size()
+                                            ? alternatives.getChips().get(mGridPreview)
+                                            : null;
+    if (preview != null && !preview.isSelected())
+    {
+      mGridHintTitle.setText(
+          mActivity.getString(R.string.transit_alt_hint_title, ride, preview.getBadge().getText(),
+                              preview.getDeparture()));
+      final String text;
+      if (alternatives.getNextLine() == null)
+        text = mActivity.getString(R.string.transit_alt_hint_arrival, preview.getArrival());
+      else if (preview.missesNext())
+        text = mActivity.getString(R.string.transit_alt_hint_drag_missed, alternatives.getNextLine());
+      else
+        text = mActivity.getResources().getQuantityString(R.plurals.transit_alt_hint_reach,
+                                                          alternatives.getConnectingCount(),
+                                                          alternatives.getConnectingCount(), alternatives.getNextLine())
+             + " · " + AlternativesViews.status(mActivity, preview);
+      UiUtils.setTextAndHideIfEmpty(mGridHintText, text);
+      return;
+    }
     final AlternativesItem.Chip chip = alternatives.getSelected();
     mGridHintTitle.setText(chip != null ? mActivity.getString(R.string.transit_alt_hint_title, ride,
                                                               chip.getBadge().getText(), chip.getDeparture())
