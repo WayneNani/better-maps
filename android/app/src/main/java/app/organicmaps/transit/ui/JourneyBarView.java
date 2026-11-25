@@ -8,11 +8,10 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.TypedValue;
-import android.view.MotionEvent;
-import android.view.SoundEffectConstants;
 import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import androidx.core.content.ContextCompat;
 import app.organicmaps.R;
 import app.organicmaps.transit.ItineraryTimeline;
@@ -26,17 +25,13 @@ import java.util.List;
  * Horizontal bar over the whole duration of a connection: rides in their line colors with the line name if it fits,
  * walks as dotted lines, waits empty. The geometry comes from {@link JourneyBarLayout}.
  * <p>
- * One ride can be made tappable ({@link #setRideClickListener}), e.g. to show other departures of the first ride;
- * other taps go to the parent (e.g. to open the connection).
+ * The bar takes no touches itself: taps go to the parent (e.g. to open the connection). One ride can be marked as
+ * the one the parent reacts to when it is held ({@link #setRide}, {@link #isOnRide}), e.g. to show the other
+ * departures of the first ride.
  */
 public final class JourneyBarView extends View
 {
-  public interface RideClickListener
-  {
-    void onRideClick(int legIndex);
-  }
-
-  /** Taps this far beside the ride still count. */
+  /** Touches this far beside the ride still count. */
   private static final float TOUCH_SLACK_DP = 8;
 
   private static final float HEIGHT_DP = 20;
@@ -61,10 +56,7 @@ public final class JourneyBarView extends View
   @NonNull
   private List<JourneyBarLayout.Piece> mPieces = Collections.emptyList();
   private int mLayoutWidth = -1;
-  @Nullable
-  private RideClickListener mRideListener;
   private int mRideLegIndex = -1;
-  private boolean mRidePressed;
   // Leg index of the highlighted (open) ride, -1 for none.
   private int mOpenLegIndex = -1;
   private final Paint mOutline = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -88,7 +80,7 @@ public final class JourneyBarView extends View
     // Zero-length dashes with round caps are dots.
     mWalk.setPathEffect(new DashPathEffect(new float[] {0, dp(DOT_SPACING_DP)}, 0));
     mWalk.setColor(ThemeUtils.getColor(context, android.R.attr.textColorSecondary));
-    // The rows around it describe the connection; the ride is also reachable with a button.
+    // The rows around it describe the connection; the ride's departures are also reachable with a button.
     setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
     mOutline.setStyle(Paint.Style.STROKE);
     mOutline.setStrokeWidth(dp(2));
@@ -96,57 +88,46 @@ public final class JourneyBarView extends View
   }
 
   /**
-   * Makes one ride tappable.
+   * Marks the ride the parent reacts to when it is held.
    *
-   * @param legIndex leg index of the ride ({@link ItineraryTimeline.Segment#getLegIndex()}).
+   * @param legIndex leg index of the ride ({@link ItineraryTimeline.Segment#getLegIndex()}), -1 for none.
    * @param open the ride is outlined, e.g. while its other departures are shown.
    */
-  public void setRideClickListener(@Nullable RideClickListener listener, int legIndex, boolean open)
+  public void setRide(int legIndex, boolean open)
   {
-    mRideListener = listener;
-    mRideLegIndex = listener != null ? legIndex : -1;
+    mRideLegIndex = legIndex;
     mOpenLegIndex = open ? legIndex : -1;
-    mRidePressed = false;
     invalidate();
   }
 
-  @Override
-  public boolean onTouchEvent(@NonNull MotionEvent event)
-  {
-    if (mRideListener == null)
-      return super.onTouchEvent(event);
-    switch (event.getActionMasked())
-    {
-    case MotionEvent.ACTION_DOWN:
-      mRidePressed = isOnRide(event.getX());
-      return mRidePressed;
-    case MotionEvent.ACTION_UP:
-      if (mRidePressed && isOnRide(event.getX()))
-      {
-        mRidePressed = false;
-        playSoundEffect(SoundEffectConstants.CLICK);
-        mRideListener.onRideClick(mRideLegIndex);
-        return true;
-      }
-      mRidePressed = false;
-      return false;
-    case MotionEvent.ACTION_CANCEL: mRidePressed = false; return false;
-    default: return mRidePressed;
-    }
-  }
-
-  private boolean isOnRide(float x)
+  /** True if a point in view coordinates is on (or a little beside) the marked ride. */
+  public boolean isOnRide(float x, float y)
   {
     final JourneyBarLayout.Piece piece = ridePiece();
-    if (piece == null)
+    if (piece == null || y < 0 || y > getHeight())
       return false;
     final float[] bounds = bounds(piece);
     return x >= bounds[0] - dp(TOUCH_SLACK_DP) && x <= bounds[1] + dp(TOUCH_SLACK_DP);
   }
 
+  /** Center of the marked ride in view coordinates, null if there is none (or the bar is not laid out yet). */
+  @VisibleForTesting
+  @Nullable
+  public float[] getRideCenter()
+  {
+    final JourneyBarLayout.Piece piece = ridePiece();
+    if (piece == null)
+      return null;
+    final float[] bounds = bounds(piece);
+    return new float[] {(bounds[0] + bounds[1]) / 2, getHeight() / 2f};
+  }
+
   @Nullable
   private JourneyBarLayout.Piece ridePiece()
   {
+    if (mRideLegIndex < 0)
+      return null;
+    updateLayout();
     for (JourneyBarLayout.Piece piece : mPieces)
       if (piece.getKind() == ItineraryTimeline.Kind.RIDE && piece.getSegment().getLegIndex() == mRideLegIndex)
         return piece;
@@ -184,12 +165,8 @@ public final class JourneyBarView extends View
     super.onDraw(canvas);
     if (mTimeline == null)
       return;
+    updateLayout();
     final int width = getWidth() - getPaddingLeft() - getPaddingRight();
-    if (width != mLayoutWidth)
-    {
-      mLayoutWidth = width;
-      mPieces = JourneyBarLayout.layout(mTimeline, width, Math.round(dp(MIN_RIDE_DP)), Math.round(dp(GAP_DP)));
-    }
     final float top = getPaddingTop();
     final float bottom = getHeight() - getPaddingBottom();
     final float centerY = (top + bottom) / 2;
@@ -232,6 +209,23 @@ public final class JourneyBarView extends View
           break;
         }
       }
+    }
+  }
+
+  /** The pieces for the current width; a touch can come before the first draw after new data. */
+  private void updateLayout()
+  {
+    final int width = getWidth() - getPaddingLeft() - getPaddingRight();
+    if (mTimeline == null || width <= 0)
+    {
+      mPieces = Collections.emptyList();
+      mLayoutWidth = -1;
+      return;
+    }
+    if (width != mLayoutWidth)
+    {
+      mLayoutWidth = width;
+      mPieces = JourneyBarLayout.layout(mTimeline, width, Math.round(dp(MIN_RIDE_DP)), Math.round(dp(GAP_DP)));
     }
   }
 
