@@ -26,6 +26,10 @@ export CCACHE_NOHASHDIR=true
 # Ziel für adb und instrumentierte Tests: immer der Emulator, nie ein per USB angeschlossenes Handy
 # (AGP und adb werten ANDROID_SERIAL aus). Für ein echtes Gerät ANDROID_SERIAL bewusst selbst setzen.
 export ANDROID_SERIAL="${ANDROID_SERIAL:-emulator-5554}"
+# Ein per WLAN gekoppeltes Handy soll sich nie von selbst verbinden (adb verbindet sonst jedes gekoppelte Gerät,
+# das es per mDNS findet). Gilt für einen adb-Server, der hier gestartet wird; ein Handy dann bewusst mit
+# "adb connect <ip>:<port>" verbinden.
+export ADB_MDNS_AUTO_CONNECT="${ADB_MDNS_AUTO_CONNECT:-0}"
 
 NJOBS="${BM_NJOBS:-6}"
 LOCK_DIR="${BM_LOCK_DIR:-$HOME/.cache/bettermaps-locks}"
