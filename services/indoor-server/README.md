@@ -73,7 +73,7 @@ angesprochen; Go wird nur für `new-token.sh` und die Tests gebraucht).
 
 ```sh
 cd services/indoor-server
-scripts/fetch-data.sh                 # Geofabrik-Extrakte, Standard: Hessen + NRW (~1,1 GB)
+scripts/fetch-data.sh                 # Geofabrik-Extrakte, Standard: Hessen + NRW (~1,2 GB)
 scripts/import.sh                     # filtern + Venues bauen (siehe Ressourcenbedarf), löscht danach die Extrakte
 scripts/new-token.sh pixel            # Token für ein Gerät anlegen, wird einmal angezeigt
 scripts/run.sh                        # Gateway starten (baut das Image beim ersten Mal)
@@ -98,7 +98,7 @@ Skripte (`scripts/common.sh`, alles über Umgebungsvariablen):
 | `INDOOR_KEEP_PBF` | `0` | `1` behält die Extrakte nach einem erfolgreichen Import |
 | `INDOOR_IMPORT_MEMORY` / `INDOOR_IMPORT_CPUS` | `3g` / `2` | Limits der Import-Container |
 | `INDOOR_BIND` / `INDOOR_PORT` | `127.0.0.1` / `18300` | Veröffentlichter Port des Gateways |
-| `INDOOR_MEMORY` | `256m` | Speicherlimit des Gateways |
+| `INDOOR_MEMORY` | `128m` | Speicherlimit des Gateways (gemessen: 12 MB) |
 | `INDOOR_TOKENS_FILE` | `~/.config/bettermaps-indoor/tokens` | Token-Hashes |
 | `INDOOR_RATE_PER_MINUTE` / `INDOOR_RATE_BURST` | `120` / `60` | Ratenlimit pro Token |
 | `INDOOR_LOG_LEVEL` | `info` | `debug`, `info`, `warn`, `error` |
@@ -244,7 +244,27 @@ ganzer Etagen (`indoor=level`) zählen nur, wenn kein Raum passt.
 
 ## Ressourcenbedarf
 
-{{RESOURCES}}
+Siehe `import-stats.txt` und `import-history.txt` im Cache. Gemessen am 25.11.2026 (Geofabrik-Stand 24.11.2026
+21:21 UTC, Hessen + NRW, Rechner mit 16 Threads / 31 GB, Limits 3 GB / 2 CPUs):
+
+| | Hessen + NRW |
+|---|---|
+| Download (`input/`) | 333 MB + 876 MB, nach dem Import gelöscht |
+| filter (je Region 3 × `tags-filter`, `merge`, `export`) | 128 s; Spitze laut cgroup 2,9 GB (überwiegend Seitencache) |
+| Zwischendateien (`work/`, danach gelöscht) | zusammengeführt 45 MB PBF, Export 230 MB GeoJSONSeq (765 336 Objekte) |
+| indoor-import | 6,6 s, Spitze 688 MB |
+| Import gesamt (`import.sh`) | 137 s |
+| Ergebnis (`data/`) | 2,8 MB: 579 Venues (Hessen 180, NRW 399), 35 176 Features, 1,1 MB gzip / 4,5 MB JSON, `index.json` 133 KB |
+| Gateway | 12 MB Speicher, < 2 ms je Anfrage lokal |
+| Liste Frankfurt Flughafen (9 Venues) / Köln Hbf (8) | 3,1 KB / 2,7 KB, gzip 0,8 KB / 0,7 KB |
+| Dokument Köln Hbf (428 Features) | 60 KB, gzip 13 KB |
+| Dokument Terminal 1 Flugsteig B (100 Features) | 15 KB, gzip 3,5 KB |
+| größte Dokumente | b-it Bonn 1119 Features 119 KB / 18 KB gzip; The Squaire (Frankfurt Flughafen Fernbahnhof) 1115 Features 130 KB / 28 KB gzip |
+
+Übersprungen wurden 627 Cluster unter den Schwellen (zusammen 2860 Features), 138 Features mit unlesbarer Etage und
+2591 Türen ohne Etage abseits von Raumumrissen; 109 Venues sind Gebäude-Venues. Für größere Regionen (ganz
+Deutschland) ist der Bedarf nicht gemessen; der osmium-Schritt braucht dann mehr als 3 GB
+(`INDOOR_IMPORT_MEMORY` erhöhen), der Rest wächst mit der Zahl der Innenraum-Objekte.
 
 ## Wöchentliches Update
 
@@ -258,7 +278,7 @@ systemctl --user enable --now bettermaps-indoor-update.timer
 
 `scripts/update.sh` lädt die Extrakte (ETag/Last-Modified, MD5-Prüfung), importiert in `data.next` und tauscht erst
 nach Erfolg; ein laufendes Gateway wird mit den neuen Daten neu gestartet. Weil `import.sh` die Extrakte nach dem
-Import löscht (`INDOOR_KEEP_PBF=1` behält sie), lädt jedes Update sie neu (Hessen + NRW ≈ 1,1 GB); Geofabrik
+Import löscht (`INDOOR_KEEP_PBF=1` behält sie), lädt jedes Update sie neu (Hessen + NRW ≈ 1,2 GB); Geofabrik
 veröffentlicht ohnehin täglich neue Extrakte, so dass wöchentlich fast immer etwas Neues da ist.
 
 ### Dauerbetrieb
@@ -280,4 +300,16 @@ Token/Koordinaten/Ids.
 
 ## Bekannte Grenzen
 
-{{LIMITS}}
+- **Datenlage**: Die Venues sind so gut wie die OSM-Daten. Frankfurt Terminal 1 hat kaum `indoor=room`, aber
+  viele Läden, Gates und Toiletten mit `level`; es erscheint als mehrere Venues („Terminal 1 Flugsteig A“, „…
+  Flugsteig B“ und ein nach dem Flughafen benannter Teil um Flugsteig A-Plus), Terminal 2 fehlt mangels Daten.
+  Etagen-Labels sind meist Zahlen (`level:ref` ist selten), Zwischenetagen wie `0.3` kommen aus den Daten.
+- Gates und andere Objekte mehr als 20 m außerhalb eines Terminals werden ignoriert; ebenso alles mit `level`
+  außerhalb von Venues (`unattached`, z. B. Läden in gewöhnlichen Gebäuden).
+- Venues können sich überlappen (z. B. benachbarte Terminals); die App zeigt dann mehrere an derselben Stelle.
+- Die Ids sind stabil, solange das namengebende OSM-Objekt bzw. die kleinste Innenraumfläche bleibt; sonst ändert
+  sich die Id beim nächsten Import (die App lädt das Dokument dann neu).
+- gzip- und unkomprimierte Antwort tragen dasselbe starke ETag (so vereinbart, damit das ETag der Liste für beide
+  passt); `Vary: Accept-Encoding` hält Zwischenspeicher auseinander.
+- Die bbox steht in der URL: Zugriffslogs eines Reverse Proxys müssen sie maskieren oder abgeschaltet sein.
+- Regionen werden nur zusammengeführt; derselbe Dateiname in zwei Pfaden (`…/a/x` und `…/b/x`) geht nicht.

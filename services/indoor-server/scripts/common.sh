@@ -17,7 +17,7 @@ export INDOOR_KEEP_PBF="${INDOOR_KEEP_PBF:-0}"
 # Android emulator (10.0.2.2 = host loopback).
 export INDOOR_PORT="${INDOOR_PORT:-18300}"
 export INDOOR_BIND="${INDOOR_BIND:-127.0.0.1}"
-export INDOOR_MEMORY="${INDOOR_MEMORY:-256m}"
+export INDOOR_MEMORY="${INDOOR_MEMORY:-128m}"
 # Token hashes of the devices (scripts/new-token.sh adds lines). Outside the repo, readable only by you.
 export INDOOR_TOKENS_FILE="${INDOOR_TOKENS_FILE:-${XDG_CONFIG_HOME:-$HOME/.config}/bettermaps-indoor/tokens}"
 export INDOOR_RATE_PER_MINUTE="${INDOOR_RATE_PER_MINUTE:-120}"

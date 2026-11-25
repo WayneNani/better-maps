@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Update: downloads the extracts and re-imports when one of them changed. A running gateway is restarted with the
 # new data by import.sh. Since import.sh deletes the extracts (unless INDOOR_KEEP_PBF=1), every run downloads them
-# again (Hessen + NRW: ~1.1 GB); Geofabrik publishes daily, so a weekly run finds new data anyway.
+# again (Hessen + NRW: ~1.2 GB); Geofabrik publishes daily, so a weekly run finds new data anyway.
 #
 # Usage: INDOOR_REGIONS="..." scripts/update.sh [--force]
 # See systemd/ for a user timer that runs this weekly.

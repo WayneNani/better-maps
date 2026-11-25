@@ -97,8 +97,8 @@ services:
     restart: unless-stopped
     # Rootless Podman: uid 0 in the container is your host user, which can read the token file (mode 600). The
     # container gets no capabilities and a read-only file system.
-    mem_limit: ${INDOOR_MEMORY:-256m}
-    memswap_limit: ${INDOOR_MEMORY:-256m}
+    mem_limit: ${INDOOR_MEMORY:-128m}
+    memswap_limit: ${INDOOR_MEMORY:-128m}
     cpus: 1
     networks: [frontend]
     ports:
