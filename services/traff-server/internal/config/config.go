@@ -1,6 +1,7 @@
 // Package config reads the server configuration from command-line flags and environment
 // variables. Flags take precedence over environment variables, which take precedence over the
-// built-in defaults.
+// built-in defaults. Device tokens are never configured on the command line (visible in the
+// process list), only as a file of hashes (TRAFF_TOKENS_FILE).
 package config
 
 import (
@@ -34,6 +35,13 @@ type Config struct {
 	MaxSubscriptions        int
 	MaxFilters              int
 	LogLevel                slog.Level
+
+	// Access control: a file of token hashes (see internal/auth), or explicitly none.
+	TokensFile     string
+	InsecureNoAuth bool          // TRAFF_INSECURE_NO_AUTH=1: serve without tokens (local development only)
+	ReloadTokens   time.Duration // interval for checking the token file for changes, 0 = only on SIGHUP
+	RatePerMinute  float64       // requests per minute and token on average, 0 = unlimited
+	RateBurst      int           // requests per token at once
 
 	// DATEX II feeds (empty = DATEX II source disabled).
 	Datex2Feeds    []Datex2Feed
@@ -80,6 +88,11 @@ const (
 	DefaultDatex2Timeout           = time.Minute
 	DefaultDedupDistance           = 500
 	DefaultDedupSpatialDistance    = 250
+	DefaultReloadTokens            = 30 * time.Second
+	// The app polls every 5 minutes and changes its subscription when the set of maps around the
+	// view, the position or the route changes; a few requests per minute at most.
+	DefaultRatePerMinute = 60
+	DefaultRateBurst     = 30
 )
 
 type envFunc func(string) string
@@ -119,6 +132,18 @@ func Parse(args []string, env func(string) string, out io.Writer) (Config, error
 		}
 		return i
 	}
+	floatEnv := func(key string, def float64) float64 {
+		v := env(key)
+		if strings.TrimSpace(v) == "" {
+			return def
+		}
+		f, err := strconv.ParseFloat(strings.TrimSpace(v), 64)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("%s: %w", key, err))
+			return def
+		}
+		return f
+	}
 	boolEnv := func(key string, def bool) bool {
 		v := env(key)
 		if strings.TrimSpace(v) == "" {
@@ -145,6 +170,13 @@ func Parse(args []string, env func(string) string, out io.Writer) (Config, error
 	fs.DurationVar(&c.MessageLease, "message-lease", durEnv("TRAFF_MESSAGE_LEASE", DefaultMessageLease), "expiration_time granted to messages, renewed while the source reports them (env TRAFF_MESSAGE_LEASE)")
 	fs.IntVar(&c.MaxSubscriptions, "max-subscriptions", intEnv("TRAFF_MAX_SUBSCRIPTIONS", DefaultMaxSubscriptions), "maximum number of concurrent subscriptions (env TRAFF_MAX_SUBSCRIPTIONS)")
 	fs.IntVar(&c.MaxFilters, "max-filters", intEnv("TRAFF_MAX_FILTERS", DefaultMaxFilters), "maximum number of filter items per request (env TRAFF_MAX_FILTERS)")
+	fs.StringVar(&c.TokensFile, "tokens-file", envString(env, "TRAFF_TOKENS_FILE", ""), "file with the token hashes of the devices (env TRAFF_TOKENS_FILE)")
+	fs.DurationVar(&c.ReloadTokens, "reload-tokens", durEnv("TRAFF_RELOAD_TOKENS", DefaultReloadTokens), "check the token file for changes this often, 0 = only on SIGHUP (env TRAFF_RELOAD_TOKENS)")
+	fs.Float64Var(&c.RatePerMinute, "rate-per-minute", floatEnv("TRAFF_RATE_PER_MINUTE", DefaultRatePerMinute), "requests per minute and device on average, 0 = unlimited (env TRAFF_RATE_PER_MINUTE)")
+	fs.IntVar(&c.RateBurst, "rate-burst", intEnv("TRAFF_RATE_BURST", DefaultRateBurst), "requests per device at once (env TRAFF_RATE_BURST)")
+	// Only as environment variable, so that it cannot end up in a service file by accident of
+	// copying a command line.
+	c.InsecureNoAuth = boolEnv("TRAFF_INSECURE_NO_AUTH", false)
 	level := fs.String("log-level", envString(env, "TRAFF_LOG_LEVEL", "info"), "log level: debug, info, warn, error (env TRAFF_LOG_LEVEL)")
 	feeds := fs.String("datex2-feeds", envString(env, "TRAFF_DATEX2_FEEDS", ""), "DATEX II feeds as comma-separated name=URL list, empty = disabled (env TRAFF_DATEX2_FEEDS)")
 	fs.DurationVar(&c.Datex2Interval, "datex2-interval", durEnv("TRAFF_DATEX2_INTERVAL", 0), "minimum time between two downloads of a DATEX II feed, 0 = every poll (env TRAFF_DATEX2_INTERVAL)")
@@ -186,6 +218,18 @@ func Parse(args []string, env func(string) string, out io.Writer) (Config, error
 		c.Datex2Horizon < 0 || c.Datex2Timeout <= 0 || c.DedupDistance <= 0 || c.DedupSpatialDistance < 0 ||
 		c.CrowdTimeout <= 0 || c.CrowdMergeDistance < 0 || c.CrowdMaxLength < 0 {
 		errs = append(errs, errors.New("negative limits are not allowed"))
+	}
+	switch {
+	case c.TokensFile == "" && !c.InsecureNoAuth:
+		errs = append(errs, errors.New("no token file (-tokens-file / TRAFF_TOKENS_FILE); set TRAFF_INSECURE_NO_AUTH=1 to serve without access control (local development only)"))
+	case c.TokensFile != "" && c.InsecureNoAuth:
+		errs = append(errs, errors.New("TRAFF_TOKENS_FILE and TRAFF_INSECURE_NO_AUTH are both set, choose one"))
+	}
+	if c.RatePerMinute < 0 || (c.RatePerMinute > 0 && c.RateBurst < 1) {
+		errs = append(errs, errors.New("rate-per-minute must be >= 0 and rate-burst >= 1"))
+	}
+	if c.ReloadTokens < 0 {
+		errs = append(errs, errors.New("reload-tokens must be >= 0"))
 	}
 	if c.CrowdURL != "" {
 		if _, err := crowd.ExportURL(c.CrowdURL); err != nil {

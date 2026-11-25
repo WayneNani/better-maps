@@ -122,7 +122,7 @@ func (ts *twoSources) health(t *testing.T) (h struct {
 	Sources    []source.Status `json:"sources"`
 }) {
 	t.Helper()
-	resp, err := http.Get(ts.http.URL + "/healthz")
+	resp, err := http.Get(ts.http.URL + "/status")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -13,14 +13,20 @@ import (
 	"github.com/WayneNani/better-maps/services/traff-server/internal/traff"
 )
 
-func noEnv(string) string { return "" }
+// noEnv is an empty environment that serves without tokens (see TestServeWithTokens).
+func noEnv(k string) string {
+	if k == "TRAFF_INSECURE_NO_AUTH" {
+		return "1"
+	}
+	return ""
+}
 
 func TestRunConfigErrors(t *testing.T) {
 	var out bytes.Buffer
-	if err := run([]string{"-poll-interval", "1s"}, noEnv, &out); err == nil {
+	if err := run([]string{"-poll-interval", "1s"}, noEnv, io.Discard, &out); err == nil {
 		t.Error("invalid config accepted")
 	}
-	if err := run([]string{"-listen", "256.0.0.1:99999", "-autobahn=false"}, noEnv, &out); err == nil {
+	if err := run([]string{"-listen", "256.0.0.1:99999", "-autobahn=false"}, noEnv, io.Discard, &out); err == nil {
 		t.Error("invalid listen address accepted")
 	}
 }
@@ -75,7 +81,7 @@ func TestBuildWithAutobahn(t *testing.T) {
 }
 
 func TestBuildWithDatex2(t *testing.T) {
-	envs := map[string]string{"TRAFF_DATEX2_FEEDS": "bw=https://example.org/a.xml,local=file:///tmp/x.xml"}
+	envs := map[string]string{"TRAFF_DATEX2_FEEDS": "bw=https://example.org/a.xml,local=file:///tmp/x.xml", "TRAFF_INSECURE_NO_AUTH": "1"}
 	cfg, err := config.Parse([]string{"-autobahn-roads", "A7"}, func(k string) string { return envs[k] }, io.Discard)
 	if err != nil {
 		t.Fatal(err)
@@ -101,7 +107,7 @@ func TestBuildWithDatex2(t *testing.T) {
 }
 
 func TestBuildWithCrowd(t *testing.T) {
-	envs := map[string]string{"TRAFF_CROWD_URL": "http://crowd-traffic:8080", "TRAFF_DATEX2_FEEDS": "bw=https://example.org/a.xml"}
+	envs := map[string]string{"TRAFF_CROWD_URL": "http://crowd-traffic:8080", "TRAFF_DATEX2_FEEDS": "bw=https://example.org/a.xml", "TRAFF_INSECURE_NO_AUTH": "1"}
 	cfg, err := config.Parse([]string{"-autobahn-roads", "A7", "-dedup-spatial-distance", "0"}, func(k string) string { return envs[k] }, io.Discard)
 	if err != nil {
 		t.Fatal(err)

@@ -2,16 +2,33 @@
 // Management, section 6.1): a single URL that accepts XML requests via POST and answers with XML
 // responses. TraFF-level errors are reported with HTTP status 200 and a TraFF status code.
 //
-// Privacy: handlers never log client addresses, user agents, subscription IDs or filters.
+//	POST /, POST /traff   TraFF requests (Bearer token required)
+//	GET  /, GET /traff    short usage text (Bearer token required)
+//	GET  /status          state of the store and the sources as JSON (Bearer token required)
+//	GET  /healthz         "ok" (no token, no information)
+//
+// Every path except /healthz needs "Authorization: Bearer <token>" with a device token from the
+// token file (see internal/auth); without it the answer is 401 without details, before the request
+// body is read. Each token has its own rate limit (429 with Retry-After). Without a token store
+// (TRAFF_INSECURE_NO_AUTH, local development only) every request is accepted.
+//
+// Privacy: handlers never log tokens, client addresses, user agents, subscription IDs or filters
+// (bounding boxes). Each request is logged with method, a path class ("traff", "status",
+// "other"), status, duration and the label of the token.
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"log/slog"
+	"math"
 	"net/http"
+	"strconv"
 	"time"
 
+	"github.com/WayneNani/better-maps/services/traff-server/internal/auth"
+	"github.com/WayneNani/better-maps/services/traff-server/internal/ratelimit"
 	"github.com/WayneNani/better-maps/services/traff-server/internal/source"
 	"github.com/WayneNani/better-maps/services/traff-server/internal/store"
 	"github.com/WayneNani/better-maps/services/traff-server/internal/subscription"
@@ -20,6 +37,23 @@ import (
 
 // MaxRequestBytes limits the size of a request body.
 const MaxRequestBytes = 1 << 20
+
+// Limits are the request limits. Zero values mean unlimited.
+type Limits struct {
+	// Per token: RatePerMinute requests per minute on average, up to RateBurst at once.
+	RatePerMinute float64
+	RateBurst     int
+	// Requests with a wrong token, all clients together.
+	UnauthorizedPerSecond float64
+	UnauthorizedBurst     int
+}
+
+// DefaultLimits returns the production limits. The app polls every 5 minutes and changes its
+// subscription when the maps around the view, the position or the route change: a few requests
+// per minute and device at most.
+func DefaultLimits() Limits {
+	return Limits{RatePerMinute: 60, RateBurst: 30, UnauthorizedPerSecond: 5, UnauthorizedBurst: 20}
+}
 
 // Server serves the TraFF API.
 type Server struct {
@@ -30,21 +64,39 @@ type Server struct {
 	MaxFilters int
 	Now        func() time.Time
 	Log        *slog.Logger
+	// Tokens holds the device tokens. nil serves without access control (TRAFF_INSECURE_NO_AUTH).
+	Tokens *auth.Store
+	Limits Limits
+
+	perTok *ratelimit.Limiter
+	unauth *ratelimit.Limiter
 }
 
-// Handler returns the HTTP handler with all routes.
+// Handler returns the HTTP handler with all routes. Call it once.
 func (s *Server) Handler() http.Handler {
+	s.perTok = ratelimit.New(s.Limits.RatePerMinute/60, s.Limits.RateBurst, s.Now)
+	s.unauth = ratelimit.New(s.Limits.UnauthorizedPerSecond, s.Limits.UnauthorizedBurst, s.Now)
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", s.handleHealth)
-	mux.HandleFunc("/traff", s.handleTraff)
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/status", s.protect(http.HandlerFunc(s.handleStatus)))
+	mux.Handle("/traff", s.protect(http.HandlerFunc(s.handleTraff)))
+	// Unknown paths need a token as well, so that a client without one learns nothing.
+	mux.Handle("/", s.protect(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
 			return
 		}
 		s.handleTraff(w, r)
-	})
-	return mux
+	})))
+	return s.logRequests(mux)
+}
+
+// Prune drops idle rate limit buckets; call it now and then.
+func (s *Server) Prune() {
+	if s.perTok != nil {
+		s.perTok.Prune()
+		s.unauth.Prune()
+	}
 }
 
 func (s *Server) now() time.Time {
@@ -54,7 +106,137 @@ func (s *Server) now() time.Time {
 	return time.Now()
 }
 
+type ctxKey struct{}
+
+// requestInfo is filled by the handlers for the log line.
+type requestInfo struct {
+	device string
+	reason string
+}
+
+type statusWriter struct {
+	http.ResponseWriter
+	status int
+}
+
+func (w *statusWriter) WriteHeader(code int) {
+	if w.status == 0 {
+		w.status = code
+	}
+	w.ResponseWriter.WriteHeader(code)
+}
+
+func (w *statusWriter) Write(b []byte) (int, error) {
+	if w.status == 0 {
+		w.status = http.StatusOK
+	}
+	return w.ResponseWriter.Write(b)
+}
+
+func (s *Server) logRequests(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		ri := &requestInfo{device: "-"}
+		sw := &statusWriter{ResponseWriter: w}
+		next.ServeHTTP(sw, r.WithContext(context.WithValue(r.Context(), ctxKey{}, ri)))
+		if r.URL.Path == "/healthz" {
+			return
+		}
+		attrs := []any{"method", r.Method, "path", logPath(r.URL.Path), "status", sw.status,
+			"ms", time.Since(start).Milliseconds(), "device", ri.device}
+		if ri.reason != "" {
+			attrs = append(attrs, "reason", ri.reason)
+		}
+		s.Log.Info("request", attrs...)
+	})
+}
+
+// logPath keeps whatever a client puts into unknown paths out of the log.
+func logPath(p string) string {
+	switch p {
+	case "/", "/traff":
+		return "traff"
+	case "/status":
+		return "status"
+	}
+	return "other"
+}
+
+func reqInfo(r *http.Request) *requestInfo {
+	if i, ok := r.Context().Value(ctxKey{}).(*requestInfo); ok {
+		return i
+	}
+	return &requestInfo{}
+}
+
+// protect checks the token and the rate limit of the token before next sees the request.
+func (s *Server) protect(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if s.Tokens == nil {
+			next.ServeHTTP(w, r)
+			return
+		}
+		ri := reqInfo(r)
+		label, ok := "", false
+		if token, err := auth.BearerToken(r); err == nil {
+			if allowed, _ := s.unauth.Allow("probe"); !allowed {
+				ri.reason = "unauthorized_flood"
+				writeRetry(w, time.Second)
+				return
+			}
+			label, ok = s.Tokens.Lookup(token)
+			if ok {
+				// A valid token must not use up the budget of failed attempts.
+				s.unauth.Refund("probe")
+			}
+		}
+		if !ok {
+			ri.reason = "auth"
+			w.Header().Set("WWW-Authenticate", `Bearer realm="traff"`)
+			writePlain(w, http.StatusUnauthorized, "unauthorized")
+			return
+		}
+		ri.device = label
+		if allowed, wait := s.perTok.Allow(label); !allowed {
+			ri.reason = "rate_limit"
+			writeRetry(w, wait)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func writeRetry(w http.ResponseWriter, wait time.Duration) {
+	secs := int(math.Ceil(wait.Seconds()))
+	if secs < 1 {
+		secs = 1
+	}
+	w.Header().Set("Retry-After", strconv.Itoa(secs))
+	writePlain(w, http.StatusTooManyRequests, "too many requests")
+}
+
+func writePlain(w http.ResponseWriter, status int, text string) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-store")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.WriteHeader(status)
+	_, _ = w.Write([]byte(text + "\n"))
+}
+
+// handleHealth answers "ok" without a token and without any information, for monitoring.
 func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet && r.Method != http.MethodHead {
+		w.Header().Set("Allow", "GET, HEAD")
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-store")
+	_, _ = w.Write([]byte("ok\n"))
+}
+
+// handleStatus reports the state of the store and the sources (token required).
+func (s *Server) handleStatus(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet && r.Method != http.MethodHead {
 		w.Header().Set("Allow", "GET, HEAD")
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
