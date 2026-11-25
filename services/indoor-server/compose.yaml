@@ -1,0 +1,118 @@
+# Self-hosted indoor maps for the app (venues from OpenStreetMap Simple Indoor Tagging behind a small Go gateway).
+#
+# Normally driven by the scripts in scripts/ (they set the variables below). Direct use:
+#   export INDOOR_CACHE=$HOME/.cache/bettermaps-indoor INDOOR_REGION_NAMES="hessen nordrhein-westfalen"
+#   podman-compose -p bettermaps-indoor run --rm filter && podman-compose -p bettermaps-indoor run --rm import
+#   export INDOOR_TOKENS_FILE=$HOME/.config/bettermaps-indoor/tokens
+#   podman-compose -p bettermaps-indoor up -d gateway
+#
+# Only the gateway is published (on INDOOR_BIND:INDOOR_PORT, 127.0.0.1 by default, put a TLS reverse proxy in
+# front). It reads the prebuilt data read-only and talks to nothing else. The import containers have no network.
+#
+# Rootless Podman: uid 0 in the containers is your host user, so the files in $INDOOR_CACHE stay owned by you.
+# ":z" relabels the volumes for SELinux.
+
+x-hardened: &hardened
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges"]
+  read_only: true
+  user: "0:0"
+
+services:
+  # Step 1: per region, keep only indoor-relevant objects (osmium tags-filter), merge the regions (a venue on a
+  # border appears once) and export them as GeoJSONSeq (config/osmium-export.json decides which closed ways are
+  # areas). Writes /work/indoor.geojsonseq, /work/timestamps.txt and /work/regions/*.poly.
+  filter:
+    <<: *hardened
+    image: localhost/bettermaps-osmium:latest
+    build:
+      context: .
+      dockerfile: osmium.Containerfile
+    profiles: ["import"]
+    network_mode: none
+    tmpfs: ["/tmp"]
+    mem_limit: ${INDOOR_IMPORT_MEMORY:-3g}
+    memswap_limit: ${INDOOR_IMPORT_MEMORY:-3g}
+    cpus: ${INDOOR_IMPORT_CPUS:-2}
+    environment:
+      INDOOR_REGION_NAMES: ${INDOOR_REGION_NAMES:?set INDOOR_REGION_NAMES}
+    volumes:
+      - ${INDOOR_CACHE:?set INDOOR_CACHE}/input:/input:ro,z
+      - ${INDOOR_CACHE}/work:/work:z
+      - ./config:/config:ro,z
+    entrypoint: ["sh", "-c"]
+    command:
+      - >-
+        set -e; start=$$(date +%s); d=/work; mkdir -p "$$d/regions"; : >"$$d/timestamps.txt"; files="";
+        for r in $$INDOOR_REGION_NAMES; do
+        in="/input/$$r-latest.osm.pbf";
+        ts=$$(osmium fileinfo -g header.option.osmosis_replication_timestamp "$$in");
+        echo "$$r $$ts" >>"$$d/timestamps.txt";
+        [ -f "/input/$$r.poly" ] && cp "/input/$$r.poly" "$$d/regions/";
+        nice -n 15 osmium tags-filter --overwrite --no-progress "$$in"
+        nwr/indoor nwr/level nwr/repeat_on nwr/level:ref n/door n/entrance nw/highway=elevator,steps nwr/conveying
+        nwr/aeroway=aerodrome,terminal,gate nwr/railway=station,halt,platform nwr/public_transport=station,platform
+        nwr/building=train_station,transportation,terminal nwr/shop=mall,department_store
+        -o "$$d/$$r-indoor.osm.pbf";
+        nice -n 15 osmium tags-filter --overwrite --no-progress "$$in" wr/building -o "$$d/$$r-buildings.osm.pbf";
+        nice -n 15 osmium tags-filter --overwrite --no-progress "$$d/$$r-buildings.osm.pbf" wr/name -o "$$d/$$r-named.osm.pbf";
+        rm "$$d/$$r-buildings.osm.pbf";
+        files="$$files $$d/$$r-indoor.osm.pbf $$d/$$r-named.osm.pbf";
+        done;
+        nice -n 15 osmium merge --overwrite --no-progress $$files -o "$$d/merged.osm.pbf";
+        rm $$files;
+        nice -n 15 osmium export --overwrite --no-progress -c /config/osmium-export.json -f geojsonseq
+        --add-unique-id=type_id -o "$$d/indoor.geojsonseq" "$$d/merged.osm.pbf";
+        echo "filter-stats: seconds=$$(( $$(date +%s) - start )) merged_bytes=$$(wc -c <"$$d/merged.osm.pbf")
+        geojsonseq_bytes=$$(wc -c <"$$d/indoor.geojsonseq")
+        memory_peak_bytes=$$(cat /sys/fs/cgroup/memory.peak 2>/dev/null || echo unknown)";
+        rm "$$d/merged.osm.pbf"
+
+  # Step 2: indoor-import (Containerfile) builds the venues from the export into /out (= $INDOOR_CACHE/data.next).
+  import:
+    <<: *hardened
+    image: localhost/bettermaps-indoor-gateway:latest
+    profiles: ["import"]
+    network_mode: none
+    mem_limit: ${INDOOR_IMPORT_MEMORY:-3g}
+    memswap_limit: ${INDOOR_IMPORT_MEMORY:-3g}
+    cpus: ${INDOOR_IMPORT_CPUS:-2}
+    environment:
+      GOMAXPROCS: ${INDOOR_IMPORT_CPUS:-2}
+    volumes:
+      - ${INDOOR_CACHE:?set INDOOR_CACHE}/work:/work:ro,z
+      - ${INDOOR_CACHE}/data.next:/out:z
+    entrypoint: ["/usr/local/bin/indoor-import"]
+    command: ["-input", "/work/indoor.geojsonseq", "-out", "/out", "-timestamps", "/work/timestamps.txt",
+              "-regions", "/work/regions"]
+
+  # Authenticating gateway (Containerfile), the only published service. No outgoing network is needed; the
+  # "frontend" network only carries the published port.
+  gateway:
+    <<: *hardened
+    image: localhost/bettermaps-indoor-gateway:latest
+    build:
+      context: .
+      dockerfile: Containerfile
+    restart: unless-stopped
+    # Rootless Podman: uid 0 in the container is your host user, which can read the token file (mode 600). The
+    # container gets no capabilities and a read-only file system.
+    mem_limit: ${INDOOR_MEMORY:-256m}
+    memswap_limit: ${INDOOR_MEMORY:-256m}
+    cpus: 1
+    networks: [frontend]
+    ports:
+      - "${INDOOR_BIND:-127.0.0.1}:${INDOOR_PORT:-18300}:8080"
+    environment:
+      INDOOR_LISTEN: ":8080"
+      INDOOR_DATA_DIR: /data
+      INDOOR_TOKENS_FILE: /config/tokens
+      INDOOR_RATE_PER_MINUTE: ${INDOOR_RATE_PER_MINUTE:-120}
+      INDOOR_RATE_BURST: ${INDOOR_RATE_BURST:-60}
+      INDOOR_LOG_LEVEL: ${INDOOR_LOG_LEVEL:-info}
+    volumes:
+      - ${INDOOR_TOKENS_FILE:?set INDOOR_TOKENS_FILE}:/config/tokens:ro,z
+      - ${INDOOR_CACHE:?set INDOOR_CACHE}/data:/data:ro,z
+
+networks:
+  frontend: {}
