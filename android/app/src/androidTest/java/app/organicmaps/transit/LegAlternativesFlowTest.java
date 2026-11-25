@@ -1,6 +1,7 @@
 package app.organicmaps.transit;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.actionWithAssertions;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
@@ -28,6 +29,10 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.testing.FragmentScenario;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.espresso.ViewAction;
+import androidx.test.espresso.action.GeneralClickAction;
+import androidx.test.espresso.action.Press;
+import androidx.test.espresso.action.Tap;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import app.organicmaps.R;
@@ -36,6 +41,7 @@ import app.organicmaps.sdk.transit.TransitItinerary;
 import app.organicmaps.sdk.transit.TransitLocation;
 import app.organicmaps.sdk.transit.TransitServiceConfig;
 import app.organicmaps.sdk.transit.provider.TransitousProvider;
+import app.organicmaps.transit.ui.JourneyBarView;
 import app.organicmaps.transit.ui.TimeGridView;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -54,7 +60,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Other departures for the first ride in the detail view: a tap on the ride shows them (one request), a tap on one
+ * Other departures for the first ride. In the detail view a tap on the ride shows them (one request), a tap on one
  * changes the connection, one that misses the next ride searches the rest again (one request) and shows a banner
  * with "Undo". The provider is the real Transitous client talking to a local mock server: the found connection
  * (S5 to Alexanderplatz, U2 to Klosterstraße), the direct S-Bahn trips to Alexanderplatz and the rest after a
@@ -215,9 +221,157 @@ public class LegAlternativesFlowTest
   }
 
   /**
-   * The same connection in the time grid: holding the S5 lifts it and loads its other departures, dragging snaps it
-   * to them with the hint card telling what each one means, lifting the finger uses the departure. A cancelled drag
-   * and a drag back to the start change nothing; a departure that misses the U2 searches the rest again.
+   * Tap and hold in the time grid: a tap on the S5 opens the connection; holding it (without moving) selects it and
+   * shows its other departures, which stay after the finger is lifted so that a pill can be tapped. While it is
+   * selected, a tap on the S5 or beside it only ends the selection.
+   */
+  @Test
+  public void tapOpensAndHoldSelectsInTheTimeGrid() throws Exception
+  {
+    mServer.enqueue(json("plan_two_rides.json"));
+    mServer.enqueue(json("plan_first_ride_alternatives.json"));
+    final FragmentScenario<OnlineTransitFlowTest.PanelHostFragment> scenario = FragmentScenario.launchInContainer(
+        OnlineTransitFlowTest.PanelHostFragment.class, null, R.style.MwmTheme);
+    final TransitConnectionsPresenter presenter = onMain(() -> mServices.getConnectionsPresenter());
+    onMain(() -> {
+      presenter.search(HBF, KLOSTER);
+      presenter.setViewMode(ConnectionsState.ViewMode.GRID);
+      return null;
+    });
+    waitFor(() -> onMain(() -> presenter.getState().getItems().size() == 1));
+    mServer.takeRequest();
+    final AtomicReference<TimeGridView> gridRef = new AtomicReference<>();
+    scenario.onFragment(fragment -> gridRef.set(fragment.requireView().findViewById(R.id.transit_grid)));
+    final TimeGridView grid = gridRef.get();
+    waitFor(() -> onMain(() -> grid.isShown() && grid.getRideCenter(0, 1) != null));
+
+    // A tap on the S5: the connection opens, nothing is searched.
+    Finger.tapRide(grid, 0, 1);
+    waitFor(() -> onMain(() -> presenter.getState().getScreen() == ConnectionsState.Screen.DETAIL));
+    assertNull(onMain(() -> presenter.getState().getAlternatives()));
+    assertEquals(1, mServer.getRequestCount());
+    onView(withId(R.id.transit_back)).perform(click());
+    waitFor(() -> onMain(() -> presenter.getState().getScreen() == ConnectionsState.Screen.LIST && grid.isShown()
+                                   && grid.getRideCenter(0, 1) != null));
+
+    // Held and let go without moving: selected with its departures and the hint card, nothing chosen.
+    Finger.hold(grid, 0, 1).lift();
+    assertFalse(onMain(grid::isDragging));
+    waitFor(() -> onMain(() -> {
+      final AlternativesItem alternatives = presenter.getState().getAlternatives();
+      return alternatives != null && !alternatives.isLoading() && grid.getAlternativeCenter(1) != null;
+    }));
+    assertEquals(2, mServer.getRequestCount());
+    assertEquals(ConnectionsState.Screen.LIST, onMain(() -> presenter.getState().getScreen()));
+    assertNull(onMain(() -> presenter.getState().getItems().get(0).getChange()));
+    onView(withId(R.id.transit_grid_hint)).check(matches(isDisplayed()));
+
+    // A tap on the selected S5 ends the selection; the connection does not open.
+    Finger.tapRide(grid, 0, 1);
+    waitFor(() -> onMain(() -> presenter.getState().getAlternatives() == null));
+    assertEquals(ConnectionsState.Screen.LIST, onMain(() -> presenter.getState().getScreen()));
+    onView(withId(R.id.transit_grid_hint)).check(matches(not(isDisplayed())));
+
+    // Again (the departures are known): a tap beside the rides ends the selection too.
+    Finger.hold(grid, 0, 1).lift();
+    waitFor(() -> onMain(() -> presenter.getState().getAlternatives() != null && grid.getColumnCenter(0) != null));
+    Finger.tap(grid, onMain(() -> grid.getColumnCenter(0)));
+    waitFor(() -> onMain(() -> presenter.getState().getAlternatives() == null));
+    assertEquals(ConnectionsState.Screen.LIST, onMain(() -> presenter.getState().getScreen()));
+
+    // Held and let go, then a tap on the S3's pill: the S3 is used.
+    Finger.hold(grid, 0, 1).lift();
+    waitFor(() -> onMain(() -> {
+      final AlternativesItem alternatives = presenter.getState().getAlternatives();
+      return alternatives != null && !alternatives.isLoading() && grid.getAlternativeCenter(1) != null;
+    }));
+    Finger.tap(grid, onMain(() -> grid.getAlternativeCenter(1)));
+    waitFor(() -> onMain(() -> presenter.getState().getItems().get(0).getChange() != null));
+    assertTrue(onMain(() -> presenter.getState().getAlternatives().getChips().get(1).isSelected()));
+    assertEquals(ConnectionsState.Screen.LIST, onMain(() -> presenter.getState().getScreen()));
+    assertEquals(2, mServer.getRequestCount());
+
+    // "Details" in the hint card opens the connection.
+    onView(withId(R.id.transit_grid_hint_details)).perform(click());
+    waitFor(() -> onMain(() -> presenter.getState().getScreen() == ConnectionsState.Screen.DETAIL));
+  }
+
+  /**
+   * Tap and hold in the list: a tap on the first ride in the bar opens the connection like anywhere on the card;
+   * holding it shows its other departures in the card (and holding it again hides them); the "Departures" button
+   * shows them with a tap.
+   */
+  @Test
+  public void tapOpensAndHoldShowsDeparturesInTheList() throws Exception
+  {
+    mServer.enqueue(json("plan_two_rides.json"));
+    mServer.enqueue(json("plan_first_ride_alternatives.json"));
+    final FragmentScenario<OnlineTransitFlowTest.PanelHostFragment> scenario = FragmentScenario.launchInContainer(
+        OnlineTransitFlowTest.PanelHostFragment.class, null, R.style.MwmTheme);
+    final TransitConnectionsPresenter presenter = onMain(() -> mServices.getConnectionsPresenter());
+    onMain(() -> {
+      presenter.search(HBF, KLOSTER);
+      presenter.setViewMode(ConnectionsState.ViewMode.LIST);
+      return null;
+    });
+    waitFor(() -> onMain(() -> presenter.getState().getItems().size() == 1));
+    mServer.takeRequest();
+    final AtomicReference<RecyclerView> list = new AtomicReference<>();
+    scenario.onFragment(fragment -> list.set(fragment.requireView().findViewById(R.id.transit_list)));
+    waitFor(() -> onMain(() -> list.get().getChildCount() > 0));
+
+    // A tap on the S5 in the bar: the connection opens, nothing is searched.
+    onView(allOf(withId(R.id.bar), isDisplayed())).perform(onBarRide(Tap.SINGLE));
+    waitFor(() -> onMain(() -> presenter.getState().getScreen() == ConnectionsState.Screen.DETAIL));
+    assertNull(onMain(() -> presenter.getState().getAlternatives()));
+    assertEquals(1, mServer.getRequestCount());
+    onView(withId(R.id.transit_back)).perform(click());
+    waitFor(() -> onMain(() -> presenter.getState().getScreen() == ConnectionsState.Screen.LIST));
+
+    // Held: its departures in the card, the connection stays closed.
+    onView(allOf(withId(R.id.bar), isDisplayed())).perform(onBarRide(Tap.LONG));
+    waitFor(() -> onMain(() -> {
+      final AlternativesItem alternatives = presenter.getState().getAlternatives();
+      return alternatives != null && !alternatives.isLoading();
+    }));
+    assertEquals(2, mServer.getRequestCount());
+    assertEquals(ConnectionsState.Screen.LIST, onMain(() -> presenter.getState().getScreen()));
+    assertEquals(1, (int) onMain(() -> presenter.getState().getAlternatives().getLegIndex()));
+    onView(withId(R.id.alternatives_chips)).check(matches(hasChildCount(4)));
+
+    // Held again: hidden.
+    onView(allOf(withId(R.id.bar), isDisplayed())).perform(onBarRide(Tap.LONG));
+    waitFor(() -> onMain(() -> presenter.getState().getAlternatives() == null));
+    assertEquals(ConnectionsState.Screen.LIST, onMain(() -> presenter.getState().getScreen()));
+
+    // The button shows them with a tap (known already: no request). Its negative margins keep it partly outside the
+    // row, too little of it for Espresso's click.
+    onView(withId(R.id.alternatives_button)).check(matches(isDisplayed()));
+    onMain(() -> list.get().findViewById(R.id.alternatives_button).performClick());
+    waitFor(() -> onMain(() -> presenter.getState().getAlternatives() != null));
+    assertEquals(ConnectionsState.Screen.LIST, onMain(() -> presenter.getState().getScreen()));
+    assertEquals(2, mServer.getRequestCount());
+  }
+
+  /** Taps or holds the first ride in a connection's bar. */
+  @NonNull
+  private static ViewAction onBarRide(@NonNull Tap tap)
+  {
+    return actionWithAssertions(new GeneralClickAction(tap, view -> {
+      final float[] center = ((JourneyBarView) view).getRideCenter();
+      if (center == null)
+        throw new AssertionError("No ride in the bar");
+      final int[] location = new int[2];
+      view.getLocationOnScreen(location);
+      return new float[] {location[0] + center[0], location[1] + center[1]};
+    }, Press.FINGER, 0, 0));
+  }
+
+  /**
+   * The same connection in the time grid: holding the S5 selects and lifts it in one gesture and loads its other
+   * departures, dragging snaps it to them with the hint card telling what each one means, lifting the finger uses the
+   * departure. A cancelled drag and a drag back to the start change nothing; a departure that misses the U2 searches
+   * the rest again.
    */
   @Test
   public void dragTheFirstRideInTheTimeGrid() throws Exception
@@ -343,6 +497,25 @@ public class LegAlternativesFlowTest
       mScreenX = screenX;
       mDownScreenY = screenY;
       mScreenY = screenY;
+    }
+
+    /** A short tap on a ride. */
+    static void tapRide(@NonNull TimeGridView grid, int connection, int legIndex) throws Exception
+    {
+      tap(grid, onMain(() -> grid.getRideCenter(connection, legIndex)));
+    }
+
+    /** A short tap at a point in the grid's coordinates. */
+    static void tap(@NonNull TimeGridView grid, @NonNull float[] point) throws Exception
+    {
+      final int[] location = onMain(() -> {
+        final int[] result = new int[2];
+        grid.getLocationOnScreen(result);
+        return result;
+      });
+      final Finger finger = new Finger(grid, SystemClock.uptimeMillis(), location[0] + point[0], location[1] + point[1]);
+      finger.send(MotionEvent.ACTION_DOWN);
+      finger.lift();
     }
 
     /** Puts the finger on a ride and holds it there long enough to lift it. */
