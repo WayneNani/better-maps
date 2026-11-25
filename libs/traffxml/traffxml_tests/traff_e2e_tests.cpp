@@ -2,6 +2,7 @@
 //
 // These tests are skipped unless the following environment variables are set:
 //   TRAFF_E2E_URL           URL of the TraFF service, e.g. http://127.0.0.1:18081/
+//   TRAFF_E2E_TOKEN         device token for the service (Authorization: Bearer), empty for none
 //   TRAFF_E2E_MAPS_DIR      directory with the MWMs to use (see TRAFF_E2E_MWMS)
 // Optional:
 //   TRAFF_E2E_MWMS          comma-separated MWM names, default "Germany_Berlin"
@@ -56,7 +57,7 @@ class E2eHttpTraffSource : public traffxml::HttpTraffSource
 {
 public:
   E2eHttpTraffSource(traffxml::TraffSourceManager & manager, std::string const & url)
-    : traffxml::HttpTraffSource(manager, url)
+    : traffxml::HttpTraffSource(manager, url, GetEnv("TRAFF_E2E_TOKEN"))
   {}
 
   std::string GetSubscriptionId()

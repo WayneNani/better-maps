@@ -191,8 +191,10 @@ public:
    *
    * @param enabled Whether the HTTP TraFF source is enabled.
    * @param url The URL for the TraFF API.
+   * @param token The access token sent as `Authorization: Bearer` with every request, empty for
+   * none (better-maps, services/traff-server). Never logged.
    */
-  void SetHttpTraffSource(bool enabled, std::string url);
+  void SetHttpTraffSource(bool enabled, std::string url, std::string token = {});
 
   /**
    * @brief Removes all `TraffSource` instances which satisfy a predicate.

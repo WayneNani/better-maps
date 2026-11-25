@@ -466,7 +466,7 @@ void Framework::InitializeTraffic()
   m_trafficManager.SetEnabled(CurrentMapModeHasTraffic());
   if (!m_trafficManager.IsTestMode() && LoadTrafficHttpEnabled())
     // TODO handle invalid URLs
-    traffxml::HttpTraffSource::Create(m_trafficManager, LoadTrafficHttpUrl());
+    traffxml::HttpTraffSource::Create(m_trafficManager, LoadTrafficHttpUrl(), m_trafficHttpToken);
 
   /*
    * MockTraffSource for debugging purposes.
@@ -2696,7 +2696,7 @@ void Framework::SetFontScaleFactor(double scaleFactor)
 
 void Framework::SetTrafficHttpEnabled(bool enabled)
 {
-  m_trafficManager.SetHttpTraffSource(enabled, LoadTrafficHttpUrl());
+  m_trafficManager.SetHttpTraffSource(enabled, LoadTrafficHttpUrl(), m_trafficHttpToken);
 }
 
 bool Framework::LoadTrafficHttpEnabled()
@@ -2714,7 +2714,17 @@ void Framework::SaveTrafficHttpEnabled(bool trafficHttpEnabled)
 
 void Framework::SetTrafficHttpUrl(std::string url)
 {
-  m_trafficManager.SetHttpTraffSource(LoadTrafficHttpEnabled(), url);
+  m_trafficManager.SetHttpTraffSource(LoadTrafficHttpEnabled(), url, m_trafficHttpToken);
+}
+
+void Framework::SetTrafficHttpToken(std::string const & token)
+{
+  if (token == m_trafficHttpToken)
+    return;
+  m_trafficHttpToken = token;
+  // Recreate the source only if it exists: SetHttpTraffSource() replaces it with one using the new token.
+  if (LoadTrafficHttpEnabled())
+    m_trafficManager.SetHttpTraffSource(true, LoadTrafficHttpUrl(), m_trafficHttpToken);
 }
 
 std::string Framework::LoadTrafficHttpUrl()

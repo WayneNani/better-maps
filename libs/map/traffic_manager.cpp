@@ -1087,7 +1087,7 @@ bool TrafficManager::IsEnabled() const
   return m_state != TrafficState::Disabled;
 }
 
-void TrafficManager::SetHttpTraffSource(bool enabled, std::string url)
+void TrafficManager::SetHttpTraffSource(bool enabled, std::string url, std::string token)
 {
   if (IsTestMode())
     return;
@@ -1105,7 +1105,7 @@ void TrafficManager::SetHttpTraffSource(bool enabled, std::string url)
         ++it;
   }
   if (enabled)
-    traffxml::HttpTraffSource::Create(*this, url);
+    traffxml::HttpTraffSource::Create(*this, url, token);
 }
 
 void TrafficManager::RemoveTraffSourceIf(const std::function<bool(traffxml::TraffSource *)> &pred)

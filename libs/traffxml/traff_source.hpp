@@ -435,6 +435,17 @@ private:
 };
 
 /**
+ * @brief Prepares a HTTP request to a TraFF service: the request as XML body (POST) and, if `token`
+ * is not empty, the header `Authorization: Bearer <token>` (better-maps: device token of
+ * services/traff-server).
+ *
+ * @param request The request to prepare.
+ * @param token The access token, empty for none. It is never logged.
+ * @param data The TraFF request, in XML format.
+ */
+void PrepareHttpRequest(platform::HttpClient & request, std::string const & token, std::string data);
+
+/**
  * @brief A TraFF source backed by a HTTP[S] server.
  */
 class HttpTraffSource : public TraffSource
@@ -445,8 +456,9 @@ public:
    *
    * @param manager The traffic manager to register the new instance with
    * @param url The URL for the TraFF service API.
+   * @param token The access token sent as `Authorization: Bearer` with every request, empty for none.
    */
-  static void Create(TraffSourceManager & manager, std::string const & url);
+  static void Create(TraffSourceManager & manager, std::string const & url, std::string const & token = {});
 
   /**
    * @brief Prepares the HTTP traffic source for unloading.
@@ -514,8 +526,9 @@ protected:
    * @brief Constructs a new `HttpTraffSource`.
    * @param manager The `TrafficSourceManager` instance to register the source with.
    * @param url The URL for the TraFF service API.
+   * @param token The access token sent as `Authorization: Bearer` with every request, empty for none.
    */
-  HttpTraffSource(TraffSourceManager & manager, std::string const & url);
+  HttpTraffSource(TraffSourceManager & manager, std::string const & url, std::string const & token = {});
 
   /**
    * @brief Sends a TraFF request to the service and returns the response.
@@ -608,6 +621,11 @@ private:
    * @brief The URL for the TraFF service.
    */
   const std::string m_url;
+
+  /**
+   * @brief The access token for the TraFF service, empty for none. Never logged.
+   */
+  const std::string m_token;
 
   /**
    * @brief The subscription timeout reported by the service, in seconds; 0 if unknown.
