@@ -361,6 +361,25 @@ public class MotisMapperTest
     assertTrue(MotisMapper.toStops(null).isEmpty());
   }
 
+  /** The responses of the app's flow test for other departures of a ride (made from plan_hbf_alex.json). */
+  @Test
+  public void alternativesFlowFixtures() throws IOException
+  {
+    final TransitPlan two = MotisMapper.toPlan(parsePlan(Fixtures.read("plan_two_rides.json")));
+    assertEquals(1, two.getItineraries().size());
+    assertEquals(1, two.getItineraries().get(0).getTransfers());
+    assertEquals(18 * 60, two.getItineraries().get(0).getDurationSeconds());
+    assertEquals("U2", two.getItineraries().get(0).getLegs().get(3).getLineName());
+
+    final TransitPlan alternatives = MotisMapper.toPlan(parsePlan(Fixtures.read("plan_first_ride_alternatives.json")));
+    assertEquals(7, alternatives.getItineraries().size());
+    for (TransitItinerary itinerary : alternatives.getItineraries())
+      assertEquals(1, itinerary.getTransitLegs().size());
+
+    final TransitPlan rest = MotisMapper.toPlan(parsePlan(Fixtures.read("plan_rest_alexanderplatz.json")));
+    assertEquals("test_u2_alex", rest.getItineraries().get(0).getLegs().get(0).getTo().getStopId());
+  }
+
   private static Plan200Response parsePlan(String json) throws IOException
   {
     return Plan200Response.fromJson(json);

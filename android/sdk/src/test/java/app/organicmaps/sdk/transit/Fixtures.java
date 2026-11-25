@@ -21,6 +21,9 @@ import java.nio.charset.StandardCharsets;
  * <li>stoptimes_alex.json: /api/v6/stoptimes?stopId=de-VBB_de:11000:900100003&n=20, S7 delayed by 1 min</li>
  * <li>reverse_geocode_alex.json, geocode_hbf.json: /api/v1/(reverse-)geocode with type=STOP</li>
  * <li>error_bad_place.json (HTTP 404), error_bad_request.json (HTTP 400)</li>
+ * <li>plan_two_rides.json, plan_first_ride_alternatives.json, plan_rest_alexanderplatz.json: made from
+ * plan_hbf_alex.json for the app's flow test of other departures of a ride (S5 and a made-up U2 to Klosterstraße,
+ * the S-Bahn trips without the last walk, the rest after missing the U2)</li>
  * </ul>
  */
 final class Fixtures
