@@ -1213,6 +1213,7 @@ public:
 
   Type GetType() const override { return Type::FlushIndoor; }
   bool IsGraphicsContextDependent() const override { return true; }
+  bool ContainsRenderState() const override { return true; }
 
   IndoorRenderBatch && AcceptBatch() { return std::move(m_batch); }
 

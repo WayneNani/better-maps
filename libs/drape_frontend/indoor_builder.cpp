@@ -237,6 +237,16 @@ IndoorRenderBatch IndoorBuilder::BuildImpl(ref_ptr<dp::GraphicsContext> context,
         if (tri.empty())
           continue;
         triangles += tri.size() / 3;
+        // Face culling keeps only one winding, which depends on the graphics API's orientation of the screen: add
+        // every triangle in both windings (cheap at the size of a venue).
+        size_t const n = tri.size();
+        tri.reserve(2 * n);
+        for (size_t t = 0; t + 2 < n; t += 3)
+        {
+          tri.push_back(tri[t]);
+          tri.push_back(tri[t + 2]);
+          tri.push_back(tri[t + 1]);
+        }
         BuildingOutline outline;
         outline.m_generateOutline = f.m_kind != Kind::Wall;
         if (outline.m_generateOutline)

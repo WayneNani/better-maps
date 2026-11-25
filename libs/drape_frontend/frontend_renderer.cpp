@@ -1489,22 +1489,28 @@ void FrontendRenderer::RenderScene(ScreenBase const & modelView, bool activeFram
 
     RenderRasterLayer(modelView);
     Render2dLayer(modelView);
-    RenderIndoorLayer(modelView);
     RenderUserMarksLayer(modelView, DepthLayer::UserLineLayer);
 
     RenderOverlayUnderBuildingLayer(modelView);
 
     bool const hasTransitRouteData = HasTransitRouteData();
+    // better-maps: the indoor map lies on top of the buildings (also the 3D ones, which would hide the whole floor
+    // plan of a station or terminal) but below the route.
+    bool const indoorVisible = IsValidCurrentZoom() && m_indoorRenderer->IsVisible(GetCurrentZoom());
     if (m_buildingsFramebuffer->IsSupported() && !m_routeRenderer->IsRulerRoute())
     {
       RenderTrafficLayer(modelView);
-      if (!hasTransitRouteData)
+      if (!hasTransitRouteData && !indoorVisible)
         RenderRouteLayer(modelView);
       Render3dLayer(modelView);
+      RenderIndoorLayer(modelView);
+      if (!hasTransitRouteData && indoorVisible)
+        RenderRouteLayer(modelView);
     }
     else
     {
       Render3dLayer(modelView);
+      RenderIndoorLayer(modelView);
       RenderTrafficLayer(modelView);
       if (!hasTransitRouteData)
         RenderRouteLayer(modelView);
@@ -1689,7 +1695,7 @@ void FrontendRenderer::ApplyRasterLayer(raster::RasterLayerParams const & params
 void FrontendRenderer::RenderIndoorLayer(ScreenBase const & modelView)
 {
   TRACE_SECTION("[drape] RenderIndoorLayer");
-  if (!m_indoorRenderer->IsVisible(GetCurrentZoom()))
+  if (!IsValidCurrentZoom() || !m_indoorRenderer->IsVisible(GetCurrentZoom()))
     return;
   DEBUG_LABEL(m_context, "Indoor Layer");
   m_indoorRenderer->RenderGeometry(m_context, make_ref(m_gpuProgramManager), modelView, m_frameValues);
@@ -1698,7 +1704,7 @@ void FrontendRenderer::RenderIndoorLayer(ScreenBase const & modelView)
 void FrontendRenderer::RenderIndoorOverlays(ScreenBase const & modelView)
 {
   TRACE_SECTION("[drape] RenderIndoorOverlays");
-  if (!m_indoorRenderer->IsVisible(GetCurrentZoom()))
+  if (!IsValidCurrentZoom() || !m_indoorRenderer->IsVisible(GetCurrentZoom()))
     return;
   DEBUG_LABEL(m_context, "Indoor Overlays");
   m_indoorRenderer->RenderOverlays(m_context, make_ref(m_gpuProgramManager), modelView, m_frameValues);
