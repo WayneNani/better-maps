@@ -103,6 +103,16 @@ public final class TransitTestData
     return departure;
   }
 
+  /** The departure as if realtime data ended its trip early at the given stop. */
+  @NonNull
+  public static TransitDeparture shortened(@NonNull TransitDeparture departure, @NonNull String end)
+  {
+    departure.mScheduledDirection = departure.mDirection;
+    departure.mDirection = end;
+    departure.mShortened = true;
+    return departure;
+  }
+
   public static final class PlaceBuilder
   {
     private final TransitPlace mPlace = new TransitPlace();

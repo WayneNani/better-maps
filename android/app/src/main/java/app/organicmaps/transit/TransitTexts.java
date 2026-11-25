@@ -80,4 +80,10 @@ public interface TransitTexts
   /** E.g. "on the way", for a connection that has departed and not arrived yet. */
   @NonNull
   String onTheWay();
+
+  /**
+   * Direction of a departure that realtime data cuts short, e.g. "Bertha-von-Suttner-Platz (instead of Siegburg)".
+   */
+  @NonNull
+  String shortenedDirection(@NonNull String direction, @NonNull String scheduledDirection);
 }

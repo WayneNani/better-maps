@@ -18,12 +18,14 @@ public final class DepartureItem
   final String mTrack;
   final boolean mTrackChanged;
   final boolean mCancelled;
+  final boolean mDirectionChanged;
 
-  DepartureItem(@NonNull LineBadge badge, @Nullable String direction, @NonNull String time,
+  DepartureItem(@NonNull LineBadge badge, @Nullable String direction, boolean directionChanged, @NonNull String time,
                 @NonNull TransitFormatter.Delay delay, @Nullable String track, boolean trackChanged, boolean cancelled)
   {
     mBadge = badge;
     mDirection = direction;
+    mDirectionChanged = directionChanged;
     mTime = time;
     mDelay = delay;
     mTrack = track;
@@ -41,6 +43,12 @@ public final class DepartureItem
   public String getDirection()
   {
     return mDirection;
+  }
+
+  /** True if realtime data cuts the trip short, so the direction differs from the timetable. */
+  public boolean isDirectionChanged()
+  {
+    return mDirectionChanged;
   }
 
   /** Expected departure time (realtime if available). */

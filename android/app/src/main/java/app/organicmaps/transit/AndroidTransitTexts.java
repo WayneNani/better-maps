@@ -159,4 +159,11 @@ public final class AndroidTransitTexts implements TransitTexts
   {
     return mResources.getString(R.string.transit_on_the_way);
   }
+
+  @NonNull
+  @Override
+  public String shortenedDirection(@NonNull String direction, @NonNull String scheduledDirection)
+  {
+    return mResources.getString(R.string.transit_direction_shortened, direction, scheduledDirection);
+  }
 }

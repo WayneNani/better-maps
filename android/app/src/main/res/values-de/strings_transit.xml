@@ -68,6 +68,8 @@
   <string name="transit_meters">%d m</string>
   <string name="transit_kilometers">%.1f km</string>
   <string name="transit_direction">→ %1$s</string>
+  <!-- Direction of a departure that realtime data cuts short: actual end, then the scheduled destination. -->
+  <string name="transit_direction_shortened">%1$s (statt %2$s)</string>
   <string name="transit_cancelled">Fällt aus</string>
   <string name="transit_realtime">Echtzeit</string>
   <string name="transit_back">Zurück zu den Verbindungen</string>
