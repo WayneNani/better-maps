@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: other departures of the open ride in the detail view, below the ride. -->
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:background="@drawable/bg_transit_alt_area_bottom"
+  android:orientation="vertical"
+  android:paddingTop="@dimen/margin_quarter"
+  android:paddingBottom="@dimen/margin_half">
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/margin_base"
+    android:paddingEnd="@dimen/margin_base">
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/alt_title"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:accessibilityHeading="true"
+      android:textAppearance="@style/MwmTextAppearance.Body4"
+      android:textStyle="bold"
+      tools:text="Other departures to the ICE 1022" />
+
+    <com.google.android.material.textview.MaterialTextView
+      android:id="@+id/alt_transfer"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="@dimen/margin_half"
+      android:textAppearance="@style/MwmTextAppearance.Body4"
+      tools:text="Transfer: walk 7 min" />
+  </LinearLayout>
+
+  <HorizontalScrollView
+    android:id="@+id/alt_scroll"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp"
+    android:clipToPadding="false"
+    android:paddingStart="@dimen/margin_base"
+    android:paddingEnd="@dimen/margin_base"
+    android:scrollbars="none">
+
+    <LinearLayout
+      android:id="@+id/alt_chips"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal" />
+  </HorizontalScrollView>
+
+  <com.google.android.material.progressindicator.LinearProgressIndicator
+    android:id="@+id/alt_progress"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/margin_base"
+    android:layout_marginEnd="@dimen/margin_base"
+    android:indeterminate="true"
+    android:visibility="gone" />
+
+  <com.google.android.material.textview.MaterialTextView
+    android:id="@+id/alt_message"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/margin_quarter"
+    android:accessibilityLiveRegion="polite"
+    android:paddingStart="@dimen/margin_base"
+    android:paddingEnd="@dimen/margin_base"
+    android:textAppearance="@style/MwmTextAppearance.Body4"
+    android:visibility="gone"
+    tools:text="No other departures found" />
+</LinearLayout>

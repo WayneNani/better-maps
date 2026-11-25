@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import app.organicmaps.R;
 import app.organicmaps.sdk.routing.RoutingController;
 import app.organicmaps.settings.TransitSettingsActivity;
+import app.organicmaps.transit.AlternativesItem;
+import app.organicmaps.transit.ChangeItem;
 import app.organicmaps.transit.ConnectionsState;
 import app.organicmaps.transit.ItineraryItem;
 import app.organicmaps.transit.TransitConnectionsPresenter;
@@ -73,6 +75,11 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
   private final MaterialButton mBack;
   private final MaterialButton mTime;
   private final TextView mDetailTitle;
+  private final View mDetailTitles;
+  private final TextView mDetailSubtitle;
+  private final View mGridHint;
+  private final TextView mGridHintTitle;
+  private final TextView mGridHintText;
   private final View mProgress;
   private final View mStatus;
   private final TextView mStatusText;
@@ -106,6 +113,11 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
   @Nullable
   private ValueAnimator mSettleAnimator;
   private boolean mWasLoading;
+  // The other departures that were scrolled into view, to do it once.
+  @Nullable
+  private String mScrolledAlternatives;
+  @Nullable
+  private String mGridSelection;
 
   public OnlineTransitPanel(@NonNull Activity activity, @NonNull View panel)
   {
@@ -131,6 +143,11 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
     mBack = panel.findViewById(R.id.transit_back);
     mTime = panel.findViewById(R.id.transit_time);
     mDetailTitle = panel.findViewById(R.id.transit_detail_title);
+    mDetailTitles = panel.findViewById(R.id.transit_detail_titles);
+    mDetailSubtitle = panel.findViewById(R.id.transit_detail_subtitle);
+    mGridHint = panel.findViewById(R.id.transit_grid_hint);
+    mGridHintTitle = panel.findViewById(R.id.transit_grid_hint_title);
+    mGridHintText = panel.findViewById(R.id.transit_grid_hint_text);
     mProgress = panel.findViewById(R.id.transit_progress);
     mStatus = panel.findViewById(R.id.transit_status);
     mStatusText = panel.findViewById(R.id.transit_status_text);
@@ -208,6 +225,30 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
       {
         mPresenter.loadLater();
       }
+
+      @Override
+      public void onRideClick(int index, int legIndex)
+      {
+        mPresenter.toggleAlternatives(index, legIndex);
+      }
+
+      @Override
+      public void onAlternativeClick(int chipIndex)
+      {
+        mPresenter.chooseAlternative(chipIndex);
+      }
+
+      @Override
+      public void onDismissAlternatives()
+      {
+        mPresenter.closeAlternatives();
+      }
+    });
+    panel.findViewById(R.id.transit_grid_hint_done).setOnClickListener(v -> mPresenter.closeAlternatives());
+    panel.findViewById(R.id.transit_grid_hint_details).setOnClickListener(v -> {
+      final AlternativesItem alternatives = mPresenter.getState().getAlternatives();
+      if (alternatives != null)
+        mPresenter.select(alternatives.getConnection());
     });
     mRetry.setOnClickListener(v -> mPresenter.retry());
     if (routePoints != null)
@@ -302,7 +343,7 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
 
     final boolean detail = state.getScreen() == ConnectionsState.Screen.DETAIL;
     final boolean grid = !detail && state.getViewMode() == ConnectionsState.ViewMode.GRID;
-    UiUtils.showIf(detail, mBack, mDetailTitle, mSave);
+    UiUtils.showIf(detail, mBack, mDetailTitles, mDetailTitle, mSave);
     UiUtils.showIf(!detail, mTime, mViewToggle, mSavedList);
     UiUtils.showIf(mRoutePoints != null && state.getScreen() == ConnectionsState.Screen.LIST, mPoints);
     mFromName.setText(state.getFromLabel());
@@ -327,6 +368,8 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
     final ItineraryItem selected = state.getSelected();
     if (selected != null)
       mDetailTitle.setText(TransitSheet.title(selected));
+    final ChangeItem change = detail && selected != null ? selected.getChange() : null;
+    UiUtils.setTextAndHideIfEmpty(mDetailSubtitle, change != null ? AlternativesViews.changed(mActivity, change) : null);
 
     UiUtils.showIf(state.isLoading(), mProgress);
 
@@ -355,12 +398,13 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
     final boolean showGrid = grid && !state.getItems().isEmpty();
     final boolean expanded = mSheetState != TransitSheet.State.COLLAPSED || isSettling();
     UiUtils.showIf(showGrid && expanded, mGridScroll);
+    bindGridHint(showGrid && expanded ? state : null);
     UiUtils.showIf(!grid && expanded, mList);
     if (detail)
     {
       if (mList.getAdapter() != mLegs)
         mList.setAdapter(mLegs);
-      mLegs.setLegs(state.getLegs());
+      mLegs.setLegs(state.getLegs(), state.getAlternatives(), change, state.canChooseAlternatives());
     }
     else if (grid)
       bindGrid(state);
@@ -375,9 +419,29 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
       mScreen = state.getScreen();
       mList.scrollToPosition(0);
     }
+    scrollToAlternatives(state);
 
     TransitViews.bindAttribution(mAttribution, null, state.getProviderName(), state.getAttributionUrl());
     updateCollapsedViews();
+  }
+
+  /** Newly shown other departures of a ride come into view (in the list or the detail view). */
+  private void scrollToAlternatives(@NonNull ConnectionsState state)
+  {
+    final AlternativesItem alternatives = state.getAlternatives();
+    final String open = alternatives == null || state.getViewMode() == ConnectionsState.ViewMode.GRID
+                                && state.getScreen() == ConnectionsState.Screen.LIST
+                            ? null
+                            : state.getScreen() + ":" + alternatives.getConnection() + ":" + alternatives.getLegIndex();
+    if (open == null || open.equals(mScrolledAlternatives))
+    {
+      mScrolledAlternatives = open;
+      return;
+    }
+    mScrolledAlternatives = open;
+    final int position = mList.getAdapter() == mLegs ? mLegs.alternativesPosition() : mConnections.alternativesPosition();
+    if (position >= 0)
+      mList.post(() -> mList.smoothScrollToPosition(position));
   }
 
   /** Collapsed: only the handle, the summary line and the progress; otherwise the header and the body. */
@@ -387,7 +451,7 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
     UiUtils.showIf(collapsed, mSummary);
     UiUtils.showIf(!collapsed, mHeader);
     if (collapsed)
-      UiUtils.hide(mPoints, mStatus, mSavedInfo, mAttribution, mList, mGridScroll);
+      UiUtils.hide(mPoints, mStatus, mSavedInfo, mAttribution, mList, mGridScroll, mGridHint);
   }
 
   private void rerender()
@@ -603,11 +667,45 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
     return Math.max(0, bottom - top - chrome - mPanel.getPaddingBottom() - margin);
   }
 
+  /** The card below the time grid while a ride is selected; hidden for null. */
+  private void bindGridHint(@Nullable ConnectionsState state)
+  {
+    final AlternativesItem alternatives = state != null ? state.getAlternatives() : null;
+    UiUtils.showIf(alternatives != null, mGridHint);
+    if (alternatives == null)
+      return;
+    final String ride =
+        AlternativesViews.rideName(mActivity, alternatives.getPosition(), alternatives.getRideNumber(), true);
+    final AlternativesItem.Chip chip = alternatives.getSelected();
+    mGridHintTitle.setText(chip != null ? mActivity.getString(R.string.transit_alt_hint_title, ride,
+                                                              chip.getBadge().getText(), chip.getDeparture())
+                                        : ride);
+    String text = AlternativesViews.message(mActivity, alternatives);
+    if (text == null && chip != null)
+    {
+      final ItineraryItem item = alternatives.getConnection() < state.getItems().size()
+                                   ? state.getItems().get(alternatives.getConnection())
+                                   : null;
+      final ChangeItem change = item != null ? item.getChange() : null;
+      if (alternatives.getNextLine() == null)
+        text = mActivity.getString(R.string.transit_alt_hint_arrival, chip.getArrival());
+      else if (chip.missesNext() && change != null && change.isReplanned())
+        text = mActivity.getString(R.string.transit_alt_hint_missed, alternatives.getNextLine(), change.getArrival());
+      else
+        text = mActivity.getResources().getQuantityString(R.plurals.transit_alt_hint_reach,
+                                                          alternatives.getConnectingCount(),
+                                                          alternatives.getConnectingCount(), alternatives.getNextLine())
+             + " · " + AlternativesViews.status(mActivity, chip);
+    }
+    UiUtils.setTextAndHideIfEmpty(mGridHintText, text);
+  }
+
   private void bindGrid(@NonNull ConnectionsState state)
   {
     final List<ItineraryItem> items = state.getItems();
     mGrid.setData(items, state.getNow(), mFormatter, state.canLoadEarlier() || state.isLoadingEarlier(),
-                  state.isLoadingEarlier(), state.canLoadLater() || state.isLoadingLater(), state.isLoadingLater());
+                  state.isLoadingEarlier(), state.canLoadLater() || state.isLoadingLater(), state.isLoadingLater(),
+                  state.getAlternatives());
     final String first = items.isEmpty() ? null : items.get(0).getKey();
     if (first != null && !first.equals(mGridFirstKey))
     {
@@ -625,5 +723,26 @@ public final class OnlineTransitPanel implements TransitConnectionsPresenter.Vie
       });
     }
     mGridFirstKey = first;
+    // A newly selected ride comes into view with its other departures.
+    final AlternativesItem alternatives = state.getAlternatives();
+    final String selection = alternatives != null ? alternatives.getConnection() + ":" + alternatives.getLegIndex() : null;
+    if (selection != null && !selection.equals(mGridSelection))
+      mGridScroll.post(this::scrollGridToSelection);
+    mGridSelection = selection;
+  }
+
+  /** Once the grid is wide enough for the lane of the selected ride, scrolls it into view. */
+  private void scrollGridToSelection()
+  {
+    if (!mShown)
+      return;
+    if (mGrid.isLayoutRequested())
+    {
+      mGridScroll.post(this::scrollGridToSelection);
+      return;
+    }
+    final int x = mGrid.scrollForSelection(mGridScroll.getScrollX(), mGridScroll.getWidth());
+    if (x >= 0)
+      mGridScroll.smoothScrollTo(x, 0);
   }
 }

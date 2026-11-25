@@ -94,15 +94,34 @@
       app:icon="@drawable/ic_transit_schedule"
       tools:text="Depart now" />
 
-    <com.google.android.material.textview.MaterialTextView
-      android:id="@+id/transit_detail_title"
+    <!-- Times of the connection in the detail view, and whether the user changed a ride. -->
+    <LinearLayout
+      android:id="@+id/transit_detail_titles"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
       android:layout_weight="1"
-      android:textAppearance="@style/MwmTextAppearance.Body2"
-      android:textStyle="bold"
+      android:orientation="vertical"
       android:visibility="gone"
-      tools:text="17:29 – 17:46 · 17 min" />
+      tools:visibility="visible">
+
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/transit_detail_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/MwmTextAppearance.Body2"
+        android:textStyle="bold"
+        android:visibility="gone"
+        tools:text="17:29 – 17:46 · 17 min" />
+
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/transit_detail_subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:accessibilityLiveRegion="polite"
+        android:textAppearance="@style/MwmTextAppearance.Body4"
+        android:visibility="gone"
+        tools:text="Changed: other first ride, same connection" />
+    </LinearLayout>
 
     <!-- List or time grid, for the running search. -->
     <com.google.android.material.button.MaterialButtonToggleGroup
@@ -340,6 +359,72 @@
       android:layout_width="wrap_content"
       android:layout_height="match_parent" />
   </HorizontalScrollView>
+
+  <!-- Time grid with a selected ride: which one and whether its other departures reach the next ride. -->
+  <LinearLayout
+    android:id="@+id/transit_grid_hint"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/margin_half"
+    android:layout_marginTop="@dimen/margin_quarter"
+    android:layout_marginEnd="@dimen/margin_half"
+    android:background="@drawable/bg_transit_hint"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="14dp"
+    android:paddingEnd="4dp"
+    android:visibility="gone"
+    tools:visibility="visible">
+
+    <LinearLayout
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="@dimen/margin_half"
+      android:layout_marginBottom="@dimen/margin_half"
+      android:layout_weight="1"
+      android:accessibilityLiveRegion="polite"
+      android:orientation="vertical">
+
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/transit_grid_hint_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/MwmTextAppearance.Body3"
+        android:textColor="@color/transit_hint_text"
+        android:textStyle="bold"
+        tools:text="First ride: 63 at 09:29" />
+
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/transit_grid_hint_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/MwmTextAppearance.Body4"
+        android:textColor="@color/transit_hint_text_secondary"
+        tools:text="5 departures reach the ICE 1022 · 4 min buffer" />
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/transit_grid_hint_details"
+      style="@style/Widget.Material3.Button.TextButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:minWidth="0dp"
+      android:minHeight="44dp"
+      android:text="@string/transit_alt_details"
+      android:textAllCaps="false"
+      android:textColor="@color/transit_hint_action" />
+
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/transit_grid_hint_done"
+      style="@style/Widget.Material3.Button.TextButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:minWidth="0dp"
+      android:minHeight="44dp"
+      android:text="@string/transit_alt_done"
+      android:textAllCaps="false"
+      android:textColor="@color/transit_hint_action" />
+  </LinearLayout>
 
   <app.organicmaps.transit.ui.MaxHeightRecyclerView
     android:id="@+id/transit_list"
