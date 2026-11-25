@@ -698,7 +698,7 @@ public final class TimeGridView extends View
     if (pills == null)
     {
       if (drag != null && selectedBlock != null)
-        drawLifted(canvas, column, selectedBlock, selectedBlock.getTop(), selectedBlock.getBottom());
+        drawLifted(canvas, column, selectedBlock.getBadge(), selectedBlock.getTop(), selectedBlock.getBottom());
       return;
     }
     mPillText.getFontMetrics(mMetrics);
@@ -734,7 +734,7 @@ public final class TimeGridView extends View
     final int target = drag.mSnap.getIndex();
     if (target < 0 || target >= pills.size() || target == drag.mSnap.getOriginal())
     {
-      drawLifted(canvas, column, selectedBlock, selectedBlock.getTop(), selectedBlock.getBottom());
+      drawLifted(canvas, column, selectedBlock.getBadge(), selectedBlock.getTop(), selectedBlock.getBottom());
       return;
     }
     // The pill it snaps to, and the ride at that departure.
@@ -747,14 +747,13 @@ public final class TimeGridView extends View
     final float top = layout.y(chip.getDepartureEpoch());
     final float bottom = chip.getArrivalEpoch() > chip.getDepartureEpoch() ? layout.y(chip.getArrivalEpoch())
                                                                           : top + selectedBlock.getHeight();
-    drawLifted(canvas, column, selectedBlock, top, Math.max(bottom, top + dp(MIN_BLOCK_DP)));
+    drawLifted(canvas, column, chip.getBadge(), top, Math.max(bottom, top + dp(MIN_BLOCK_DP)));
   }
 
-  /** A lifted ride: a little wider, with a shadow and an outline. */
-  private void drawLifted(@NonNull Canvas canvas, @NonNull TimeGridLayout.Column column,
-                          @NonNull TimeGridLayout.Block block, float top, float bottom)
+  /** A lifted ride (in the line of the departure it is at): a little wider, with a shadow and an outline. */
+  private void drawLifted(@NonNull Canvas canvas, @NonNull TimeGridLayout.Column column, @Nullable LineBadge badge,
+                          float top, float bottom)
   {
-    final LineBadge badge = block.getBadge();
     if (badge == null)
       return;
     final float grow = dp(LIFT_DP);
