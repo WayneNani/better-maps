@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Creates a token for a device: appends its hash to the token file and prints the token once, to be entered in the
-# app (Einstellungen -> Indoor-Server). The server never stores the token itself. The gateway picks up the change
+# app (Einstellungen -> Kartendarstellung -> Innenraumkarten-Server). The server never stores the token itself. The gateway picks up the change
 # within 30 s.
 #
 # Usage: scripts/new-token.sh <label>     label: name of the device, A-Z a-z 0-9 . _ -, e.g. pixel-7

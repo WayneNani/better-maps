@@ -87,6 +87,30 @@ Skripte lesen dieselben Variablen). Ohne Container geht es auch direkt:
 
 Im Emulator erreicht man den Rechner unter `http://10.0.2.2:18300`.
 
+### App einrichten
+
+Einstellungen → Kartendarstellung → **Innenraumkarten-Server**: „Innenraumkarten anzeigen“ einschalten,
+Server-Adresse (z. B. `https://innen.example.org`, im Emulator `http://10.0.2.2:18300`) und Token des Geräts
+eintragen. Standardmäßig ist alles aus, in der APK steht kein Server und kein Token; `http://` geht nur für lokale
+Adressen, das Token wird nur als „gesetzt“ angezeigt, nie geloggt und nicht gesichert (app-private
+SharedPreferences `indoor_maps`).
+
+So nutzt die App den Server:
+
+- Ab Zoomstufe 15 fragt sie `GET /v1/venues?bbox=…` für den sichtbaren Ausschnitt plus die Hälfte rundherum, auf ein
+  0,02°-Raster gerundet (höchstens 0,9° × 0,9°), erst wenn die Karte 0,4 s stillsteht; Antworten gelten eine Stunde,
+  nach einem Fehler wird zwei Minuten nicht neu gefragt.
+- Ab Zoomstufe 16 zeigt sie **eine** Venue: die, die die Bildschirmmitte enthält (bei Überlappung die kleinere, die
+  bisherige bleibt, solange sie die Mitte enthält), sonst die meistsichtbare. Deren Dokument lädt sie mit
+  `If-None-Match` (Speicher: 6 Venues, Platte: 40 Venues/30 MB in `TmpDir()/indoor_venues`); stimmt das ETag der
+  Liste mit dem gespeicherten überein, fragt sie gar nicht.
+- Gezeichnet wird eine Etage (Standard: `default_level`, gewählte Etage je Venue bleibt bis zum App-Neustart):
+  Flächen über den Flächen und Gebäuden der Karte, aber unter Route und eigenen Markierungen; Beschriftungen und
+  Symbole (Toiletten, Aufzug, Läden, Gastronomie, Info, Gates …) nehmen an der Kollisionsbehandlung der Karte teil.
+  Rechts am Rand erscheint die Etagenwahl mit „© OpenStreetMap-Mitwirkende“; Antippen eines Raums oder Orts zeigt
+  Name, Ref, Etage, Art und Öffnungszeiten.
+- Fehler (Server weg, 401, kaputte Daten) zeigen einfach die normale Karte.
+
 ## Konfiguration
 
 Skripte (`scripts/common.sh`, alles über Umgebungsvariablen):
@@ -306,7 +330,8 @@ Token/Koordinaten/Ids.
   Etagen-Labels sind meist Zahlen (`level:ref` ist selten), Zwischenetagen wie `0.3` kommen aus den Daten.
 - Gates und andere Objekte mehr als 20 m außerhalb eines Terminals werden ignoriert; ebenso alles mit `level`
   außerhalb von Venues (`unattached`, z. B. Läden in gewöhnlichen Gebäuden).
-- Venues können sich überlappen (z. B. benachbarte Terminals); die App zeigt dann mehrere an derselben Stelle.
+- Venues können sich überlappen (z. B. benachbarte Terminals); die App zeigt immer nur eine davon (die die
+  Bildschirmmitte enthält, bei mehreren die kleinere).
 - Die Ids sind stabil, solange das namengebende OSM-Objekt bzw. die kleinste Innenraumfläche bleibt; sonst ändert
   sich die Id beim nächsten Import (die App lädt das Dokument dann neu).
 - gzip- und unkomprimierte Antwort tragen dasselbe starke ETag (so vereinbart, damit das ETag der Liste für beide
