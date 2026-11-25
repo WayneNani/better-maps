@@ -1,0 +1,17 @@
+# Starts the imagery proxy at boot (user service). Install, see README "Dauerbetrieb".
+[Unit]
+Description=better-maps imagery proxy (MapProxy + gateway)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# Adjust the path to your checkout. Environment variables from scripts/common.sh can be set here.
+Environment=IMAGERY_PORT=18200
+ExecStart=%h/Projects/better-maps/services/imagery-proxy/scripts/run.sh
+ExecStop=%h/Projects/better-maps/services/imagery-proxy/scripts/stop.sh
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target

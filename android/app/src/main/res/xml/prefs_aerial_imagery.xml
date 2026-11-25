@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: aerial imagery server. Keys and values: app.organicmaps.settings.AerialImagerySettings. -->
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <Preference
+    android:key="aerial_imagery_info"
+    android:persistent="false"
+    android:selectable="false"
+    android:summary="@string/aerial_imagery_info"
+    app:iconSpaceReserved="false"
+    app:singleLineTitle="false" />
+
+  <EditTextPreference
+    android:key="aerial_imagery_url"
+    android:title="@string/aerial_imagery_url"
+    android:dialogMessage="@string/aerial_imagery_url_hint"
+    app:iconSpaceReserved="false"
+    app:singleLineTitle="false" />
+
+  <EditTextPreference
+    android:key="aerial_imagery_token"
+    android:persistent="false"
+    android:title="@string/aerial_imagery_token"
+    android:dialogMessage="@string/aerial_imagery_token_hint"
+    app:iconSpaceReserved="false"
+    app:singleLineTitle="false" />
+
+</androidx.preference.PreferenceScreen>

@@ -1,0 +1,39 @@
+<!-- better-maps: map layer "Luftbild" (aerial imagery): fields, woods and a road seen from above. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="54dp"
+    android:height="54dp"
+    android:viewportWidth="54"
+    android:viewportHeight="54">
+  <group>
+    <clip-path
+        android:pathData="M10,0L44,0A10,10 0,0 1,54 10L54,44A10,10 0,0 1,44 54L10,54A10,10 0,0 1,0 44L0,10A10,10 0,0 1,10 0z"/>
+    <path
+        android:pathData="M0,0h54v54h-54z"
+        android:fillColor="#6f8a3a"/>
+    <path
+        android:pathData="M0,0L30,0L24,22L0,28Z"
+        android:fillColor="#b9a56a"/>
+    <path
+        android:pathData="M34,0L54,0L54,20L28,26Z"
+        android:fillColor="#3f5f2a"/>
+    <path
+        android:pathData="M0,33L22,28L18,54L0,54Z"
+        android:fillColor="#8fa34e"/>
+    <path
+        android:pathData="M30,31L54,26L54,54L26,54Z"
+        android:fillColor="#a88f5a"/>
+    <path
+        android:pathData="M36,36m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0"
+        android:fillColor="#c8c2b4"/>
+    <path
+        android:pathData="M-2,30L56,22"
+        android:strokeWidth="3"
+        android:strokeColor="#e8e4da"
+        android:fillColor="#00000000"/>
+    <path
+        android:pathData="M25,-2L20,56"
+        android:strokeWidth="2.2"
+        android:strokeColor="#e8e4da"
+        android:fillColor="#00000000"/>
+  </group>
+</vector>

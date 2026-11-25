@@ -411,6 +411,16 @@ public class Framework
    */
   public static native void nativeSetRoutingServer(@NonNull String url, @NonNull String token);
 
+  /**
+   * better-maps: aerial imagery layer ("Luftbild", services/imagery-proxy). Off unless enabled with a server URL and a
+   * device token. The token is kept in memory by the core only.
+   */
+  public static native void nativeSetAerialImagery(boolean enabled, @NonNull String url, @NonNull String token);
+
+  /** better-maps: the current viewport as {minLon, minLat, maxLon, maxLat}. */
+  @NonNull
+  public static native double[] nativeGetViewportLatLonRect();
+
   public static native void nativeSetCustomMapDownloadUrl(String url);
 
   public static void applyCustomMapDownloadUrl(@NonNull Context context, @Nullable String url)

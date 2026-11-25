@@ -11,6 +11,7 @@
 #include "drape_frontend/my_position_controller.hpp"
 #include "drape_frontend/overlays_tracker.hpp"
 #include "drape_frontend/postprocess_renderer.hpp"
+#include "drape_frontend/raster_tile_loader.hpp"
 #include "drape_frontend/route_shape.hpp"
 #include "drape_frontend/scenario_manager.hpp"
 #include "drape_frontend/selection_shape.hpp"
@@ -243,6 +244,9 @@ public:
   void ClearAllTransitSchemeCache();
 
   void EnableIsolines(bool enable);
+
+  // better-maps: raster tile layer ("Luftbild"), see raster_tile_loader.hpp. Inactive params switch it off.
+  void SetRasterLayer(raster::RasterLayerParams const & params);
 
   void SetFontScaleFactor(double scaleFactor);
 

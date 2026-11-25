@@ -45,5 +45,12 @@
     android:widgetLayout="@layout/preference_switch"
     app:icon="@drawable/ic_translate_indic"
     app:singleLineTitle="false" />
+  <!-- better-maps: server of the aerial imagery layer ("Luftbild"). -->
+  <Preference
+    android:key="aerial_imagery_screen"
+    android:persistent="false"
+    android:title="@string/aerial_imagery_server_title"
+    android:fragment="app.organicmaps.settings.AerialImagerySettingsFragment"
+    app:singleLineTitle="false" />
 
 </androidx.preference.PreferenceScreen>

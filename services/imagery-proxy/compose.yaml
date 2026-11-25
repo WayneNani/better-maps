@@ -1,0 +1,77 @@
+# Self-hosted aerial imagery for the app's "Luftbild" layer: MapProxy (state orthophotos + Sentinel-2 2016 as
+# WebMercator tiles) behind a small Go gateway (tokens, rate limit, disk cache, attributions).
+#
+# Normally driven by the scripts in scripts/ (they set the variables below). Direct use:
+#   export IMAGERY_CACHE=$HOME/.cache/bettermaps-imagery IMAGERY_TOKENS_FILE=$HOME/.config/bettermaps-imagery/tokens
+#   podman-compose -p bettermaps-imagery up -d
+#
+# Only the gateway is published (on IMAGERY_BIND:IMAGERY_PORT, 127.0.0.1 by default, put a TLS reverse proxy in
+# front). MapProxy has no published port; it reaches the state servers through the "egress" network and is reached
+# only by the gateway through the internal "backend" network.
+
+networks:
+  # MapProxy <-> gateway. internal: no published ports, no route to the outside.
+  backend:
+    internal: true
+  # MapProxy -> state WMS servers and EOX (outgoing only, nothing published).
+  egress: {}
+  # Gateway <-> host (published port).
+  frontend: {}
+
+services:
+  mapproxy:
+    image: localhost/bettermaps-mapproxy:latest
+    build:
+      context: .
+      dockerfile: mapproxy.Containerfile
+      args:
+        MAPPROXY_VERSION: ${MAPPROXY_VERSION:-8.1.1}
+    restart: unless-stopped
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges"]
+    read_only: true
+    tmpfs: ["/tmp"]
+    mem_limit: ${MAPPROXY_MEMORY:-768m}
+    memswap_limit: ${MAPPROXY_MEMORY:-768m}
+    cpus: 2
+    networks: [backend, egress]
+    volumes:
+      - ./config:/mapproxy/config:ro,z
+
+  # Authenticating, caching gateway (Containerfile), the only published service.
+  gateway:
+    image: localhost/bettermaps-imagery-gateway:latest
+    build:
+      context: .
+      dockerfile: Containerfile
+    restart: unless-stopped
+    # Rootless Podman: uid 0 in the container is your host user, which can read the token file (mode 600) and write
+    # the tile cache. The container gets no capabilities and a read-only file system.
+    user: "0:0"
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges"]
+    read_only: true
+    mem_limit: 192m
+    memswap_limit: 192m
+    cpus: 1
+    depends_on: [mapproxy]
+    networks: [backend, frontend]
+    ports:
+      - "${IMAGERY_BIND:-127.0.0.1}:${IMAGERY_PORT:-18200}:8080"
+    environment:
+      IMAGERY_LISTEN: ":8080"
+      IMAGERY_UPSTREAM_URL: "http://mapproxy:8080"
+      IMAGERY_TOKENS_FILE: /config/tokens
+      IMAGERY_SOURCES_FILE: /sources/sources.json
+      IMAGERY_CACHE_DIR: /cache
+      IMAGERY_CACHE_MAX_MB: ${IMAGERY_CACHE_MAX_MB:-1024}
+      IMAGERY_CACHE_MAX_AGE: ${IMAGERY_CACHE_MAX_AGE:-720h}
+      IMAGERY_MAX_ZOOM: ${IMAGERY_MAX_ZOOM:-19}
+      IMAGERY_RATE_PER_MINUTE: ${IMAGERY_RATE_PER_MINUTE:-600}
+      IMAGERY_RATE_BURST: ${IMAGERY_RATE_BURST:-300}
+      IMAGERY_MAX_CONCURRENT: ${IMAGERY_MAX_CONCURRENT:-4}
+      IMAGERY_LOG_LEVEL: ${IMAGERY_LOG_LEVEL:-info}
+    volumes:
+      - ${IMAGERY_TOKENS_FILE:?set IMAGERY_TOKENS_FILE}:/config/tokens:ro,z
+      - ./config:/sources:ro,z
+      - ${IMAGERY_CACHE:?set IMAGERY_CACHE}/tiles:/cache:z

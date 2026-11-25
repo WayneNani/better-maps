@@ -1244,6 +1244,26 @@ JNIEXPORT void JNICALL Java_app_organicmaps_sdk_Framework_nativeSetRoutingServer
   frm()->GetRoutingManager().SetRoutingServer(jni::ToNativeString(env, url), jni::ToNativeString(env, token));
 }
 
+// better-maps: aerial imagery layer ("Luftbild"). Empty url or token, or enabled == false, turns it off. The token is
+// not logged.
+JNIEXPORT void JNICALL Java_app_organicmaps_sdk_Framework_nativeSetAerialImagery(JNIEnv * env, jclass,
+                                                                                jboolean enabled, jstring url,
+                                                                                jstring token)
+{
+  frm()->SetAerialImagery(enabled, jni::ToNativeString(env, url), jni::ToNativeString(env, token));
+}
+
+// better-maps: the current viewport as {minLon, minLat, maxLon, maxLat} (for the attribution of the aerial imagery).
+JNIEXPORT jdoubleArray JNICALL Java_app_organicmaps_sdk_Framework_nativeGetViewportLatLonRect(JNIEnv * env, jclass)
+{
+  m2::RectD const r = frm()->GetCurrentViewport();
+  jdouble const values[] = {mercator::XToLon(r.minX()), mercator::YToLat(r.minY()), mercator::XToLon(r.maxX()),
+                            mercator::YToLat(r.maxY())};
+  jdoubleArray result = env->NewDoubleArray(4);
+  env->SetDoubleArrayRegion(result, 0, 4, values);
+  return result;
+}
+
 JNIEXPORT jstring JNICALL Java_app_organicmaps_sdk_Framework_nativeGetBookmarkDir(JNIEnv * env, jclass)
 {
   return jni::ToJavaString(env, GetPlatform().SettingsDir().c_str());

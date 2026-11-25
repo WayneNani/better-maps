@@ -892,6 +892,12 @@ void DrapeEngine::EnableIsolines(bool enable)
                                   make_unique_dp<EnableIsolinesMessage>(enable), MessagePriority::Normal);
 }
 
+void DrapeEngine::SetRasterLayer(raster::RasterLayerParams const & params)
+{
+  m_threadCommutator->PostMessage(ThreadsCommutator::RenderThread, make_unique_dp<SetRasterLayerMessage>(params),
+                                  MessagePriority::Normal);
+}
+
 void DrapeEngine::SetFontScaleFactor(double scaleFactor)
 {
   VisualParams::Instance().SetFontScale(scaleFactor);

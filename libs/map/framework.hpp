@@ -219,6 +219,8 @@ protected:
   TViewportChangedFn m_viewportChangedFn;
 
   drape_ptr<df::DrapeEngine> m_drapeEngine;
+  // better-maps: aerial imagery layer, applied to every new drape engine.
+  df::raster::RasterLayerParams m_aerialImagery;
 
   StorageDownloadingPolicy m_storageDownloadingPolicy;
   storage::Storage m_storage;
@@ -892,6 +894,11 @@ public:
   TransitReadManager & GetTransitManager();
   IsolinesManager & GetIsolinesManager();
   IsolinesManager const & GetIsolinesManager() const;
+
+  // better-maps: aerial imagery layer ("Luftbild", services/imagery-proxy). Off unless enabled with a server URL and
+  // a device token. The token is kept in memory only and never logged. Tiles are cached in TmpDir()/aerial_tiles.
+  void SetAerialImagery(bool enabled, std::string const & url, std::string const & token);
+  bool IsAerialImageryActive() const;
 
   void SetTrafficHttpEnabled(bool enabled);
   bool LoadTrafficHttpEnabled();

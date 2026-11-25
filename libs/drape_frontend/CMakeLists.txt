@@ -139,6 +139,12 @@ set(SRC
   poi_symbol_shape.hpp
   postprocess_renderer.cpp
   postprocess_renderer.hpp
+  raster_renderer.cpp
+  raster_renderer.hpp
+  raster_tile_loader.cpp
+  raster_tile_loader.hpp
+  raster_tiles.cpp
+  raster_tiles.hpp
   read_manager.cpp
   read_manager.hpp
   read_metaline_task.cpp

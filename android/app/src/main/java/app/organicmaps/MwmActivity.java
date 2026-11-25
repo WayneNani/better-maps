@@ -34,6 +34,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -77,6 +78,7 @@ import app.organicmaps.leftbutton.LeftButton;
 import app.organicmaps.leftbutton.LeftButtonsHolder;
 import app.organicmaps.leftbutton.LeftToggleButton;
 import app.organicmaps.location.TrackRecordingService;
+import app.organicmaps.maplayer.AerialAttributionController;
 import app.organicmaps.maplayer.MapButtonsController;
 import app.organicmaps.maplayer.MapButtonsViewModel;
 import app.organicmaps.maplayer.ToggleMapLayerFragment;
@@ -207,6 +209,9 @@ public class MwmActivity extends BaseMwmFragmentActivity
   private OnmapDownloader mOnmapDownloader;
   @Nullable
   private SavedConnectionCard mSavedConnectionCard;
+  // better-maps: attribution of the aerial imagery layer.
+  @Nullable
+  private AerialAttributionController mAerialAttribution;
   // Last result of canShowSavedConnection(), to update the card only when it changes.
   private boolean mSavedConnectionCardRoom;
   private boolean mIsTabletLayout;
@@ -674,6 +679,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
     initMainMenu();
     initOnmapDownloader();
     initSavedConnectionCard();
+    initAerialAttribution();
     initPositionChooser();
   }
 
@@ -1248,6 +1254,8 @@ public class MwmActivity extends BaseMwmFragmentActivity
 
     MwmApplication.from(this).getSensorHelper().addListener(this);
     processSavedConnectionIntent();
+    if (mAerialAttribution != null)
+      mAerialAttribution.onResume();
   }
 
   @Override
@@ -1262,6 +1270,8 @@ public class MwmActivity extends BaseMwmFragmentActivity
   {
     if (mOnmapDownloader != null)
       mOnmapDownloader.onPause();
+    if (mAerialAttribution != null)
+      mAerialAttribution.onPause();
     MwmApplication.from(this).getSensorHelper().removeListener(this);
     dismissLocationErrorDialog();
     dismissAlertDialog();
@@ -1329,8 +1339,40 @@ public class MwmActivity extends BaseMwmFragmentActivity
     mPostNotificationPermissionRequest = null;
     mPowerSaveSettings.unregister();
     mPowerSaveSettings = null;
+    if (mAerialAttribution != null)
+    {
+      mAerialAttribution.onDestroy();
+      mAerialAttribution = null;
+    }
     if (mRemoveDisplayListener && !isChangingConfigurations())
       mDisplayManager.removeListener(DisplayType.Device);
+  }
+
+  /** better-maps: attribution of the aerial imagery layer, above the bottom buttons (and the saved connection card). */
+  private void initAerialAttribution()
+  {
+    if (mAerialAttribution != null)
+      return;
+    final TextView view = findViewById(R.id.aerial_attribution);
+    mAerialAttribution = new AerialAttributionController(view);
+    mMapButtonsViewModel.getBottomButtonsHeight().observe(this, height -> placeAerialAttribution(view));
+    view.getRootView().addOnLayoutChangeListener(
+        (v, l, t, r, b, oldL, oldT, oldR, oldB) -> placeAerialAttribution(view));
+  }
+
+  private void placeAerialAttribution(@NonNull TextView view)
+  {
+    final Float bottomButtons = mMapButtonsViewModel.getBottomButtonsHeight().getValue();
+    int bottom = (bottomButtons != null ? bottomButtons.intValue() : 0) + mNavBarHeight;
+    final View savedCard = findViewById(R.id.transit_saved_card);
+    if (savedCard != null && savedCard.isShown() && savedCard.getHeight() > 0)
+      bottom = Math.max(bottom, ((View) savedCard.getParent()).getHeight() - savedCard.getTop());
+    bottom += getResources().getDimensionPixelSize(R.dimen.margin_quarter);
+    final ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+    if (params.bottomMargin == bottom)
+      return;
+    params.bottomMargin = bottom;
+    view.setLayoutParams(params);
   }
 
   /** The card with the next saved public transport connection on the map. */
