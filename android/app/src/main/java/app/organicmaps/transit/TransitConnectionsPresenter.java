@@ -94,6 +94,11 @@ public final class TransitConnectionsPresenter
   private final DefaultViewSource mDefaultView;
   @NonNull
   private final SavedConnectionsStore mSavedStore;
+  @NonNull
+  private final LegChoices mChoices;
+  // The connection on the map, to draw a changed one again.
+  @Nullable
+  private TransitItinerary mDisplayed;
 
   @Nullable
   private View mView;
@@ -161,6 +166,34 @@ public final class TransitConnectionsPresenter
     mRouteDisplay = routeDisplay;
     mDefaultView = defaultView;
     mSavedStore = savedStore;
+    mChoices = new LegChoices(registry, options, clock, new LegChoices.Host() {
+      @Nullable
+      @Override
+      public String providerId()
+      {
+        return TransitConnectionsPresenter.this.providerId();
+      }
+
+      @Nullable
+      @Override
+      public TransitLocation origin()
+      {
+        return mFrom;
+      }
+
+      @Nullable
+      @Override
+      public TransitLocation destination()
+      {
+        return mTo;
+      }
+
+      @Override
+      public void onChanged(@NonNull String key)
+      {
+        onChoicesChanged();
+      }
+    });
     // E.g. a connection was removed in the list of saved connections.
     mSavedStore.addListener(this::render);
   }
@@ -240,7 +273,7 @@ public final class TransitConnectionsPresenter
     mArriveBy = false;
     mViewMode = null;
     mSaved = saved;
-    mRouteDisplay.show(saved.getItinerary());
+    display(saved.getItinerary());
     render();
     if (mListener != null)
       mListener.onQueryFinished(true);
@@ -406,7 +439,8 @@ public final class TransitConnectionsPresenter
       return;
     mSelected = index;
     mExpandedLegs.clear();
-    mRouteDisplay.show(all.get(index));
+    mChoices.close(false);
+    display(mChoices.current(all.get(index)));
     render();
   }
 
@@ -426,7 +460,8 @@ public final class TransitConnectionsPresenter
       return false;
     mSelected = -1;
     mExpandedLegs.clear();
-    mRouteDisplay.clear();
+    mChoices.close(false);
+    clearDisplay();
     render();
     return true;
   }
@@ -439,6 +474,53 @@ public final class TransitConnectionsPresenter
     if (!mExpandedLegs.remove(legIndex))
       mExpandedLegs.add(legIndex);
     render();
+  }
+
+  /**
+   * Shows the other departures of a ride of a connection in the list or time grid, or hides them if they are shown.
+   * Sends one request unless they are known already.
+   *
+   * @param legIndex index of the ride in the shown connection's legs.
+   */
+  public void toggleAlternatives(int connection, int legIndex)
+  {
+    final List<TransitItinerary> all = getAllItineraries();
+    if (mSaved != null || connection < 0 || connection >= all.size())
+      return;
+    mChoices.toggle(all.get(connection), legIndex);
+  }
+
+  /** Shows or hides the other departures of a ride of the connection in the detail view. */
+  public void toggleAlternatives(int legIndex)
+  {
+    if (mSelected >= 0)
+      toggleAlternatives(mSelected, legIndex);
+  }
+
+  /** Uses another departure of the open ride ({@link AlternativesItem#getChips()}). */
+  public void chooseAlternative(int chipIndex)
+  {
+    mChoices.choose(chipIndex);
+  }
+
+  /** Hides the other departures; a running request is ignored. */
+  public void closeAlternatives()
+  {
+    mChoices.close(true);
+  }
+
+  /** Back to a connection as it was found. */
+  public void undoChange(int connection)
+  {
+    final List<TransitItinerary> all = getAllItineraries();
+    if (connection >= 0 && connection < all.size())
+      mChoices.undo(all.get(connection));
+  }
+
+  /** Back to the connection in the detail view as it was found. */
+  public void undoChange()
+  {
+    undoChange(mSelected);
   }
 
   /** Forgets everything, e.g. when route planning is closed. */
@@ -458,7 +540,7 @@ public final class TransitConnectionsPresenter
     mLoading = false;
     mError = null;
     if (hadSelection)
-      mRouteDisplay.clear();
+      clearDisplay();
     render();
   }
 
@@ -467,7 +549,7 @@ public final class TransitConnectionsPresenter
   {
     final TransitItinerary itinerary = getSelectedItinerary();
     if (itinerary != null)
-      mRouteDisplay.show(itinerary);
+      display(itinerary);
   }
 
   /** The selected connection, null in the list. */
@@ -477,7 +559,7 @@ public final class TransitConnectionsPresenter
     if (mSaved != null)
       return mSaved.getItinerary();
     final List<TransitItinerary> all = getAllItineraries();
-    return mSelected >= 0 && mSelected < all.size() ? all.get(mSelected) : null;
+    return mSelected >= 0 && mSelected < all.size() ? mChoices.current(all.get(mSelected)) : null;
   }
 
   public boolean hasQuery()
@@ -499,7 +581,7 @@ public final class TransitConnectionsPresenter
     final List<TransitItinerary> all = getAllItineraries();
     final List<ItineraryItem> items = new ArrayList<>(all.size());
     for (TransitItinerary itinerary : all)
-      items.add(mItems.itinerary(itinerary));
+      items.add(mItems.itinerary(itinerary, mChoices));
 
     final TransitItinerary selected = getSelectedItinerary();
     final boolean detail = selected != null;
@@ -508,7 +590,7 @@ public final class TransitConnectionsPresenter
       selectedItem = mItems.itinerary(mSaved.getItinerary());
     else if (detail)
       selectedItem = items.get(mSelected);
-    return new ConnectionsState(
+    final ConnectionsState state = new ConnectionsState(
         detail ? ConnectionsState.Screen.DETAIL : ConnectionsState.Screen.LIST, timeLabel, mArriveBy, mLoading,
         mLoadingEarlier, mLoadingLater, mError, mPagingError, items,
         !mLoading && mError == null && mPreviousCursor != null, !mLoading && mError == null && mNextCursor != null,
@@ -517,6 +599,29 @@ public final class TransitConnectionsPresenter
         mSaved != null && mSaved.isPast(now),
         detail ? mItems.getFormatter().formatDate(selected.getStartTime(), zoneOf(selected)) : null, now,
         label(mFromName), label(mToName), mSaved == null && TransitDateRange.isFarAhead(mTime, now));
+    state.mAlternatives = mSaved == null ? alternatives(all, detail) : null;
+    state.mCanChooseAlternatives = mSaved == null;
+    return state;
+  }
+
+  /** The open ride's alternatives; in the detail view only those of the shown connection. */
+  @Nullable
+  private AlternativesItem alternatives(@NonNull List<TransitItinerary> all, boolean detail)
+  {
+    final LegChoices.Session session = mChoices.getSession();
+    if (session == null)
+      return null;
+    for (int i = 0; i < all.size(); ++i)
+    {
+      final TransitItinerary original = all.get(i);
+      if (!TransitItemFactory.key(original).equals(session.getKey()))
+        continue;
+      if (detail && i != mSelected)
+        return null;
+      return mItems.alternatives(session, i, mChoices.current(original), mChoices.openLegIndex(original),
+                                 mChoices.selectedOption());
+    }
+    return null;
   }
 
   private void startQuery(boolean debounce)
@@ -534,7 +639,7 @@ public final class TransitConnectionsPresenter
     mLoading = true;
     mError = null;
     if (hadSelection)
-      mRouteDisplay.clear();
+      clearDisplay();
     render();
     if (debounce)
       mDebouncer.submit(() -> sendQuery(generation));
@@ -586,6 +691,7 @@ public final class TransitConnectionsPresenter
 
   private void resetResults()
   {
+    mChoices.reset();
     mItineraries.clear();
     mDirect.clear();
     mPreviousCursor = null;
@@ -705,6 +811,27 @@ public final class TransitConnectionsPresenter
   {
     final TransitProvider provider = currentProvider();
     return provider != null ? provider.getAttributionUrl() : null;
+  }
+
+  private void display(@NonNull TransitItinerary itinerary)
+  {
+    mDisplayed = itinerary;
+    mRouteDisplay.show(itinerary);
+  }
+
+  private void clearDisplay()
+  {
+    mDisplayed = null;
+    mRouteDisplay.clear();
+  }
+
+  /** A ride of a connection was changed or its alternatives changed. */
+  private void onChoicesChanged()
+  {
+    final TransitItinerary selected = getSelectedItinerary();
+    if (selected != null && selected != mDisplayed)
+      display(selected);
+    render();
   }
 
   private void render()

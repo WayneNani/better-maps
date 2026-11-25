@@ -79,6 +79,67 @@ public final class TransitItemFactory
         ItineraryTimeline.of(itinerary));
   }
 
+  /** A connection the user may have changed: the changed one with what was changed. */
+  @NonNull
+  public ItineraryItem itinerary(@NonNull TransitItinerary original, @NonNull LegChoices choices)
+  {
+    final LegChoices.Change change = choices.getChange(original);
+    final ItineraryItem item = itinerary(change != null ? change.getCurrent() : original);
+    if (change != null)
+      item.mChange = change(change);
+    return item;
+  }
+
+  @NonNull
+  ChangeItem change(@NonNull LegChoices.Change change)
+  {
+    final TransitItinerary current = change.getCurrent();
+    final TransitItinerary original = change.getOriginal();
+    final List<TransitLeg> legs = current.getLegs();
+    final String endZone = legs.get(legs.size() - 1).getTo().getTimeZone();
+    final long delay = Math.floorDiv(current.getEndTime().getEpochSecond() - original.getEndTime().getEpochSecond(), 60);
+    final TransitLeg missed = change.getMissedLeg();
+    return new ChangeItem(change.getRide().getPosition(), change.getRide().getNumber(), change.isReplanned(),
+                          missed != null ? missed.getLineName() : null,
+                          mFormatter.formatTime(current.getEndTime(), endZone), delay, change.getRestLegIndex());
+  }
+
+  /**
+   * The alternatives of the open ride.
+   *
+   * @param connection index of the connection in the list.
+   * @param shown the connection as shown (maybe changed).
+   * @param legIndex index of the open ride in {@code shown}.
+   * @param selected the option that {@code shown} uses.
+   */
+  @NonNull
+  public AlternativesItem alternatives(@NonNull LegChoices.Session session, int connection,
+                                       @NonNull TransitItinerary shown, int legIndex,
+                                       @Nullable LegAlternatives.Option selected)
+  {
+    final LegAlternatives.Ride ride = session.getRide();
+    final TransitLeg next = ride.getNextLeg();
+    final long transfer = ride.getTransferSeconds();
+    final List<AlternativesItem.Chip> chips = new ArrayList<>();
+    for (LegAlternatives.Option option : session.getOptions())
+    {
+      final TransitLeg leg = option.getRide();
+      final Long buffer = option.getBufferSeconds();
+      final List<TransitLeg> optionLegs = option.getLegs();
+      chips.add(new AlternativesItem.Chip(
+          mFormatter.formatTime(option.getDeparture(), leg.getFrom().getTimeZone()),
+          option.getDeparture().getEpochSecond(), badge(leg), option.getStatus(),
+          buffer == null ? 0 : Math.floorDiv(buffer, 60),
+          mFormatter.formatTime(option.getArrival(), optionLegs.get(optionLegs.size() - 1).getTo().getTimeZone()),
+          mFormatter.placeName(leg.getFrom()), option == selected, option.getKey().equals(session.getPendingKey()),
+          option.isCurrent()));
+    }
+    return new AlternativesItem(connection, legIndex, ride.getPosition(), ride.getNumber(),
+                                next != null ? next.getLineName() : null,
+                                next != null && transfer > 0 ? mFormatter.formatDuration(transfer) : null,
+                                session.isLoading(), session.getError(), chips, session.getRestError());
+  }
+
   /** Server id, or a key from times and lines for servers without ids. */
   @NonNull
   public static String key(@NonNull TransitItinerary itinerary)
