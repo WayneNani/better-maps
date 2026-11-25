@@ -71,6 +71,9 @@ compose() {
 # directory after the swap, so it has to be restarted in any case.
 swap_in_data() { # <dir with the new data>
   local next="$1" was_running=false c
+  # osrm-extract writes .fileIndex with mode 0700; make everything readable for a server that does not run as the
+  # owner (e.g. as nobody under rootful Podman), whoever wrote or copied the files.
+  chmod -R u+rwX,go+rX,go-w "$next"
   if [[ -z "${ROUTE_RESTART_CMD:-}" ]]; then
     for c in $(podman_cmd ps --filter name=bettermaps-route_osrm --format '{{.Names}}'); do
       if podman_cmd inspect "$c" --format '{{range .Mounts}}{{.Source}} {{end}}' | grep -qF "$OSRM_REGION_DIR/data "; then

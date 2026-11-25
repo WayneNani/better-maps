@@ -38,8 +38,6 @@ else
   cp -a "$src" "$next"
   rm -rf "$src"
 fi
-# Readable for the server container, whoever copied the files.
-chmod -R u+rwX,go+rX,go-w "$next"
 cp "$next/import-stats.txt" "$OSRM_REGION_DIR/import-stats.txt"
 { tr '\n' ' ' <"$next/import-stats.txt"; echo "installed=$(date -Iseconds)"; } >>"$OSRM_REGION_DIR/import-history.txt"
 swap_in_data "$next"
