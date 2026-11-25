@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: dark variants of values/colors_transit.xml. -->
+<resources>
+  <color name="transit_alt_area">#1A5EEAD4</color>
+  <color name="transit_alt_area_stroke">#405EEAD4</color>
+  <color name="transit_alt_chip">#FF32363A</color>
+  <color name="transit_alt_chip_missed">#FF2A2D31</color>
+  <color name="transit_alt_chip_stroke">#40FFFFFF</color>
+  <color name="transit_alt_ok">#FF9CCC65</color>
+  <color name="transit_alt_tight">#FFFFB74D</color>
+  <color name="transit_alt_banner">#FF3A2E1C</color>
+  <color name="transit_alt_banner_stroke">#FF7A5A2A</color>
+  <color name="transit_alt_banner_text">#FFFFDDB0</color>
+  <color name="transit_hint">#FFE3E7E6</color>
+  <color name="transit_hint_text">#FF1B1F1E</color>
+  <color name="transit_hint_text_secondary">#FF3E4846</color>
+  <color name="transit_hint_action">#FF0F766E</color>
+</resources>

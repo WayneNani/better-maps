@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- better-maps: the chosen departure misses the next ride; the rest of the connection was searched again. -->
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:layout_marginStart="@dimen/margin_base"
+  android:layout_marginTop="@dimen/margin_quarter"
+  android:layout_marginEnd="@dimen/margin_base"
+  android:layout_marginBottom="@dimen/margin_quarter"
+  android:background="@drawable/bg_transit_alt_banner"
+  android:gravity="center_vertical"
+  android:orientation="horizontal"
+  android:paddingStart="10dp"
+  android:paddingEnd="2dp">
+
+  <com.google.android.material.imageview.ShapeableImageView
+    android:layout_width="20dp"
+    android:layout_height="20dp"
+    android:importantForAccessibility="no"
+    app:srcCompat="@drawable/ic_transit_refresh"
+    app:tint="@color/transit_alt_banner_text" />
+
+  <com.google.android.material.textview.MaterialTextView
+    android:id="@+id/banner_text"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="10dp"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp"
+    android:layout_weight="1"
+    android:accessibilityLiveRegion="polite"
+    android:textAppearance="@style/MwmTextAppearance.Body4"
+    android:textColor="@color/transit_alt_banner_text"
+    tools:text="ICE 1022 no longer reachable · rest searched again, arrival 10:30 (+24 min)" />
+
+  <com.google.android.material.button.MaterialButton
+    android:id="@+id/banner_undo"
+    style="@style/Widget.Material3.Button.TextButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:minHeight="44dp"
+    android:text="@string/transit_alt_undo"
+    android:textAllCaps="false" />
+</LinearLayout>
